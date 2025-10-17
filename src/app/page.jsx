@@ -335,7 +335,7 @@ useEffect(() => {
 </div>
 
       {/* CENTER – Search (hidden on mobile) */}
-      <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+      <div className="hidden md:flex flex-1 max-w-xl mx-8">
         <div className="relative w-full">
           <input
             type="text"
@@ -589,7 +589,7 @@ useEffect(() => {
                   </div>
                   
                   <div className="p-5">
-                    <h3 className={`font-semibold text-base mb-1 ${COLORS.neutralHeading}`}>
+                 <h3 className={`font-semibold text-base mb-1 min-h-[3rem] flex items-start ${COLORS.neutralHeading}`}>
                       {campaign.title}
                     </h3>
                     <p className={`text-sm ${COLORS.neutralBody} mb-3`}>{campaign.org}</p>
