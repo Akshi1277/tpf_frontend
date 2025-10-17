@@ -633,9 +633,13 @@ useEffect(() => {
       </svg>
     </button>
     <button className="flex items-center gap-1 text-zinc-600 hover:text-emerald-600 transition-colors">
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-      </svg>
+      <Image
+        src="/share.svg"
+        alt="Share"
+        width={20}
+        height={20}
+        className="w-5 h-5 rotate-45"
+      />
     </button>
   </div>
   <div className="flex items-center gap-1 text-xs bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-full">
