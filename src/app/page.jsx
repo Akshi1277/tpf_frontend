@@ -55,6 +55,7 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, []);
 
+  
   useEffect(() => {
   localStorage.setItem('darkMode', JSON.stringify(darkMode));
 }, [darkMode]);
