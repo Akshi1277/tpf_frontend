@@ -516,64 +516,93 @@ useEffect(() => {
           </a>
 
           {/* Main menu items with icons */}
-          <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
-            {[
-              { name: 'Deeds', icon: '+', color: 'text-emerald-600' },
-              { name: 'Palestine', icon: '❤️', color: 'text-red-600' },
-              { name: 'Daily Givers', icon: '🟢', color: 'text-emerald-600' },
-              { name: 'Zakat', icon: '☪️', color: 'text-emerald-600' }
-            ].map(item => (
-              <a
-                key={item.name}
-                href="#"
-                className={`flex items-center gap-3 py-2 px-2 rounded-lg transition-colors
-                  ${darkMode
-                    ? 'text-zinc-300 hover:bg-zinc-800'
-                    : 'text-zinc-700 hover:bg-zinc-100'
-                  }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className={item.color}>{item.icon}</span>
-                <span>{item.name}</span>
-              </a>
-            ))}
-          </div>
+         <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
+  {[
+    { name: 'Deeds', icon: '/deeds.svg' },
+    { name: 'Palestine', icon: '/heart.svg' },
+    { name: 'Daily Givers', icon: '/leaf.svg' },
+    { name: 'Zakat', icon: '/zakkat.svg' }
+  ].map(item => (
+    <a
+      key={item.name}
+      href="#"
+      className={`flex items-center gap-3 py-2 px-2 rounded-lg transition-colors
+        ${darkMode
+          ? 'text-zinc-300 hover:bg-zinc-800'
+          : 'text-zinc-700 hover:bg-zinc-100'
+        }`}
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      <Image
+        src={item.icon}
+        alt={item.name}
+        width={20}
+        height={20}
+        className="w-5 h-5"
+      />
+      <span>{item.name}</span>
+    </a>
+  ))}
+</div>
 
           {/* Start section */}
-          <div>
-            <p className={`text-xs font-semibold mb-2 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-              START
-            </p>
-            <div className="space-y-1">
-              <a
-                href="#"
-                className={`flex items-center justify-between py-2 px-2 rounded-lg transition-colors
-                  ${darkMode
-                    ? 'text-zinc-300 hover:bg-zinc-800'
-                    : 'text-zinc-700 hover:bg-zinc-100'
-                  }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>✈️</span>
-                  <span>Start fundraising</span>
-                </div>
-                <span className="text-xs text-emerald-600 font-medium">0% platform fee!</span>
-              </a>
-              <a
-                href="#"
-                className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
-                  ${darkMode
-                    ? 'text-zinc-300 hover:bg-zinc-800'
-                    : 'text-zinc-700 hover:bg-zinc-100'
-                  }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span>👥</span>
-                <span>Start a community</span>
-              </a>
-            </div>
-          </div>
+        <div>
+  <p
+    className={`text-xs font-semibold mb-2 ${
+      darkMode ? "text-zinc-500" : "text-zinc-400"
+    }`}
+  >
+    START
+  </p>
+  <div className="space-y-1">
+    {/* Start Fundraising */}
+    <a
+      href="#"
+      className={`flex items-center justify-between py-2 px-2 rounded-lg transition-colors
+        ${
+          darkMode
+            ? "text-zinc-300 hover:bg-zinc-800"
+            : "text-zinc-700 hover:bg-zinc-100"
+        }`}
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      <div className="flex items-center gap-2">
+        <Image
+          src="/share.svg"
+          alt="Start Fundraising"
+          width={20}
+          height={20}
+          className="w-5 h-5"
+        />
+        <span>Start fundraising</span>
+      </div>
+      <span className="text-xs text-emerald-600 font-medium">
+        0% platform fee!
+      </span>
+    </a>
+
+    {/* Start Community */}
+    <a
+      href="#"
+      className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
+        ${
+          darkMode
+            ? "text-zinc-300 hover:bg-zinc-800"
+            : "text-zinc-700 hover:bg-zinc-100"
+        }`}
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      <Image
+        src="/community.svg"
+        alt="Start a community"
+        width={20}
+        height={20}
+        className="w-5 h-5"
+      />
+      <span>Start a community</span>
+    </a>
+  </div>
+</div>
 
           {/* Support */}
           <a
