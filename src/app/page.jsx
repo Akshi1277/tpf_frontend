@@ -503,7 +503,7 @@ useEffect(() => {
           {/* Discover link */}
           <a
             href="#"
-            className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
+            className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
               ${darkMode
                 ? 'text-zinc-300 hover:bg-zinc-800'
                 : 'text-zinc-700 hover:bg-zinc-100'
