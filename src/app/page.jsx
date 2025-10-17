@@ -447,44 +447,176 @@ useEffect(() => {
   </div>
 
   {/* Mobile menu dropdown */}
-  {mobileMenuOpen && (
-    <div
-      className={`border-t
-        ${darkMode
-          ? 'bg-zinc-900/95 border-zinc-800/50 backdrop-blur-md'
-          : 'bg-white/95 border-zinc-200/50 backdrop-blur-md'
-        }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-1">
-        <a
-          href="#"
-          className={`md:hidden block py-3 px-4 rounded-lg font-medium text-center transition-colors
-            ${darkMode
-              ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-              : 'bg-emerald-600 text-white hover:bg-emerald-700'
-            }`}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          Start fundraising
-        </a>
+{mobileMenuOpen && (
+  <>
+    {/* Backdrop overlay */}
+   <div 
+  className="fixed inset-0 z-40 flex items-start justify-end pr-8 pt-20"
+  onClick={() => setMobileMenuOpen(false)}
+>
+      {/* Modal popup */}
+      <div
+        className={`w-96 h-[33rem] max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden 
+          ${darkMode
+            ? 'bg-zinc-900'
+            : 'bg-white'
+          }`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Menu content */}
+       <div className="px-6 py-6 space-y-4 max-h-[80vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 
-        {['Campaigns', 'Curated', 'Partners', 'Pulse', 'Stories'].map(item => (
+          {/* Greeting */}
+          <div>
+            <p className={`text-xs font-semibold ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              SALAM!
+            </p>
+          </div>
+
+          {/* Search */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="I want to support..."
+              className={`w-full px-4 py-3 pl-10 rounded-xl border
+                ${darkMode
+                  ? 'bg-zinc-800 text-white placeholder-zinc-500 border-zinc-700'
+                  : 'bg-zinc-50 text-zinc-900 placeholder-zinc-400 border-zinc-200'
+                } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+            />
+            <svg
+              className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5
+                ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+
+          {/* Discover link */}
           <a
-            key={item}
-            href={`#${item.toLowerCase()}`}
-            className={`block py-3 px-4 rounded-lg text-sm transition-colors
+            href="#"
+            className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
               ${darkMode
-                ? 'text-zinc-300 hover:bg-zinc-800/50'
-                : 'text-zinc-700 hover:bg-zinc-100/50'
+                ? 'text-zinc-300 hover:bg-zinc-800'
+                : 'text-zinc-700 hover:bg-zinc-100'
+              }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Discover inspiring campaigns →</span>
+          </a>
+
+          {/* Main menu items with icons */}
+          <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
+            {[
+              { name: 'Deeds', icon: '+', color: 'text-emerald-600' },
+              { name: 'Palestine', icon: '❤️', color: 'text-red-600' },
+              { name: 'Daily Givers', icon: '🟢', color: 'text-emerald-600' },
+              { name: 'Zakat', icon: '☪️', color: 'text-emerald-600' }
+            ].map(item => (
+              <a
+                key={item.name}
+                href="#"
+                className={`flex items-center gap-3 py-2 px-2 rounded-lg transition-colors
+                  ${darkMode
+                    ? 'text-zinc-300 hover:bg-zinc-800'
+                    : 'text-zinc-700 hover:bg-zinc-100'
+                  }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className={item.color}>{item.icon}</span>
+                <span>{item.name}</span>
+              </a>
+            ))}
+          </div>
+
+          {/* Start section */}
+          <div>
+            <p className={`text-xs font-semibold mb-2 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              START
+            </p>
+            <div className="space-y-1">
+              <a
+                href="#"
+                className={`flex items-center justify-between py-2 px-2 rounded-lg transition-colors
+                  ${darkMode
+                    ? 'text-zinc-300 hover:bg-zinc-800'
+                    : 'text-zinc-700 hover:bg-zinc-100'
+                  }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <div className="flex items-center gap-2">
+                  <span>✈️</span>
+                  <span>Start fundraising</span>
+                </div>
+                <span className="text-xs text-emerald-600 font-medium">0% platform fee!</span>
+              </a>
+              <a
+                href="#"
+                className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
+                  ${darkMode
+                    ? 'text-zinc-300 hover:bg-zinc-800'
+                    : 'text-zinc-700 hover:bg-zinc-100'
+                  }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span>👥</span>
+                <span>Start a community</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Support */}
+          <a
+            href="#"
+            className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors border-t pt-3 border-zinc-200 dark:border-zinc-700
+              ${darkMode
+                ? 'text-zinc-300 hover:bg-zinc-800'
+                : 'text-zinc-700 hover:bg-zinc-100'
               }`}
             onClick={() => setMobileMenuOpen(false)}
           >
-            {item}
+            <span>🎧</span>
+            <span>Support</span>
           </a>
-        ))}
+
+          {/* Sign up / Log in */}
+          <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
+            <a
+              href="#"
+              className={`block text-center py-2 px-4 rounded-lg transition-colors
+                ${darkMode
+                  ? 'text-zinc-300 hover:bg-zinc-800'
+                  : 'text-zinc-700 hover:bg-zinc-100'
+                }`}
+            >
+              Sign up
+            </a>
+            <a
+              href="#"
+              className={`block text-center py-2 px-4 rounded-lg transition-colors
+                ${darkMode
+                  ? 'text-zinc-300 hover:bg-zinc-800'
+                  : 'text-zinc-700 hover:bg-zinc-100'
+                }`}
+            >
+              Log in
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-  )}
+  </>
+)}
 </header>
 
       {/* Hero Section */}
