@@ -7,7 +7,13 @@ export default function TPFAidMinimal() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [totalRaised, setTotalRaised] = useState(2547893);
   const [scrolled, setScrolled] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  }
+  return false;
+});
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [curatedScrollIndex, setCuratedScrollIndex] = useState(0);
@@ -48,6 +54,10 @@ useEffect(() => {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+  localStorage.setItem('darkMode', JSON.stringify(darkMode));
+}, [darkMode]);
 
   const campaigns = [
     {
