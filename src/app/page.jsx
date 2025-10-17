@@ -35,7 +35,7 @@ export default function TPFAidMinimal() {
     return () => clearInterval(interval);
   }, []);
 
-  // FIX: navbar stays transparent while scrolling
+  
 useEffect(() => {
   const onScroll = () => setScrolled(window.scrollY > 0);
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -179,7 +179,6 @@ const partners = [
     ? campaigns 
     : campaigns.filter(c => c.category === selectedCategory);
 
-  // Auto-scroll for campaigns on mobile
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
     if (!isMobile) return;
@@ -191,7 +190,6 @@ const partners = [
     return () => clearInterval(interval);
   }, [filteredCampaigns.length]);
 
-  // Auto-scroll for stories on mobile
  useEffect(() => {
   const checkAndScroll = () => {
     const isMobile = window.innerWidth < 768;
