@@ -7,10 +7,15 @@ export default function TPFAidMinimal() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [totalRaised, setTotalRaised] = useState(2547893);
   const [scrolled, setScrolled] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
+const [darkMode, setDarkMode] = useState(() => {
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
+    try {
+      const saved = localStorage.getItem('darkMode');
+      return saved ? JSON.parse(saved) : false;
+    } catch (error) {
+      console.error('localStorage not available:', error);
+      return false;
+    }
   }
   return false;
 });
@@ -55,9 +60,13 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, []);
 
-  
-  useEffect(() => {
-  localStorage.setItem('darkMode', JSON.stringify(darkMode));
+
+useEffect(() => {
+  try {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  } catch (error) {
+    console.error('Failed to save to localStorage:', error);
+  }
 }, [darkMode]);
 
   const campaigns = [
