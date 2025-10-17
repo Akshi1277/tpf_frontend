@@ -509,14 +509,14 @@ useEffect(() => {
                 : 'text-zinc-700 hover:bg-zinc-100'
               }`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>Discover inspiring campaigns →</span>
           </a>
 
           {/* Main menu items with icons */}
-         <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
+<div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
   {[
     { name: 'Deeds', icon: '/deeds.svg' },
     { name: 'Palestine', icon: '/heart.svg' },
@@ -526,7 +526,7 @@ useEffect(() => {
     <a
       key={item.name}
       href="#"
-      className={`flex items-center gap-3 py-2 px-2 rounded-lg transition-colors
+      className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
         ${darkMode
           ? 'text-zinc-300 hover:bg-zinc-800'
           : 'text-zinc-700 hover:bg-zinc-100'
@@ -538,15 +538,16 @@ useEffect(() => {
         alt={item.name}
         width={20}
         height={20}
-        className="w-5 h-5"
+        className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
       />
       <span>{item.name}</span>
     </a>
   ))}
 </div>
 
+
           {/* Start section */}
-        <div>
+<div>
   <p
     className={`text-xs font-semibold mb-2 ${
       darkMode ? "text-zinc-500" : "text-zinc-400"
@@ -558,7 +559,7 @@ useEffect(() => {
     {/* Start Fundraising */}
     <a
       href="#"
-      className={`flex items-center justify-between py-2 px-2 rounded-lg transition-colors
+      className={`group flex items-center justify-between py-2 px-2 rounded-lg transition-all duration-300
         ${
           darkMode
             ? "text-zinc-300 hover:bg-zinc-800"
@@ -572,7 +573,7 @@ useEffect(() => {
           alt="Start Fundraising"
           width={20}
           height={20}
-          className="w-5 h-5"
+          className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
         />
         <span>Start fundraising</span>
       </div>
@@ -584,7 +585,7 @@ useEffect(() => {
     {/* Start Community */}
     <a
       href="#"
-      className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
+      className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-all duration-300
         ${
           darkMode
             ? "text-zinc-300 hover:bg-zinc-800"
@@ -597,12 +598,13 @@ useEffect(() => {
         alt="Start a community"
         width={20}
         height={20}
-        className="w-5 h-5"
+        className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
       />
       <span>Start a community</span>
     </a>
   </div>
 </div>
+
 
           {/* Support */}
           <a
