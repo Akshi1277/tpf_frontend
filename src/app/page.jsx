@@ -322,16 +322,17 @@ useEffect(() => {
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="flex items-center justify-between h-16 gap-6">
       {/* LEFT – Logo */}
-      <div className="flex-shrink-0">
-        <Image
-          src="/TPFAid-Logo1.png"
-          alt="TPF Aid Logo"
-          width={120}
-          height={120}
-          priority
-          className="cursor-pointer"
-        />
-      </div>
+    {/* LEFT – Logo */}
+<div className="flex-shrink-0">
+  <Image
+    src={scrolled && !darkMode ? "/TPFAid-Logo.png" : "/TPFAid-Logo1.png"}
+    alt="TPF Aid Logo"
+    width={120}
+    height={120}
+    priority
+    className="cursor-pointer"
+  />
+</div>
 
       {/* CENTER – Search (hidden on mobile) */}
       <div className="hidden md:flex flex-1 max-w-2xl mx-8">

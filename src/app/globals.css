@@ -42,7 +42,7 @@
   --shadow-blur: 0px;
   --shadow-spread: 0px;
   --shadow-opacity: 1;
-  --shadow-color: #10b981;
+  --shadow-color: transparent;
 }
 
 .dark {
