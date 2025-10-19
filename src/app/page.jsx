@@ -687,18 +687,19 @@ useEffect(() => {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="max-w-2xl rounded-xl bg-white/90 backdrop-blur p-6">
-            <h1 className="text-3xl md:text-5xl font-semibold leading-tight text-zinc-900">
+          <div className="max-w-2xl rounded-xl bg-transparent p-6">
+            <h1 className="text-3xl md:text-5xl font-semibold leading-tight text-white">
               Rebuild shattered lives. Stand with Gaza.
             </h1>
-            <p className="mt-3 md:mt-4 text-base md:text-lg text-zinc-600">
-              TPF Aid mobilizes fast, transparent support to deliver urgent relief and long-term recovery for families in crisis.
+            <p className="mt-3 md:mt-4 text-base md:text-lg text-amber-300">
+              TPF Aid mobilizes fast, transparent support to deliver urgent relief and<br></br> 
+              long-term recovery for families in crisis.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <button className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
                 Send urgent aid
               </button>
-              <button className="px-6 py-3 border border-emerald-600 text-emerald-700 hover:bg-emerald-50 rounded-lg font-medium transition-colors">
+              <button className="px-6 py-3 border border-emerald-600 text-white hover:bg-emerald-50 rounded-lg font-medium transition-colors">
                 Discover campaigns
               </button>
             </div>
@@ -713,9 +714,9 @@ useEffect(() => {
             <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading}`}>
               Fundraising now
             </h2>
-            <a href="#" className="text-sm font-medium text-emerald-700 hover:underline">
+            <button href="#" className="text-sm font-medium bg-emerald-700 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
               Discover more
-            </a>
+            </button>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
