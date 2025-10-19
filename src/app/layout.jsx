@@ -7,10 +7,10 @@ const _geistMono = V0_Font_Geist_Mono({ subsets: ['latin'], weight: ["100","200"
 const _sourceSerif_4 = V0_Font_Source_Serif_4({ subsets: ['latin'], weight: ["200","300","400","500","600","700","800","900"] })
 
 export const metadata = {
-  title: 'TPF Aid',
-  description: 'TPF Aid | A Fundraising Website | Supporting Those In Need',
-  generator: '',
+  title: 'TPF Aid | A Fundraising Website | Supporting Those In Need',
+  description: 'Support those in need through transparent and trusted fundraising.',
 }
+
 
 export default function RootLayout({ children }) {
   return (

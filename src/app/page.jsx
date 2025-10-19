@@ -298,7 +298,7 @@ const partners = [
 
 const communities=[
   {
-    name: "Blood Communities", image: "https://openclipart.org/image/800px/154351"
+    name: "Blood Community", image: "https://openclipart.org/image/800px/154351"
   }
 ]
 
@@ -491,33 +491,60 @@ useEffect(() => {
 </div>
 
       {/* CENTER – Search (hidden on mobile) */}
-      <div className="hidden md:flex flex-1 max-w-xl mx-8">
-        <div className="relative w-full">
-          <input
-            type="text"
-            placeholder="Discover inspiring causes"
-            className={`w-full px-4 py-2 pl-10 rounded-full border
-              ${darkMode
-                ? 'bg-zinc-800/80 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-sm'
-                : 'bg-white/80 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-sm'
-              } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-          />
-          <svg
-            className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5
-              ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
-      </div>
+    <div className="hidden md:flex flex-1 max-w-xl mx-8">
+  <div className="relative w-full group">
+    {/* Animated background gradient */}
+    <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
+      ${darkMode 
+        ? 'bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-cyan-500/30' 
+        : 'bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20'
+      } animate-[pulse_3s_ease-in-out_infinite]`} 
+    />
+    
+    {/* Shimmer effect on focus */}
+    <div className="absolute inset-0 rounded-full overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
+      <div className={`absolute inset-0 -translate-x-full group-focus-within:translate-x-full transition-transform duration-[2000ms] ease-in-out
+        ${darkMode 
+          ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent' 
+          : 'bg-gradient-to-r from-transparent via-white/40 to-transparent'
+        }`} 
+      />
+    </div>
+
+    <input
+      type="text"
+      placeholder="Discover inspiring causes"
+      className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
+        ${darkMode
+          ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
+          : 'bg-white/90 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-md focus:bg-white focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.15),inset_0_1px_2px_rgba(16,185,129,0.1)]'
+        } focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:scale-[1.02] hover:border-emerald-400/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)]`}
+    />
+    
+    {/* Search icon with rotation animation */}
+    <svg
+      className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-all duration-500 group-focus-within:scale-110 group-focus-within:rotate-90 group-focus-within:text-emerald-500
+        ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+
+    {/* Particle effect dots */}
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-all duration-500 flex gap-1">
+      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0s'}} />
+      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.3s'}} />
+      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.6s'}} />
+    </div>
+  </div>
+</div>
 
       {/* RIGHT – Actions */}
       <div className="flex items-center gap-3">
@@ -807,49 +834,94 @@ useEffect(() => {
 </header>
 
       {/* Hero Section */}
-      <section className="relative pt-16">
-        <div className="absolute inset-0">
-          {heroImages.map((img, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                currentHeroImage === idx ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <img src={img} alt="" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-br from-zinc-900/70 via-zinc-800/60 to-emerald-900/50"></div>
-            </div>
-          ))}
-        </div>
+{/* Hero Section */}
+<section className="relative h-[600px] overflow-hidden">
+  <div className="absolute inset-0">
+    {heroImages.map((img, idx) => (
+      <div
+        key={idx}
+        className={`absolute inset-0 transition-opacity duration-1000 ${
+          idx === currentHeroImage ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <img
+          src={img}
+          alt={`Hero ${idx + 1}`}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
+      </div>
+    ))}
+  </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <div className="max-w-2xl rounded-xl bg-transparent p-6">
-            <h1 className="text-3xl md:text-5xl font-semibold leading-tight text-white">
-              Rebuild shattered lives. Stand with Gaza.
-            </h1>
-            <p className="mt-3 md:mt-4 text-base md:text-lg text-emerald-300">
-              TPF Aid mobilizes fast, transparent support to deliver urgent relief and<br></br> 
-              long-term recovery for families in crisis.
-            </p>
-            <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <button className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
-                Send urgent aid
-              </button>
-              <button className="px-6 py-3 border border-emerald-600 text-white hover:bg-emerald-50 rounded-lg font-medium transition-colors">
-                Discover campaigns
-              </button>
-            </div>
+  <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
+    <div className="max-w-2xl space-y-6">
+      <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight">
+        Make a difference in someone's life today
+      </h1>
+      <p className="text-xl text-zinc-200">
+        Join thousands of donors supporting causes that matter. Every contribution creates lasting impact.
+      </p>
+      <div className="flex flex-wrap gap-4">
+        <button className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-lg transition-colors shadow-lg">
+          Start Giving
+        </button>
+        <button className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors border-2
+          ${darkMode 
+            ? 'border-white text-white hover:bg-white/10' 
+            : 'border-white text-white hover:bg-white/20'
+          }`}>
+          Learn More
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Progress indicators */}
+  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+    {heroImages.map((_, idx) => (
+      <button
+        key={idx}
+        onClick={() => setCurrentHeroImage(idx)}
+        className={`h-1.5 rounded-full transition-all duration-300 ${
+          idx === currentHeroImage 
+            ? 'w-8 bg-emerald-500' 
+            : 'w-1.5 bg-white/50 hover:bg-white/75'
+        }`}
+      />
+    ))}
+  </div>
+</section>
+{/* Impact Stats Bar */}
+<section className={`py-12 border-b ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {[
+        { label: "Total Raised", value: currency(totalRaised) },
+        { label: "Active Campaigns", value: "150+" },
+        { label: "Lives Impacted", value: "50,000+" },
+        { label: "Partner NGOs", value: `${partners.length}` }
+      ].map((stat, idx) => (
+        <div key={idx} className="text-center">
+          <div className={`text-3xl md:text-4xl font-bold mb-2 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+            {stat.value}
+          </div>
+          <div className={`text-sm font-medium uppercase tracking-wider ${darkMode ? 'text-zinc-500' : 'text-zinc-600'}`}>
+            {stat.label}
           </div>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* Campaigns Section */}
-      <section id="campaigns" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+      <section id="campaigns" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading}`}>
-              Fundraising now
-            </h2>
+           <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+        Fundraising now
+      </h2>
             <button href="#" className="text-sm font-medium bg-emerald-700 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
               Discover more
             </button>
@@ -976,10 +1048,10 @@ useEffect(() => {
       </section>
 
       {/* Curated Section */}
- <section id="curated" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+ <section id="curated" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center mb-10">
-      <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
+     <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Curated for you
       </h2>
       <p className={`text-sm ${COLORS.neutralBody}`}>
@@ -990,34 +1062,33 @@ useEffect(() => {
       id="curated-container"
       className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
     >
-      {curatedItems.map((item, idx) => (
-        <button
-          key={idx}
-          className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[45vw] lg:w-[350px] snap-center group relative flex flex-col rounded-xl overflow-hidden transition-all duration-300 ${
-            darkMode ? 'bg-zinc-900' : 'bg-white'
-          } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
-        >
-          <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
-          
-          <div className="relative h-48 overflow-hidden w-full">
-            <img 
-              src={item.image} 
-              alt={item.label}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-          </div>
-
-          <div className="p-5">
-            <h3 className={`text-lg font-semibold mb-2 ${COLORS.neutralHeading} group-hover:text-emerald-600 transition-colors duration-300`}>
-              {item.label}
-            </h3>
-            <p className={`text-sm ${COLORS.neutralBody}`}>
-              {item.description}
-            </p>
-          </div>
-        </button>
-      ))}
+  {curatedItems.map((item, index) => (
+  <div
+    key={index}
+    className={`flex-shrink-0 w-[280px] snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
+      ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+      shadow-lg hover:shadow-2xl`}
+  >
+    <div className="relative h-48 overflow-hidden">
+      <img
+        src={item.image}
+        alt={item.label}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <h3 className="font-bold text-white text-lg mb-1">{item.label}</h3>
+        <p className="text-white/90 text-sm line-clamp-2">{item.description}</p>
+      </div>
+    </div>
+    <div className="p-4">
+      <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+        <span>Support Now</span>
+        <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+))}
     </div>
   </div>
 </section>
@@ -1086,12 +1157,12 @@ useEffect(() => {
         </div>
       </section> */}
 
-      <section id="communities" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+      <section id="communities" className={`py-12 border-b border-gray-300 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
-              Communities
-            </h2>
+         <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+        Communities
+      </h2>
             <p className={`text-sm ${COLORS.neutralBody}`}>
              Communities you would like to join
             </p>
@@ -1117,7 +1188,7 @@ useEffect(() => {
   />
 </div>
                 <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-                <button className='cursor-pointer mt-2 text-sm w-16 h-7 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
+                <button className='cursor-pointer mt-2 flex items-center gap-2 px-2 py-2 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
                   Donate
                 </button>
               </div>
@@ -1127,12 +1198,12 @@ useEffect(() => {
           </div>
         </div>
       </section>
-     <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+     <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
-              Trusted By
-            </h2>
+          <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+        Trusted By
+      </h2>
             <p className={`text-sm ${COLORS.neutralBody}`}>
               Trusted partners we collaborate with to deliver impact
             </p>
@@ -1162,12 +1233,12 @@ useEffect(() => {
       </section>
 
       {/* Pulse Section */}
-      <section id="pulse" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+      <section id="pulse" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
-              Pulse of the Ummah
-            </h2>
+           <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+        Pulse of the Ummah
+      </h2>
             <p className={`text-sm ${COLORS.neutralBody}`}>
               Live generosity snapshot
             </p>
@@ -1211,7 +1282,7 @@ useEffect(() => {
       </section>
 
       {/* Stories Section */}
-      <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+      <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
             Impact stories
@@ -1254,110 +1325,138 @@ useEffect(() => {
         </div>
       </section>
 
+      {/* Newsletter Section */}
+<section className={`py-16 ${darkMode ? 'bg-gradient-to-br from-emerald-900 to-zinc-900' : 'bg-gradient-to-br from-emerald-600 to-emerald-700'}`}>
+  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20">
+      <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        Stay Updated on Our Impact
+      </h2>
+      <p className="text-white/90 text-lg mb-8">
+        Get weekly stories of hope, campaign updates, and ways to make a difference
+      </p>
+      <form className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+        <input
+          type="email"
+          placeholder="Enter your email address"
+          value={newsletterEmail}
+          onChange={(e) => setNewsletterEmail(e.target.value)}
+          className="flex-1 px-6 py-4 rounded-xl border-2 border-white/30 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-sm"
+        />
+        <button
+          type="submit"
+          className="px-8 py-4 bg-white text-emerald-600 rounded-xl font-bold hover:bg-zinc-100 transition-colors whitespace-nowrap"
+        >
+          Subscribe
+        </button>
+      </form>
+      <p className="text-white/70 text-sm mt-4">
+        Join 10,000+ subscribers. Unsubscribe anytime.
+      </p>
+    </div>
+  </div>
+</section>
+
       {/* Footer */}
-      <footer className={`py-12 border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
-            {/* Logo and Tagline */}
-            <div className="md:col-span-1">
-            <Image
-  src={darkMode ? "/TPFAid-Logo1.png" : "/TPFAid-Logo.png"}
-  alt="TPF Aid Logo"
-  width={160}
-  height={160}
-  priority
-  className="cursor-pointer mb-4"
-/>
-              <p className={`text-sm font-semibold ${darkMode ? 'text-zinc-400' : 'text-gray-600'} leading-relaxed`}>
-                Making a difference through community-funded projects and transparent impact.
-              </p>
-            </div>
-
-            {/* About TPF */}
-            <div>
-              <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>About TPF</div>
-              <ul className="space-y-2.5 text-sm">
-                {['About us', 
-	'Our Mission', 
-	'Our Team',
-	'FAQs'
-].map(item => (
-                  <li key={item}>
-                    <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* What We Do */}
-            <div>
-              <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>What We Do</div>
-              <ul className="space-y-2.5 text-sm">
-                {['Social Services', 'TPF School', 'TPF Hospital', 'TPF Dawah Centre', 'Future Projects'].map(item => (
-                  <li key={item}>
-                    <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Get Involved */}
-            <div>
-              <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Get Involved</div>
-              <ul className="space-y-2.5 text-sm">
-                {['Careers', 
-'Join TPF Aid', 
-'Volunteer Now', 
-'TPF Aid in News', 
-'Blog', 
-'Notices'
-].map(item => (
-                  <li key={item}>
-                    <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Legal & Help */}
-            <div>
-              <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Legal & Help</div>
-              <ul className="space-y-2.5 text-sm">
-                {['Contact Us', 'Request a Feature', 'Complaints', 'Help Centre', 'Our Legal Status', 'Privacy Policies'].map(item => (
-                  <li key={item}>
-                    <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+   <footer className={`py-12 border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+      {/* Logo and Tagline */}
+      <div className="md:col-span-1">
+        <Image
+          src={darkMode ? "/TPFAid-Logo1.png" : "/TPFAid-Logo.png"}
+          alt="TPF Aid Logo"
+          width={160}
+          height={160}
+          priority
+          className="cursor-pointer mb-4"
+        />
+        <p className={`text-sm font-semibold ${darkMode ? 'text-zinc-400' : 'text-gray-600'} leading-relaxed`}>
+          Making a difference through community-funded projects and transparent impact.
+        </p>
+      </div>
+      {/* About TPF */}
+      <div>
+        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>About TPF</div>
+        <ul className="space-y-2.5 text-sm mb-6">
+          {['About us', 'Our Mission', 'Our Team', 'FAQs'].map(item => (
+            <li key={item}>
+              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                {item}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a 
+          href="#" 
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            darkMode 
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+          }`}
+        >
+          What We Do
+          <ArrowRight className="w-4 h-4" />
+        </a>
+      </div>
+      {/* Get Involved */}
+      <div>
+        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Get Involved</div>
+        <ul className="space-y-2.5 text-sm">
+          {['Careers', 'Join TPF Aid', 'Volunteer Now', 'TPF Aid in News', 'Blog', 'Notices'].map(item => (
+            <li key={item}>
+              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                {item}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* Legal & Help */}
+      <div>
+        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Legal & Help</div>
+        <ul className="space-y-2.5 text-sm">
+          {['Contact Us', 'Request a Feature', 'Complaints', 'Help Centre', 'Our Legal Status', 'Privacy Policies'].map(item => (
+            <li key={item}>
+              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                {item}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
 
           {/* Islamic Calendar */}
-<div className={`mb-6 py-4 px-4 border-t border-b ${darkMode ? 'border-zinc-700' : 'border-zinc-300'}`}>
-  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm">
-    <div className="flex items-center gap-2">
-      <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+<div
+  className={`mb-6 py-4 px-4 border-t border-b ${
+    darkMode ? 'border-zinc-700' : 'border-zinc-300'
+  }`}
+>
+  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm text-center sm:text-left">
+    <div className="flex flex-col sm:flex-row items-center gap-2 flex-wrap justify-center sm:justify-start">
+      <span
+        className={`font-semibold ${
+          darkMode ? 'text-white' : 'text-gray-800'
+        }`}
+      >
         Today's Date:
       </span>
-    <span className={`${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
- {hijriFromApi || "..."}
-</span>
-
+      <span
+        className={`${
+          darkMode ? 'text-zinc-300' : 'text-gray-700'
+        } break-words`}
+      >
+        {hijriFromApi || '...'}
+      </span>
     </div>
   </div>
 </div>
 
 
+
           {/* Bottom Bar */}
-          <div className={`pt-6 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-300'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
+          <div className={`pt-6 flex flex-col sm:flex-row items-center justify-between gap-4`}>
             <span className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
               © {new Date().getFullYear()} True Path Foundation. All rights reserved.
             </span>
