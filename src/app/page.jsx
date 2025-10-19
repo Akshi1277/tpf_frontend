@@ -1345,7 +1345,7 @@ useEffect(() => {
   <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm">
     <div className="flex items-center gap-2">
       <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-        Today's Islamic Date:
+        Today's Date:
       </span>
     <span className={`${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
  {hijriFromApi || "..."}
