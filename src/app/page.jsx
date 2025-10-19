@@ -129,35 +129,70 @@ useEffect(() => {
 
   const curatedItems = [
   { 
-    label: "Feed the hungry", 
+    label: "Daily Giver", 
     image: "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=800",
     description: "Help provide meals to those in need"
   },
   { 
-    label: "Provide clean water", 
+    label: "Donate Weekly (Friday) ", 
     image: "https://media.istockphoto.com/id/600999260/photo/hands-of-poor-african-children-asking-for-drinking-water.webp?a=1&b=1&s=612x612&w=0&k=20&c=Ev7WU39mC-XPkcsfhRBRJv6cKSeEsR01-yrcuQYUa_0=",
     description: "Bring fresh water to communities"
   },
   { 
-    label: "Send Gaza aid", 
+    label: "Donate Monthly", 
     image: "https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=800",
     description: "Support humanitarian relief efforts"
   },
   { 
-    label: "Emergency aid", 
+    label: "Donate Your Zakat", 
     image: "https://plus.unsplash.com/premium_photo-1663091439138-cc1e9307ff4e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZW1lcmdlbmN5JTIwYWlkfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
     description: "Respond to urgent crisis situations"
   },
   { 
-    label: "Support orphans", 
+    label: "Discover Fundraiser", 
     image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
     description: "Give children a brighter future"
   },
   { 
-    label: "Education", 
-    image: "https://plus.unsplash.com/premium_photo-1661501762981-b30750d3e50c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cHJvdmlkZSUyMGVkdWNhdGlvbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
+    label: "Donate in Emergency Funds", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
     description: "Empower through learning"
-  }
+  },
+   { 
+    label: "Eid Kits(Eid-al-Fitr)", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Legal Aid for the Voiceless", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Shelter and Home Support ", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Financial Emergency Aid ", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Global Muslim Crisis Support ", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Assistance for Marginalized Communities", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Community Development", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
 ];
 
 const partners = [
@@ -691,7 +726,7 @@ useEffect(() => {
             <h1 className="text-3xl md:text-5xl font-semibold leading-tight text-white">
               Rebuild shattered lives. Stand with Gaza.
             </h1>
-            <p className="mt-3 md:mt-4 text-base md:text-lg text-amber-300">
+            <p className="mt-3 md:mt-4 text-base md:text-lg text-emerald-300">
               TPF Aid mobilizes fast, transparent support to deliver urgent relief and<br></br> 
               long-term recovery for families in crisis.
             </p>
@@ -917,6 +952,41 @@ useEffect(() => {
       </section>
 
       {/* Partners Section */}
+
+      {/* <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
+              Inspiring organizations
+            </h2>
+            <p className={`text-sm ${COLORS.neutralBody}`}>
+              Trusted partners we collaborate with to deliver impact
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5">
+            {partners.map((partner, idx) => (
+            <div 
+  key={idx}
+  className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
+    darkMode ? 'bg-zinc-900' : 'bg-white'
+  } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
+>
+                <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+               <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+  <img 
+    src={partner.image}
+    alt={partner.name}
+    className="w-full h-full object-cover"
+  />
+</div>
+                <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section> */}
+
       <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
