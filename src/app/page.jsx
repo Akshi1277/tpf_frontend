@@ -7,6 +7,9 @@ import HijriDate from "hijri-date";
 
 
 export default function TPFAidMinimal() {
+
+
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hijriFromApi, setHijriFromApi] = useState(null);
 
@@ -50,6 +53,17 @@ const [darkMode, setDarkMode] = useState(() => {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+  const link = document.createElement('link');
+  link.href = 'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap';
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+  
+  return () => {
+    document.head.removeChild(link);
+  };
+}, []);
 
 useEffect(() => {
   async function fetchHijri() {
@@ -424,27 +438,30 @@ useEffect(() => {
   };
 
   return (
-    <div className={`min-h-screen font-sans ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-      <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        @keyframes pulse-glow {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-          }
-          50% {
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
-          }
-        }
-        .pulse-glow {
-          animation: pulse-glow 3s ease-in-out infinite;
-        }
-      `}</style>
+<div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+     <style jsx global>{`
+  * {
+    font-family: 'Amiri', serif !important;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
+    }
+  }
+  .pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+`}</style>
 
 
 <header
