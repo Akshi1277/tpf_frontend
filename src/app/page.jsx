@@ -12,7 +12,7 @@ export default function TPFAidMinimal() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hijriFromApi, setHijriFromApi] = useState(null);
-
+const [isMobile, setIsMobile] = useState(false);
   const [totalRaised, setTotalRaised] = useState(2547893);
   const [scrolled, setScrolled] = useState(false);
 const [darkMode, setDarkMode] = useState(() => {
@@ -34,6 +34,147 @@ const [darkMode, setDarkMode] = useState(() => {
   const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
   const [storyScrollIndex, setStoryScrollIndex] = useState(0);
 
+    const campaigns = [
+    {
+      id: 1,
+      title: "Emergency Relief for Families in Gaza",
+      category: "emergency",
+      image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
+      raised: 45627,
+      goal: 75000,
+      donors: 342,
+      org: "Global Family Aid",
+      verified: true,
+      urgent: true
+    },
+    {
+      id: 2,
+      title: "Medical Supplies for Field Clinics",
+      category: "medical",
+      image: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80",
+      raised: 32450,
+      goal: 50000,
+      donors: 198,
+      org: "Seed Charity",
+      verified: true
+    },
+    {
+      id: 3,
+      title: "Safe Housing for Displaced Orphans",
+      category: "orphans",
+      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+      raised: 28900,
+      goal: 40000,
+      donors: 267,
+      org: "Together Organization",
+      verified: true
+    },
+    {
+      id: 4,
+      title: "School Kits for Children",
+      category: "education",
+      image: "https://images.unsplash.com/photo-1541844053589-346841d0b34c?w=800&q=80",
+      raised: 18750,
+      goal: 30000,
+      donors: 156,
+      org: "TPF Aid Education",
+      verified: true,
+      urgent: true
+    }
+  ];
+
+   const successStories = [
+    {
+      title: "Your donations delivered winter kits to 1,200 families",
+      image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80",
+      excerpt: "Blankets, heaters, and fuel vouchers have reached those most in need."
+    },
+    {
+      title: "A new water point is serving 3,000 daily",
+      image: "https://images.unsplash.com/photo-1541844053589-346841d0b34c?w=800&q=80",
+      excerpt: "Clean, safe water is now accessible within walking distance."
+    },
+    {
+      title: "School-in-a-box restarted classes in the camps",
+      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+      excerpt: "Portable school kits brought structured learning back to children."
+    }
+  ];
+
+   const curatedItems = [
+  { 
+    label: "Daily Giver", 
+    image: "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=800",
+    description: "Help provide meals to those in need"
+  },
+  { 
+    label: "Donate Weekly (Friday) ", 
+    image: "https://media.istockphoto.com/id/600999260/photo/hands-of-poor-african-children-asking-for-drinking-water.webp?a=1&b=1&s=612x612&w=0&k=20&c=Ev7WU39mC-XPkcsfhRBRJv6cKSeEsR01-yrcuQYUa_0=",
+    description: "Bring fresh water to communities"
+  },
+  { 
+    label: "Donate Monthly", 
+    image: "https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=800",
+    description: "Support humanitarian relief efforts"
+  },
+  { 
+    label: "Donate Your Zakat", 
+    image: "https://plus.unsplash.com/premium_photo-1663091439138-cc1e9307ff4e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZW1lcmdlbmN5JTIwYWlkfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
+    description: "Respond to urgent crisis situations"
+  },
+  { 
+    label: "Discover Fundraiser", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+  { 
+    label: "Donate in Emergency Funds", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Empower through learning"
+  },
+   { 
+    label: "Eid Kits(Eid-al-Fitr)", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Legal Aid for the Voiceless", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Shelter and Home Support ", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Financial Emergency Aid ", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Global Muslim Crisis Support ", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Assistance for Marginalized Communities", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+   { 
+    label: "Community Development", 
+    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    description: "Give children a brighter future"
+  },
+];
+
+  const filteredCampaigns = selectedCategory === 'all' 
+    ? campaigns 
+    : campaigns.filter(c => c.category === selectedCategory);
+  // Duplicate arrays for infinite scroll effect
+
+
   const COLORS = {
     primary: "bg-emerald-600",
     primaryText: "text-emerald-600",
@@ -46,6 +187,11 @@ const [darkMode, setDarkMode] = useState(() => {
     "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&q=80",
     "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1200&q=80"
   ];
+
+  // Duplicate arrays for infinite scroll effect
+const infiniteCampaigns = [...filteredCampaigns, ...filteredCampaigns];
+const infiniteStories = [...successStories, ...successStories];
+const infiniteCurated = [...curatedItems, ...curatedItems];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,6 +212,17 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+  
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  
+  return () => window.removeEventListener('resize', checkMobile);
+}, []);
+
+useEffect(() => {
   async function fetchHijri() {
     try {
       const today = new Date();
@@ -77,7 +234,6 @@ useEffect(() => {
       const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
       const json = await res.json();
 
-      console.log("ALADHAN RESPONSE:", json);
 
       const hijri = json?.data?.hijri;
       const greg = json?.data?.gregorian;
@@ -160,54 +316,7 @@ const hijriFormatted = `${hijriMonths[h.getMonth()]} ${h.getDate()}, ${h.getFull
     day: 'numeric'
   });
 
-  const campaigns = [
-    {
-      id: 1,
-      title: "Emergency Relief for Families in Gaza",
-      category: "emergency",
-      image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
-      raised: 45627,
-      goal: 75000,
-      donors: 342,
-      org: "Global Family Aid",
-      verified: true,
-      urgent: true
-    },
-    {
-      id: 2,
-      title: "Medical Supplies for Field Clinics",
-      category: "medical",
-      image: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80",
-      raised: 32450,
-      goal: 50000,
-      donors: 198,
-      org: "Seed Charity",
-      verified: true
-    },
-    {
-      id: 3,
-      title: "Safe Housing for Displaced Orphans",
-      category: "orphans",
-      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
-      raised: 28900,
-      goal: 40000,
-      donors: 267,
-      org: "Together Organization",
-      verified: true
-    },
-    {
-      id: 4,
-      title: "School Kits for Children",
-      category: "education",
-      image: "https://images.unsplash.com/photo-1541844053589-346841d0b34c?w=800&q=80",
-      raised: 18750,
-      goal: 30000,
-      donors: 156,
-      org: "TPF Aid Education",
-      verified: true,
-      urgent: true
-    }
-  ];
+ 
 
   const categories = [
     { key: "all", label: "All" },
@@ -218,73 +327,7 @@ const hijriFormatted = `${hijriMonths[h.getMonth()]} ${h.getDate()}, ${h.getFull
     { key: "water", label: "Clean Water"}
   ];
 
-  const curatedItems = [
-  { 
-    label: "Daily Giver", 
-    image: "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=800",
-    description: "Help provide meals to those in need"
-  },
-  { 
-    label: "Donate Weekly (Friday) ", 
-    image: "https://media.istockphoto.com/id/600999260/photo/hands-of-poor-african-children-asking-for-drinking-water.webp?a=1&b=1&s=612x612&w=0&k=20&c=Ev7WU39mC-XPkcsfhRBRJv6cKSeEsR01-yrcuQYUa_0=",
-    description: "Bring fresh water to communities"
-  },
-  { 
-    label: "Donate Monthly", 
-    image: "https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=800",
-    description: "Support humanitarian relief efforts"
-  },
-  { 
-    label: "Donate Your Zakat", 
-    image: "https://plus.unsplash.com/premium_photo-1663091439138-cc1e9307ff4e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZW1lcmdlbmN5JTIwYWlkfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
-    description: "Respond to urgent crisis situations"
-  },
-  { 
-    label: "Discover Fundraiser", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-  { 
-    label: "Donate in Emergency Funds", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Empower through learning"
-  },
-   { 
-    label: "Eid Kits(Eid-al-Fitr)", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-   { 
-    label: "Legal Aid for the Voiceless", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-   { 
-    label: "Shelter and Home Support ", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-   { 
-    label: "Financial Emergency Aid ", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-   { 
-    label: "Global Muslim Crisis Support ", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-   { 
-    label: "Assistance for Marginalized Communities", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-   { 
-    label: "Community Development", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
-    description: "Give children a brighter future"
-  },
-];
+ 
 
 const partners = [
    { name: "Seed Charity", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2Ff0e211f4eed743b9a70fe6b4b6001b85?format=webp&width=2000" },
@@ -310,124 +353,150 @@ const communities=[
     { name: "Yusuf M.", amount: 750, time: "15 min ago" }
   ];
 
-  const successStories = [
-    {
-      title: "Your donations delivered winter kits to 1,200 families",
-      image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80",
-      excerpt: "Blankets, heaters, and fuel vouchers have reached those most in need."
-    },
-    {
-      title: "A new water point is serving 3,000 daily",
-      image: "https://images.unsplash.com/photo-1541844053589-346841d0b34c?w=800&q=80",
-      excerpt: "Clean, safe water is now accessible within walking distance."
-    },
-    {
-      title: "School-in-a-box restarted classes in the camps",
-      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
-      excerpt: "Portable school kits brought structured learning back to children."
-    }
-  ];
+ 
 
-  const filteredCampaigns = selectedCategory === 'all' 
-    ? campaigns 
-    : campaigns.filter(c => c.category === selectedCategory);
 
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) return;
 
-    const interval = setInterval(() => {
-      setCampaignScrollIndex(prev => (prev + 1) % filteredCampaigns.length);
-    }, 4000);
+ // Auto-scroll campaigns
 
-    return () => clearInterval(interval);
-  }, [filteredCampaigns.length]);
 
- useEffect(() => {
-  const checkAndScroll = () => {
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) return null;
+// Scroll campaigns with infinite effect
 
-    const interval = setInterval(() => {
-      setStoryScrollIndex(prev => (prev + 1) % successStories.length);
-    }, 4000);
 
-    return interval;
-  };
+// Auto-scroll stories
 
-  const interval = checkAndScroll();
-  return () => {
-    if (interval) clearInterval(interval);
-  };
-}, [successStories.length]);
+// Scroll stories with infinite effect
+
 
   // Scroll campaigns on mobile
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) return;
-
-    const container = document.getElementById('campaigns-container');
-    if (container) {
-      const cardWidth = container.scrollWidth / filteredCampaigns.length;
-      container.scrollTo({
-        left: cardWidth * campaignScrollIndex,
-        behavior: 'smooth'
-      });
-    }
-  }, [campaignScrollIndex, filteredCampaigns.length]);
+ 
 
   // Scroll stories on mobile
- useEffect(() => {
-  const scrollStories = () => {
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) return;
 
-    const container = document.getElementById('stories-container');
-    if (container && container.scrollWidth > 0) {
-      const cardWidth = container.scrollWidth / successStories.length;
-      container.scrollTo({
-        left: cardWidth * storyScrollIndex,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  // Small delay to ensure DOM is ready
-  const timer = setTimeout(scrollStories, 100);
-  return () => clearTimeout(timer);
-}, [storyScrollIndex, successStories.length]);
 
 // Auto-scroll for curated on mobile
+// Auto-scroll curated
+
+// Scroll curated with infinite effect
+
+
+// Scroll curated on mobile
+
+
+// Auto-scroll for campaigns (mobile only)
 useEffect(() => {
-  const isMobile = window.innerWidth < 768;
   if (!isMobile) return;
 
   const interval = setInterval(() => {
-    setCuratedScrollIndex(prev => (prev + 1) % curatedItems.length);
+    setCampaignScrollIndex(prev => prev + 1);
   }, 4000);
 
   return () => clearInterval(interval);
-}, [curatedItems.length]);
+}, [isMobile]);
 
-// Scroll curated on mobile
+// Scroll campaigns container
 useEffect(() => {
-  const scrollCurated = () => {
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) return;
+  if (!isMobile) return;
 
-    const container = document.getElementById('curated-container');
-    if (container && container.scrollWidth > 0) {
-      const cardWidth = container.scrollWidth / curatedItems.length;
+  const container = document.getElementById('campaigns-container');
+  if (!container) return;
+
+  const cardWidth = container.offsetWidth;
+  const actualIndex = campaignScrollIndex % filteredCampaigns.length;
+  const scrollTo = cardWidth * campaignScrollIndex;
+  
+  container.scrollTo({
+    left: scrollTo,
+    behavior: 'smooth'
+  });
+
+  // Reset to beginning without animation when reaching the end
+  if (campaignScrollIndex >= filteredCampaigns.length) {
+    setTimeout(() => {
       container.scrollTo({
-        left: cardWidth * curatedScrollIndex,
-        behavior: 'smooth'
+        left: 0,
+        behavior: 'auto' // instant, no animation
       });
-    }
-  };
+      setCampaignScrollIndex(0);
+    }, 500); // after smooth scroll completes
+  }
+}, [campaignScrollIndex, isMobile, filteredCampaigns.length]);
 
-  const timer = setTimeout(scrollCurated, 100);
-  return () => clearTimeout(timer);
-}, [curatedScrollIndex, curatedItems.length]);
+// Auto-scroll for stories (mobile only)
+useEffect(() => {
+  if (!isMobile) return;
+
+  const interval = setInterval(() => {
+    setStoryScrollIndex(prev => prev + 1);
+  }, 4000);
+
+  return () => clearInterval(interval);
+}, [isMobile]);
+
+// Scroll stories container
+useEffect(() => {
+  if (!isMobile) return;
+
+  const container = document.getElementById('stories-container');
+  if (!container) return;
+
+  const cardWidth = container.offsetWidth;
+  const scrollTo = cardWidth * storyScrollIndex;
+  
+  container.scrollTo({
+    left: scrollTo,
+    behavior: 'smooth'
+  });
+
+  // Reset to beginning without animation
+  if (storyScrollIndex >= successStories.length) {
+    setTimeout(() => {
+      container.scrollTo({
+        left: 0,
+        behavior: 'auto'
+      });
+      setStoryScrollIndex(0);
+    }, 500);
+  }
+}, [storyScrollIndex, isMobile, successStories.length]);
+
+// Auto-scroll for curated (mobile only)
+useEffect(() => {
+  if (!isMobile) return;
+
+  const interval = setInterval(() => {
+    setCuratedScrollIndex(prev => prev + 1);
+  }, 4000);
+
+  return () => clearInterval(interval);
+}, [isMobile]);
+
+// Scroll curated container
+useEffect(() => {
+  if (!isMobile) return;
+
+  const container = document.getElementById('curated-container');
+  if (!container) return;
+
+  const cardWidth = container.offsetWidth;
+  const scrollTo = cardWidth * curatedScrollIndex;
+  
+  container.scrollTo({
+    left: scrollTo,
+    behavior: 'smooth'
+  });
+
+  // Reset to beginning without animation
+  if (curatedScrollIndex >= curatedItems.length) {
+    setTimeout(() => {
+      container.scrollTo({
+        left: 0,
+        behavior: 'auto'
+      });
+      setCuratedScrollIndex(0);
+    }, 500);
+  }
+}, [curatedScrollIndex, isMobile, curatedItems.length]);
 
   const currency = (amount) => {
     return new Intl.NumberFormat("en-IN", { 
@@ -837,16 +906,16 @@ useEffect(() => {
 
 <section className="relative h-[500px] md:h-[600px] overflow-hidden">
   <div className="absolute inset-0">
-    {heroImages.map((img, idx) => (
+    {heroImages.map((img, index) => (
       <div
-        key={idx}
+        key={index}
         className={`absolute inset-0 transition-opacity duration-1000 ${
-          idx === currentHeroImage ? 'opacity-100' : 'opacity-0'
+          index === currentHeroImage ? 'opacity-100' : 'opacity-0'
         }`}
       >
         <img
           src={img}
-          alt={`Hero ${idx + 1}`}
+          alt={`Hero ${index + 1}`}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40 md:from-black/70 md:via-black/50 md:to-transparent"></div>
@@ -879,16 +948,16 @@ useEffect(() => {
 
   {/* Progress indicators */}
   <div className="absolute bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
-    {heroImages.map((_, idx) => (
+    {heroImages.map((_, index) => (
       <button
-        key={idx}
-        onClick={() => setCurrentHeroImage(idx)}
+        key={index}
+        onClick={() => setCurrentHeroImage(index)}
         className={`h-1.5 rounded-full transition-all duration-300 ${
-          idx === currentHeroImage 
+          index === currentHeroImage 
             ? 'w-8 bg-emerald-500' 
             : 'w-1.5 bg-white/50 hover:bg-white/75'
         }`}
-        aria-label={`Go to slide ${idx + 1}`}
+        aria-label={`Go to slide ${index + 1}`}
       />
     ))}
   </div>
@@ -902,8 +971,8 @@ useEffect(() => {
         { label: "Active Campaigns", value: "150+" },
         { label: "Lives Impacted", value: "50,000+" },
         { label: "Partner NGOs", value: `${partners.length}` }
-      ].map((stat, idx) => (
-        <div key={idx} className="text-center">
+      ].map((stat, index) => (
+        <div key={index} className="text-center">
           <div className={`text-3xl md:text-4xl font-bold mb-2 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
             {stat.value}
           </div>
@@ -948,19 +1017,20 @@ useEffect(() => {
             })}
           </div>
 
-          <div 
-            id="campaigns-container"
-            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible"
-          >
-            {filteredCampaigns.map((campaign) => {
-              const progress = Math.min(100, Math.round((campaign.raised / campaign.goal) * 100));
-              return (
-                <div 
-                  key={campaign.id}
-                  className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
-                    ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-                    shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
-                >
+<div 
+  id="campaigns-container"
+  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible"
+>
+ {(isMobile ? infiniteCampaigns : filteredCampaigns).map((campaign, index) => {
+
+    const progress = Math.min(100, Math.round((campaign.raised / campaign.goal) * 100));
+    return (
+      <div 
+        key={`campaign-${campaign.id}-${index}`}  // Changed this line
+        className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+          ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+          shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
+      >
                   <div className="relative aspect-video">
                     <img
                       src={campaign.image}
@@ -1059,17 +1129,17 @@ useEffect(() => {
         Explore causes that matter most to our community
       </p>
     </div>
-    <div 
-      id="curated-container"
-      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+<div 
+  id="curated-container"
+  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+>
+  {(isMobile ? infiniteCurated : curatedItems).map((item, index) => (
+    <div
+      key={`curated-${index}`}  // Changed from just `index` to `curated-${index}`
+      className={`flex-shrink-0 w-[280px] snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
+        ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+        shadow-lg hover:shadow-2xl`}
     >
-  {curatedItems.map((item, index) => (
-  <div
-    key={index}
-    className={`flex-shrink-0 w-[280px] snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
-      ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-      shadow-lg hover:shadow-2xl`}
-  >
     <div className="relative h-48 overflow-hidden">
       <img
         src={item.image}
@@ -1136,9 +1206,9 @@ useEffect(() => {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5">
-            {partners.map((partner, idx) => (
+            {partners.map((partner, index) => (
             <div 
-  key={idx}
+  key={index}
   className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
     darkMode ? 'bg-zinc-900' : 'bg-white'
   } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
@@ -1170,9 +1240,9 @@ useEffect(() => {
           </div>
           
           <div className="grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 flex items-center justify-center">
-            {communities.map((partner, idx) => (
+            {communities.map((partner, index) => (
             <div 
-  key={idx}
+  key={index}
   className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
     darkMode ? 'bg-zinc-900' : 'bg-white'
   } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
@@ -1211,9 +1281,9 @@ useEffect(() => {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5">
-            {partners.map((partner, idx) => (
+            {partners.map((partner, index) => (
             <div 
-  key={idx}
+  key={index}
   className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
     darkMode ? 'bg-zinc-900' : 'bg-white'
   } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
@@ -1256,9 +1326,9 @@ useEffect(() => {
 
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {recentDonations.map((donation, idx) => (
+              {recentDonations.map((donation, index) => (
             <div 
-  key={idx}
+  key={index}
   className={`relative group p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${
     darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
   } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-emerald-600 shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
@@ -1292,17 +1362,17 @@ useEffect(() => {
             Real change made possible by your generosity.
           </p>
           
-          <div 
-            id="stories-container"
-            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
-          >
-            {successStories.map((story, idx) => (
-              <div 
-                key={idx}
-                className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
-                  ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-                  shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
-              >
+<div 
+  id="stories-container"
+  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
+>
+ {(isMobile ? infiniteStories : successStories).map((story, index) => (
+    <div 
+      key={`story-${index}`}  // This is already correct since index is unique
+      className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+        ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+        shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
+    >
                 <img
                   src={story.image}
                   alt={story.title}
