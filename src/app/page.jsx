@@ -86,7 +86,7 @@ useEffect(() => {
 
       const monthName = hijri.month?.en || hijriMonths[Number(hijri.month)-1];
 
-      const formatted = `${monthName} ${hijri.day}, ${hijri.year} AH (${greg.weekday.en}, ${greg.date.replace(/-/g,' ')})`;
+      const formatted = `${monthName} ${hijri.day}, ${hijri.year}  (${greg.weekday.en}, ${greg.date})`;
 
       setHijriFromApi(formatted);
     } catch (err) {
@@ -142,7 +142,7 @@ useEffect(() => {
   // 1) Hijri date parts
  const h = new HijriDate(); // moonsighting / global
 
-const hijriFormatted = `${hijriMonths[h.getMonth()]} ${h.getDate()}, ${h.getFullYear()} AH`;
+const hijriFormatted = `${hijriMonths[h.getMonth()]} ${h.getDate()}, ${h.getFullYear()} `;
 
 
   // const dayHijri = islamic.find(p => p.type === "day").value;
