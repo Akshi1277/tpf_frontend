@@ -2,9 +2,14 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Menu, X, Users, ChevronRight, CheckCircle, ArrowRight, Moon, Sun } from 'lucide-react';
+import { lazy } from 'react';
+import HijriDate from "hijri-date";
+
 
 export default function TPFAidMinimal() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hijriFromApi, setHijriFromApi] = useState(null);
+
   const [totalRaised, setTotalRaised] = useState(2547893);
   const [scrolled, setScrolled] = useState(false);
 const [darkMode, setDarkMode] = useState(() => {
@@ -46,6 +51,40 @@ const [darkMode, setDarkMode] = useState(() => {
     return () => clearInterval(interval);
   }, []);
 
+useEffect(() => {
+  async function fetchHijri() {
+    try {
+      const today = new Date();
+      const d = today.getDate();
+      const m = today.getMonth() + 1;
+      const y = today.getFullYear();
+      const dateStr = `${d}-${m}-${y}`;
+
+      const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
+      const json = await res.json();
+
+      console.log("ALADHAN RESPONSE:", json);
+
+      const hijri = json?.data?.hijri;
+      const greg = json?.data?.gregorian;
+
+      if (!hijri || !greg) return;
+
+      const monthName = hijri.month?.en || hijriMonths[Number(hijri.month)-1];
+
+      const formatted = `${monthName} ${hijri.day}, ${hijri.year} AH (${greg.weekday.en}, ${greg.date.replace(/-/g,' ')})`;
+
+      setHijriFromApi(formatted);
+    } catch (err) {
+      console.error("Failed to fetch Hijri date", err);
+    }
+  }
+
+  fetchHijri();
+}, []);
+
+
+
   
 useEffect(() => {
   const onScroll = () => setScrolled(window.scrollY > 0);
@@ -68,6 +107,44 @@ useEffect(() => {
     console.error('Failed to save to localStorage:', error);
   }
 }, [darkMode]);
+
+ const today = new Date();
+
+  const hijriMonths = [
+    "Muharram",
+    "Safar",
+    "Rabi’ al-Awwal",
+    "Rabi’ ath-Thani",
+    "Jumada al-Ula",
+    "Jumada ath-Thani",
+    "Rajab",
+    "Sha’ban",
+    "Ramadan",
+    "Shawwal",
+    "Dhu al-Qa’dah",
+    "Dhu al-Hijjah"
+  ];
+
+  // 1) Hijri date parts
+ const h = new HijriDate(); // moonsighting / global
+
+const hijriFormatted = `${hijriMonths[h.getMonth()]} ${h.getDate()}, ${h.getFullYear()} AH`;
+
+
+  // const dayHijri = islamic.find(p => p.type === "day").value;
+  // const monthHijriIndex = +islamic.find(p => p.type === "month").value - 1;
+  // const yearHijri = islamic.find(p => p.type === "year").value;
+
+ 
+
+
+  // 2) Gregorian with weekday
+  const gregorianFormatted = today.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   const campaigns = [
     {
@@ -196,13 +273,20 @@ useEffect(() => {
 ];
 
 const partners = [
-  { name: "Seed Charity", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2Ff0e211f4eed743b9a70fe6b4b6001b85?format=webp&width=2000" },
+   { name: "Seed Charity", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2Ff0e211f4eed743b9a70fe6b4b6001b85?format=webp&width=2000" },
   { name: "Global Family Aid", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2Fe9df5f33b91d46a293a5d3c661e5ad00?format=webp&width=2000" },
   { name: "Human Relief", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2F1bf296792ea647b9aa7980631140b241?format=webp&width=2000" },
   { name: "Maan", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2F9256431f39904e7997bbf0d7f19e2f96?format=webp&width=2000" },
   { name: "UN-ICC", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2Fed5a55b79ee24f20a5cc6fd1abe39177?format=webp&width=2000" },
   { name: "Little Tree Foundation", image: "https://cdn.builder.io/api/v1/image/assets%2Fc05b786f1645447ab878b73ca4dd6870%2F4d5eb38bd91446389d6773e87a9aa424?format=webp&width=2000" }
+ 
 ];
+
+const communities=[
+  {
+    name: "Blood Communities", image: "https://openclipart.org/image/800px/154351"
+  }
+]
 
   const recentDonations = [
     { name: "Anonymous", amount: 500, time: "2 min ago" },
@@ -875,7 +959,7 @@ useEffect(() => {
       </section>
 
       {/* Curated Section */}
-     <section id="curated" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+ <section id="curated" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center mb-10">
       <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
@@ -885,41 +969,39 @@ useEffect(() => {
         Explore causes that matter most to our community
       </p>
     </div>
-   <div 
-  id="curated-container"
-  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide lg:grid lg:grid-cols-3 lg:overflow-visible"
->
-  {curatedItems.map((item, idx) => (
-    <button
-      key={idx}
-      className={`flex-shrink-0 w-[85vw] sm:w-[70vw] lg:w-auto snap-center group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
-        darkMode ? 'bg-zinc-900' : 'bg-white'
-      } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
+    <div 
+      id="curated-container"
+      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
     >
-      <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-      
-      <div className="relative h-48 overflow-hidden w-full">
-        <img 
-          src={item.image} 
-          alt={item.label}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-      </div>
+      {curatedItems.map((item, idx) => (
+        <button
+          key={idx}
+          className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[45vw] lg:w-[350px] snap-center group relative flex flex-col rounded-xl overflow-hidden transition-all duration-300 ${
+            darkMode ? 'bg-zinc-900' : 'bg-white'
+          } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
+        >
+          <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
+          
+          <div className="relative h-48 overflow-hidden w-full">
+            <img 
+              src={item.image} 
+              alt={item.label}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+          </div>
 
-      <div className="p-5">
-        <h3 className={`text-lg font-semibold mb-2 ${COLORS.neutralHeading} group-hover:text-emerald-600 transition-colors duration-300`}>
-          {item.label}
-        </h3>
-        <p className={`text-sm ${COLORS.neutralBody}`}>
-          {item.description}
-        </p>
-      </div>
-
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-    </button>
-  ))}
-</div>
+          <div className="p-5">
+            <h3 className={`text-lg font-semibold mb-2 ${COLORS.neutralHeading} group-hover:text-emerald-600 transition-colors duration-300`}>
+              {item.label}
+            </h3>
+            <p className={`text-sm ${COLORS.neutralBody}`}>
+              {item.description}
+            </p>
+          </div>
+        </button>
+      ))}
+    </div>
   </div>
 </section>
 
@@ -987,11 +1069,52 @@ useEffect(() => {
         </div>
       </section> */}
 
-      <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+      <section id="communities" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
-              Inspiring organizations
+              Communities
+            </h2>
+            <p className={`text-sm ${COLORS.neutralBody}`}>
+             Communities you would like to join
+            </p>
+          </div>
+          
+          <div className="grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 flex items-center justify-center">
+            {communities.map((partner, idx) => (
+            <div 
+  key={idx}
+  className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
+    darkMode ? 'bg-zinc-900' : 'bg-white'
+  } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
+>
+ 
+                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                
+               <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+  <img 
+    src={partner.image}
+    alt={partner.name}
+    className="w-full h-full object-cover"
+    loading='lazy'
+  />
+</div>
+                <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
+                <button className='cursor-pointer mt-2 text-sm w-16 h-7 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
+                  Donate
+                </button>
+              </div>
+              
+            ))}
+            
+          </div>
+        </div>
+      </section>
+     <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
+              Trusted By
             </h2>
             <p className={`text-sm ${COLORS.neutralBody}`}>
               Trusted partners we collaborate with to deliver impact
@@ -1137,7 +1260,11 @@ useEffect(() => {
             <div>
               <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>About TPF</div>
               <ul className="space-y-2.5 text-sm">
-                {['About TPF', 'TPF Mission', 'Our Founder', 'Our Team', 'TPF Blog', 'FAQs'].map(item => (
+                {['About us', 
+	'Our Mission', 
+	'Our Team',
+	'FAQs'
+].map(item => (
                   <li key={item}>
                     <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
                       {item}
@@ -1165,7 +1292,13 @@ useEffect(() => {
             <div>
               <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Get Involved</div>
               <ul className="space-y-2.5 text-sm">
-                {['Join as Volunteer', 'Start a Fundraiser', 'Zakat', 'Emergency Funds', 'TPF AID in News'].map(item => (
+                {['Careers', 
+'Join TPF Aid', 
+'Volunteer Now', 
+'TPF Aid in News', 
+'Blog', 
+'Notices'
+].map(item => (
                   <li key={item}>
                     <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
                       {item}
@@ -1179,7 +1312,7 @@ useEffect(() => {
             <div>
               <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Legal & Help</div>
               <ul className="space-y-2.5 text-sm">
-                {['Legal', 'Privacy Policy', 'Terms & Conditions', 'Use of Cookies', 'Help Centre', 'Contact Us'].map(item => (
+                {['Contact Us', 'Request a Feature', 'Complaints', 'Help Centre', 'Our Legal Status', 'Privacy Policies'].map(item => (
                   <li key={item}>
                     <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
                       {item}
@@ -1189,6 +1322,22 @@ useEffect(() => {
               </ul>
             </div>
           </div>
+
+          {/* Islamic Calendar */}
+<div className={`mb-6 py-4 px-4 border-t border-b ${darkMode ? 'border-zinc-700' : 'border-zinc-300'}`}>
+  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm">
+    <div className="flex items-center gap-2">
+      <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+        Today's Islamic Date:
+      </span>
+    <span className={`${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
+ {hijriFromApi || "..."}
+</span>
+
+    </div>
+  </div>
+</div>
+
 
           {/* Bottom Bar */}
           <div className={`pt-6 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-300'} flex flex-col sm:flex-row items-center justify-between gap-4`}>
