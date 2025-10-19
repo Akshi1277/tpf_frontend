@@ -633,13 +633,13 @@ useEffect(() => {
 {mobileMenuOpen && (
   <>
     {/* Backdrop overlay */}
-   <div 
-  className="fixed inset-0 z-40 flex items-start justify-end pr-8 pt-20"
+<div 
+  className="fixed inset-0 z-40 md:flex md:items-start md:justify-end md:pr-8 md:pt-20"
   onClick={() => setMobileMenuOpen(false)}
 >
       {/* Modal popup */}
       <div
-        className={`w-96 h-[33rem] max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden 
+        className={`fixed md:relative right-0 top-0 h-full md:h-[33rem] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl shadow-2xl overflow-hidden transition-transform duration-300 ease-in-out
           ${darkMode
             ? 'bg-zinc-900'
             : 'bg-white'
@@ -863,7 +863,7 @@ useEffect(() => {
         Join thousands of donors supporting causes that matter. Every contribution creates lasting impact.
       </p>
       <div className="flex flex-wrap gap-4">
-        <button className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-lg transition-colors shadow-lg">
+        <button className="px-8 py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-lg transition-colors shadow-lg">
           Start Giving
         </button>
         <button className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors border-2
