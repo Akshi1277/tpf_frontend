@@ -54,9 +54,9 @@ const [darkMode, setDarkMode] = useState(() => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
   const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap';
   link.rel = 'stylesheet';
   document.head.appendChild(link);
   
@@ -439,10 +439,10 @@ useEffect(() => {
 
   return (
 <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-     <style jsx global>{`
-  * {
-    font-family: 'Amiri', serif !important;
-  }
+<style jsx global>{`
+* {
+  font-family: 'Aref Ruqaa', serif !important;
+}
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
