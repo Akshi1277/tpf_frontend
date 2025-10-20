@@ -109,7 +109,7 @@ const [darkMode, setDarkMode] = useState(() => {
   },
   { 
     label: "Donate Weekly (Friday) ", 
-    image: "https://media.istockphoto.com/id/600999260/photo/hands-of-poor-african-children-asking-for-drinking-water.webp?a=1&b=1&s=612x612&w=0&k=20&c=Ev7WU39mC-XPkcsfhRBRJv6cKSeEsR01-yrcuQYUa_0=",
+    image: "https://media.istockphoto.com/id/2159138979/photo/muslim-boy-donating-money.webp?a=1&b=1&s=612x612&w=0&k=20&c=1Ib35R9k_UjN6LC_h117cLRyOvINJ6iZ6bBkwVlSix8=",
     description: "Make a lasting impact every Jumu’ah with your weekly giving."
   },
   { 
