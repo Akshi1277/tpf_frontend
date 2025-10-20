@@ -86,17 +86,17 @@ const [darkMode, setDarkMode] = useState(() => {
    const successStories = [
     {
       title: "Your donations delivered winter kits to 1,200 families",
-      image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80",
+      image: "https://plus.unsplash.com/premium_photo-1661964155049-f8a24a60be74?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZG9uYXRpb25zJTIwZGVsaXZlcmVkJTIwd2ludGVyJTIwa2l0cyUyMHRvJTIwMSUyQzIwMCUyMGZhbWlsaWVzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
       excerpt: "Blankets, heaters, and fuel vouchers have reached those most in need."
     },
     {
       title: "A new water point is serving 3,000 daily",
-      image: "https://images.unsplash.com/photo-1541844053589-346841d0b34c?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1559079236-2e64f89c7764?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fENsZWFuJTJDJTIwc2FmZSUyMHdhdGVyJTIwaXMlMjBub3clMjBhY2Nlc3NpYmxlJTIwd2l0aGluJTIwd2Fsa2luZyUyMGRpc3RhbmNlLnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
       excerpt: "Clean, safe water is now accessible within walking distance."
     },
     {
       title: "School-in-a-box restarted classes in the camps",
-      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1726726192151-6d4139ff229d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTB8fFBvcnRhYmxlJTIwc2Nob29sJTIwa2l0cyUyMGJyb3VnaHQlMjBzdHJ1Y3R1cmVkJTIwbGVhcm5pbmclMjBiYWNrJTIwdG8lMjBjaGlsZHJlbi58ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
       excerpt: "Portable school kits brought structured learning back to children."
     }
   ];
@@ -184,7 +184,7 @@ const [darkMode, setDarkMode] = useState(() => {
   };
 
   const heroImages = [
-    "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1200&q=80",
+    "https://images.unsplash.com/photo-1622864352372-a68fa7dac64e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fFN0YW5kJTIwd2l0aCUyMEdhemF8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
     "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&q=80",
     "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1200&q=80"
   ];
@@ -1171,22 +1171,23 @@ useEffect(() => {
       <section className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-2xl">
-            <div className="absolute inset-0 bg-zinc-900/60"></div>
-            <img
-              src={heroImages[0]}
-              alt="Stand with Gaza"
-              className="h-64 md:h-80 w-full object-cover"
-            />
+            <div className="absolute inset-0 "></div>
+        <img
+  src={heroImages[0]}
+  alt="Stand with Gaza"
+  className="h-64 md:h-96 w-full object-cover object-[50%_37%]"
+/>
+
             <div className="absolute inset-0 p-6 md:p-10 flex items-center">
               <div className="max-w-xl text-white">
                 <h3 className="text-2xl md:text-3xl font-semibold mb-3">
-                  Stand with Gaza every single day
+                 Stand with Gaza — every day matters
                 </h3>
                 <p className="text-sm md:text-base text-white/90 mb-5">
-                  Your steady support helps deliver food, shelter, medical care, and dignity to families in crisis.
+               Your daily support delivers relief, care, and dignity to families in urgent need.
                 </p>
                 <button className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
-                  Sign up for Daily Givers
+                 Start Giving Daily Now
                 </button>
               </div>
             </div>
