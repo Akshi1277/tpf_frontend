@@ -150,22 +150,22 @@ const [darkMode, setDarkMode] = useState(() => {
   },
    { 
     label: "Financial Emergency Aid ", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://media.istockphoto.com/id/813320518/photo/social-assistance.webp?a=1&b=1&s=612x612&w=0&k=20&c=ViKfqudhFcslXku_zcd9RYePinRk6gWWi1S7qL6kVwI=",
     description: "Offer immediate relief to families facing hardship."
   },
    { 
     label: "Global Muslim Crisis Support ", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://images.unsplash.com/photo-1573886578907-58681efbaad3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8R2xvYmFsJTIwTXVzbGltJTIwQ3Jpc2lzJTIwU3VwcG9ydHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
     description: "Stand with Muslim communities in crisis worldwide."
   },
    { 
     label: "Assistance for Marginalized Communities", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://media.istockphoto.com/id/537311780/photo/unity-of-indian-children-asia.webp?a=1&b=1&s=612x612&w=0&k=20&c=Z3vpXyVtDv0xzqOX2FDbdxn4kyIbwpO3xrGakyYPN1k=",
     description: "Empower those left behind through your compassion."
   },
    { 
     label: "Community Development", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://media.istockphoto.com/id/981339754/photo/silhouette-of-engineer-and-construction-team-working-at-site-over-blurred-background-sunset.webp?a=1&b=1&s=612x612&w=0&k=20&c=ftbsxL76vkKvsB8WUO-FMrCHyjrRJKzLpZ_evRWJR4E=",
     description: "Invest in education, growth, and a better tomorrow."
   },
 ];
