@@ -110,7 +110,7 @@ const [darkMode, setDarkMode] = useState(() => {
   { 
     label: "Donate Weekly (Friday) ", 
     image: "https://media.istockphoto.com/id/600999260/photo/hands-of-poor-african-children-asking-for-drinking-water.webp?a=1&b=1&s=612x612&w=0&k=20&c=Ev7WU39mC-XPkcsfhRBRJv6cKSeEsR01-yrcuQYUa_0=",
-    description: "Bring fresh water to communities"
+    description: "Make a lasting impact every Jumu’ah with your weekly giving."
   },
   { 
     label: "Donate Monthly", 
@@ -137,7 +137,7 @@ const [darkMode, setDarkMode] = useState(() => {
     image: "https://i.etsystatic.com/27296220/r/il/cd44af/3622176989/il_570xN.3622176989_2kws.jpg",
     description: "Give children a brighter future"
   },
-  
+
    { 
     label: "Legal Aid for the Voiceless", 
     image: "https://media.istockphoto.com/id/2014292728/photo/judges-gavel-as-a-symbol-of-legal-system-and-wooden-stand-with-text-word.webp?a=1&b=1&s=612x612&w=0&k=20&c=lyx0WuVJC-yMC5BbA3y70una6t0ttX2fqi7m5EI7Awg=",
@@ -930,7 +930,8 @@ useEffect(() => {
         Make a difference in someone's life today
       </h1>
       <p className="text-base sm:text-lg md:text-xl text-zinc-200">
-        Join thousands of donors supporting causes that matter. Every contribution creates lasting impact.
+        Join thousands of donors supporting causes that matter. <br></br>
+        Every contribution creates lasting impact.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2">
         <button className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg transition-colors shadow-lg">
