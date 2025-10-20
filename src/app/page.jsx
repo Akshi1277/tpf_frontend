@@ -137,6 +137,7 @@ const [darkMode, setDarkMode] = useState(() => {
     image: "https://i.etsystatic.com/27296220/r/il/cd44af/3622176989/il_570xN.3622176989_2kws.jpg",
     description: "Give children a brighter future"
   },
+  
    { 
     label: "Legal Aid for the Voiceless", 
     image: "https://media.istockphoto.com/id/2014292728/photo/judges-gavel-as-a-symbol-of-legal-system-and-wooden-stand-with-text-word.webp?a=1&b=1&s=612x612&w=0&k=20&c=lyx0WuVJC-yMC5BbA3y70una6t0ttX2fqi7m5EI7Awg=",
