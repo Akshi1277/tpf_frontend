@@ -104,7 +104,7 @@ const [darkMode, setDarkMode] = useState(() => {
    const curatedItems = [
   { 
     label: "Daily Giver", 
-    image: "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=800",
+    image: "https://images.unsplash.com/photo-1677128912094-36d988ce198b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhlbHAlMjBwcm92aWRlJTIwbWVhbHMlMjBmb3IlMjB0aG9zZSUyMGluJTIwbmVlZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
     description: "Help provide meals to those in need"
   },
   { 
@@ -114,37 +114,37 @@ const [darkMode, setDarkMode] = useState(() => {
   },
   { 
     label: "Donate Monthly", 
-    image: "https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=800",
+    image: "https://images.unsplash.com/photo-1576465767066-87fadbc4c2d8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fHN1cHBvcnQlMjBodW1hbml0YXJpYW4lMjByZWxpZWYlMjBlZmZvcnRzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
     description: "Support humanitarian relief efforts"
   },
   { 
     label: "Donate Your Zakat", 
-    image: "https://plus.unsplash.com/premium_photo-1663091439138-cc1e9307ff4e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZW1lcmdlbmN5JTIwYWlkfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
+    image: "https://media.istockphoto.com/id/1312575736/photo/concept-of-zakat-in-islam-religion-selective-focus-of-money-and-rice-with-alphabet-of-zakat.webp?a=1&b=1&s=612x612&w=0&k=20&c=SO0YUYqqHjRLRxMD5wiWNANHSD4pGII19FzfqHvcdPw=",
     description: "Respond to urgent crisis situations"
   },
   { 
     label: "Discover Fundraiser", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://images.unsplash.com/photo-1643429096345-9de0d2ab7e7c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Z2l2ZSUyMGlzbGFtaWMlMjBjaGlsZHJlbiUyMGElMjBicmlnaHQlMjBmdXR1cmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
     description: "Give children a brighter future"
   },
   { 
     label: "Donate in Emergency Funds", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://plus.unsplash.com/premium_photo-1683140538884-07fb31428ca6?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGRvbmF0ZSUyMGluJTIwZW1lcmdlbmN5JTIwZnVuZHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
     description: "Empower through learning"
   },
    { 
     label: "Eid Kits(Eid-al-Fitr)", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://i.etsystatic.com/27296220/r/il/cd44af/3622176989/il_570xN.3622176989_2kws.jpg",
     description: "Give children a brighter future"
   },
    { 
     label: "Legal Aid for the Voiceless", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://media.istockphoto.com/id/2014292728/photo/judges-gavel-as-a-symbol-of-legal-system-and-wooden-stand-with-text-word.webp?a=1&b=1&s=612x612&w=0&k=20&c=lyx0WuVJC-yMC5BbA3y70una6t0ttX2fqi7m5EI7Awg=",
     description: "Give children a brighter future"
   },
    { 
     label: "Shelter and Home Support ", 
-    image: "https://media.istockphoto.com/id/900565350/photo/rural-children.webp?a=1&b=1&s=612x612&w=0&k=20&c=jkEbfVI87_ZcxKAd7icX17U2m7b7WS6MB9w_yQT049A=",
+    image: "https://plus.unsplash.com/premium_photo-1683135030516-6317ed744628?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8c2hlbHRlciUyMGFuZCUyMGhvbWUlMjBzdXBwb3J0JTIwZm9yJTIwcGVvcGxlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
     description: "Give children a brighter future"
   },
    { 
@@ -1496,6 +1496,8 @@ useEffect(() => {
           ))}
         </ul>
       </div>
+
+    
     </div>
 
           {/* Islamic Calendar */}
