@@ -1355,9 +1355,9 @@ useEffect(() => {
       {/* Stories Section */}
       <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
-            Impact stories
-          </h2>
+        <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+        Impact stories
+      </h2>
           <p className={`text-sm ${COLORS.neutralBody} mb-6`}>
             Real change made possible by your generosity.
           </p>
