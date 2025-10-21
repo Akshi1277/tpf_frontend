@@ -88,7 +88,7 @@
 
 @theme inline {
   
- --font-sans: 'Geist', 'Geist Fallback';
+--font-sans: 'Markazi Text', serif;
 
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
@@ -128,7 +128,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 /* In global CSS */
- --font-serif: 'Source Serif 4', 'Source Serif 4 Fallback';
+--font-sans: 'Markazi Text', serif;
 
   /* computed shadow variables below - do not modify */
   --shadow-2xs: var(--shadow-x) var(--shadow-y) color-mix(in srgb, var(--shadow-color) calc(var(--shadow-opacity) * 100%), transparent);
