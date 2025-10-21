@@ -402,6 +402,7 @@ useEffect(() => {
 
 
 // Scroll campaigns container
+
 useEffect(() => {
   if (!isMobile) return;
 
@@ -409,13 +410,23 @@ useEffect(() => {
   if (!container) return;
 
   const cardWidth = container.offsetWidth;
-  const actualIndex = campaignScrollIndex % filteredCampaigns.length;
-  const scrollTo = cardWidth * actualIndex;
+  const scrollTo = cardWidth * campaignScrollIndex;
   
   container.scrollTo({
     left: scrollTo,
     behavior: 'smooth'
   });
+
+  // Reset to beginning without animation when reaching the duplicate set
+  if (campaignScrollIndex >= filteredCampaigns.length) {
+    setTimeout(() => {
+      container.scrollTo({
+        left: 0,
+        behavior: 'auto' // instant, no animation
+      });
+      setCampaignScrollIndex(0);
+    }, 500); // after smooth scroll completes
+  }
 }, [campaignScrollIndex, isMobile, filteredCampaigns.length]);
 
 
@@ -431,6 +442,7 @@ useEffect(() => {
 }, [isMobile, isUserScrolling.stories]);
 
 
+
 // Scroll stories container
 useEffect(() => {
   if (!isMobile) return;
@@ -439,13 +451,23 @@ useEffect(() => {
   if (!container) return;
 
   const cardWidth = container.offsetWidth;
-  const actualIndex = storyScrollIndex % successStories.length;
-  const scrollTo = cardWidth * actualIndex;
+  const scrollTo = cardWidth * storyScrollIndex;
   
   container.scrollTo({
     left: scrollTo,
     behavior: 'smooth'
   });
+
+  // Reset to beginning without animation
+  if (storyScrollIndex >= successStories.length) {
+    setTimeout(() => {
+      container.scrollTo({
+        left: 0,
+        behavior: 'auto'
+      });
+      setStoryScrollIndex(0);
+    }, 500);
+  }
 }, [storyScrollIndex, isMobile, successStories.length]);
 
 
@@ -461,6 +483,7 @@ useEffect(() => {
 }, [isMobile, isUserScrolling.curated]);
 
 
+
 // Scroll curated container
 useEffect(() => {
   if (!isMobile) return;
@@ -469,16 +492,27 @@ useEffect(() => {
   if (!container) return;
 
   const cardWidth = container.offsetWidth;
-  const actualIndex = curatedScrollIndex % curatedItems.length;
-  const scrollTo = cardWidth * actualIndex;
+  const scrollTo = cardWidth * curatedScrollIndex;
   
   container.scrollTo({
     left: scrollTo,
     behavior: 'smooth'
   });
+
+  // Reset to beginning without animation
+  if (curatedScrollIndex >= curatedItems.length) {
+    setTimeout(() => {
+      container.scrollTo({
+        left: 0,
+        behavior: 'auto'
+      });
+      setCuratedScrollIndex(0);
+    }, 500);
+  }
 }, [curatedScrollIndex, isMobile, curatedItems.length]);
 
-// Handle user scrolling for all containers
+
+// Handle user scrolling detection
 useEffect(() => {
   if (!isMobile) return;
 
@@ -495,23 +529,28 @@ useEffect(() => {
     if (!container) return;
 
     let scrollTimeout;
+    let isScrolling = false;
 
-    const handleScroll = () => {
-      setIsUserScrolling(prev => ({ ...prev, [key]: true }));
+    const handleScrollStart = () => {
+      if (!isScrolling) {
+        isScrolling = true;
+        setIsUserScrolling(prev => ({ ...prev, [key]: true }));
+      }
       
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
+        isScrolling = false;
         setIsUserScrolling(prev => ({ ...prev, [key]: false }));
-      }, 3000); // Resume auto-scroll 3 seconds after user stops scrolling
+      }, 2000); // Resume auto-scroll 2 seconds after user stops
     };
 
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    handlers.push({ container, handleScroll });
+    container.addEventListener('scroll', handleScrollStart, { passive: true });
+    handlers.push({ container, handleScrollStart });
   });
 
   return () => {
-    handlers.forEach(({ container, handleScroll }) => {
-      container.removeEventListener('scroll', handleScroll);
+    handlers.forEach(({ container, handleScrollStart }) => {
+      container.removeEventListener('scroll', handleScrollStart);
     });
   };
 }, [isMobile]);
@@ -523,6 +562,64 @@ useEffect(() => {
       maximumFractionDigits: 0 
     }).format(amount);
   };
+
+
+  // Handle seamless infinite loop for manual scrolling
+useEffect(() => {
+  if (!isMobile) return;
+
+  const containers = [
+    { id: 'campaigns-container', length: filteredCampaigns.length, setIndex: setCampaignScrollIndex },
+    { id: 'stories-container', length: successStories.length, setIndex: setStoryScrollIndex },
+    { id: 'curated-container', length: curatedItems.length, setIndex: setCuratedScrollIndex }
+  ];
+
+  const observers = [];
+
+  containers.forEach(({ id, length, setIndex }) => {
+    const container = document.getElementById(id);
+    if (!container) return;
+
+    const handleScrollEnd = () => {
+      const cardWidth = container.offsetWidth;
+      const scrollLeft = container.scrollLeft;
+      const currentIndex = Math.round(scrollLeft / cardWidth);
+
+      // If user scrolled past the original items into duplicates
+      if (currentIndex >= length) {
+        const equivalentIndex = currentIndex - length;
+        container.scrollTo({
+          left: equivalentIndex * cardWidth,
+          behavior: 'auto' // instant jump
+        });
+        setIndex(equivalentIndex);
+      }
+      // If user scrolled backwards before 0 (shouldn't happen but just in case)
+      else if (currentIndex < 0) {
+        container.scrollTo({
+          left: (length + currentIndex) * cardWidth,
+          behavior: 'auto'
+        });
+        setIndex(length + currentIndex);
+      }
+    };
+
+    let scrollTimeout;
+    const onScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(handleScrollEnd, 150);
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+    observers.push({ container, onScroll });
+  });
+
+  return () => {
+    observers.forEach(({ container, onScroll }) => {
+      container.removeEventListener('scroll', onScroll);
+    });
+  };
+}, [isMobile, filteredCampaigns.length, successStories.length, curatedItems.length]);
 
   return (
 <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
