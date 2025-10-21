@@ -733,14 +733,14 @@ useEffect(() => {
       {/* RIGHT – Actions */}
       <div className="flex items-center gap-3">
         {/* Start Fundraising – desktop only */}
-        <button className="hidden md:flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-colors">
+        <button className="hidden md:flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-colors cursor-pointer">
           Start fundraising
         </button>
 
         {/* Zakaat icon */}
         <button
           aria-label="Zakaat"
-          className={`p-2 rounded-full transition-colors
+          className={`p-2 rounded-full transition-colors cursor-pointer
             ${darkMode
               ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
               : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
@@ -759,7 +759,7 @@ useEffect(() => {
         <button
           onClick={() => setDarkMode(!darkMode)}
           aria-label="Toggle dark mode"
-          className={`p-2 rounded-full transition-colors
+          className={`p-2 rounded-full transition-colors cursor-pointer
             ${darkMode
               ? 'bg-zinc-800/80 text-yellow-400 hover:bg-zinc-700 backdrop-blur-sm'
               : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
@@ -772,7 +772,7 @@ useEffect(() => {
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Menu"
-          className={`p-2 rounded-full transition-colors
+          className={`p-2 rounded-full transition-colors cursor-pointer
             ${darkMode
               ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
               : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
@@ -1084,10 +1084,10 @@ useEffect(() => {
         Every contribution creates lasting impact.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2">
-        <button className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg transition-colors shadow-lg">
+        <button className="w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg transition-colors shadow-lg">
           Start Giving
         </button>
-        <button className={`w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base md:text-lg transition-colors border-2
+        <button className={`w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base md:text-lg transition-colors border-2
           ${darkMode 
             ? 'border-white text-white hover:bg-white/10' 
             : 'border-white text-white hover:bg-white/20'
@@ -1104,7 +1104,7 @@ useEffect(() => {
       <button
         key={index}
         onClick={() => setCurrentHeroImage(index)}
-        className={`h-1.5 rounded-full transition-all duration-300 ${
+        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
           index === currentHeroImage 
             ? 'w-8 bg-emerald-500' 
             : 'w-1.5 bg-white/50 hover:bg-white/75'
@@ -1144,7 +1144,7 @@ useEffect(() => {
            <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Fundraising now
       </h2>
-            <button href="#" className="text-sm font-medium bg-emerald-700 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
+            <button href="#" className="text-sm cursor-pointer font-medium bg-emerald-700 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
               Discover more
             </button>
           </div>
@@ -1155,7 +1155,7 @@ useEffect(() => {
                 <button
                   key={cat.key}
                   onClick={() => setSelectedCategory(cat.key)}
-                  className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition-colors flex items-center gap-2 ${
+                  className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm cursor-pointer transition-colors flex items-center gap-2 ${
                     selectedCategory === cat.key
                       ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                       : darkMode 
@@ -1236,18 +1236,18 @@ useEffect(() => {
                       </span>
                     </div>
 
-              <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-sm transition-colors mb-4">
+              <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-sm transition-colors mb-4">
   Donate Now
 </button>
 
 <div className="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-700">
   <div className="flex items-center gap-4">
-    <button className="flex items-center gap-1 text-zinc-600 hover:text-red-600 transition-colors">
+    <button className="flex items-center gap-1 text-zinc-600 hover:text-red-600 transition-colors cursor-pointer">
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
     </button>
-    <button className="flex items-center gap-1 text-zinc-600 hover:text-emerald-600 transition-colors">
+    <button className="flex items-center gap-1 text-zinc-600 hover:text-emerald-600 transition-colors cursor-pointer">
       <Image
         src="/share.svg"
         alt="Share"
@@ -1305,7 +1305,7 @@ useEffect(() => {
       </div>
     </div>
     <div className="p-4">
-      <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+      <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
         <span>Support Now</span>
         <ArrowRight className="w-4 h-4" />
       </button>
@@ -1336,7 +1336,7 @@ useEffect(() => {
                 <p className="text-sm md:text-base text-white/90 mb-5">
                Your daily support delivers relief, care, and dignity to families in urgent need.
                 </p>
-                <button className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
+                <button className="px-6 py-3 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
                  Start Giving Daily Now
                 </button>
               </div>
@@ -1569,7 +1569,7 @@ useEffect(() => {
         />
         <button
           type="submit"
-          className="px-8 py-4 bg-white text-emerald-600 rounded-xl font-bold hover:bg-zinc-100 transition-colors whitespace-nowrap"
+          className="cursor-pointer px-8 py-4 bg-white text-emerald-600 rounded-xl font-bold hover:bg-zinc-100 transition-colors whitespace-nowrap"
         >
           Subscribe
         </button>
@@ -1708,7 +1708,7 @@ useEffect(() => {
       {scrolled && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-8 right-8 w-12 h-12 bg-emerald-600 text-white rounded-full shadow-lg hover:bg-emerald-700 flex items-center justify-center z-40 transition-all"
+          className="fixed bottom-8 right-8 w-12 h-12 bg-emerald-600 text-white rounded-full shadow-lg hover:bg-emerald-700 flex items-center justify-center z-40 transition-all cursor-pointer"
           aria-label="Scroll to top"
         >
           <ChevronRight className="w-6 h-6 -rotate-90" />
