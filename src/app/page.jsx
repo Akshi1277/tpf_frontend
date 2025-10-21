@@ -686,34 +686,61 @@ useEffect(() => {
       </div>
     </div>
 
-    {/* Mobile search bar */}
-    <div className="md:hidden pb-3">
-      <div className="relative w-full">
-        <input
-          type="text"
-          placeholder="Discover inspiring causes"
-          className={`w-full px-4 py-2 pl-10 rounded-full border
-            ${darkMode
-              ? 'bg-zinc-800/80 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-sm'
-              : 'bg-white/80 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-sm'
-            } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-        />
-        <svg
-          className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5
-            ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
-      </div>
+   {/* Mobile search bar */}
+<div className="md:hidden pb-3">
+  <div className="relative w-full group">
+    {/* Animated background gradient */}
+    <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
+      ${darkMode 
+        ? 'bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-cyan-500/30' 
+        : 'bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20'
+      } animate-[pulse_3s_ease-in-out_infinite]`} 
+    />
+    
+    {/* Shimmer effect on focus */}
+    <div className="absolute inset-0 rounded-full overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
+      <div className={`absolute inset-0 -translate-x-full group-focus-within:translate-x-full transition-transform duration-[2000ms] ease-in-out
+        ${darkMode 
+          ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent' 
+          : 'bg-gradient-to-r from-transparent via-white/40 to-transparent'
+        }`} 
+      />
     </div>
+
+    <input
+      type="text"
+      placeholder="Discover inspiring causes"
+      className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
+        ${darkMode
+          ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
+          : 'bg-white/90 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-md focus:bg-white focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.15),inset_0_1px_2px_rgba(16,185,129,0.1)]'
+        } focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:scale-[1.02] hover:border-emerald-400/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)]`}
+    />
+    
+    {/* Search icon with rotation animation */}
+    <svg
+      className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-all duration-500 group-focus-within:scale-110 group-focus-within:rotate-90 group-focus-within:text-emerald-500
+        ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+
+    {/* Particle effect dots */}
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-all duration-500 flex gap-1">
+      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0s'}} />
+      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.3s'}} />
+      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.6s'}} />
+    </div>
+  </div>
+</div>
   </div>
 
   {/* Mobile menu dropdown */}
