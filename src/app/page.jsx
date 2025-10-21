@@ -208,7 +208,7 @@ const infiniteCurated = [...curatedItems, ...curatedItems];
 
 useEffect(() => {
   const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&display=swap';
   link.rel = 'stylesheet';
   document.head.appendChild(link);
   
@@ -1412,7 +1412,7 @@ useEffect(() => {
   />
 </div>
                 <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-                <button className='cursor-pointer mt-2 flex items-center gap-2 px-2 py-2 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
+                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
                   Donate
                 </button>
               </div>
