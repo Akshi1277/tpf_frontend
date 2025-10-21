@@ -9,6 +9,7 @@ import HijriDate from "hijri-date";
 export default function TPFAidMinimal() {
 
 
+const [fontFamily, setFontFamily] = useState("aref"); 
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hijriFromApi, setHijriFromApi] = useState(null);
@@ -207,15 +208,25 @@ const infiniteCurated = [...curatedItems, ...curatedItems];
   }, []);
 
 useEffect(() => {
-  const link = document.createElement('link');
-  link.href = 'https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;500;600;700&display=swap';
-  link.rel = 'stylesheet';
-  document.head.appendChild(link);
-  
-  return () => {
-    document.head.removeChild(link);
-  };
+  const head = document.head;
+  const links = [
+    "https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap",
+    "https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&display=swap",
+    "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap",
+     "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap",
+  ];
+
+  const created = links.map(href => {
+    const l = document.createElement("link");
+    l.rel = "stylesheet";
+    l.href = href;
+    head.appendChild(l);
+    return l;
+  });
+
+  return () => created.forEach(l => head.removeChild(l));
 }, []);
+
 
 useEffect(() => {
   const checkMobile = () => {
@@ -622,11 +633,19 @@ useEffect(() => {
 }, [isMobile, filteredCampaigns.length, successStories.length, curatedItems.length]);
 
   return (
-<div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+<div
+  className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
+style={{
+  fontFamily:
+    fontFamily === "aref" ? "'Aref Ruqaa', serif" :
+    fontFamily === "markazi" ? "'Markazi Text', serif" :
+    fontFamily === "cairo" ? "'Cairo', sans-serif" :
+    "'Amiri', serif"
+}}
+
+>
+
 <style jsx global>{`
-* {
-  font-family: 'Aref Ruqaa', serif !important;
-}
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -767,6 +786,18 @@ useEffect(() => {
         >
           {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
+
+        <select
+  value={fontFamily}
+  onChange={e => setFontFamily(e.target.value)}
+  className="p-2 bg-white text-black rounded"
+>
+  <option value="aref">Aref Ruqaa</option>
+  <option value="markazi">Markazi Text</option>
+  <option value="cairo">Cairo</option>
+  <option value="amiri">Amiri</option>
+</select>
+
 
         {/* Hamburger */}
         <button
