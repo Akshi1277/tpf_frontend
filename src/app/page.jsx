@@ -400,6 +400,7 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [isMobile, isUserScrolling.campaigns]);
 
+
 // Scroll campaigns container
 useEffect(() => {
   if (!isMobile) return;
@@ -409,23 +410,12 @@ useEffect(() => {
 
   const cardWidth = container.offsetWidth;
   const actualIndex = campaignScrollIndex % filteredCampaigns.length;
-  const scrollTo = cardWidth * campaignScrollIndex;
+  const scrollTo = cardWidth * actualIndex;
   
   container.scrollTo({
     left: scrollTo,
     behavior: 'smooth'
   });
-
-  // Reset to beginning without animation when reaching the end
-  if (campaignScrollIndex >= filteredCampaigns.length) {
-    setTimeout(() => {
-      container.scrollTo({
-        left: 0,
-        behavior: 'auto' // instant, no animation
-      });
-      setCampaignScrollIndex(0);
-    }, 500); // after smooth scroll completes
-  }
 }, [campaignScrollIndex, isMobile, filteredCampaigns.length]);
 
 
@@ -440,6 +430,7 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [isMobile, isUserScrolling.stories]);
 
+
 // Scroll stories container
 useEffect(() => {
   if (!isMobile) return;
@@ -448,23 +439,13 @@ useEffect(() => {
   if (!container) return;
 
   const cardWidth = container.offsetWidth;
-  const scrollTo = cardWidth * storyScrollIndex;
+  const actualIndex = storyScrollIndex % successStories.length;
+  const scrollTo = cardWidth * actualIndex;
   
   container.scrollTo({
     left: scrollTo,
     behavior: 'smooth'
   });
-
-  // Reset to beginning without animation
-  if (storyScrollIndex >= successStories.length) {
-    setTimeout(() => {
-      container.scrollTo({
-        left: 0,
-        behavior: 'auto'
-      });
-      setStoryScrollIndex(0);
-    }, 500);
-  }
 }, [storyScrollIndex, isMobile, successStories.length]);
 
 
@@ -479,6 +460,7 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [isMobile, isUserScrolling.curated]);
 
+
 // Scroll curated container
 useEffect(() => {
   if (!isMobile) return;
@@ -487,23 +469,13 @@ useEffect(() => {
   if (!container) return;
 
   const cardWidth = container.offsetWidth;
-  const scrollTo = cardWidth * curatedScrollIndex;
+  const actualIndex = curatedScrollIndex % curatedItems.length;
+  const scrollTo = cardWidth * actualIndex;
   
   container.scrollTo({
     left: scrollTo,
     behavior: 'smooth'
   });
-
-  // Reset to beginning without animation
-  if (curatedScrollIndex >= curatedItems.length) {
-    setTimeout(() => {
-      container.scrollTo({
-        left: 0,
-        behavior: 'auto'
-      });
-      setCuratedScrollIndex(0);
-    }, 500);
-  }
 }, [curatedScrollIndex, isMobile, curatedItems.length]);
 
 // Handle user scrolling for all containers
