@@ -15,6 +15,11 @@ export default function TPFAidMinimal() {
 const [isMobile, setIsMobile] = useState(false);
   const [totalRaised, setTotalRaised] = useState(2547893);
   const [scrolled, setScrolled] = useState(false);
+  const [isUserScrolling, setIsUserScrolling] = useState({
+  campaigns: false,
+  stories: false,
+  curated: false
+});
 const [darkMode, setDarkMode] = useState(() => {
   if (typeof window !== 'undefined') {
     try {
@@ -386,14 +391,14 @@ const communities=[
 
 // Auto-scroll for campaigns (mobile only)
 useEffect(() => {
-  if (!isMobile) return;
+  if (!isMobile || isUserScrolling.campaigns) return;
 
   const interval = setInterval(() => {
     setCampaignScrollIndex(prev => prev + 1);
   }, 4000);
 
   return () => clearInterval(interval);
-}, [isMobile]);
+}, [isMobile, isUserScrolling.campaigns]);
 
 // Scroll campaigns container
 useEffect(() => {
@@ -423,16 +428,17 @@ useEffect(() => {
   }
 }, [campaignScrollIndex, isMobile, filteredCampaigns.length]);
 
+
 // Auto-scroll for stories (mobile only)
 useEffect(() => {
-  if (!isMobile) return;
+  if (!isMobile || isUserScrolling.stories) return;
 
   const interval = setInterval(() => {
     setStoryScrollIndex(prev => prev + 1);
   }, 4000);
 
   return () => clearInterval(interval);
-}, [isMobile]);
+}, [isMobile, isUserScrolling.stories]);
 
 // Scroll stories container
 useEffect(() => {
@@ -461,16 +467,17 @@ useEffect(() => {
   }
 }, [storyScrollIndex, isMobile, successStories.length]);
 
+
 // Auto-scroll for curated (mobile only)
 useEffect(() => {
-  if (!isMobile) return;
+  if (!isMobile || isUserScrolling.curated) return;
 
   const interval = setInterval(() => {
     setCuratedScrollIndex(prev => prev + 1);
   }, 4000);
 
   return () => clearInterval(interval);
-}, [isMobile]);
+}, [isMobile, isUserScrolling.curated]);
 
 // Scroll curated container
 useEffect(() => {
@@ -498,6 +505,44 @@ useEffect(() => {
     }, 500);
   }
 }, [curatedScrollIndex, isMobile, curatedItems.length]);
+
+// Handle user scrolling for all containers
+useEffect(() => {
+  if (!isMobile) return;
+
+  const containers = [
+    { id: 'campaigns-container', key: 'campaigns' },
+    { id: 'stories-container', key: 'stories' },
+    { id: 'curated-container', key: 'curated' }
+  ];
+
+  const handlers = [];
+
+  containers.forEach(({ id, key }) => {
+    const container = document.getElementById(id);
+    if (!container) return;
+
+    let scrollTimeout;
+
+    const handleScroll = () => {
+      setIsUserScrolling(prev => ({ ...prev, [key]: true }));
+      
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        setIsUserScrolling(prev => ({ ...prev, [key]: false }));
+      }, 3000); // Resume auto-scroll 3 seconds after user stops scrolling
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    handlers.push({ container, handleScroll });
+  });
+
+  return () => {
+    handlers.forEach(({ container, handleScroll }) => {
+      container.removeEventListener('scroll', handleScroll);
+    });
+  };
+}, [isMobile]);
 
   const currency = (amount) => {
     return new Intl.NumberFormat("en-IN", { 
@@ -708,7 +753,7 @@ useEffect(() => {
   onClick={() => setMobileMenuOpen(false)}
 >
       {/* Modal popup */}
-      <div
+       <div
         className={`fixed md:relative right-0 top-0 h-full md:h-[33rem] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl shadow-2xl overflow-hidden transition-transform duration-300 ease-in-out
           ${darkMode
             ? 'bg-zinc-900'
@@ -716,6 +761,15 @@ useEffect(() => {
           }`}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Close button - fixed at top on mobile */}
+        <div className={`md:hidden sticky top-0 z-10 flex justify-end px-4 py-3 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
+          >
+            <X className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-zinc-900'}`} />
+          </button>
+        </div>
         {/* Menu content */}
        <div className="px-6 py-6 space-y-4 max-h-[80vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
 
