@@ -1,21 +1,81 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Menu, X, Users, ChevronRight, CheckCircle, ArrowRight, Moon, Sun } from 'lucide-react';
 import { lazy } from 'react';
 import HijriDate from "hijri-date";
 
+function useCountUp(end, duration = 2000, shouldStart = false) {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(0);
+  const startTimeRef = useRef(null);
+
+  useEffect(() => {
+    if (!shouldStart) return;
+
+    const animate = (currentTime) => {
+      if (!startTimeRef.current) startTimeRef.current = currentTime;
+      const progress = (currentTime - startTimeRef.current) / duration;
+
+      if (progress < 1) {
+        countRef.current = Math.floor(end * progress);
+        setCount(countRef.current);
+        requestAnimationFrame(animate);
+      } else {
+        setCount(end);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [end, duration, shouldStart]);
+
+  return count;
+}
+
+function StatCounter({ label, end, format, suffix = '', darkMode, shouldAnimate }) {
+  const count = useCountUp(end, 2000, shouldAnimate);
+  
+  const formatValue = (value) => {
+    if (format === 'currency') {
+      return new Intl.NumberFormat("en-IN", { 
+        style: "currency", 
+        currency: "INR", 
+        maximumFractionDigits: 0 
+      }).format(value);
+    }
+    return value.toLocaleString() + suffix;
+  };
+
+  return (
+    <div className="text-center transform transition-all duration-700" style={{
+      opacity: shouldAnimate ? 1 : 0,
+      transform: shouldAnimate ? 'translateY(0)' : 'translateY(20px)'
+    }}>
+      <div className={`text-3xl md:text-4xl font-bold mb-2 transition-colors duration-300 ${
+        darkMode ? 'text-white' : 'text-white'
+      }`}>
+        {formatValue(count)}
+      </div>
+      <div className={`text-sm font-medium uppercase tracking-wider ${
+        darkMode ? 'text-emerald-300' : 'text-white'
+      }`}>
+        {label}
+      </div>
+    </div>
+  );
+}
 
 export default function TPFAidMinimal() {
 
 
-const [fontFamily, setFontFamily] = useState("aref"); 
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hijriFromApi, setHijriFromApi] = useState(null);
 const [isMobile, setIsMobile] = useState(false);
   const [totalRaised, setTotalRaised] = useState(2547893);
   const [scrolled, setScrolled] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(false);
+const statsRef = useRef(null);
   const [isUserScrolling, setIsUserScrolling] = useState({
   campaigns: false,
   stories: false,
@@ -208,24 +268,46 @@ const infiniteCurated = [...curatedItems, ...curatedItems];
   }, []);
 
 useEffect(() => {
-  const head = document.head;
-  const links = [
-    "https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap",
-    "https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&display=swap",
-    "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap",
-     "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap",
-  ];
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        setStatsVisible(true);
+      }
+    },
+    { threshold: 0.3 }
+  );
 
-  const created = links.map(href => {
-    const l = document.createElement("link");
-    l.rel = "stylesheet";
-    l.href = href;
-    head.appendChild(l);
-    return l;
-  });
+  if (statsRef.current) {
+    observer.observe(statsRef.current);
+  }
 
-  return () => created.forEach(l => head.removeChild(l));
+  return () => {
+    if (statsRef.current) {
+      observer.unobserve(statsRef.current);
+    }
+  };
 }, []);
+
+
+// useEffect(() => {
+//   const head = document.head;
+//   const links = [
+//     "https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap",
+//     "https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&display=swap",
+//     "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap",
+//      "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap",
+//   ];
+
+//   const created = links.map(href => {
+//     const l = document.createElement("link");
+//     l.rel = "stylesheet";
+//     l.href = href;
+//     head.appendChild(l);
+//     return l;
+//   });
+
+//   return () => created.forEach(l => head.removeChild(l));
+// }, []);
 
 
 useEffect(() => {
@@ -634,14 +716,14 @@ useEffect(() => {
 
   return (
 <div
-  className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
-style={{
-  fontFamily:
-    fontFamily === "aref" ? "'Aref Ruqaa', serif" :
-    fontFamily === "markazi" ? "'Markazi Text', serif" :
-    fontFamily === "cairo" ? "'Cairo', sans-serif" :
-    "'Amiri', serif"
-}}
+  className={`min-h-screen font-sans ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
+// style={{
+//   fontFamily:
+//     fontFamily === "aref" ? "'Aref Ruqaa', serif" :
+//     fontFamily === "markazi" ? "'Markazi Text', serif" :
+//     fontFamily === "cairo" ? "'Cairo', sans-serif" :
+//     "'Amiri', serif"
+// }}
 
 >
 
@@ -750,12 +832,11 @@ style={{
 </div>
 
       {/* RIGHT – Actions */}
-      <div className="flex items-center md:gap-4">
+      <div className="flex items-center gap-4">
         {/* Start Fundraising – desktop only */}
-        <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-colors cursor-pointer">
-          Start fundraising
-        </button>
-
+<button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
+  Start fundraising
+</button>
         {/* Zakaat icon */}
         <button
           aria-label="Zakaat"
@@ -789,7 +870,7 @@ style={{
 
     
 
-    <select
+    {/* <select
   value={fontFamily}
   onChange={e => setFontFamily(e.target.value)}
   className="p-2 bg-white text-black rounded"
@@ -798,7 +879,7 @@ style={{
   <option value="markazi">Markazi Text</option>
   <option value="cairo">Cairo</option>
   <option value="amiri">Amiri</option>
-</select>
+</select> */}
         {/* Hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -1146,24 +1227,73 @@ style={{
   </div>
 </section>
 {/* Impact Stats Bar */}
-<section className={`py-12 border-b ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section 
+  ref={statsRef}
+  className={`py-16 md:py-36 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}
+>
+  {/* World Map Background */}
+  <div className="absolute inset-0 flex items-center justify-center">
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Equirectangular_projection_SW.jpg/1280px-Equirectangular_projection_SW.jpg"
+      alt="World Map"
+    className={`w-full h-full object-cover object-[50%_37%] ${darkMode ? 'brightness-50' : 'brightness-100'}`}
+    />
+  </div>
+
+  {/* <div className="absolute inset-0 pointer-events-none">
+    {[
+      { top: '22%', left: '26%' }, // North America
+      { top: '45%', left: '30%' }, // South America
+      { top: '30%', left: '50%' }, // Europe
+      { top: '40%', left: '55%' }, // Africa
+      { top: '3%', left: '72%' }, // Asia
+      { top: '60%', left: '80%' }, // Australia
+    ].map((pos, i) => (
+      <div
+        key={i}
+        className="absolute w-3 h-3 animate-ping"
+        style={{
+          top: pos.top,
+          left: pos.left,
+          animationDelay: `${i * 0.3}s`,
+          animationDuration: '2s'
+        }}
+      >
+        <div className="w-full h-full bg-emerald-600 rounded-full"></div>
+      </div>
+    ))}
+  </div> */}
+
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-      {[
-        { label: "Total Raised", value: currency(totalRaised) },
-        { label: "Active Campaigns", value: "150+" },
-        { label: "Lives Impacted", value: "50,000+" },
-        { label: "Partner NGOs", value: `${partners.length}` }
-      ].map((stat, index) => (
-        <div key={index} className="text-center">
-          <div className={`text-3xl md:text-4xl font-bold mb-2 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-            {stat.value}
-          </div>
-          <div className={`text-sm font-medium uppercase tracking-wider ${darkMode ? 'text-zinc-500' : 'text-zinc-600'}`}>
-            {stat.label}
-          </div>
-        </div>
-      ))}
+      <StatCounter
+        label="Total Raised"
+        end={totalRaised}
+        format="currency"
+        darkMode={darkMode}
+        shouldAnimate={statsVisible}
+      />
+      <StatCounter
+        label="Active Campaigns"
+        end={150}
+        suffix="+"
+        darkMode={darkMode}
+        shouldAnimate={statsVisible}
+      />
+      <StatCounter
+        label="Lives Impacted"
+        end={50000}
+        suffix="+"
+        darkMode={darkMode}
+        shouldAnimate={statsVisible}
+      />
+      <StatCounter
+        label="Number Of Donors"
+        end={1000}
+        suffix="+"
+        darkMode={darkMode}
+        shouldAnimate={statsVisible}
+      />
     </div>
   </div>
 </section>
@@ -1175,7 +1305,7 @@ style={{
            <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Fundraising now
       </h2>
-            <button href="#" className="text-sm cursor-pointer font-medium bg-emerald-700 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
+            <button href="#" className="text-sm font-medium bg-emerald-700 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
               Discover more
             </button>
           </div>
@@ -1208,12 +1338,13 @@ style={{
 
     const progress = Math.min(100, Math.round((campaign.raised / campaign.goal) * 100));
     return (
-      <div 
-        key={`campaign-${campaign.id}-${index}`}  // Changed this line
-        className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
-          ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-          shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
-      >
+   <div 
+  key={`campaign-${campaign.id}-${index}`} 
+  className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+    ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+    shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+>
+
                   <div className="relative aspect-video">
                     <img
                       src={campaign.image}
@@ -1267,7 +1398,7 @@ style={{
                       </span>
                     </div>
 
-              <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-sm transition-colors mb-4">
+              <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-lg transition-colors mb-4">
   Donate Now
 </button>
 
@@ -1314,20 +1445,21 @@ style={{
     </div>
 <div 
   id="curated-container"
-  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+  className="flex gap-8 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
 >
   {(isMobile ? infiniteCurated : curatedItems).map((item, index) => (
-    <div
-      key={`curated-${index}`}  // Changed from just `index` to `curated-${index}`
-      className={`flex-shrink-0 w-[280px] snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
-        ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-        shadow-lg hover:shadow-2xl`}
-    >
+   <div
+  key={`curated-${index}`}
+  className={`flex-shrink-0 w-[175px] snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
+    ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+    shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+>
+
     <div className="relative h-48 overflow-hidden">
       <img
         src={item.image}
         alt={item.label}
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-95"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
       <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -1336,7 +1468,7 @@ style={{
       </div>
     </div>
     <div className="p-4">
-      <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+      <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ">
         <span>Support Now</span>
         <ArrowRight className="w-4 h-4" />
       </button>
@@ -1367,7 +1499,7 @@ style={{
                 <p className="text-sm md:text-base text-white/90 mb-5">
                Your daily support delivers relief, care, and dignity to families in urgent need.
                 </p>
-                <button className="px-6 py-3 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors">
+                <button className="px-6 py-3 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
                  Start Giving Daily Now
                 </button>
               </div>
@@ -1443,8 +1575,8 @@ style={{
   />
 </div>
                 <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
-                  Donate
+                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 py-1 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
+                  Join Now
                 </button>
               </div>
               
@@ -1580,8 +1712,7 @@ style={{
         </div>
       </section>
 
-      {/* Newsletter Section */}
-<section className={`py-16 ${darkMode ? 'bg-gradient-to-br from-emerald-900 to-zinc-900' : 'bg-gradient-to-br from-emerald-600 to-emerald-700'}`}>
+{/* <section className={`py-16 ${darkMode ? 'bg-gradient-to-br from-emerald-900 to-zinc-900' : 'bg-gradient-to-br from-emerald-600 to-emerald-700'}`}>
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
     <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20">
       <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -1610,7 +1741,7 @@ style={{
       </p>
     </div>
   </div>
-</section>
+</section> */}
 
       {/* Footer */}
    <footer className={`py-12 border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
@@ -1634,7 +1765,7 @@ style={{
       <div>
         <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>About TPF</div>
         <ul className="space-y-2.5 text-sm mb-6">
-          {['About us', 'Our Mission', 'Our Team', 'FAQs', 'What We Do'].map(item => (
+          {['About us', 'Our Mission', 'Our Team', 'FAQs','What We Do'].map(item => (
             <li key={item}>
               <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
                 {item}
@@ -1642,17 +1773,7 @@ style={{
             </li>
           ))}
         </ul>
-        {/* <a 
-          href="#" 
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-            darkMode 
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-          }`}
-        >
-          What We Do
-          <ArrowRight className="w-4 h-4" />
-        </a> */}
+       
       </div>
       {/* Get Involved */}
       <div>
@@ -1668,7 +1789,7 @@ style={{
         </ul>
       </div>
       {/* Legal & Help */}
-      <div>
+ <div>
         <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Legal & Help</div>
         <ul className="space-y-2.5 text-sm">
           {['Contact Us', 'Request a Feature', 'Complaints', 'Help Centre', 'Our Legal Status', 'Privacy Policies'].map(item => (
@@ -1681,6 +1802,19 @@ style={{
         </ul>
       </div>
 
+      <div>
+        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Ways To Jannah</div>
+        <ul className="space-y-2.5 text-sm">
+          {['Daily Giver', 'Donate Weekly (Friday)', ' Donate Monthly', ' Donate Your Zakat', ' Discover Fundraiser', 'Donate in Emergency Funds'].map(item => (
+            <li key={item}>
+              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                {item}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+  
     
     </div>
 
