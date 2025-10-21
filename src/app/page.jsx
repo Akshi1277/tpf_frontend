@@ -207,25 +207,25 @@ const infiniteCurated = [...curatedItems, ...curatedItems];
     return () => clearInterval(interval);
   }, []);
 
-useEffect(() => {
-  const head = document.head;
-  const links = [
-    "https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap",
-    "https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&display=swap",
-    "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap",
-     "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap",
-  ];
+// useEffect(() => {
+//   const head = document.head;
+//   const links = [
+//     "https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap",
+//     "https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&display=swap",
+//     "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap",
+//      "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap",
+//   ];
 
-  const created = links.map(href => {
-    const l = document.createElement("link");
-    l.rel = "stylesheet";
-    l.href = href;
-    head.appendChild(l);
-    return l;
-  });
+//   const created = links.map(href => {
+//     const l = document.createElement("link");
+//     l.rel = "stylesheet";
+//     l.href = href;
+//     head.appendChild(l);
+//     return l;
+//   });
 
-  return () => created.forEach(l => head.removeChild(l));
-}, []);
+//   return () => created.forEach(l => head.removeChild(l));
+// }, []);
 
 
 useEffect(() => {
@@ -634,14 +634,14 @@ useEffect(() => {
 
   return (
 <div
-  className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
-style={{
-  fontFamily:
-    fontFamily === "aref" ? "'Aref Ruqaa', serif" :
-    fontFamily === "markazi" ? "'Markazi Text', serif" :
-    fontFamily === "cairo" ? "'Cairo', sans-serif" :
-    "'Amiri', serif"
-}}
+  className={`min-h-screen font-sans ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
+// style={{
+//   fontFamily:
+//     fontFamily === "aref" ? "'Aref Ruqaa', serif" :
+//     fontFamily === "markazi" ? "'Markazi Text', serif" :
+//     fontFamily === "cairo" ? "'Cairo', sans-serif" :
+//     "'Amiri', serif"
+// }}
 
 >
 
@@ -750,7 +750,7 @@ style={{
 </div>
 
       {/* RIGHT – Actions */}
-      <div className="flex items-center md:gap-4">
+      <div className="flex items-center gap-4">
         {/* Start Fundraising – desktop only */}
         <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-colors cursor-pointer">
           Start fundraising
@@ -789,7 +789,7 @@ style={{
 
     
 
-    <select
+    {/* <select
   value={fontFamily}
   onChange={e => setFontFamily(e.target.value)}
   className="p-2 bg-white text-black rounded"
@@ -798,7 +798,7 @@ style={{
   <option value="markazi">Markazi Text</option>
   <option value="cairo">Cairo</option>
   <option value="amiri">Amiri</option>
-</select>
+</select> */}
         {/* Hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
