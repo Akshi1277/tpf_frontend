@@ -1634,7 +1634,7 @@ style={{
       <div>
         <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>About TPF</div>
         <ul className="space-y-2.5 text-sm mb-6">
-          {['About us', 'Our Mission', 'Our Team', 'FAQs'].map(item => (
+          {['About us', 'Our Mission', 'Our Team', 'FAQs', 'What We Do'].map(item => (
             <li key={item}>
               <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
                 {item}
@@ -1642,7 +1642,7 @@ style={{
             </li>
           ))}
         </ul>
-        <a 
+        {/* <a 
           href="#" 
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
             darkMode 
@@ -1652,7 +1652,7 @@ style={{
         >
           What We Do
           <ArrowRight className="w-4 h-4" />
-        </a>
+        </a> */}
       </div>
       {/* Get Involved */}
       <div>
