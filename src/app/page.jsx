@@ -750,7 +750,7 @@ style={{
 </div>
 
       {/* RIGHT – Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center md:gap-4">
         {/* Start Fundraising – desktop only */}
         <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-colors cursor-pointer">
           Start fundraising
@@ -787,7 +787,9 @@ style={{
           {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
 
-        <select
+    
+
+    <select
   value={fontFamily}
   onChange={e => setFontFamily(e.target.value)}
   className="p-2 bg-white text-black rounded"
@@ -797,8 +799,6 @@ style={{
   <option value="cairo">Cairo</option>
   <option value="amiri">Amiri</option>
 </select>
-
-
         {/* Hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
