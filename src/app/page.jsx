@@ -1179,7 +1179,7 @@ useEffect(() => {
     return (
       <div 
         key={`campaign-${campaign.id}-${index}`}  // Changed this line
-        className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+        className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
           ${darkMode ? 'bg-zinc-800' : 'bg-white'}
           shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
       >
@@ -1522,7 +1522,7 @@ useEffect(() => {
  {(isMobile ? infiniteStories : successStories).map((story, index) => (
     <div 
       key={`story-${index}`}  // This is already correct since index is unique
-      className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+      className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
         ${darkMode ? 'bg-zinc-800' : 'bg-white'}
         shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
     >
