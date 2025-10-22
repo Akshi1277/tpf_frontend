@@ -19,20 +19,29 @@ export default function CommunitiesSection({ darkMode }) {
           </p>
         </div>
 
-        <div
-          id="communities-container"
-          className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-4 md:overflow-visible"
-        >
+      <div
+  id="communities-container"
+  className="
+    /* MOBILE */
+    flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide
+
+   
+    md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:snap-none md:pb-0
+  "
+>
+
           {communities.map((community, index) => (
-            <div
-              key={`community-${index}`}
-              className={`
-                flex-shrink-0 w-[280px] snap-center rounded-2xl overflow-hidden 
-                group cursor-pointer transition-all duration-300 hover:scale-105
-                ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-                shadow-lg hover:shadow-2xl
-              `}
-            >
+          <div
+  key={`community-${index}`}
+  className="
+    flex-shrink-0 w-[280px] md:w-auto   /* IMPORTANT — reset width on grid */
+    snap-center rounded-2xl overflow-hidden 
+    group cursor-pointer transition-all duration-300 hover:scale-105
+    shadow-lg hover:shadow-2xl
+    bg-white dark:bg-zinc-800
+  "
+>
+
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={community.image}
