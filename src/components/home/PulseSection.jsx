@@ -19,7 +19,8 @@ const influencerAvatars = [
   "https://plus.unsplash.com/premium_photo-1661964252605-8ba0cd83b056?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YXJhYiUyMG1hbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
   "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=256&q=80&auto=format",
   "https://plus.unsplash.com/premium_photo-1679064458881-76904cf6d1aa?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8aGlqYWIlMjB3b21lbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
-  "https://plus.unsplash.com/premium_photo-1681489847451-0eaec69a0214?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGhpamFiJTIwd29tZW58ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600"
+  "https://plus.unsplash.com/premium_photo-1681489847451-0eaec69a0214?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGhpamFiJTIwd29tZW58ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
+  "https://media.istockphoto.com/id/2195339571/photo/portrait-of-happy-arab-man-standing-at-park.webp?a=1&b=1&s=612x612&w=0&k=20&c=NWyGOj28eT6nftfzxG0-Gs6z6S_O5lmAwPbpenfJp5o="
 ];
 
 const influencersExtended = [
