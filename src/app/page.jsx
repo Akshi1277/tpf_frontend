@@ -806,7 +806,7 @@ useEffect(() => {
            <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Fundraising now
       </h2>
-            <button href="#" className="text-sm font-medium bg-emerald-600 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
+            <button href="#" className="text-sm font-medium bg-emerald-600 p-2 rounded-4xl text-white hover:animate-pulse cursor-pointer">
               Discover more
             </button>
           </div>
