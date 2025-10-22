@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import StoryCard from '@/components/ui/StoryCard';
 import { successStories } from '@/lib/constants';
+import { ArrowRight } from 'lucide-react';
 
 export default function StoriesSection({ darkMode }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -128,28 +129,48 @@ export default function StoriesSection({ darkMode }) {
   }, [isMobile]);
 
   return (
-    <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
-          Impact stories
-        </h2>
-        <p className={`text-sm ${COLORS.neutralBody} mb-6`}>
-          Real change made possible by your generosity.
-        </p>
-        
+   <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+      Impact Stories
+    </h2>
+    <p className={`text-sm ${COLORS.neutralBody} mb-6`}>
+      Real change made possible by your generosity.
+    </p>
+
+    <div 
+      id="stories-container"
+      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
+    >
+      {(isMobile ? infiniteStories : successStories).map((story, index) => (
         <div 
-          id="stories-container"
-          className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
+          key={`story-${index}`}
+          className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+            ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+            shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
         >
-          {(isMobile ? infiniteStories : successStories).map((story, index) => (
-            <StoryCard 
-              key={`story-${index}`}
-              story={story}
-              darkMode={darkMode}
-            />
-          ))}
+          <img
+            src={story.image}
+            alt={story.title}
+            className="h-44 w-full object-cover"
+          />
+          <div className="p-5">
+            <h3 className={`font-semibold text-base ${COLORS.neutralHeading} mb-2`}>
+              {story.title}
+            </h3>
+            <p className={`text-sm ${COLORS.neutralBody} mb-3`}>
+              {story.excerpt}
+            </p>
+            <a href="#" className="text-sm font-medium text-emerald-700 hover:underline flex items-center gap-1">
+              Read more 
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
         </div>
-      </div>
-    </section>
+      ))}
+    </div>
+  </div>
+</section>
+
   );
 }

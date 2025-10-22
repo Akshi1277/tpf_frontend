@@ -147,7 +147,19 @@ export const partners = [
 export const communities = [
   {
     name: "Blood Community", 
-    image: "https://openclipart.org/image/800px/154351"
+    image: "https://www.shutterstock.com/image-vector/high-quality-blood-drop-isolated-600nw-2589564683.jpg"
+  },
+   {
+    name: "Masjid Building Initiative", 
+    image: "https://images.unsplash.com/photo-1512167108213-5ee155879c6a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWFzamlkJTIwYnVpbGRpbmclMjBpbml0aWF0aXZlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600"
+  },
+   {
+    name: "Quranic Studies Center", 
+    image: "https://media.istockphoto.com/id/1161964542/photo/koran-holy-book-of-muslims-on-the-table-still-life.webp?a=1&b=1&s=612x612&w=0&k=20&c=q8tCvR0FT0W38pRIOTM_vFwV1ndJ3FRK42KhnvSYTPs="
+  },
+   {
+    name: "Modern Islamic School Project", 
+    image: "https://images.unsplash.com/photo-1643429096345-9de0d2ab7e7c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8TW9kZXJuJTIwSXNsYW1pYyUyMFNjaG9vbCUyMFByb2plY3R8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600"
   }
 ];
 

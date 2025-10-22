@@ -22,7 +22,7 @@ export default function PulseSection({ darkMode, totalRaised }) {
         
         <div className="flex flex-col items-center mb-10">
           <div className={`relative inline-block px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
-            <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">
+            <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
               {currency(totalRaised)}
             </div>
           </div>
