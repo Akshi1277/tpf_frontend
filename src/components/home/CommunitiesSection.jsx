@@ -39,7 +39,7 @@ export default function CommunitiesSection({ darkMode }) {
   />
 </div>
                 <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 py-1 bg-emerald-400 text-white rounded-2xl group-hover:bg-red-500'>
+                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 py-1 bg-emerald-600 text-white rounded-2xl group-hover:bg-red-500'>
                   Join Now
                 </button>
               </div>
