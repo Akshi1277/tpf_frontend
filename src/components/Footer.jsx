@@ -1,7 +1,41 @@
 'use client';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import HijriDate from "hijri-date";
+import { hijriMonths } from '@/lib/constants';
 
-export default function Footer({ darkMode, hijriFromApi }) {
+
+export default function Footer({ darkMode}) {
+     const [hijriFromApi, setHijriFromApi] = useState(null);
+
+  useEffect(() => {
+    async function fetchHijri() {
+      try {
+        const today = new Date();
+        const d = today.getDate();
+        const m = today.getMonth() + 1;
+        const y = today.getFullYear();
+        const dateStr = `${d}-${m}-${y}`;
+
+        const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
+        const json = await res.json();
+
+        const hijri = json?.data?.hijri;
+        const greg = json?.data?.gregorian;
+
+        if (!hijri || !greg) return;
+
+        const monthName = hijri.month?.en || hijriMonths[Number(hijri.month)-1];
+        const formatted = `${monthName} ${hijri.day}, ${hijri.year}  (${greg.weekday.en}, ${greg.date})`;
+
+        setHijriFromApi(formatted);
+      } catch (err) {
+        console.error("Failed to fetch Hijri date", err);
+      }
+    }
+
+    fetchHijri();
+  }, []);
   return (
    <footer className={`py-12 border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
