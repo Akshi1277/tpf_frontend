@@ -1,6 +1,8 @@
-// components/home/PulseSection.jsx
+'use client';
 import { currency } from '@/lib/utils';
 import { recentDonations } from '@/lib/constants';
+
+import { useState,useEffect } from 'react';
 
 export default function PulseSection({ darkMode, totalRaised }) {
   const COLORS = {
@@ -8,7 +10,135 @@ export default function PulseSection({ darkMode, totalRaised }) {
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
 
+  /* Influencers slider (5 visible, auto-scroll left by 1 every second) */
+const VISIBLE_INFLUENCERS = 5;
+
+const influencerAvatars = [
+  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1463453091185-61582044d556?w=256&q=80&auto=format",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&q=80&auto=format",
+];
+
+const influencersExtended = [
+  ...influencerAvatars,
+  ...influencerAvatars.slice(0, VISIBLE_INFLUENCERS),
+];
+
+const [infIndex, setInfIndex] = useState(0);
+const [infNoTransition, setInfNoTransition] = useState(false);
+
+useEffect(() => {
+  const id = setInterval(() => setInfIndex((i) => i + 1), 1000);
+  return () => clearInterval(id);
+}, []);
+
+useEffect(() => {
+  if (infIndex === influencerAvatars.length) {
+    const t = setTimeout(() => {
+      setInfNoTransition(true);
+      setInfIndex(0);
+      requestAnimationFrame(() => setInfNoTransition(false));
+    }, 520); // wait for the current slide transition to end
+    return () => clearTimeout(t);
+  }
+}, [infIndex, influencerAvatars.length]);
+
   return (
+    <>
+ <section id="influencers" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="grid md:grid-cols-2 gap-6 items-stretch">
+      
+    {/* LEFT CARD */}
+<div
+  className={`rounded-3xl p-6 md:p-8 border flex flex-col
+    ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}
+  `}
+>
+  <div>
+    <h3 className={`text-2xl sm:text-4xl font-bold leading-tight mb-3 ${COLORS.neutralHeading}`}>
+    Start meaningful change with TPF Aid
+
+    </h3>
+    <p className={`text-sm ${COLORS.neutralBody} mb-4`}>
+      Join a trusted community of givers supporting impactful causes. With 0% platform fees and a global donor network, your campaign gets the reach and support it deserves. Create hope—start fundraising today.
+    </p>
+    <button className="px-6 py-2 rounded-full cursor-pointer font-semibold border transition-colors bg-white text-zinc-900 hover:bg-zinc-50 shadow-sm w-fit text-sm">
+      Start fundraising today
+    </button>
+  </div>
+
+  {/* IMAGE */}
+  <div className="mt-5 flex items-center justify-center">
+    <img
+      src="/funding.jpg"
+      alt="Funding Growth Visual"
+      className="w-full max-w-[240px] h-auto object-contain"
+    />
+  </div>
+</div>
+
+{/* RIGHT CARD */}
+<div
+  className={`rounded-3xl p-6 md:p-8 border relative overflow-hidden flex flex-col
+    ${darkMode
+      ? 'bg-zinc-900 border-zinc-800'
+      : 'bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100 border-zinc-100'
+    }
+  `}
+>
+  <h3 className="text-2xl sm:text-5xl font-bold leading-tight mb-3 text-emerald-500">
+    Easy. <br/>Trusted.<br/>Inspiring.
+  </h3>
+  <p className={`text-base ${COLORS.neutralBody} mb-7`}>
+    Give with confidence—every fundraiser is vetted,<br></br>
+     and making an impact is just a tap away. <span className="underline cursor-pointer">Learn more.</span>
+  </p>
+
+  <div className={`text-2xl font-semibold mb-3 ${COLORS.neutralHeading}`}>
+    Trusted by those you trust
+  </div>
+
+  {/* Slider viewport (exactly 5 visible) */}
+  <div className="relative overflow-hidden rounded-2xl pb-0">
+    {/* moving track */}
+    <div
+      className="grid grid-flow-col auto-cols-[20%] items-center gap-0"
+      style={{
+        transform: `translateX(-${infIndex * 10}%)`,
+        transition: infNoTransition ? 'none' : 'transform 5000ms ease-out',
+      }}
+    >
+      {influencersExtended.map((src, i) => (
+        <div key={`influencer-${i}`} className="flex items-center justify-center px-1">
+          <img
+            src={src}
+            alt={`Influencer ${i + 1}`}
+            className="w-14 h-14 sm:w-28 sm:h-28 rounded-full object-cover ring-2
+                       ring-white dark:ring-zinc-800 shadow-md"
+            loading="lazy"
+          />
+        </div>
+      ))}
+    </div>
+
+    {/* subtle edge fade */}
+    <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white/70 to-transparent dark:from-zinc-900/70"></div>
+    <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/70 to-transparent dark:from-zinc-900/70"></div>
+  </div>
+</div>
+    </div>
+  </div>
+</section>
     <section id="pulse" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
@@ -57,5 +187,6 @@ export default function PulseSection({ darkMode, totalRaised }) {
         </div>
       </div>
     </section>
+    </>
   );
 }
