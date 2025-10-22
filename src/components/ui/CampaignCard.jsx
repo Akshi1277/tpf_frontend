@@ -64,7 +64,7 @@ export default function CampaignCard({ campaign, darkMode }) {
           </span>
         </div>
 
-        <button className="w-full cursor-pointer bg-emerald-400 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-lg transition-colors mb-4">
+        <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-lg transition-colors mb-4">
           Donate Now
         </button>
 
