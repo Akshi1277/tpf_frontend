@@ -99,7 +99,7 @@ export default function Footer({ darkMode, hijriFromApi }) {
               <input
                 type="email"
                 placeholder="Email address"
-                className={`flex-1 px-4 py-3 rounded-l-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`flex-1 px-4 py-3 rounded-l-lg border-emerald-600 focus:outline-emerald-400 focus:ring-2  ${
                   darkMode 
                     ? 'bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500' 
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'

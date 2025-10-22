@@ -291,27 +291,6 @@ useEffect(() => {
 }, []);
 
 
-// useEffect(() => {
-//   const head = document.head;
-//   const links = [
-//     "https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap",
-//     "https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&display=swap",
-//     "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap",
-//      "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap",
-//   ];
-
-//   const created = links.map(href => {
-//     const l = document.createElement("link");
-//     l.rel = "stylesheet";
-//     l.href = href;
-//     head.appendChild(l);
-//     return l;
-//   });
-
-//   return () => created.forEach(l => head.removeChild(l));
-// }, []);
-
-
 useEffect(() => {
   const checkMobile = () => {
     setIsMobile(window.innerWidth < 768);
@@ -455,35 +434,6 @@ const communities=[
   ];
 
  
-
-
-
- // Auto-scroll campaigns
-
-
-// Scroll campaigns with infinite effect
-
-
-// Auto-scroll stories
-
-// Scroll stories with infinite effect
-
-
-  // Scroll campaigns on mobile
- 
-
-  // Scroll stories on mobile
-
-
-// Auto-scroll for curated on mobile
-// Auto-scroll curated
-
-// Scroll curated with infinite effect
-
-
-// Scroll curated on mobile
-
-
 // Auto-scroll for campaigns (mobile only)
 useEffect(() => {
   if (!isMobile || isUserScrolling.campaigns) return;
@@ -719,13 +669,7 @@ useEffect(() => {
   return (
 <div
   className={`min-h-screen font-sans ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
-// style={{
-//   fontFamily:
-//     fontFamily === "aref" ? "'Aref Ruqaa', serif" :
-//     fontFamily === "markazi" ? "'Markazi Text', serif" :
-//     fontFamily === "cairo" ? "'Cairo', sans-serif" :
-//     "'Amiri', serif"
-// }}
+
 
 >
 
@@ -862,7 +806,7 @@ useEffect(() => {
            <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Fundraising now
       </h2>
-            <button href="#" className="text-sm font-medium bg-emerald-400 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
+            <button href="#" className="text-sm font-medium bg-emerald-600 p-2 rounded-4xl text-white hover:animate-pulse cursor-pointer">
               Discover more
             </button>
           </div>
@@ -1064,41 +1008,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* Partners Section */}
-
-      {/* <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className={`text-xl md:text-2xl font-semibold ${COLORS.neutralHeading} mb-2`}>
-              Inspiring organizations
-            </h2>
-            <p className={`text-sm ${COLORS.neutralBody}`}>
-              Trusted partners we collaborate with to deliver impact
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5">
-            {partners.map((partner, index) => (
-            <div 
-  key={index}
-  className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
-    darkMode ? 'bg-zinc-900' : 'bg-white'
-  } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
->
-                <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-               <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-  <img 
-    src={partner.image}
-    alt={partner.name}
-    className="w-full h-full object-cover"
-  />
-</div>
-                <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
+    
 
       <section id="communities" className={`py-12 border-b border-gray-300 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1270,36 +1180,8 @@ useEffect(() => {
         </div>
       </section>
 
-{/* <section className={`py-16 ${darkMode ? 'bg-gradient-to-br from-emerald-900 to-zinc-900' : 'bg-gradient-to-br from-emerald-600 to-emerald-700'}`}>
-  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/20">
-      <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-        Stay Updated on Our Impact
-      </h2>
-      <p className="text-white/90 text-lg mb-8">
-        Get weekly stories of hope, campaign updates, and ways to make a difference
-      </p>
-      <form className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
-        <input
-          type="email"
-          placeholder="Enter your email address"
-          value={newsletterEmail}
-          onChange={(e) => setNewsletterEmail(e.target.value)}
-          className="flex-1 px-6 py-4 rounded-xl border-2 border-white/30 bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50 backdrop-blur-sm"
-        />
-        <button
-          type="submit"
-          className="cursor-pointer px-8 py-4 bg-white text-emerald-600 rounded-xl font-bold hover:bg-zinc-100 transition-colors whitespace-nowrap"
-        >
-          Subscribe
-        </button>
-      </form>
-      <p className="text-white/70 text-sm mt-4">
-        Join 10,000+ subscribers. Unsubscribe anytime.
-      </p>
-    </div>
-  </div>
-</section> */}
+
+
 
       {/* Footer */}
    <footer className={`py-12 border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
