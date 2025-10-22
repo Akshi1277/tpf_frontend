@@ -14,18 +14,12 @@ export default function PulseSection({ darkMode, totalRaised }) {
 const VISIBLE_INFLUENCERS = 5;
 
 const influencerAvatars = [
-  "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=256&q=80&auto=format",
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=256&q=80&auto=format",
   "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1541532713592-79a0317b6b77?w=256&q=80&auto=format",
+  "https://plus.unsplash.com/premium_photo-1661964252605-8ba0cd83b056?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YXJhYiUyMG1hbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
   "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1463453091185-61582044d556?w=256&q=80&auto=format",
-  "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=256&q=80&auto=format",
+  "https://plus.unsplash.com/premium_photo-1679064458881-76904cf6d1aa?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8aGlqYWIlMjB3b21lbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
+  "https://plus.unsplash.com/premium_photo-1681489847451-0eaec69a0214?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGhpamFiJTIwd29tZW58ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600"
 ];
 
 const influencersExtended = [
