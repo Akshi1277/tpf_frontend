@@ -149,6 +149,7 @@ export default function CampaignsSection({ darkMode }) {
           </h2>
          <button
   className="
+  whitespace-nowrap
     text-xs sm:text-sm font-medium
     bg-emerald-600 px-3 py-1.5 sm:px-4 sm:py-2
     rounded-full text-white
