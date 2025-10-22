@@ -1,4 +1,6 @@
 'use client';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Menu, X, Users, ChevronRight, CheckCircle, ArrowRight, Moon, Sun } from 'lucide-react';
@@ -749,421 +751,7 @@ useEffect(() => {
 `}</style>
 
 
-<header
-  className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300
-    ${scrolled
-        ? darkMode
-          ? 'bg-zinc-900 border-zinc-800 shadow-lg'
-          : 'bg-white border-zinc-200 shadow-lg'
-        : 'bg-transparent border-transparent'
-    }
-    border-b
-  `}
->
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="flex items-center justify-between h-16 gap-6">
-      {/* LEFT – Logo */}
-    {/* LEFT – Logo */}
-<div className="flex-shrink-0">
-  <Image
-    src={scrolled && !darkMode ? "/TPFAid-Logo.png" : "/TPFAid-Logo1.png"}
-    alt="TPF Aid Logo"
-    width={120}
-    height={120}
-    priority
-    className="cursor-pointer"
-  />
-</div>
-
-      {/* CENTER – Search (hidden on mobile) */}
-    <div className="hidden md:flex flex-1 max-w-xl mx-8">
-  <div className="relative w-full group">
-    {/* Animated background gradient */}
-    <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
-      ${darkMode 
-        ? 'bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-cyan-500/30' 
-        : 'bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20'
-      } animate-[pulse_3s_ease-in-out_infinite]`} 
-    />
-    
-    {/* Shimmer effect on focus */}
-    <div className="absolute inset-0 rounded-full overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
-      <div className={`absolute inset-0 -translate-x-full group-focus-within:translate-x-full transition-transform duration-[2000ms] ease-in-out
-        ${darkMode 
-          ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent' 
-          : 'bg-gradient-to-r from-transparent via-white/40 to-transparent'
-        }`} 
-      />
-    </div>
-
-    <input
-      type="text"
-      placeholder="Discover inspiring causes"
-      className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
-        ${darkMode
-          ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
-          : 'bg-white/90 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-md focus:bg-white focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.15),inset_0_1px_2px_rgba(16,185,129,0.1)]'
-        } focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:scale-[1.02] hover:border-emerald-400/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)]`}
-    />
-    
-    {/* Search icon with rotation animation */}
-    <svg
-      className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-all duration-500 group-focus-within:scale-110 group-focus-within:rotate-90 group-focus-within:text-emerald-500
-        ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
-    </svg>
-
-    {/* Particle effect dots */}
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-all duration-500 flex gap-1">
-      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0s'}} />
-      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.3s'}} />
-      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.6s'}} />
-    </div>
-  </div>
-</div>
-
-      {/* RIGHT – Actions */}
-      <div className="flex items-center gap-4">
-        {/* Start Fundraising – desktop only */}
-<button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-400 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
-  Start fundraising
-</button>
-        {/* Zakaat icon */}
-        <button
-          aria-label="Zakaat"
-          className={`p-2 rounded-full transition-colors cursor-pointer
-            ${darkMode
-              ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-              : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-            }`}
-        >
-          <Image
-            src="/zakkat.svg"
-            alt="Zakaat"
-            width={20}
-            height={20}
-            className={darkMode ? 'brightness-0 invert' : ''}
-          />
-        </button>
-
-        {/* Dark-mode toggle */}
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          aria-label="Toggle dark mode"
-          className={`p-2 rounded-full transition-colors cursor-pointer
-            ${darkMode
-              ? 'bg-zinc-800/80 text-yellow-400 hover:bg-zinc-700 backdrop-blur-sm'
-              : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-            }`}
-        >
-          {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-        </button>
-
-    
-
-    {/* <select
-  value={fontFamily}
-  onChange={e => setFontFamily(e.target.value)}
-  className="p-2 bg-white text-black rounded"
->
-  <option value="aref">Aref Ruqaa</option>
-  <option value="markazi">Markazi Text</option>
-  <option value="cairo">Cairo</option>
-  <option value="amiri">Amiri</option>
-</select> */}
-        {/* Hamburger */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Menu"
-          className={`p-2 rounded-full transition-colors cursor-pointer
-            ${darkMode
-              ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-              : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-            }`}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-    </div>
-
-   {/* Mobile search bar */}
-<div className="md:hidden pb-3">
-  <div className="relative w-full group">
-    {/* Animated background gradient */}
-    <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
-      ${darkMode 
-        ? 'bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-cyan-500/30' 
-        : 'bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20'
-      } animate-[pulse_3s_ease-in-out_infinite]`} 
-    />
-    
-    {/* Shimmer effect on focus */}
-    <div className="absolute inset-0 rounded-full overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
-      <div className={`absolute inset-0 -translate-x-full group-focus-within:translate-x-full transition-transform duration-[2000ms] ease-in-out
-        ${darkMode 
-          ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent' 
-          : 'bg-gradient-to-r from-transparent via-white/40 to-transparent'
-        }`} 
-      />
-    </div>
-
-    <input
-      type="text"
-      placeholder="Discover inspiring causes"
-      className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
-        ${darkMode
-          ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
-          : 'bg-white/90 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-md focus:bg-white focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.15),inset_0_1px_2px_rgba(16,185,129,0.1)]'
-        } focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:scale-[1.02] hover:border-emerald-400/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)]`}
-    />
-    
-    {/* Search icon with rotation animation */}
-    <svg
-      className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-all duration-500 group-focus-within:scale-110 group-focus-within:rotate-90 group-focus-within:text-emerald-500
-        ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
-    </svg>
-
-    {/* Particle effect dots */}
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-all duration-500 flex gap-1">
-      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0s'}} />
-      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.3s'}} />
-      <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{animationDelay: '0.6s'}} />
-    </div>
-  </div>
-</div>
-  </div>
-
-  {/* Mobile menu dropdown */}
-{mobileMenuOpen && (
-  <>
-    {/* Backdrop overlay */}
-<div 
-  className="fixed inset-0 z-40 md:flex md:items-start md:justify-end md:pr-8 md:pt-20"
-  onClick={() => setMobileMenuOpen(false)}
->
-      {/* Modal popup */}
-       <div
-        className={`fixed md:relative right-0 top-0 h-full md:h-[33rem] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl shadow-2xl overflow-hidden transition-transform duration-300 ease-in-out
-          ${darkMode
-            ? 'bg-zinc-900'
-            : 'bg-white'
-          }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button - fixed at top on mobile */}
-        <div className={`md:hidden sticky top-0 z-10 flex justify-end px-4 py-3 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
-          >
-            <X className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-zinc-900'}`} />
-          </button>
-        </div>
-        {/* Menu content */}
-       <div className="px-6 py-6 space-y-4 max-h-[80vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-
-          {/* Greeting */}
-          <div>
-            <p className={`text-xs font-semibold ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-              SALAM!
-            </p>
-          </div>
-
-          {/* Search */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="I want to support..."
-              className={`w-full px-4 py-3 pl-10 rounded-xl border
-                ${darkMode
-                  ? 'bg-zinc-800 text-white placeholder-zinc-500 border-zinc-700'
-                  : 'bg-zinc-50 text-zinc-900 placeholder-zinc-400 border-zinc-200'
-                } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-            />
-            <svg
-              className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5
-                ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-
-          {/* Discover link */}
-          <a
-            href="#"
-            className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
-              ${darkMode
-                ? 'text-zinc-300 hover:bg-zinc-800'
-                : 'text-zinc-700 hover:bg-zinc-100'
-              }`}
-          >
-            <svg className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Discover inspiring campaigns →</span>
-          </a>
-
-          {/* Main menu items with icons */}
-<div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
-  {[
-    { name: 'Deeds', icon: '/deeds.svg' },
-    { name: 'Palestine', icon: '/heart.svg' },
-    { name: 'Daily Givers', icon: '/leaf.svg' },
-    { name: 'Zakat', icon: '/zakkat.svg' }
-  ].map(item => (
-    <a
-      key={item.name}
-      href="#"
-      className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
-        ${darkMode
-          ? 'text-zinc-300 hover:bg-zinc-800'
-          : 'text-zinc-700 hover:bg-zinc-100'
-        }`}
-      onClick={() => setMobileMenuOpen(false)}
-    >
-      <Image
-        src={item.icon}
-        alt={item.name}
-        width={20}
-        height={20}
-        className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
-      />
-      <span>{item.name}</span>
-    </a>
-  ))}
-</div>
-
-
-          {/* Start section */}
-<div>
-  <p
-    className={`text-xs font-semibold mb-2 ${
-      darkMode ? "text-zinc-500" : "text-zinc-400"
-    }`}
-  >
-    START
-  </p>
-  <div className="space-y-1">
-    {/* Start Fundraising */}
-    <a
-      href="#"
-      className={`group flex items-center justify-between py-2 px-2 rounded-lg transition-all duration-300
-        ${
-          darkMode
-            ? "text-zinc-300 hover:bg-zinc-800"
-            : "text-zinc-700 hover:bg-zinc-100"
-        }`}
-      onClick={() => setMobileMenuOpen(false)}
-    >
-      <div className="flex items-center gap-2">
-        <Image
-          src="/share.svg"
-          alt="Start Fundraising"
-          width={20}
-          height={20}
-          className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
-        />
-        <span>Start fundraising</span>
-      </div>
-      <span className="text-xs text-emerald-600 font-medium">
-        0% platform fee!
-      </span>
-    </a>
-
-    {/* Start Community */}
-    <a
-      href="#"
-      className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-all duration-300
-        ${
-          darkMode
-            ? "text-zinc-300 hover:bg-zinc-800"
-            : "text-zinc-700 hover:bg-zinc-100"
-        }`}
-      onClick={() => setMobileMenuOpen(false)}
-    >
-      <Image
-        src="/community.svg"
-        alt="Start a community"
-        width={20}
-        height={20}
-        className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
-      />
-      <span>Start a community</span>
-    </a>
-  </div>
-</div>
-
-
-          {/* Support */}
-          <a
-            href="#"
-            className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors border-t pt-3 border-zinc-200 dark:border-zinc-700
-              ${darkMode
-                ? 'text-zinc-300 hover:bg-zinc-800'
-                : 'text-zinc-700 hover:bg-zinc-100'
-              }`}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <span>🎧</span>
-            <span>Support</span>
-          </a>
-
-          {/* Sign up / Log in */}
-          <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
-            <a
-              href="#"
-              className={`block text-center py-2 px-4 rounded-lg transition-colors
-                ${darkMode
-                  ? 'text-zinc-300 hover:bg-zinc-800'
-                  : 'text-zinc-700 hover:bg-zinc-100'
-                }`}
-            >
-              Sign up
-            </a>
-            <a
-              href="#"
-              className={`block text-center py-2 px-4 rounded-lg transition-colors
-                ${darkMode
-                  ? 'text-zinc-300 hover:bg-zinc-800'
-                  : 'text-zinc-700 hover:bg-zinc-100'
-                }`}
-            >
-              Log in
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </>
-)}
-</header>
+<Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
 
       {/* Hero Section */}
 
@@ -1588,53 +1176,55 @@ useEffect(() => {
       </section>
 
       {/* Pulse Section */}
-      <section id="pulse" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-           <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+     <section id="pulse" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-8">
+      <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Pulse of the Ummah
       </h2>
-            <p className={`text-sm ${COLORS.neutralBody}`}>
-              Live generosity snapshot
-            </p>
-          </div>
-          
-          <div className="flex flex-col items-center mb-10">
-            <div className={`relative inline-block px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} pulse-glow`}>
-              <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">
-                {currency(totalRaised)}
+      <p className={`text-sm ${COLORS.neutralBody}`}>
+        Live generosity snapshot
+      </p>
+    </div>
+    
+    <div className="flex flex-col items-center mb-10">
+      <div className={`relative inline-block px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
+        <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">
+          {currency(totalRaised)}
+        </div>
+      </div>
+      <div className={`text-sm ${COLORS.neutralBody} mt-3`}>raised in the last hour</div>
+    </div>
+
+    <div className="max-w-5xl mx-auto">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        {recentDonations.map((donation, index) => (
+          <div 
+            key={index}
+            className={`relative group p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${
+              darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
+            } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
+            shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative">
+              <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
+                {currency(donation.amount)}
+              </div>
+              <div className={`text-xs ${COLORS.neutralBody}`}>
+                {donation.name}
+              </div>
+              <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
+                {donation.time}
               </div>
             </div>
-            <div className={`text-sm ${COLORS.neutralBody} mt-3`}>raised in the last hour</div>
           </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
 
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {recentDonations.map((donation, index) => (
-            <div 
-  key={index}
-  className={`relative group p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${
-    darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
-  } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-emerald-600 shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
->
-                  <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                  <div className="relative">
-                    <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
-                      {currency(donation.amount)}
-                    </div>
-                    <div className={`text-xs ${COLORS.neutralBody}`}>
-                      {donation.name}
-                    </div>
-                    <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
-                      {donation.time}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Stories Section */}
       <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
@@ -1712,130 +1302,7 @@ useEffect(() => {
 </section> */}
 
       {/* Footer */}
-   <footer className={`py-12 border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
-      {/* Logo and Tagline */}
-      <div className="md:col-span-1">
-        <Image
-          src={darkMode ? "/TPFAid-Logo1.png" : "/TPFAid-Logo.png"}
-          alt="TPF Aid Logo"
-          width={160}
-          height={160}
-          priority
-          className="cursor-pointer mb-4"
-        />
-        <p className={`text-sm font-semibold ${darkMode ? 'text-zinc-400' : 'text-gray-600'} leading-relaxed`}>
-          Making a difference through community-funded projects and transparent impact.
-        </p>
-      </div>
-      {/* About TPF */}
-      <div>
-        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>About TPF</div>
-        <ul className="space-y-2.5 text-sm mb-6">
-          {['About us', 'Our Mission', 'Our Team', 'FAQs','What We Do'].map(item => (
-            <li key={item}>
-              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                {item}
-              </a>
-            </li>
-          ))}
-        </ul>
-       
-      </div>
-      {/* Get Involved */}
-      <div>
-        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Get Involved</div>
-        <ul className="space-y-2.5 text-sm">
-          {['Careers', 'Join TPF Aid', 'Volunteer Now', 'TPF Aid in News', 'Blog', 'Notices'].map(item => (
-            <li key={item}>
-              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                {item}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-      {/* Legal & Help */}
- <div>
-        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Legal & Help</div>
-        <ul className="space-y-2.5 text-sm">
-          {['Contact Us', 'Request a Feature', 'Complaints', 'Help Centre', 'Our Legal Status', 'Privacy Policies'].map(item => (
-            <li key={item}>
-              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                {item}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Ways To Jannah</div>
-        <ul className="space-y-2.5 text-sm">
-          {['Daily Giver', 'Donate Weekly (Friday)', ' Donate Monthly', ' Donate Your Zakat', ' Discover Fundraiser', 'Donate in Emergency Funds'].map(item => (
-            <li key={item}>
-              <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                {item}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-  
-    
-    </div>
-
-          {/* Islamic Calendar */}
-<div
-  className={`mb-6 py-4 px-4 border-t border-b ${
-    darkMode ? 'border-zinc-700' : 'border-zinc-300'
-  }`}
->
-  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm text-center sm:text-left">
-    <div className="flex flex-col sm:flex-row items-center gap-2 flex-wrap justify-center sm:justify-start">
-      <span
-        className={`font-semibold ${
-          darkMode ? 'text-white' : 'text-gray-800'
-        }`}
-      >
-        Today's Date:
-      </span>
-      <span
-        className={`${
-          darkMode ? 'text-zinc-300' : 'text-gray-700'
-        } break-words`}
-      >
-        {hijriFromApi || '...'}
-      </span>
-    </div>
-  </div>
-</div>
-
-
-
-          {/* Bottom Bar */}
-          <div className={`pt-6 flex flex-col sm:flex-row items-center justify-between gap-4`}>
-            <span className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
-              © {new Date().getFullYear()} True Path Foundation. All rights reserved.
-            </span>
-            <div className="flex items-center gap-3">
-              <a href="#" className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              </a>
-              <a href="#" className="w-10 h-10 bg-blue-400 hover:bg-blue-500 text-white rounded flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-              </a>
-              <a href="#" className="w-10 h-10 bg-red-600 hover:bg-red-700 text-white rounded flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-              </a>
-              <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-gray-900 text-white rounded flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+  <Footer darkMode={darkMode} hijriFromApi={hijriFromApi} />
 
       {/* Scroll to Top Button */}
       {scrolled && (
