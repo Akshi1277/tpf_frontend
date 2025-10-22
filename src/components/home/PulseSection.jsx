@@ -106,7 +106,7 @@ useEffect(() => {
   </div>
 
   {/* Slider viewport (exactly 5 visible) */}
-  <div className="relative overflow-hidden rounded-2xl pb-0">
+  <div className="relative overflow-hidden rounded-2xl p-2">
     {/* moving track */}
     <div
       className="grid grid-flow-col auto-cols-[20%] items-center gap-0"
@@ -129,8 +129,8 @@ useEffect(() => {
     </div>
 
     {/* subtle edge fade */}
-    <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white/70 to-transparent dark:from-zinc-900/70"></div>
-    <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/70 to-transparent dark:from-zinc-900/70"></div>
+    <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white/40 to-transparent dark:from-zinc-900/70"></div>
+    <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/40 to-transparent dark:from-zinc-900/70"></div>
   </div>
 </div>
     </div>
