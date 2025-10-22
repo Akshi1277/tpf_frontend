@@ -1,7 +1,7 @@
 // app/page.jsx
 'use client';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/home/HeroSection';
 import ImpactStatsBar from '@/components/home/ImpactStatsBar';
 import CampaignsSection from '@/components/home/CampaignsSection';

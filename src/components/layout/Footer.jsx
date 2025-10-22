@@ -126,7 +126,7 @@ export default function Footer({ darkMode}) {
                 Stay inspired — join our journey beyond this life
               </h3>
               <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
-               Planted in this dunya, to bloom in the akhirah.
+               Plant in this dunya, to bloom in the akhirah.
               </p>
             </div>
             <div className="flex w-full md:w-auto md:min-w-[400px]">
