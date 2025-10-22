@@ -784,7 +784,7 @@ useEffect(() => {
         Every contribution creates lasting impact.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2">
-        <button className="w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 flex items-center justify-center bg-emerald-400 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg transition-colors shadow-lg">
+        <button className="w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg transition-colors shadow-lg">
           Start Giving
         </button>
         <button className={`w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base md:text-lg transition-colors border-2
@@ -817,7 +817,7 @@ useEffect(() => {
 {/* Impact Stats Bar */}
 <section 
   ref={statsRef}
-  className={`py-16 md:py-36 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}
+  className={`py-12 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}
 >
  
 
@@ -862,7 +862,7 @@ useEffect(() => {
            <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Fundraising now
       </h2>
-            <button href="#" className="text-sm font-medium bg-emerald-400 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
+            <button href="#" className="text-sm font-medium bg-emerald-600 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
               Discover more
             </button>
           </div>
@@ -955,7 +955,7 @@ useEffect(() => {
                       </span>
                     </div>
 
-              <button className="w-full cursor-pointer bg-emerald-400 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-lg transition-colors mb-4">
+              <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-lg transition-colors mb-4">
   Donate Now
 </button>
 
@@ -1024,7 +1024,7 @@ useEffect(() => {
       </div>
     </div>
     <div className="p-4">
-      <button className="w-full cursor-pointer bg-emerald-400 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+      <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
         <span>Support Now</span>
         <ArrowRight className="w-4 h-4" />
       </button>
@@ -1055,7 +1055,7 @@ useEffect(() => {
                 <p className="text-sm md:text-base text-white/90 mb-5">
                Your daily support delivers relief, care, and dignity to families in urgent need.
                 </p>
-                <button className="px-6 py-3 cursor-pointer bg-emerald-400 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
+                <button className="px-6 py-3 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
                  Start Giving Daily Now
                 </button>
               </div>
@@ -1100,80 +1100,93 @@ useEffect(() => {
         </div>
       </section> */}
 
-      <section id="communities" className={`py-12 border-b border-gray-300 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-         <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+     <section id="communities" className={`py-12 border-b border-gray-300 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-8">
+      <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Communities
       </h2>
-            <p className={`text-sm ${COLORS.neutralBody}`}>
-             Communities you would like to join
-            </p>
+      <p className={`text-sm ${COLORS.neutralBody}`}>
+        Communities you would like to join
+      </p>
+    </div>
+    
+    <div className="grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 flex items-center justify-center">
+      {communities.map((partner, index) => (
+        <div 
+          key={index}
+          className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
+            darkMode ? 'bg-zinc-900' : 'bg-white'
+          } border ${darkMode ? 'border-zinc-700 hover:border-zinc-500' : 'border-zinc-200 hover:border-zinc-400'}
+          shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+        >
+          <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+          
+          <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+            <img 
+              src={partner.image}
+              alt={partner.name}
+              className="w-full h-full object-cover"
+              loading='lazy'
+            />
           </div>
           
-          <div className="grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 flex items-center justify-center">
-            {communities.map((partner, index) => (
-            <div 
-  key={index}
-  className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
-    darkMode ? 'bg-zinc-900' : 'bg-white'
-  } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
->
- 
-                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                
-               <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-  <img 
-    src={partner.image}
-    alt={partner.name}
-    className="w-full h-full object-cover"
-    loading='lazy'
-  />
-</div>
-                <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 py-1 bg-emerald-400 text-white rounded-2xl group-hover:bg-red-500'>
-                  Join Now
-                </button>
-              </div>
-              
-            ))}
-            
-          </div>
+          <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>
+            {partner.name}
+          </span>
+
+          <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 py-1 bg-emerald-600 text-white rounded-2xl group-hover:bg-red-500'>
+            Join Now
+          </button>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
+
      <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-8">
+      <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Trusted By
       </h2>
-            <p className={`text-sm ${COLORS.neutralBody}`}>
-              Trusted partners we collaborate with to deliver impact
-            </p>
-          </div>
+      <p className={`text-sm ${COLORS.neutralBody}`}>
+        Trusted partners we collaborate with to deliver impact
+      </p>
+    </div>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5">
+      {partners.map((partner, index) => (
+        <div
+          key={index}
+          className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
+            darkMode ? 'bg-zinc-900' : 'bg-white'
+          } border ${darkMode ? 'border-zinc-700 hover:border-zinc-500' : 'border-zinc-200 hover:border-zinc-400'}
+          shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+        >
+          <div
+            className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
+          ></div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5">
-            {partners.map((partner, index) => (
-            <div 
-  key={index}
-  className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
-    darkMode ? 'bg-zinc-900' : 'bg-white'
-  } border ${darkMode ? 'border-zinc-700 hover:border-emerald-600' : 'border-zinc-200 hover:border-emerald-600'} shadow-[0_2px_6px_rgba(110,231,183,0.25)] hover:shadow-[0_4px_12px_rgba(16,185,129,0.4)]`}
->
-                <div className={`absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-               <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-  <img 
-    src={partner.image}
-    alt={partner.name}
-    className="w-full h-full object-cover"
-  />
-</div>
-                <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-              </div>
-            ))}
+          <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+            <img
+              src={partner.image}
+              alt={partner.name}
+              className="w-full h-full object-cover"
+            />
           </div>
+
+          <span
+            className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}
+          >
+            {partner.name}
+          </span>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Pulse Section */}
      <section id="pulse" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
@@ -1189,7 +1202,7 @@ useEffect(() => {
     
     <div className="flex flex-col items-center mb-10">
       <div className={`relative inline-block px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
-        <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">
+        <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
           {currency(totalRaised)}
         </div>
       </div>
@@ -1228,47 +1241,48 @@ useEffect(() => {
 
       {/* Stories Section */}
       <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
-        Impact stories
-      </h2>
-          <p className={`text-sm ${COLORS.neutralBody} mb-6`}>
-            Real change made possible by your generosity.
-          </p>
-          
-<div 
-  id="stories-container"
-  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
->
- {(isMobile ? infiniteStories : successStories).map((story, index) => (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+      Impact Stories
+    </h2>
+    <p className={`text-sm ${COLORS.neutralBody} mb-6`}>
+      Real change made possible by your generosity.
+    </p>
+
     <div 
-      key={`story-${index}`}  // This is already correct since index is unique
-      className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
-        ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-        shadow-[0_4px_10px_rgba(110,231,183,0.4)] hover:shadow-[0_6px_14px_rgba(16,185,129,0.6)]`}
+      id="stories-container"
+      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
     >
-                <img
-                  src={story.image}
-                  alt={story.title}
-                  className="h-44 w-full object-cover"
-                />
-                <div className="p-5">
-                  <h3 className={`font-semibold text-base ${COLORS.neutralHeading} mb-2`}>
-                    {story.title}
-                  </h3>
-                  <p className={`text-sm ${COLORS.neutralBody} mb-3`}>
-                    {story.excerpt}
-                  </p>
-                  <a href="#" className="text-sm font-medium text-emerald-700 hover:underline flex items-center gap-1">
-                    Read more 
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            ))}
+      {(isMobile ? infiniteStories : successStories).map((story, index) => (
+        <div 
+          key={`story-${index}`}
+          className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+            ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+            shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+        >
+          <img
+            src={story.image}
+            alt={story.title}
+            className="h-44 w-full object-cover"
+          />
+          <div className="p-5">
+            <h3 className={`font-semibold text-base ${COLORS.neutralHeading} mb-2`}>
+              {story.title}
+            </h3>
+            <p className={`text-sm ${COLORS.neutralBody} mb-3`}>
+              {story.excerpt}
+            </p>
+            <a href="#" className="text-sm font-medium text-emerald-700 hover:underline flex items-center gap-1">
+              Read more 
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
+
 
 {/* <section className={`py-16 ${darkMode ? 'bg-gradient-to-br from-emerald-900 to-zinc-900' : 'bg-gradient-to-br from-emerald-600 to-emerald-700'}`}>
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

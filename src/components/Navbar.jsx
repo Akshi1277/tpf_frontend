@@ -92,7 +92,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             {/* RIGHT – Actions */}
             <div className="flex items-center gap-4">
               {/* Start Fundraising – desktop only */}
-              <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-400 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
+              <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
                 Start fundraising
               </button>
 
