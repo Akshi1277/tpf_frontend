@@ -52,12 +52,12 @@ function StatCounter({ label, end, format, suffix = '', darkMode, shouldAnimate 
       transform: shouldAnimate ? 'translateY(0)' : 'translateY(20px)'
     }}>
       <div className={`text-3xl md:text-4xl font-bold mb-2 transition-colors duration-300 ${
-        darkMode ? 'text-white' : 'text-white'
+        darkMode ? 'text-emerald-400' : 'text-emerald-500'
       }`}>
         {formatValue(count)}
       </div>
       <div className={`text-sm font-medium uppercase tracking-wider ${
-        darkMode ? 'text-emerald-300' : 'text-white'
+        darkMode ? 'text-zinc-500' : 'text-zinc-600'
       }`}>
         {label}
       </div>
@@ -834,7 +834,7 @@ useEffect(() => {
       {/* RIGHT – Actions */}
       <div className="flex items-center gap-4">
         {/* Start Fundraising – desktop only */}
-<button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
+<button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-400 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
   Start fundraising
 </button>
         {/* Zakaat icon */}
@@ -1196,7 +1196,7 @@ useEffect(() => {
         Every contribution creates lasting impact.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2">
-        <button className="w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg transition-colors shadow-lg">
+        <button className="w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 flex items-center justify-center bg-emerald-400 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg transition-colors shadow-lg">
           Start Giving
         </button>
         <button className={`w-full cursor-pointer sm:w-auto px-6 md:px-8 py-3 md:py-4 rounded-lg font-semibold text-base md:text-lg transition-colors border-2
@@ -1229,40 +1229,9 @@ useEffect(() => {
 {/* Impact Stats Bar */}
 <section 
   ref={statsRef}
-  className={`py-16 md:py-36 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}
+  className={`py-16 md:py-36 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}
 >
-  {/* World Map Background */}
-  <div className="absolute inset-0 flex items-center justify-center">
-    <img
-      src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Equirectangular_projection_SW.jpg/1280px-Equirectangular_projection_SW.jpg"
-      alt="World Map"
-    className={`w-full h-full object-cover object-[50%_37%] ${darkMode ? 'brightness-50' : 'brightness-100'}`}
-    />
-  </div>
-
-  {/* <div className="absolute inset-0 pointer-events-none">
-    {[
-      { top: '22%', left: '26%' }, // North America
-      { top: '45%', left: '30%' }, // South America
-      { top: '30%', left: '50%' }, // Europe
-      { top: '40%', left: '55%' }, // Africa
-      { top: '3%', left: '72%' }, // Asia
-      { top: '60%', left: '80%' }, // Australia
-    ].map((pos, i) => (
-      <div
-        key={i}
-        className="absolute w-3 h-3 animate-ping"
-        style={{
-          top: pos.top,
-          left: pos.left,
-          animationDelay: `${i * 0.3}s`,
-          animationDuration: '2s'
-        }}
-      >
-        <div className="w-full h-full bg-emerald-600 rounded-full"></div>
-      </div>
-    ))}
-  </div> */}
+ 
 
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -1305,7 +1274,7 @@ useEffect(() => {
            <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
         Fundraising now
       </h2>
-            <button href="#" className="text-sm font-medium bg-emerald-700 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
+            <button href="#" className="text-sm font-medium bg-emerald-400 p-2 rounded-full text-white hover:animate-pulse cursor-pointer">
               Discover more
             </button>
           </div>
@@ -1398,7 +1367,7 @@ useEffect(() => {
                       </span>
                     </div>
 
-              <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-lg transition-colors mb-4">
+              <button className="w-full cursor-pointer bg-emerald-400 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-lg transition-colors mb-4">
   Donate Now
 </button>
 
@@ -1445,16 +1414,15 @@ useEffect(() => {
     </div>
 <div 
   id="curated-container"
-  className="flex gap-8 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
 >
   {(isMobile ? infiniteCurated : curatedItems).map((item, index) => (
-   <div
-  key={`curated-${index}`}
-  className={`flex-shrink-0 w-[175px] snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
-    ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-    shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
->
-
+    <div
+      key={`curated-${index}`}  // Changed from just `index` to `curated-${index}`
+      className={`flex-shrink-0 w-[280px] snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
+        ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+        shadow-lg hover:shadow-2xl`}
+    >
     <div className="relative h-48 overflow-hidden">
       <img
         src={item.image}
@@ -1468,7 +1436,7 @@ useEffect(() => {
       </div>
     </div>
     <div className="p-4">
-      <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ">
+      <button className="w-full cursor-pointer bg-emerald-400 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
         <span>Support Now</span>
         <ArrowRight className="w-4 h-4" />
       </button>
@@ -1499,7 +1467,7 @@ useEffect(() => {
                 <p className="text-sm md:text-base text-white/90 mb-5">
                Your daily support delivers relief, care, and dignity to families in urgent need.
                 </p>
-                <button className="px-6 py-3 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
+                <button className="px-6 py-3 cursor-pointer bg-emerald-400 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
                  Start Giving Daily Now
                 </button>
               </div>
@@ -1575,7 +1543,7 @@ useEffect(() => {
   />
 </div>
                 <span className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}>{partner.name}</span>
-                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 py-1 bg-emerald-500 text-white rounded-2xl group-hover:bg-red-500'>
+                <button className='cursor-pointer text-sm mt-2 flex items-center justify-center gap-2 px-2 py-1 bg-emerald-400 text-white rounded-2xl group-hover:bg-red-500'>
                   Join Now
                 </button>
               </div>
@@ -1633,7 +1601,7 @@ useEffect(() => {
           
           <div className="flex flex-col items-center mb-10">
             <div className={`relative inline-block px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} pulse-glow`}>
-              <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+              <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">
                 {currency(totalRaised)}
               </div>
             </div>
