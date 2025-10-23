@@ -20,7 +20,7 @@ export default function StatCounter({ label, end, format, suffix = '', darkMode,
       opacity: shouldAnimate ? 1 : 0,
       transform: shouldAnimate ? 'translateY(0)' : 'translateY(20px)'
     }}>
-      <div className={`text-3xl md:text-4xl font-bold mb-2 transition-colors duration-300 ${
+      <div className={`text-xl md:text-3xl font-bold mb-2 transition-colors duration-300 ${
         darkMode ? 'text-emerald-400' : 'text-emerald-500'
       }`}>
         {formatValue(count)}

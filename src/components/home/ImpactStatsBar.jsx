@@ -30,7 +30,7 @@ export default function ImpactStatsBar({ darkMode, totalRaised }) {
   return (
     <section 
       ref={statsRef}
-      className={`py-12 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}
+      className={`py-8 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
