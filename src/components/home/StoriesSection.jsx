@@ -125,23 +125,8 @@ export default function StoriesSection({ darkMode }) {
             Every contribution writes a new chapter in someone's life. These are the stories of transformation, resilience, and hope made possible by people like you.
           </p>
 
-          {/* Stats bar */}
-          <div className={`mt-10 inline-flex items-center gap-8 px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-zinc-50 border border-zinc-200'}`}>
-            {[
-              { num: '1,200+', label: 'Families Helped' },
-              { num: '50K+', label: 'Lives Impacted' },
-              { num: '15', label: 'Countries' }
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className={`text-2xl font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                  {stat.num}
-                </div>
-                <div className={`text-xs ${COLORS.neutralBody} mt-1`}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
+          
+         
         </div>
 
         {/* Cards grid */}
