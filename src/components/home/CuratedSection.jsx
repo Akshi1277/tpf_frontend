@@ -145,7 +145,7 @@ export default function CuratedSection({ darkMode }) {
   className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
 >
   {(isMobile ? infiniteCurated : curatedItems).map((item, index) => (
-    <div key={`curated-${index}`} className="flex-shrink-0 w-[280px] snap-start">
+    <div key={`curated-${index}`} className="flex-shrink-0 w-[160px] md:w-[280px] snap-start">
       <CuratedCard 
         item={item}
         darkMode={darkMode}
