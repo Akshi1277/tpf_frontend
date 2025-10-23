@@ -21,10 +21,7 @@ export default function CuratedCard({ item, darkMode }) {
         </div>
       </div>
     <div className="mt-auto">
-  <button className="w-full rounded-b-2xl bg-emerald-600 hover:bg-emerald-700 text-white py-3 md:py-3.5 text-sm md:text-base font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-    <span>Support Now</span>
-    <ArrowRight className="w-4 h-4" />
-  </button>
+ 
 </div>
 
     </div>
