@@ -5,7 +5,7 @@ export const campaigns = [
     id: 1,
     title: "Emergency Relief for Families in Gaza",
     category: "emergency",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1739879353789-41554220f9c4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZW1lcmdlbmN5JTIwcmVsaWVmJTIwZm9yJTIwZmFtaWx5JTIwaW4lMjBnYXphfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
     raised: 45627,
     goal: 75000,
     donors: 342,
