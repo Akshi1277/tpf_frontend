@@ -4,7 +4,6 @@ import CuratedCard from '@/components/ui/CuratedCard';
 import { curatedItems } from '@/lib/constants';
 
 export default function CuratedSection({ darkMode }) {
-  const [isMobile, setIsMobile] = useState(false);
   const [curatedScrollIndex, setCuratedScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
 
@@ -15,37 +14,25 @@ export default function CuratedSection({ darkMode }) {
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
-  // Auto-scroll for curated (mobile only)
   useEffect(() => {
-    if (!isMobile || isUserScrolling) return;
+    if (isUserScrolling) return;
 
     const interval = setInterval(() => {
       setCuratedScrollIndex(prev => prev + 1);
-    }, 4000);
+    }, 2000);
 
     return () => clearInterval(interval);
-  }, [isMobile, isUserScrolling]);
+  }, [isUserScrolling]);
 
   // Scroll curated container
   useEffect(() => {
-    if (!isMobile) return;
-
     const container = document.getElementById('curated-container');
     if (!container) return;
 
-    const cardWidth = container.offsetWidth;
-    const scrollTo = cardWidth * curatedScrollIndex;
+    const cardWidth = container.children[0]?.offsetWidth || 0;
+    const gap = 20; // 1.25rem = 20px
+    const scrollTo = (cardWidth + gap) * curatedScrollIndex;
     
     container.scrollTo({
       left: scrollTo,
@@ -61,12 +48,10 @@ export default function CuratedSection({ darkMode }) {
         setCuratedScrollIndex(0);
       }, 500);
     }
-  }, [curatedScrollIndex, isMobile]);
+  }, [curatedScrollIndex]);
 
   // Handle user scrolling detection
   useEffect(() => {
-    if (!isMobile) return;
-
     const container = document.getElementById('curated-container');
     if (!container) return;
 
@@ -91,27 +76,32 @@ export default function CuratedSection({ darkMode }) {
     return () => {
       container.removeEventListener('scroll', handleScrollStart);
     };
-  }, [isMobile]);
+  }, []);
 
-  // Handle seamless infinite loop
+  // Handle seamless infinite loop for manual scrolling
   useEffect(() => {
-    if (!isMobile) return;
-
     const container = document.getElementById('curated-container');
     if (!container) return;
 
     const handleScrollEnd = () => {
-      const cardWidth = container.offsetWidth;
+      const cardWidth = container.children[0]?.offsetWidth || 0;
+      const gap = 20; // 1.25rem = 20px
       const scrollLeft = container.scrollLeft;
-      const currentIndex = Math.round(scrollLeft / cardWidth);
+      const currentIndex = Math.round(scrollLeft / (cardWidth + gap));
 
       if (currentIndex >= curatedItems.length) {
         const equivalentIndex = currentIndex - curatedItems.length;
         container.scrollTo({
-          left: equivalentIndex * cardWidth,
+          left: equivalentIndex * (cardWidth + gap),
           behavior: 'auto'
         });
         setCuratedScrollIndex(equivalentIndex);
+      } else if (currentIndex < 0) {
+        container.scrollTo({
+          left: (curatedItems.length + currentIndex) * (cardWidth + gap),
+          behavior: 'auto'
+        });
+        setCuratedScrollIndex(curatedItems.length + currentIndex);
       }
     };
 
@@ -126,7 +116,7 @@ export default function CuratedSection({ darkMode }) {
     return () => {
       container.removeEventListener('scroll', onScroll);
     };
-  }, [isMobile]);
+  }, []);
 
   return (
     <section id="curated" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
@@ -140,19 +130,19 @@ export default function CuratedSection({ darkMode }) {
           </p>
         </div>
         
-  <div 
-  id="curated-container"
-  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
->
-  {(isMobile ? infiniteCurated : curatedItems).map((item, index) => (
-    <div key={`curated-${index}`} className="flex-shrink-0 w-[160px] md:w-[280px] snap-start">
-      <CuratedCard 
-        item={item}
-        darkMode={darkMode}
-      />
-    </div>
-  ))}
-</div>
+        <div 
+          id="curated-container"
+          className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+        >
+          {infiniteCurated.map((item, index) => (
+            <div key={`curated-${item.id}-${index}`} className="flex-shrink-0 w-[160px] md:w-[280px] snap-start">
+              <CuratedCard 
+                item={item}
+                darkMode={darkMode}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
