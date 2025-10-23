@@ -188,7 +188,7 @@ Start today, inspire others, and help create a world where generosity knows no b
         </div>
         
         <div className="flex flex-col items-center mb-10">
-          <div className={`relative inline-block px-5 py-1 md:px-6 py-2 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
+          <div className={`relative inline-block px-5 py-1 md:px-6 md:py-2 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
             <div className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
               {currency(totalRaised)}
             </div>
@@ -197,30 +197,91 @@ Start today, inspire others, and help create a world where generosity knows no b
         </div>
 
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {recentDonations.map((donation, index) => (
-              <div 
-                key={index}
-                className={`relative group p-5 w-40 h-24 md:w-48 md:h-32 rounded-xl text-center overflow-hidden transition-all duration-300 ${
-                  darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
-                } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
-                shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
-                    {currency(donation.amount)}
-                  </div>
-                  <div className={`text-xs ${COLORS.neutralBody}`}>
-                    {donation.name}
-                  </div>
-                  <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
-                    {donation.time}
-                  </div>
-                </div>
-              </div>
-            ))}
+         {/* MOBILE — unchanged grid */}
+<div className="grid grid-cols-2 sm:grid-cols-3 md:hidden gap-5 lg:gap-40">
+  {recentDonations.map((donation, index) => (
+    <div 
+      key={index}
+      className={`relative group p-5 w-40 h-24 rounded-xl text-center overflow-hidden transition-all duration-300 ${
+        darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
+      } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
+      shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="relative">
+        <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
+          {currency(donation.amount)}
+        </div>
+        <div className={`text-xs ${COLORS.neutralBody}`}>
+          {donation.name}
+        </div>
+        <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
+          {donation.time}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+{/* DESKTOP — 6 visible with arrows */}
+<div className="relative hidden md:flex justify-center w-full">
+
+
+  {/* LEFT ARROW */}
+  <button
+    onClick={() =>
+      document.getElementById("recent-track")
+        ?.scrollBy({ left: -250, behavior: "smooth" })
+    }
+    className="absolute left-0 top-1/2 -translate-y-1/2 z-10
+               bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm
+               p-2 rounded-full shadow"
+  >
+    ←
+  </button>
+
+  {/* HORIZONTAL TRACK */}
+ <div id="recent-track" className="flex overflow-x-auto scrollbar-hide scroll-smooth">
+    {recentDonations.map((donation, index) => (
+      <div key={index} className="shrink-0 w-[16.66%] px-2">
+        <div 
+          className={`relative group p-5 w-full h-28 rounded-xl text-center overflow-hidden transition-all duration-300 ${
+            darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
+          } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
+          shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative">
+            <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
+              {currency(donation.amount)}
+            </div>
+            <div className={`text-xs ${COLORS.neutralBody}`}>
+              {donation.name}
+            </div>
+            <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
+              {donation.time}
+            </div>
           </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {/* RIGHT ARROW */}
+  <button
+    onClick={() =>
+      document.getElementById("recent-track")
+        ?.scrollBy({ left: 250, behavior: "smooth" })
+    }
+    className="absolute right-0 top-1/2 -translate-y-1/2 z-10
+               bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm
+               p-2 rounded-full shadow"
+  >
+    →
+  </button>
+
+</div>
+
         </div>
       </div>
     </section>

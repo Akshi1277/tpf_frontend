@@ -192,7 +192,9 @@ export const recentDonations = [
   { name: "Ahmed K.", amount: 250, time: "5 min ago" },
   { name: "Fatima S.", amount: 1000, time: "8 min ago" },
   { name: "Anonymous", amount: 100, time: "12 min ago" },
-  { name: "Yusuf M.", amount: 750, time: "15 min ago" }
+  { name: "Yusuf M.", amount: 750, time: "15 min ago" },
+   { name: "Anonymous", amount: 500, time: "2 min ago" },
+   { name: "Anonymous", amount: 500, time: "2 min ago" },
 ];
 
 export const heroImages = [
