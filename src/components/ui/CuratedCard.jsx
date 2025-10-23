@@ -8,7 +8,7 @@ export default function CuratedCard({ item, darkMode }) {
         ${darkMode ? 'bg-zinc-800' : 'bg-white'}
         shadow-lg hover:shadow-2xl`}
     >
-      <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden rounded-xl">
+      <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">
         <img
           src={item.image}
           alt={item.label}
