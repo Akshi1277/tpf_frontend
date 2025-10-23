@@ -104,7 +104,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                 
              >
                <Image
-                 src="/abcd.svg"
+                 src="/zakatt.png"
                  alt="Zakaat"
                  width={30}
                  height={30}
