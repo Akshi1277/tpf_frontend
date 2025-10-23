@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react';
 import StoryCard from '@/components/ui/StoryCard';
 import { successStories } from '@/lib/constants';
-import { ArrowRight } from 'lucide-react';
 
 export default function StoriesSection({ darkMode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [storyScrollIndex, setStoryScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const [activeCard, setActiveCard] = useState(null);
 
   const infiniteStories = [...successStories, ...successStories];
 
@@ -27,7 +27,6 @@ export default function StoriesSection({ darkMode }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Auto-scroll for stories (mobile only)
   useEffect(() => {
     if (!isMobile || isUserScrolling) return;
 
@@ -38,7 +37,6 @@ export default function StoriesSection({ darkMode }) {
     return () => clearInterval(interval);
   }, [isMobile, isUserScrolling]);
 
-  // Scroll stories container
   useEffect(() => {
     if (!isMobile) return;
 
@@ -64,7 +62,6 @@ export default function StoriesSection({ darkMode }) {
     }
   }, [storyScrollIndex, isMobile]);
 
-  // Handle user scrolling detection
   useEffect(() => {
     if (!isMobile) return;
 
@@ -81,7 +78,8 @@ export default function StoriesSection({ darkMode }) {
       }
       
       clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => { isScrolling = false;
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
         setIsUserScrolling(false);
       }, 2000);
     };
@@ -93,84 +91,99 @@ export default function StoriesSection({ darkMode }) {
     };
   }, [isMobile]);
 
-  // Handle seamless infinite loop
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const container = document.getElementById('stories-container');
-    if (!container) return;
-
-    const handleScrollEnd = () => {
-      const cardWidth = container.offsetWidth;
-      const scrollLeft = container.scrollLeft;
-      const currentIndex = Math.round(scrollLeft / cardWidth);
-
-      if (currentIndex >= successStories.length) {
-        const equivalentIndex = currentIndex - successStories.length;
-        container.scrollTo({
-          left: equivalentIndex * cardWidth,
-          behavior: 'auto'
-        });
-        setStoryScrollIndex(equivalentIndex);
-      }
-    };
-
-    let scrollTimeout;
-    const onScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(handleScrollEnd, 150);
-    };
-
-    container.addEventListener('scroll', onScroll, { passive: true });
-
-    return () => {
-      container.removeEventListener('scroll', onScroll);
-    };
-  }, [isMobile]);
-
   return (
-   <section id="stories" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
-      Impact Stories
-    </h2>
-    <p className={`text-sm ${COLORS.neutralBody} mb-6`}>
-      Real change made possible by your generosity.
-    </p>
+    <section id="stories" className={`py-24 relative overflow-hidden ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+      {/* Advanced background pattern */}
+      <div className="absolute inset-0 opacity-[0.03]">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 2px 2px, ${darkMode ? '#10b981' : '#059669'} 1px, transparent 0)`,
+          backgroundSize: '40px 40px'
+        }}></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Premium header */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <div className={`h-px w-12 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${darkMode ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'}`}>
+              <span className={`text-4xl md:text-6xl font-semibold ${darkMode ? 'text-emerald-400' : 'text-black'}`}>
+                Impact Stories
+              </span>
+            </div>
+            <div className={`h-px w-12 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
+          </div>
+          
+          <h2 className={`text-2xl md:text-4xl font-bold mb-6 ${COLORS.neutralHeading}`}>
+            Where Hope Meets
+            <span className={`block mt-2 ${darkMode ? 'text-emerald-400' : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'}`}>
+              Real Change
+            </span>
+          </h2>
+          
+          <p className={`text-lg md:text-xl ${COLORS.neutralBody} max-w-3xl mx-auto leading-relaxed`}>
+            Every contribution writes a new chapter in someone's life. These are the stories of transformation, resilience, and hope made possible by people like you.
+          </p>
 
-    <div 
-      id="stories-container"
-      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
-    >
-      {(isMobile ? infiniteStories : successStories).map((story, index) => (
-        <div 
-          key={`story-${index}`}
-          className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
-            ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-            shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
-        >
-          <img
-            src={story.image}
-            alt={story.title}
-            className="h-44 w-full object-cover"
-          />
-          <div className="p-5">
-            <h3 className={`font-semibold text-base ${COLORS.neutralHeading} mb-2`}>
-              {story.title}
-            </h3>
-            <p className={`text-sm ${COLORS.neutralBody} mb-3`}>
-              {story.excerpt}
-            </p>
-            <a href="#" className="text-sm font-medium text-emerald-700 hover:underline flex items-center gap-1">
-              Read more 
-              <ArrowRight className="w-4 h-4" />
-            </a>
+          {/* Stats bar */}
+          <div className={`mt-10 inline-flex items-center gap-8 px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-zinc-50 border border-zinc-200'}`}>
+            {[
+              { num: '1,200+', label: 'Families Helped' },
+              { num: '50K+', label: 'Lives Impacted' },
+              { num: '15', label: 'Countries' }
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <div className={`text-2xl font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  {stat.num}
+                </div>
+                <div className={`text-xs ${COLORS.neutralBody} mt-1`}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
 
+        {/* Cards grid */}
+        <div 
+          id="stories-container"
+          className="flex gap-8 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible"
+        >
+          {(isMobile ? infiniteStories : successStories).map((story, index) => (
+            <StoryCard 
+              key={`story-${index}`} 
+              story={story} 
+              darkMode={darkMode}
+              isActive={activeCard === index}
+              onHover={() => setActiveCard(index)}
+              onLeave={() => setActiveCard(null)}
+            />
+          ))}
+        </div>
+
+        {/* CTA section */}
+        <div className={`mt-16 text-center p-12 rounded-3xl relative overflow-hidden ${darkMode ? 'bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700' : 'bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100'}`}>
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500 rounded-full blur-3xl"></div>
+          </div>
+          <div className="relative z-10">
+            <h3 className={`text-3xl font-bold mb-4 ${COLORS.neutralHeading}`}>
+              Your Story Could Be Next
+            </h3>
+            <p className={`text-lg ${COLORS.neutralBody} mb-6 max-w-2xl mx-auto`}>
+              Join thousands creating lasting impact. Start your campaign and let the world rally behind your cause.
+            </p>
+            <button className={`px-10 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 ${
+              darkMode 
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+            }`}>
+              Explore All Impact Stories
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

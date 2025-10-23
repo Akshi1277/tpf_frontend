@@ -67,7 +67,7 @@ useEffect(() => {
 
     </h3>
     <p className={`text-sm ${COLORS.neutralBody} mb-4`}>
-      Join a trusted network of givers who believe in impact without barriers. With no platform fees and access to a global donor community, your campaign can reach hearts everywhere. Start your journey toward change today.
+     Join a trusted network of givers who believe in impact without barriers. With no platform fees and access to a community of donors <span className='font-bold'>by India, for India, within India</span>, your campaign can reach hearts across the country. Start your journey toward change today.
     </p>
     <button className="px-6 py-2 rounded-full cursor-pointer font-semibold border transition-colors bg-white text-zinc-900 hover:bg-zinc-50 shadow-sm w-fit text-sm">
       Start fundraising today
