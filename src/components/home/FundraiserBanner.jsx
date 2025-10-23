@@ -7,9 +7,9 @@ export default function StartFundraiserBanner({ darkMode }) {
         <div className="relative overflow-hidden rounded-2xl">
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30"></div>
           <img
-            src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1200&q=80"
+            src="https://images.unsplash.com/photo-1547069545-e88faa5cac9d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fFJlYWNoJTIwbWlsbGlvbnMlMjBvZiUyMGRvbm9ycyUyMHdvcmxkd2lkZS4lMjBUdXJuJTIweW91ciUyMGNhdXNlJTIwaW50byUyMGltcGFjdCUyMHRvZGF5LnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600"
             alt="Start Your Fundraiser"
-            className="h-64 md:h-96 w-full object-cover"
+            className="h-64 md:h-96 w-full object-cover object-[50%_75%]"
           />
           <div className="absolute inset-0 p-6 md:p-10 flex items-center">
             <div className="max-w-xl text-white">
