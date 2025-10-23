@@ -131,18 +131,22 @@ export default function CuratedSection({ darkMode }) {
         </div>
         
         <div 
-          id="curated-container"
-          className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-        >
-          {infiniteCurated.map((item, index) => (
-            <div key={`curated-${item.id}-${index}`} className="flex-shrink-0 w-[160px] md:w-[280px] snap-start">
-              <CuratedCard 
-                item={item}
-                darkMode={darkMode}
-              />
-            </div>
-          ))}
-        </div>
+  id="curated-container"
+  className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+>
+  {infiniteCurated.map((item, index) => (
+    <div 
+      key={`curated-${item.id}-${index}`} 
+      className="flex-shrink-0 w-[200px] md:w-[280px] snap-start"
+    >
+      <CuratedCard 
+        item={item}
+        darkMode={darkMode}
+      />
+    </div>
+  ))}
+</div>
+
       </div>
     </section>
   );

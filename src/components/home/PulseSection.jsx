@@ -196,12 +196,12 @@ useEffect(() => {
         </div>
 
         <div className="max-w-5xl mx-auto">
-         {/* MOBILE — unchanged grid */}
-<div className="grid grid-cols-2 sm:grid-cols-3 md:hidden gap-5 lg:gap-40">
+        {/* MOBILE — horizontal scroll */}
+<div className="md:hidden relative overflow-x-auto scrollbar-hide flex gap-4 px-2">
   {recentDonations.map((donation, index) => (
-    <div 
+    <div
       key={index}
-      className={`relative group p-5 w-40 h-24 rounded-xl text-center overflow-hidden transition-all duration-300 ${
+      className={`shrink-0 w-60 p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${
         darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
       } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
       shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
@@ -221,6 +221,7 @@ useEffect(() => {
     </div>
   ))}
 </div>
+
 
 {/* DESKTOP — 6 visible with arrows */}
 <div className="relative hidden md:flex justify-center w-full">
