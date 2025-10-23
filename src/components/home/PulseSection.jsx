@@ -188,8 +188,8 @@ Start today, inspire others, and help create a world where generosity knows no b
         </div>
         
         <div className="flex flex-col items-center mb-10">
-          <div className={`relative inline-block px-8 py-4 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
-            <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+          <div className={`relative inline-block px-5 py-1 md:px-6 py-2 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
+            <div className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
               {currency(totalRaised)}
             </div>
           </div>
@@ -201,7 +201,7 @@ Start today, inspire others, and help create a world where generosity knows no b
             {recentDonations.map((donation, index) => (
               <div 
                 key={index}
-                className={`relative group p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${
+                className={`relative group p-5 w-40 h-24 md:w-48 md:h-32 rounded-xl text-center overflow-hidden transition-all duration-300 ${
                   darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
                 } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
                 shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
