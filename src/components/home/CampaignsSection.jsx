@@ -26,7 +26,7 @@ export default function CampaignsSection({ darkMode }) {
 
     const interval = setInterval(() => {
       setCampaignScrollIndex(prev => prev + 1);
-    }, 4000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [isUserScrolling]);
