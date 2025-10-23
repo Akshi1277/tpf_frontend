@@ -100,18 +100,15 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
              {/* Zakaat icon */}
              <button
                aria-label="Zakaat"
-               className={`p-2 rounded-full transition-colors cursor-pointer
-                 ${darkMode
-                   ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-                   : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-                 }`}
+               className="p-2 rounded-full transition-colors cursor-pointer"
+                
              >
                <Image
-                 src="/zakkat.svg"
+                 src="/abcd.svg"
                  alt="Zakaat"
-                 width={20}
-                 height={20}
-                 className={darkMode ? 'brightness-0 invert' : ''}
+                 width={30}
+                 height={30}
+
                />
              </button>
      
@@ -296,7 +293,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
          { name: 'Deeds', icon: '/deeds.svg' },
          { name: 'Palestine', icon: '/heart.svg' },
          { name: 'Daily Givers', icon: '/leaf.svg' },
-         { name: 'Zakat', icon: '/zakkat.svg' }
+         { name: 'Zakat', icon: '/abcd.svg' }
        ].map(item => (
          <a
            key={item.name}
