@@ -66,11 +66,11 @@ useEffect(() => {
 >
   <div>
     <h3 className={`text-2xl sm:text-4xl font-bold leading-tight mb-3 ${COLORS.neutralHeading}`}>
-    Start meaningful change with TPF Aid
+    Make a difference that lasts — with TPF Aid.
 
     </h3>
     <p className={`text-sm ${COLORS.neutralBody} mb-4`}>
-      Join a trusted community of givers supporting impactful causes. With 0% platform fees and a global donor network, your campaign gets the reach and support it deserves. Create hope—start fundraising today.
+      Join a trusted network of givers who believe in impact without barriers. With no platform fees and access to a global donor community, your campaign can reach hearts everywhere. Start your journey toward change today.
     </p>
     <button className="px-6 py-2 rounded-full cursor-pointer font-semibold border transition-colors bg-white text-zinc-900 hover:bg-zinc-50 shadow-sm w-fit text-sm">
       Start fundraising today
@@ -89,51 +89,79 @@ useEffect(() => {
 
 {/* RIGHT CARD */}
 <div
-  className={`rounded-3xl p-6 md:p-8 border relative overflow-hidden flex flex-col
+  className={`rounded-3xl p-8 md:p-10 border relative overflow-hidden flex flex-col transition-all duration-500
     ${darkMode
-      ? 'bg-zinc-900 border-zinc-800'
-      : 'bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100 border-zinc-100'
+      ? 'bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border-zinc-700/50 shadow-2xl shadow-emerald-500/5'
+      : 'bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-100 border-purple-300/40 shadow-xl'
     }
   `}
 >
-  <h3 className="text-2xl sm:text-5xl font-bold leading-tight mb-3 text-emerald-500">
-    Easy. <br/>Trusted.<br/>Inspiring.
-  </h3>
-  <p className={`text-base ${COLORS.neutralBody} mb-7`}>
-    Give with confidence—every fundraiser is vetted,<br></br>
-     and making an impact is just a tap away. <span className="underline cursor-pointer">Learn more.</span>
-  </p>
+  {/* Animated gradient orbs */}
+  <div className={`absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-25 ${darkMode ? 'bg-emerald-600' : 'bg-indigo-300'}`}></div>
+  <div className={`absolute -bottom-24 -left-12 w-80 h-80 rounded-full blur-3xl opacity-20 ${darkMode ? 'bg-purple-700' : 'bg-pink-300'}`}></div>
 
-  <div className={`text-2xl font-semibold mb-3 ${COLORS.neutralHeading}`}>
-    Trusted by those you trust
+  <div className="relative z-10 mb-6">
+    <h3 className="text-2xl sm:text-5xl font-bold leading-tight mb-4">
+      <span className="inline-block transition-transform duration-300 hover:scale-105 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500">
+        Simple.
+      </span>
+      <br/>
+      <span className="inline-block transition-transform duration-300 hover:scale-105 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500">
+        Reliable.
+      </span>
+      <br/>
+      <span className="inline-block transition-transform duration-300 hover:scale-105 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
+        Impactful.
+      </span>
+    </h3>
+    
+    <p className={`text-base ${COLORS.neutralBody} max-w-md leading-relaxed`}>
+      Give with trust—every cause is verified, and making change takes just one tap.
+Start today, inspire others, and help create a world where generosity knows no boundaries.{' '}
+      <span className="underline cursor-pointer hover:text-purple-600 dark:hover:text-emerald-400 transition-colors inline-flex items-center gap-1 group font-medium">
+        Learn more
+        <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+      </span>
+    </p>
   </div>
 
-  {/* Slider viewport (exactly 5 visible) */}
-  <div className="relative overflow-hidden rounded-2xl pb-0">
-    {/* moving track */}
-    <div
-      className="grid grid-flow-col auto-cols-[20%] items-center gap-0"
-      style={{
-        transform: `translateX(-${infIndex * 10}%)`,
-        transition: infNoTransition ? 'none' : 'transform 5000ms ease-out',
-      }}
-    >
-      {influencersExtended.map((src, i) => (
-        <div key={`influencer-${i}`} className="flex items-center justify-center px-1">
-          <img
-            src={src}
-            alt={`Influencer ${i + 1}`}
-            className="w-14 h-14 sm:w-28 sm:h-28 rounded-full object-cover ring-2
-                       ring-white dark:ring-zinc-800 shadow-md"
-            loading="lazy"
-          />
-        </div>
-      ))}
+  <div className="relative z-10 mt-auto pt-6 border-t border-zinc-200/50 dark:border-zinc-700/50">
+    <div className={`text-xl font-semibold mb-5 ${COLORS.neutralHeading} flex items-center gap-2`}>
+      <span className={`inline-block w-2 h-2 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-purple-500'} animate-pulse`}></span>
+      Trusted by those you trust
     </div>
 
-    {/* subtle edge fade */}
-    <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white/70 to-transparent dark:from-zinc-900/70"></div>
-    <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white/70 to-transparent dark:from-zinc-900/70"></div>
+    {/* Slider viewport (exactly 5 visible) */}
+    <div className="relative overflow-hidden rounded-2xl">
+      {/* moving track */}
+      <div
+        className="grid grid-flow-col auto-cols-[20%] items-center gap-0 py-2"
+        style={{
+          transform: `translateX(-${infIndex * 10}%)`,
+          transition: infNoTransition ? 'none' : 'transform 5000ms ease-out',
+        }}
+      >
+        {influencersExtended.map((src, i) => (
+          <div key={`influencer-${i}`} className="flex items-center justify-center px-1.5">
+            <img
+              src={src}
+              alt={`Influencer ${i + 1}`}
+              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover shadow-xl
+                         transition-all duration-300 hover:scale-110 hover:z-10
+                         ${darkMode 
+                           ? 'ring-2 ring-emerald-500/40 hover:ring-4 hover:ring-emerald-400/60' 
+                           : 'ring-3 ring-white/80 hover:ring-4 hover:ring-purple-400/60'
+                         }`}
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Enhanced edge fades */}
+      <div className={`pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r ${darkMode ? 'from-zinc-900 via-zinc-900/90' : 'from-indigo-50 via-purple-50/90'} to-transparent`}></div>
+      <div className={`pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l ${darkMode ? 'from-zinc-950 via-zinc-900/90' : 'from-pink-100 via-purple-50/90'} to-transparent`}></div>
+    </div>
   </div>
 </div>
     </div>
@@ -143,7 +171,7 @@ useEffect(() => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
-            Pulse of the Ummah
+            Faith in Motion
           </h2>
           <p className={`text-sm ${COLORS.neutralBody}`}>
             Live generosity snapshot

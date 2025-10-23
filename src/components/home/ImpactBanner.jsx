@@ -20,7 +20,7 @@ export default function ImpactBanner({ darkMode }) {
               <p className="text-sm md:text-base text-white/90 mb-5">
                 Your daily support delivers relief, care, and dignity to families in urgent need.
               </p>
-              <button className="px-6 py-3 cursor-pointer bg-emerald-6F00 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
+              <button className="px-6 py-3 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
                 Start Giving Daily Now
               </button>
             </div>

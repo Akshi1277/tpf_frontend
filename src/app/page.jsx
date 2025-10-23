@@ -79,13 +79,13 @@ export default function Page() {
       
       <HeroSection darkMode={darkMode} />
       <ImpactStatsBar darkMode={darkMode} totalRaised={totalRaised} />
+      <StoriesSection darkMode={darkMode} />
       <CampaignsSection darkMode={darkMode} />
       <CuratedSection darkMode={darkMode} />
       <ImpactBanner darkMode={darkMode} />
       <CommunitiesSection darkMode={darkMode} />
       <PartnersSection darkMode={darkMode} />
       <PulseSection darkMode={darkMode} totalRaised={totalRaised} />
-      <StoriesSection darkMode={darkMode} />
       
       <Footer darkMode={darkMode} />
       <ScrollToTop scrolled={scrolled} />
