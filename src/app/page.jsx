@@ -12,6 +12,7 @@ import PartnersSection from '@/components/home/PartnersSection';
 import PulseSection from '@/components/home/PulseSection';
 import StoriesSection from '@/components/home/StoriesSection';
 import ScrollToTop from '@/components/ui/ScrollToTop';
+import StartFundraiserBanner from '@/components/home/FundraiserBanner';
 import { useState, useEffect } from 'react';
 
 export default function Page() {
@@ -86,6 +87,7 @@ export default function Page() {
       <CommunitiesSection darkMode={darkMode} />
       <PartnersSection darkMode={darkMode} />
       <PulseSection darkMode={darkMode} totalRaised={totalRaised} />
+      <StartFundraiserBanner darkMode={darkMode} />
       
       <Footer darkMode={darkMode} />
       <ScrollToTop scrolled={scrolled} />
