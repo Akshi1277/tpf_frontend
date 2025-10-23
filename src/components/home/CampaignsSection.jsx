@@ -6,7 +6,6 @@ import { campaigns, categories } from '@/lib/constants';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [isMobile, setIsMobile] = useState(false);
   const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
 
@@ -21,37 +20,25 @@ export default function CampaignsSection({ darkMode }) {
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
 
+  // Auto-scroll for campaigns
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Auto-scroll for campaigns (mobile only)
-  useEffect(() => {
-    if (!isMobile || isUserScrolling) return;
+    if (isUserScrolling) return;
 
     const interval = setInterval(() => {
       setCampaignScrollIndex(prev => prev + 1);
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [isMobile, isUserScrolling]);
+  }, [isUserScrolling]);
 
   // Scroll campaigns container
   useEffect(() => {
-    if (!isMobile) return;
-
     const container = document.getElementById('campaigns-container');
     if (!container) return;
 
-    const cardWidth = container.offsetWidth;
-    const scrollTo = cardWidth * campaignScrollIndex;
+    const cardWidth = container.children[0]?.offsetWidth || 0;
+    const gap = 20; // 1.25rem = 20px
+    const scrollTo = (cardWidth + gap) * campaignScrollIndex;
     
     container.scrollTo({
       left: scrollTo,
@@ -67,12 +54,10 @@ export default function CampaignsSection({ darkMode }) {
         setCampaignScrollIndex(0);
       }, 500);
     }
-  }, [campaignScrollIndex, isMobile, filteredCampaigns.length]);
+  }, [campaignScrollIndex, filteredCampaigns.length]);
 
   // Handle user scrolling detection
   useEffect(() => {
-    if (!isMobile) return;
-
     const container = document.getElementById('campaigns-container');
     if (!container) return;
 
@@ -97,30 +82,29 @@ export default function CampaignsSection({ darkMode }) {
     return () => {
       container.removeEventListener('scroll', handleScrollStart);
     };
-  }, [isMobile]);
+  }, []);
 
   // Handle seamless infinite loop for manual scrolling
   useEffect(() => {
-    if (!isMobile) return;
-
     const container = document.getElementById('campaigns-container');
     if (!container) return;
 
     const handleScrollEnd = () => {
-      const cardWidth = container.offsetWidth;
+      const cardWidth = container.children[0]?.offsetWidth || 0;
+      const gap = 20; // 1.25rem = 20px
       const scrollLeft = container.scrollLeft;
-      const currentIndex = Math.round(scrollLeft / cardWidth);
+      const currentIndex = Math.round(scrollLeft / (cardWidth + gap));
 
       if (currentIndex >= filteredCampaigns.length) {
         const equivalentIndex = currentIndex - filteredCampaigns.length;
         container.scrollTo({
-          left: equivalentIndex * cardWidth,
+          left: equivalentIndex * (cardWidth + gap),
           behavior: 'auto'
         });
         setCampaignScrollIndex(equivalentIndex);
       } else if (currentIndex < 0) {
         container.scrollTo({
-          left: (filteredCampaigns.length + currentIndex) * cardWidth,
+          left: (filteredCampaigns.length + currentIndex) * (cardWidth + gap),
           behavior: 'auto'
         });
         setCampaignScrollIndex(filteredCampaigns.length + currentIndex);
@@ -138,7 +122,7 @@ export default function CampaignsSection({ darkMode }) {
     return () => {
       container.removeEventListener('scroll', onScroll);
     };
-  }, [isMobile, filteredCampaigns.length]);
+  }, [filteredCampaigns.length]);
 
   return (
     <section id="campaigns" className={`py-10 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
@@ -147,18 +131,17 @@ export default function CampaignsSection({ darkMode }) {
           <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
             Fundraising now
           </h2>
-         <button
-  className="
-  whitespace-nowrap
-    text-xs sm:text-sm font-medium
-    bg-emerald-600 px-3 py-1.5 sm:px-4 sm:py-2
-    rounded-full text-white
-    hover:animate-pulse cursor-pointer
-  "
->
-  Discover more
-</button>
-
+          <button
+            className="
+              whitespace-nowrap
+              text-xs sm:text-sm font-medium
+              bg-emerald-600 px-3 py-1.5 sm:px-4 sm:py-2
+              rounded-full text-white
+              hover:animate-pulse cursor-pointer
+            "
+          >
+            Discover more
+          </button>
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
@@ -181,9 +164,9 @@ export default function CampaignsSection({ darkMode }) {
 
         <div 
           id="campaigns-container"
-          className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible"
+          className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
         >
-          {(isMobile ? infiniteCampaigns : filteredCampaigns).map((campaign, index) => (
+          {infiniteCampaigns.map((campaign, index) => (
             <CampaignCard 
               key={`campaign-${campaign.id}-${index}`}
               campaign={campaign}
