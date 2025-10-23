@@ -98,19 +98,31 @@ useEffect(() => {
   <div className={`absolute -bottom-24 -left-12 w-80 h-80 rounded-full blur-3xl opacity-20 ${darkMode ? 'bg-purple-700' : 'bg-pink-300'}`}></div>
 
   <div className="relative z-10 mb-6">
-    <h3 className="text-2xl sm:text-5xl font-bold leading-tight mb-4">
-      <span className="inline-block transition-transform duration-300 hover:scale-105 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500">
-        Simple.
-      </span>
-      <br/>
-      <span className="inline-block transition-transform duration-300 hover:scale-105 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500">
-        Reliable.
-      </span>
-      <br/>
-      <span className="inline-block transition-transform duration-300 hover:scale-105 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-        Impactful.
-      </span>
-    </h3>
+<h3 className="text-2xl sm:text-5xl font-bold leading-tight mb-4">
+  <span className={`inline-block transition-all duration-300 hover:scale-105 ${
+    darkMode 
+      ? 'text-emerald-400' 
+      : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
+  }`}>
+    Simple.
+  </span>
+  <br/>
+  <span className={`inline-block transition-all duration-300 hover:scale-105 ${
+    darkMode 
+      ? 'text-emerald-500' 
+      : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
+  }`}>
+    Reliable.
+  </span>
+  <br/>
+  <span className={`inline-block transition-all duration-300 hover:scale-105 ${
+    darkMode 
+      ? 'text-emerald-300' 
+      : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
+  }`}>
+    Impactful.
+  </span>
+</h3>
     
     <p className={`text-base ${COLORS.neutralBody} max-w-md leading-relaxed`}>
       Give with trust—every cause is verified, and making change takes just one tap.
