@@ -1,11 +1,139 @@
-
+import { useState, useEffect } from 'react';
 import { communities } from '@/lib/constants';
 
 export default function CommunitiesSection({ darkMode }) {
+  const [isMobile, setIsMobile] = useState(false);
+  const [scrollIndex, setScrollIndex] = useState(0);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+  const infiniteCommunities = [...communities, ...communities];
+
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Auto-scroll for mobile only
+  useEffect(() => {
+    if (!isMobile || isUserScrolling) return;
+
+    const interval = setInterval(() => {
+      setScrollIndex(prev => prev + 1);
+    }, 2000); 
+
+    return () => clearInterval(interval);
+  }, [isMobile, isUserScrolling]);
+
+  // Scroll communities container
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const container = document.getElementById('communities-container');
+    if (!container) return;
+
+    const cardWidth = container.children[0]?.offsetWidth || 0;
+    const gap = 20; // 1.25rem = 20px
+    const scrollTo = (cardWidth + gap) * scrollIndex;
+    
+    container.scrollTo({
+      left: scrollTo,
+      behavior: 'smooth'
+    });
+
+    if (scrollIndex >= communities.length) {
+      setTimeout(() => {
+        container.scrollTo({
+          left: 0,
+          behavior: 'auto'
+        });
+        setScrollIndex(0);
+      }, 500);
+    }
+  }, [scrollIndex, isMobile]);
+
+  // Handle user scrolling detection
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const container = document.getElementById('communities-container');
+    if (!container) return;
+
+    let scrollTimeout;
+    let isScrolling = false;
+
+    const handleScrollStart = () => {
+      if (!isScrolling) {
+        isScrolling = true;
+        setIsUserScrolling(true);
+      }
+      
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        setIsUserScrolling(false);
+      }, 2000);
+    };
+
+    container.addEventListener('scroll', handleScrollStart, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', handleScrollStart);
+    };
+  }, [isMobile]);
+
+  // Handle seamless infinite loop for manual scrolling
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const container = document.getElementById('communities-container');
+    if (!container) return;
+
+    const handleScrollEnd = () => {
+      const cardWidth = container.children[0]?.offsetWidth || 0;
+      const gap = 20; // 1.25rem = 20px
+      const scrollLeft = container.scrollLeft;
+      const currentIndex = Math.round(scrollLeft / (cardWidth + gap));
+
+      if (currentIndex >= communities.length) {
+        const equivalentIndex = currentIndex - communities.length;
+        container.scrollTo({
+          left: equivalentIndex * (cardWidth + gap),
+          behavior: 'auto'
+        });
+        setScrollIndex(equivalentIndex);
+      } else if (currentIndex < 0) {
+        container.scrollTo({
+          left: (communities.length + currentIndex) * (cardWidth + gap),
+          behavior: 'auto'
+        });
+        setScrollIndex(communities.length + currentIndex);
+      }
+    };
+
+    let scrollTimeout;
+    const onScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(handleScrollEnd, 150);
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', onScroll);
+    };
+  }, [isMobile]);
 
   return (
     <section id="communities" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
@@ -19,29 +147,26 @@ export default function CommunitiesSection({ darkMode }) {
           </p>
         </div>
 
-      <div
-  id="communities-container"
-  className="
-    /* MOBILE */
-    flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide
-
-   
-    md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:snap-none md:pb-0
-  "
->
-
-          {communities.map((community, index) => (
-          <div
-  key={`community-${index}`}
-  className="
-    flex-shrink-0 w-[280px] md:w-auto   /* IMPORTANT — reset width on grid */
-    snap-center rounded-2xl overflow-hidden 
-    group cursor-pointer transition-all duration-300 hover:scale-105
-    shadow-lg hover:shadow-2xl
-    bg-white dark:bg-zinc-800
-  "
->
-
+        <div
+          id="communities-container"
+          className="
+            /* MOBILE */
+            flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide
+            /* DESKTOP */
+            md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:snap-none md:pb-0
+          "
+        >
+          {(isMobile ? infiniteCommunities : communities).map((community, index) => (
+            <div
+              key={`community-${community.name}-${index}`}
+              className="
+                flex-shrink-0 w-[280px] md:w-auto
+                snap-center rounded-2xl overflow-hidden 
+                group cursor-pointer transition-all duration-300 hover:scale-105
+                shadow-lg hover:shadow-2xl
+                bg-white dark:bg-zinc-800
+              "
+            >
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={community.image}
@@ -64,7 +189,6 @@ export default function CommunitiesSection({ darkMode }) {
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );
