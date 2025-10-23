@@ -97,20 +97,22 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
      <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
        Start fundraising
      </button>
-             {/* Zakaat icon */}
-             <button
-               aria-label="Zakaat"
-               className="p-2 rounded-full transition-colors cursor-pointer"
-                
-             >
-               <Image
-                 src="/zakatt.png"
-                 alt="Zakaat"
-                 width={30}
-                 height={30}
-
-               />
-             </button>
+            {/* Zakaat icon */}
+<button
+  aria-label="Zakaat"
+  className={`p-2 rounded-full transition-colors cursor-pointer
+    ${darkMode
+      ? 'bg-zinc-800/80 hover:bg-zinc-700 backdrop-blur-sm'
+      : 'bg-white/80 hover:bg-zinc-100 backdrop-blur-sm'
+    }`}
+>
+  <Image
+    src="/zakatt.png"
+    alt="Zakaat"
+    width={30}
+    height={30}
+  />
+</button>
      
              {/* Dark-mode toggle */}
              <button
