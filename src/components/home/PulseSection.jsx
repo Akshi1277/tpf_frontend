@@ -125,8 +125,7 @@ useEffect(() => {
 </h3>
     
     <p className={`text-base ${COLORS.neutralBody} max-w-md leading-relaxed`}>
-      Give with trust—every cause is verified, and making change takes just one tap.
-Start today, inspire others, and help create a world where generosity knows no boundaries.{' '}
+    Join a trusted network of givers who believe in impact without barriers. With no platform fees and access to a community of donors <span className='font-bold'>by India, for India, within India</span>, your campaign can reach hearts across the country. Start your journey toward change today.{' '}
       <span className="underline cursor-pointer hover:text-purple-600 dark:hover:text-emerald-400 transition-colors inline-flex items-center gap-1 group font-medium">
         Learn more
         <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
