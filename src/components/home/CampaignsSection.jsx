@@ -167,11 +167,12 @@ export default function CampaignsSection({ darkMode }) {
           className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
         >
           {infiniteCampaigns.map((campaign, index) => (
-            <CampaignCard 
-              key={`campaign-${campaign.id}-${index}`}
-              campaign={campaign}
-              darkMode={darkMode}
-            />
+            <div key={`campaign-${campaign.id}-${index}`} className="flex-shrink-0 w-[280px] sm:w-[300px] snap-start">
+              <CampaignCard 
+                campaign={campaign}
+                darkMode={darkMode}
+              />
+            </div>
           ))}
         </div>
       </div>
