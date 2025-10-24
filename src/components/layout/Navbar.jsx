@@ -20,7 +20,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
          border-b
        `}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex items-center justify-between h-16 gap-6">
             {/* LEFT – Logo */}
             {/* LEFT – Logo */}
@@ -36,7 +36,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             </div>
 
             {/* CENTER – Search (hidden on mobile) */}
-            <div className="hidden md:flex flex-1 max-w-xl mx-8">
+          <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl md:mx-4 lg:mx-6 xl:mx-8">
               <div className="relative w-full group">
                 {/* Animated background gradient */}
                 <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
@@ -92,40 +92,40 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             </div>
 
             {/* RIGHT – Actions */}
-            <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
               {/* Start Fundraising – desktop only */}
-              <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl">
+            <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap">
                 Start fundraising
               </button>
               {/* Zakaat icon */}
-              <button
-                aria-label="Zakaat"
-                className={`relative p-2 rounded-full transition-colors cursor-pointer
+           <button
+  aria-label="Zakaat"
+  className={`relative p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
     ${darkMode
-                    ? 'bg-zinc-800/80 hover:bg-zinc-700 backdrop-blur-sm'
-                    : 'bg-white/80 hover:bg-zinc-100 backdrop-blur-sm'
-                  }`}
-              >
+      ? 'bg-zinc-800/80 hover:bg-zinc-700 backdrop-blur-sm'
+      : 'bg-white/80 hover:bg-zinc-100 backdrop-blur-sm'
+    }`}
+>
                 <Image
                   src="/zakaat.svg"
                   alt="Zakaat"
                   width={24}
                   height={24}
-                  className="scale-[1.7]"  // ⬅️ increased image size significantly
+                 className="scale-[1.5] sm:scale-[1.6] md:scale-[1.7]"
                 />
               </button>
               {/* Dark-mode toggle */}
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                aria-label="Toggle dark mode"
-                className={`p-2 rounded-full transition-colors cursor-pointer
-                 ${darkMode
-                    ? 'bg-zinc-800/80 text-yellow-400 hover:bg-zinc-700 backdrop-blur-sm'
-                    : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-                  }`}
-              >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
+         <button
+  onClick={() => setDarkMode(!darkMode)}
+  aria-label="Toggle dark mode"
+  className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+    ${darkMode
+      ? 'bg-zinc-800/80 text-yellow-400 hover:bg-zinc-700 backdrop-blur-sm'
+      : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
+    }`}
+>
+  {darkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+</button>
 
 
 
@@ -140,17 +140,17 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
        <option value="amiri">Amiri</option>
      </select> */}
               {/* Hamburger */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Menu"
-                className={`p-2 rounded-full transition-colors cursor-pointer
-                 ${darkMode
-                    ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-                    : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-                  }`}
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+            <button
+  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+  aria-label="Menu"
+  className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+    ${darkMode
+      ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
+      : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
+    }`}
+>
+  {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+</button>
             </div>
           </div>
 
