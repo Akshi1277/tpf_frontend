@@ -71,67 +71,54 @@ export const curatedItems = [
   { 
     label: "Daily Giver", 
     image: "https://images.unsplash.com/photo-1677128912094-36d988ce198b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGhlbHAlMjBwcm92aWRlJTIwbWVhbHMlMjBmb3IlMjB0aG9zZSUyMGluJTIwbmVlZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
-    description: "Help provide meals to those in need"
   },
   { 
     label: "Donate Weekly (Friday) ", 
     image: "https://media.istockphoto.com/id/2159138979/photo/muslim-boy-donating-money.webp?a=1&b=1&s=612x612&w=0&k=20&c=1Ib35R9k_UjN6LC_h117cLRyOvINJ6iZ6bBkwVlSix8=",
-    description: "Make a lasting impact every Jumu'ah with your weekly giving."
   },
   { 
     label: "Donate Monthly", 
     image: "https://images.unsplash.com/photo-1576465767066-87fadbc4c2d8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzZ8fHN1cHBvcnQlMjBodW1hbml0YXJpYW4lMjByZWxpZWYlMjBlZmZvcnRzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
-    description: "Support ongoing causes with consistent monthly donations."
   },
   { 
     label: "Donate Your Zakat", 
     image: "https://media.istockphoto.com/id/1312575736/photo/concept-of-zakat-in-islam-religion-selective-focus-of-money-and-rice-with-alphabet-of-zakat.webp?a=1&b=1&s=612x612&w=0&k=20&c=SO0YUYqqHjRLRxMD5wiWNANHSD4pGII19FzfqHvcdPw=",
-    description: "Fulfill your obligation and uplift those most in need."
   },
   { 
     label: "Discover Fundraiser", 
     image: "https://images.unsplash.com/photo-1643429096345-9de0d2ab7e7c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Z2l2ZSUyMGlzbGFtaWMlMjBjaGlsZHJlbiUyMGElMjBicmlnaHQlMjBmdXR1cmV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
-    description: "Explore campaigns that inspire change and save lives."
   },
   { 
     label: "Donate in Emergency Funds", 
     image: "https://plus.unsplash.com/premium_photo-1683140538884-07fb31428ca6?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGRvbmF0ZSUyMGluJTIwZW1lcmdlbmN5JTIwZnVuZHN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=600",
-    description: "Be the first to respond when disaster strikes."
   },
   { 
     label: "Eid Kits(Eid-al-Fitr)", 
     image: "https://i.etsystatic.com/27296220/r/il/cd44af/3622176989/il_570xN.3622176989_2kws.jpg",
-    description: "Share the joy of Eid with families who need it most."
   },
   { 
     label: "Legal Aid for the Voiceless", 
     image: "https://media.istockphoto.com/id/2014292728/photo/judges-gavel-as-a-symbol-of-legal-system-and-wooden-stand-with-text-word.webp?a=1&b=1&s=612x612&w=0&k=20&c=lyx0WuVJC-yMC5BbA3y70una6t0ttX2fqi7m5EI7Awg=",
-    description: "Help defend the rights of those without representation."
   },
   { 
     label: "Shelter and Home Support ", 
     image: "https://plus.unsplash.com/premium_photo-1683135030516-6317ed744628?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8c2hlbHRlciUyMGFuZCUyMGhvbWUlMjBzdXBwb3J0JTIwZm9yJTIwcGVvcGxlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
-    description: "Provide warmth, safety, and dignity to the homeless."
   },
   { 
     label: "Financial Emergency Aid ", 
     image: "https://media.istockphoto.com/id/813320518/photo/social-assistance.webp?a=1&b=1&s=612x612&w=0&k=20&c=ViKfqudhFcslXku_zcd9RYePinRk6gWWi1S7qL6kVwI=",
-    description: "Offer immediate relief to families facing hardship."
   },
   { 
     label: "Global Muslim Crisis Support ", 
     image: "https://images.unsplash.com/photo-1573886578907-58681efbaad3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8R2xvYmFsJTIwTXVzbGltJTIwQ3Jpc2lzJTIwU3VwcG9ydHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600",
-    description: "Stand with Muslim communities in crisis worldwide."
   },
   { 
     label: "Assistance for Marginalized Communities", 
     image: "https://media.istockphoto.com/id/537311780/photo/unity-of-indian-children-asia.webp?a=1&b=1&s=612x612&w=0&k=20&c=Z3vpXyVtDv0xzqOX2FDbdxn4kyIbwpO3xrGakyYPN1k=",
-    description: "Empower those left behind through your compassion."
   },
   { 
     label: "Community Development", 
     image: "https://media.istockphoto.com/id/981339754/photo/silhouette-of-engineer-and-construction-team-working-at-site-over-blurred-background-sunset.webp?a=1&b=1&s=612x612&w=0&k=20&c=ftbsxL76vkKvsB8WUO-FMrCHyjrRJKzLpZ_evRWJR4E=",
-    description: "Invest in education, growth, and a better tomorrow."
   },
 ];
 
