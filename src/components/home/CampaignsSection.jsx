@@ -20,16 +20,32 @@ export default function CampaignsSection({ darkMode }) {
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
 
-  // Auto-scroll for campaigns
-  useEffect(() => {
-    if (isUserScrolling) return;
+  const scrollLeft = () => {
+  const container = document.getElementById('campaigns-container');
+  if (container) {
+    container.scrollBy({ left: -320, behavior: 'smooth' });
+  }
+};
 
+const scrollRight = () => {
+  const container = document.getElementById('campaigns-container');
+  if (container) {
+    container.scrollBy({ left: 320, behavior: 'smooth' });
+  }
+};
+
+ useEffect(() => {
+  if (isUserScrolling) return;
+  
+  // Only auto-scroll on mobile
+  if (window.innerWidth < 768) {
     const interval = setInterval(() => {
       setCampaignScrollIndex(prev => prev + 1);
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [isUserScrolling]);
+  }
+}, [isUserScrolling]);
 
   // Scroll campaigns container
   useEffect(() => {
@@ -161,21 +177,60 @@ export default function CampaignsSection({ darkMode }) {
             </button>
           ))}
         </div>
+  <div className="relative">
+    {/* LEFT ARROW - Desktop only */}
+  <button
+  onClick={scrollLeft}
+  className="
+    hidden md:flex items-center justify-center
+    absolute -left-10 top-1/2 -translate-y-1/2 z-10
+    h-9 w-9 rounded-full
+    border border-zinc-300 dark:border-zinc-600
+    bg-white/70 dark:bg-zinc-800/50 backdrop-blur-sm
+    hover:bg-white dark:hover:bg-zinc-700
+    shadow-sm transition
+  "
+>
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+</button>
 
-        <div 
-          id="campaigns-container"
-          className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-        >
-          {infiniteCampaigns.map((campaign, index) => (
-            <div key={`campaign-${campaign.id}-${index}`} className="flex-shrink-0 w-[280px] sm:w-[300px] snap-start">
-              <CampaignCard 
-                campaign={campaign}
-                darkMode={darkMode}
-              />
-            </div>
-          ))}
+    <div 
+      id="campaigns-container"
+      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+    >
+      {infiniteCampaigns.map((campaign, index) => (
+        <div key={`campaign-${campaign.id}-${index}`} className="flex-shrink-0 w-[280px] sm:w-[285px] snap-start">
+          <CampaignCard 
+            campaign={campaign}
+            darkMode={darkMode}
+          />
         </div>
-      </div>
+      ))}
+    </div>
+
+    {/* RIGHT ARROW - Desktop only */}
+   <button
+  onClick={scrollRight}
+  className="
+    hidden md:flex items-center justify-center
+    absolute -right-10 top-1/2 -translate-y-1/2 z-10
+    h-9 w-9 rounded-full
+    border border-zinc-300 dark:border-zinc-600
+    bg-white/70 dark:bg-zinc-800/50 backdrop-blur-sm
+    hover:bg-white dark:hover:bg-zinc-700
+    shadow-sm transition
+  "
+>
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  </svg>
+</button>
+
+  </div>
+</div>
+      
     </section>
   );
 }
