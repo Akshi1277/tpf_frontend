@@ -150,7 +150,7 @@ export default function Footer({ darkMode }) {
         </div>
 
         {/* Newsletter Section */}
-        <div className={`mb-8 py-8 px-6`}>
+        <div className={`mb-8 px-6`}>
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -189,7 +189,7 @@ export default function Footer({ darkMode }) {
         </div>
 
         {/* Bottom Bar */}
-        <div className={`pt-6 flex flex-col sm:flex-row items-center justify-between gap-4`}>
+        <div className={` flex flex-col sm:flex-row items-center justify-between gap-4`}>
           <span className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
             © {new Date().getFullYear()} True Path Foundation. All rights reserved.
           </span>
