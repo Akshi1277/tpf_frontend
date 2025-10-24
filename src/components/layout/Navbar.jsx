@@ -36,7 +36,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             </div>
 
             {/* CENTER – Search (hidden on mobile) */}
-          <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl md:mx-4 lg:mx-6 xl:mx-8">
+            <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl md:mx-4 lg:mx-6 xl:mx-8">
               <div className="relative w-full group">
                 {/* Animated background gradient */}
                 <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
@@ -92,40 +92,40 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             </div>
 
             {/* RIGHT – Actions */}
-      <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
               {/* Start Fundraising – desktop only */}
-            <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap">
+              <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap">
                 Start fundraising
               </button>
               {/* Zakaat icon */}
-           <button
-  aria-label="Zakaat"
-  className={`relative p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+              <button
+                aria-label="Zakaat"
+                className={`relative p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
     ${darkMode
-      ? 'bg-zinc-800/80 hover:bg-zinc-700 backdrop-blur-sm'
-      : 'bg-white/80 hover:bg-zinc-100 backdrop-blur-sm'
-    }`}
->
+                    ? 'bg-zinc-800/80 hover:bg-zinc-700 backdrop-blur-sm'
+                    : 'bg-white/80 hover:bg-zinc-100 backdrop-blur-sm'
+                  }`}
+              >
                 <Image
                   src="/zakaat.svg"
                   alt="Zakaat"
                   width={24}
                   height={24}
-                 className="scale-[1.5] sm:scale-[1.6] md:scale-[1.7]"
+                  className="scale-[1.5] sm:scale-[1.6] md:scale-[1.7]"
                 />
               </button>
               {/* Dark-mode toggle */}
-         <button
-  onClick={() => setDarkMode(!darkMode)}
-  aria-label="Toggle dark mode"
-  className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                aria-label="Toggle dark mode"
+                className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
     ${darkMode
-      ? 'bg-zinc-800/80 text-yellow-400 hover:bg-zinc-700 backdrop-blur-sm'
-      : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-    }`}
->
-  {darkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
-</button>
+                    ? 'bg-zinc-800/80 text-yellow-400 hover:bg-zinc-700 backdrop-blur-sm'
+                    : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
+                  }`}
+              >
+                {darkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+              </button>
 
 
 
@@ -140,17 +140,17 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
        <option value="amiri">Amiri</option>
      </select> */}
               {/* Hamburger */}
-            <button
-  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-  aria-label="Menu"
-  className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Menu"
+                className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
     ${darkMode
-      ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-      : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-    }`}
->
-  {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
-</button>
+                    ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
+                    : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
+                  }`}
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+              </button>
             </div>
           </div>
 
@@ -221,8 +221,8 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             >
               {/* Modal popup */}
               <div
-                className={`fixed md:relative right-0 top-0 h-full md:h-[33rem] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl shadow-2xl overflow-hidden transition-transform duration-300 ease-in-out
-               ${darkMode
+                className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[90vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl shadow-2xl overflow-hidden transition-transform duration-300 ease-in-out flex flex-col
+   ${darkMode
                     ? 'bg-zinc-900'
                     : 'bg-white'
                   }`}
@@ -238,7 +238,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   </button>
                 </div>
                 {/* Menu content */}
-                <div className="px-6 py-6 space-y-4 max-h-[80vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <div className="px-6 py-4 space-y-4 h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pb-20">
 
                   {/* Greeting */}
                   <div>
