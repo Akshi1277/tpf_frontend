@@ -39,7 +39,7 @@ export default function CampaignCard({ campaign, darkMode }) {
   {/* Top left - Validity Date */}
   {campaign.validityDate && (
     <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-semibold text-zinc-900 w-fit">
-      Valid till: {campaign.validityDate}
+      Days Left: {campaign.validityDate}
     </div>
   )}
 
