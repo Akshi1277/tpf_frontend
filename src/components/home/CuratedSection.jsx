@@ -17,7 +17,7 @@ export default function CuratedSection({ darkMode }) {
   // ---------- AUTO SCROLL (mobile only) ----------
   useEffect(() => {
     if (isUserScrolling) return;
-    if (typeof window !== "undefined" && window.innerWidth >= 768) return; // ⛔ desktop off
+   
 
     const interval = setInterval(() => {
       setCuratedScrollIndex(prev => prev + 1);
