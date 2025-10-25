@@ -40,7 +40,7 @@ export default function HeroSection({ darkMode }) {
           <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
             <div className="max-w-[90%] sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl space-y-4 md:space-y-5 lg:space-y-6">
               {/* Heading */}
-              <h1 className="text-3xl mt-8 md:mt-0 sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
+              <h1 className="text-3xl mt-12 md:mt-0 sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight">
                 Make a difference in someone's life today
               </h1>
               
