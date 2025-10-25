@@ -229,14 +229,15 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
               onClick={() => setMobileMenuOpen(false)}
             >
               {/* Modal popup */}
-              <div
-                className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[90vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl shadow-2xl overflow-hidden transition-transform duration-300 ease-in-out flex flex-col
-   ${darkMode
-                    ? 'bg-zinc-900'
-                    : 'bg-white'
-                  }`}
-                onClick={(e) => e.stopPropagation()}
-              >
+  <div
+  className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[90vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl overflow-hidden transition-transform duration-300 ease-in-out flex flex-col
+    ${darkMode
+      ? 'bg-zinc-900 shadow-[0_0_40px_rgba(0,0,0,0.9)] border border-zinc-800'
+      : 'bg-white shadow-[0_4px_40px_rgba(0,0,0,0.25)] border border-zinc-200'
+    }`}
+  onClick={(e) => e.stopPropagation()}
+>
+
                 {/* Close button - fixed at top on mobile */}
                 <div className={`md:hidden sticky top-0 z-10 flex justify-end px-4 py-3 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
                   <button
