@@ -18,18 +18,34 @@ export default function CampaignCard({ campaign, darkMode }) {
         shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
     >
       <div className="relative aspect-video">
-        <img
-          src={campaign.image}
-          alt={campaign.title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-        {campaign.urgent && (
-          <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
-            Urgent
-          </div>
-        )}
-      </div>
+  <img
+    src={campaign.image}
+    alt={campaign.title}
+    className="w-full h-full object-cover"
+  />
+  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+  
+  {/* Top left - Validity Date */}
+  {campaign.validityDate && (
+    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-semibold text-zinc-900 w-fit">
+      Valid till: {campaign.validityDate}
+    </div>
+  )}
+
+  {/* Top right - Tax Benefit */}
+  {campaign.taxBenefit && (
+    <div className="absolute top-3 right-3 bg-emerald-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit">
+      80G Tax Benefit
+    </div>
+  )}
+
+  {/* Bottom right - Urgent */}
+  {campaign.urgent && (
+    <div className="absolute bottom-3 right-3 bg-red-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit">
+      Urgent
+    </div>
+  )}
+</div>
       
       <div className="p-5">
         <h3 className={`font-semibold text-base mb-1 min-h-[3rem] flex items-start ${COLORS.neutralHeading}`}>

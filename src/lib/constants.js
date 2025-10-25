@@ -11,7 +11,9 @@ export const campaigns = [
     donors: 342,
     org: "Global Family Aid",
     verified: true,
-    urgent: true
+    urgent: true,
+    validityDate: "31 Dec 2025",
+    taxBenefit: true
   },
   {
     id: 2,
@@ -22,7 +24,9 @@ export const campaigns = [
     goal: 50000,
     donors: 198,
     org: "Seed Charity",
-    verified: true
+    verified: true,
+    validityDate: "15 Jan 2026",
+    taxBenefit: true
   },
   {
     id: 3,
@@ -33,7 +37,9 @@ export const campaigns = [
     goal: 40000,
     donors: 267,
     org: "Together Organization",
-    verified: true
+    verified: true,
+    validityDate: "28 Feb 2026",
+    taxBenefit: false
   },
   {
     id: 4,
@@ -45,7 +51,9 @@ export const campaigns = [
     donors: 156,
     org: "TPF Aid Education",
     verified: true,
-    urgent: true
+    urgent: true,
+    validityDate: "10 Mar 2026",
+    taxBenefit: true
   }
 ];
 
