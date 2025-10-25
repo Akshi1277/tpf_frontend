@@ -5,7 +5,7 @@ export const campaigns = [
     id: 1,
     title: "Emergency Relief for Families in Gaza",
     category: "emergency",
-    image: "https://images.unsplash.com/photo-1739879353789-41554220f9c4?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZW1lcmdlbmN5JTIwcmVsaWVmJTIwZm9yJTIwZmFtaWx5JTIwaW4lMjBnYXphfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
+    video: "https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/MPaEbz-/videoblocks-v1-0070_20210811-pm-peskov-migrants-7-lakokraska00000000_rayy7obsf__e6b924c92cc2a799a0a88c00d13c1f57__P360.mp4",
     raised: 45627,
     goal: 75000,
     donors: 342,
