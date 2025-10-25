@@ -129,7 +129,7 @@ export default function Footer({ darkMode }) {
         </div>
 
         {/* Islamic Calendar */}
-        <div className={`mb-6 py-3 px-2`}>
+        <div className={`mb-6 py-1 px-2`}>
           <div className="flex flex-col items-center justify-center gap-3 text-sm text-center">
             <div className="flex flex-col sm:flex-row items-center gap-2 flex-wrap justify-center">
               <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -144,7 +144,7 @@ export default function Footer({ darkMode }) {
 
         {/* Quranic Quote */}
         <div className={`mb-6 text-center`}>
-          <p className={`text-sm italic ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
+          <p className={`text-sm font-bold italic ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
             "Those who give charity—men and women—will have a noble reward." — Quran 57:18
           </p>
         </div>
