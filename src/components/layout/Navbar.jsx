@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Menu, X, Moon, Sun } from 'lucide-react';
-
+import { Plus, Heart, Leaf } from 'lucide-react';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -292,34 +292,39 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   </a>
 
                   {/* Main menu items with icons */}
-                  <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
-                    {[
-                      { name: 'My Deeds', icon: '/deeds.svg' },
-                      { name: 'Palestine', icon: '/heart.svg' },
-                      { name: 'Daily Givers', icon: '/leaf.svg' },
-                      { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg' }
-                    ].map(item => (
-                      <a
-                        key={item.name}
-                        href="#"
-                        className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
-             ${darkMode
-                            ? 'text-zinc-300 hover:bg-zinc-800'
-                            : 'text-zinc-700 hover:bg-zinc-100'
-                          }`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <Image
-                          src={item.icon}
-                          alt={item.name}
-                          width={20}
-                          height={20}
-                          className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
-                        />
-                        <span>{item.name}</span>
-                      </a>
-                    ))}
-                  </div>
+                 <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
+  {[
+    { name: 'My Deeds', icon: Plus, isLucide: true },
+    { name: 'Palestine', icon: Heart, isLucide: true },
+    { name: 'Daily Givers', icon: Leaf, isLucide: true },
+    { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false }
+  ].map(item => (
+    <a
+      key={item.name}
+      href="#"
+      className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
+        ${darkMode
+          ? 'text-zinc-300 hover:bg-zinc-800'
+          : 'text-zinc-700 hover:bg-zinc-100'
+        }`}
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      {item.isLucide ? (
+        <item.icon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
+      ) : (
+        <Image
+          src={item.icon}
+          alt={item.name}
+          width={20}
+          height={20}
+          className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
+        />
+      )}
+      <span>{item.name}</span>
+    </a>
+  ))}
+</div>
+
 
 
                   {/* Start section */}
