@@ -107,11 +107,13 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   }`}
               >
                 <Image
-                  src="/zakaat.svg"
+                  src="/TPFAid-Icon-Zakat-1.svg"
                   alt="Zakaat"
                   width={24}
                   height={24}
-                  className="scale-[1.5] sm:scale-[1.6] md:scale-[1.7]"
+                  className="scale-[1.0] sm:scale-[1.03] md:scale-[1.06]"
+
+
                 />
               </button>
               {/* Dark-mode toggle */}
@@ -292,10 +294,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   {/* Main menu items with icons */}
                   <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
                     {[
-                      { name: 'Deeds', icon: '/deeds.svg' },
+                      { name: 'My Deeds', icon: '/deeds.svg' },
                       { name: 'Palestine', icon: '/heart.svg' },
                       { name: 'Daily Givers', icon: '/leaf.svg' },
-                      { name: 'Zakat', icon: '/abcd.svg' }
+                      { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg' }
                     ].map(item => (
                       <a
                         key={item.name}
