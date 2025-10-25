@@ -46,7 +46,7 @@ export default function CampaignCard({ campaign, darkMode }) {
   {/* Top right - Tax Benefit */}
   {campaign.taxBenefit && (
     <div className="absolute top-3 right-3 bg-emerald-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit">
-      80G Tax Benefit
+      Tax Benefits
     </div>
   )}
 
