@@ -131,19 +131,21 @@ export default function StoriesSection({ darkMode }) {
           id="stories-container"
           className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible md:gap-4"
         >
-          {(isMobile ? infiniteStories : successStories).map((story, index) => (
-            <div className="min-w-[280px] md:min-w-0 flex-shrink-0 snap-start">
-              <StoryCard 
-                key={`story-${index}`} 
-                story={story} 
-                darkMode={darkMode}
-                isActive={activeCard === index}
-                onHover={() => setActiveCard(index)}
-                onLeave={() => setActiveCard(null)}
-                compact={true}
-              />
-            </div>
-          ))}
+         {(isMobile ? infiniteStories : successStories).map((story, index) => (
+  <div 
+    key={`story-${index}-${story.name || story.title || ''}`}
+    className="min-w-[280px] md:min-w-0 flex-shrink-0 snap-start"
+  >
+    <StoryCard 
+      story={story} 
+      darkMode={darkMode}
+      isActive={activeCard === index}
+      onHover={() => setActiveCard(index)}
+      onLeave={() => setActiveCard(null)}
+      compact={true}
+    />
+  </div>
+))}
         </div>
 
         {/* CTA section */}

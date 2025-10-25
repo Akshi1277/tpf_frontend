@@ -177,58 +177,69 @@ const scrollRight = () => {
             </button>
           ))}
         </div>
-  <div className="relative">
-    {/* LEFT ARROW - Desktop only */}
+<div className="relative">
+  {/* LEFT ARROW - Desktop only */}
   <button
-  onClick={scrollLeft}
-  className="
-    hidden md:flex items-center justify-center
-    absolute -left-10 top-1/2 -translate-y-1/2 z-10
-    h-9 w-9 rounded-full
-    border border-zinc-300 dark:border-zinc-600
-    bg-white/70 dark:bg-zinc-800/50 backdrop-blur-sm
-    hover:bg-white dark:hover:bg-zinc-700
-    shadow-sm transition
-  "
->
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-  </svg>
-</button>
+    onClick={scrollLeft}
+    className="hidden md:flex items-center justify-center
+               absolute -left-10 top-1/2 -translate-y-1/2 z-10
+               h-9 w-9 rounded-full
+               border-2 border-emerald-600 dark:border-emerald-500/50
+               bg-gradient-to-br from-emerald-200 via-emerald-50 to-emerald-100
+               dark:bg-gradient-to-br dark:from-emerald-500/20 dark:via-zinc-800/60 dark:to-emerald-600/20
+               backdrop-blur-sm
+               shadow-[0_0_25px_rgba(5,150,105,0.7)]
+               dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]
+               hover:from-emerald-300 hover:via-emerald-100 hover:to-emerald-200
+               hover:shadow-[0_0_30px_rgba(5,150,105,0.9)]
+               dark:hover:from-emerald-500/30 dark:hover:via-zinc-700/80 dark:hover:to-emerald-600/30
+               dark:hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]
+               transition-all duration-300
+               text-emerald-700 dark:text-emerald-300"
+  >
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
 
-    <div 
-      id="campaigns-container"
-      className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-    >
-      {infiniteCampaigns.map((campaign, index) => (
-        <div key={`campaign-${campaign.id}-${index}`} className="flex-shrink-0 w-[280px] sm:w-[285px] snap-start">
-          <CampaignCard 
-            campaign={campaign}
-            darkMode={darkMode}
-          />
-        </div>
-      ))}
-    </div>
-
-    {/* RIGHT ARROW - Desktop only */}
-   <button
-  onClick={scrollRight}
-  className="
-    hidden md:flex items-center justify-center
-    absolute -right-10 top-1/2 -translate-y-1/2 z-10
-    h-9 w-9 rounded-full
-    border border-zinc-300 dark:border-zinc-600
-    bg-white/70 dark:bg-zinc-800/50 backdrop-blur-sm
-    hover:bg-white dark:hover:bg-zinc-700
-    shadow-sm transition
-  "
->
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-  </svg>
-</button>
-
+  <div 
+    id="campaigns-container"
+    className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+  >
+    {infiniteCampaigns.map((campaign, index) => (
+      <div key={`campaign-${campaign.id}-${index}`} className="flex-shrink-0 w-[280px] sm:w-[285px] snap-start">
+        <CampaignCard 
+          campaign={campaign}
+          darkMode={darkMode}
+        />
+      </div>
+    ))}
   </div>
+
+  {/* RIGHT ARROW - Desktop only */}
+  <button
+    onClick={scrollRight}
+    className="hidden md:flex items-center justify-center
+               absolute -right-10 top-1/2 -translate-y-1/2 z-10
+               h-9 w-9 rounded-full
+               border-2 border-emerald-600 dark:border-emerald-500/50
+               bg-gradient-to-br from-emerald-200 via-emerald-50 to-emerald-100
+               dark:bg-gradient-to-br dark:from-emerald-500/20 dark:via-zinc-800/60 dark:to-emerald-600/20
+               backdrop-blur-sm
+               shadow-[0_0_25px_rgba(5,150,105,0.7)]
+               dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]
+               hover:from-emerald-300 hover:via-emerald-100 hover:to-emerald-200
+               hover:shadow-[0_0_30px_rgba(5,150,105,0.9)]
+               dark:hover:from-emerald-500/30 dark:hover:via-zinc-700/80 dark:hover:to-emerald-600/30
+               dark:hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]
+               transition-all duration-300
+               text-emerald-700 dark:text-emerald-300"
+  >
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+</div>
 </div>
       
     </section>
