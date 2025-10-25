@@ -34,17 +34,15 @@ const scrollRight = () => {
   }
 };
 
- useEffect(() => {
+useEffect(() => {
   if (isUserScrolling) return;
   
-  // Only auto-scroll on mobile
-  if (window.innerWidth < 768) {
-    const interval = setInterval(() => {
-      setCampaignScrollIndex(prev => prev + 1);
-    }, 2000);
+  // Auto-scroll for both mobile and desktop
+  const interval = setInterval(() => {
+    setCampaignScrollIndex(prev => prev + 1);
+  }, 2000); 
 
-    return () => clearInterval(interval);
-  }
+  return () => clearInterval(interval);
 }, [isUserScrolling]);
 
   // Scroll campaigns container
