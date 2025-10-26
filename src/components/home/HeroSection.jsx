@@ -20,6 +20,7 @@ export default function HeroSection({ darkMode }) {
           src="/HeroImage.png"
           alt="Hero"
           className="w-full h-full object-cover"
+          style={{ objectPosition: '75% center' }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40 md:from-black/75 md:via-black/55 md:to-transparent lg:from-black/70 lg:via-black/50"></div>
       </div>
