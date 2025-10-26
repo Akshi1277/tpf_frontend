@@ -194,12 +194,12 @@ export default function Footer({ darkMode }) {
             © {new Date().getFullYear()} True Path Foundation. All rights reserved.
           </span>
 
-        {/* Social icons (no background divs) */}
+     {/* Social icons (light/dark mode) */}
 <div className="flex items-center gap-3 mt-3 mr-6">
   {/* Facebook */}
   <a href="#">
     <Image
-      src="/facebook.png"
+      src={darkMode ? "/face_dark.png" : "/facebook.png"}
       alt="Facebook"
       width={24}
       height={24}
@@ -210,7 +210,7 @@ export default function Footer({ darkMode }) {
   {/* Twitter */}
   <a href="#">
     <Image
-      src="/twitter.png"
+      src={darkMode ? "/twitter_dark.png" : "/twitter.png"}
       alt="Twitter"
       width={24}
       height={24}
@@ -221,7 +221,7 @@ export default function Footer({ darkMode }) {
   {/* YouTube */}
   <a href="#">
     <Image
-      src="/youtube.png"
+      src={darkMode ? "/youtube_dark.png" : "/youtube.png"}
       alt="YouTube"
       width={24}
       height={24}
@@ -232,7 +232,7 @@ export default function Footer({ darkMode }) {
   {/* Instagram */}
   <a href="#">
     <Image
-      src="/instagram.png"
+      src={darkMode ? "/insta_dark.png" : "/instagram.png"}
       alt="Instagram"
       width={24}
       height={24}
@@ -240,6 +240,7 @@ export default function Footer({ darkMode }) {
     />
   </a>
 </div>
+
 </div>
       </div>
     </footer>
