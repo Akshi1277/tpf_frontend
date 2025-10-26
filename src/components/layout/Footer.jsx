@@ -172,7 +172,7 @@ export default function Footer({ darkMode }) {
                 <input
                   type="email"
                   placeholder="Email address"
-                  className={`flex-1 px-1 py-3 mr-5 border rounded-lg focus:outline-gray-500 focus:ring-2 ${
+                  className={`flex-1 px-1 py-3 mr- border rounded-lg focus:outline-gray-500 focus:ring-2 ${
                     darkMode
                       ? 'bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500'
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
