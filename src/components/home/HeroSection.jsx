@@ -5,12 +5,12 @@ import { heroImages } from '@/lib/constants';
 export default function HeroSection({ darkMode }) {
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentHeroImage(prev => (prev + 1) % heroImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentHeroImage(prev => (prev + 1) % heroImages.length);
+  //   }, 5000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return (
   <section className="relative h-[500px] md:h-[600px] lg:h-[650px] overflow-hidden">
@@ -63,7 +63,7 @@ export default function HeroSection({ darkMode }) {
       </div>
 
       {/* Carousel Indicators */}
-      <div className="absolute bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+      {/* <div className="absolute bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
         {heroImages.map((_, index) => (
           <button
             key={index}
@@ -76,7 +76,7 @@ export default function HeroSection({ darkMode }) {
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
-      </div>
+      </div> */}
     </section>
   );
 }
