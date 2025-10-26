@@ -159,6 +159,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
     Menu
   </span>
+  
 </div>
             </div>
           </div>
