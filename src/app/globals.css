@@ -157,6 +157,20 @@
   100% { transform: translateX(100%); }
 }
 
+body, html {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+* {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
