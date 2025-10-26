@@ -248,7 +248,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   </button>
                 </div>
                 {/* Menu content */}
-                <div className="px-6 py-4 space-y-4 h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pb-20">
+                <div className="px-6 py-4 space-y-4 h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pb-5">
 
                   {/* Greeting */}
                   <div>
@@ -428,6 +428,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                     >
                       Log in
                     </a>
+                    
                   </div>
                 </div>
               </div>
