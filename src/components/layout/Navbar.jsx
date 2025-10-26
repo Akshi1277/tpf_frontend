@@ -99,7 +99,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
               </button>
             <div className="tooltip-container">
   <button 
-    className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
+    className={`p-2 rounded-full transition-colors ${darkMode ? ' bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'}`}
   >
     <Image
       src="/TPFAid-Icon-Zakat-1.svg"
@@ -117,7 +117,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
              <div className="tooltip-container">
   <button
     onClick={() => setDarkMode(!darkMode)}
-    className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
+    className={`p-2 rounded-full transition-colors ${darkMode ? ' bg-zinc-800 hover:bg-zinc-800' : ' bg-white/80 hover:bg-zinc-100'}`}
   >
     {darkMode ? (
       <Sun className="w-6 h-6 text-white" />
@@ -159,7 +159,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
     Menu
   </span>
-  
+
 </div>
             </div>
           </div>
