@@ -97,42 +97,38 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
               <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap">
                 Start fundraising
               </button>
-              {/* Zakaat icon */}
-             <button
-  aria-label="Zakaat"
-  title="Zakaat"
-  className={`relative p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
-    ${darkMode
-      ? 'bg-zinc-800/80 hover:bg-zinc-700 backdrop-blur-sm shadow-[0_0_10px_rgba(255,255,100,0.4)]'
-      : 'bg-white/80 hover:bg-zinc-100 backdrop-blur-sm shadow-sm shadow-zinc-300/50'
-    }`}
->
-  <Image
-    src="/TPFAid-Icon-Zakat-1.svg"
-    alt="Zakaat"
-    width={24}
-    height={24}
-    className="scale-[1.0] sm:scale-[1.03] md:scale-[1.06]"
-  />
-</button>
+            <div className="tooltip-container">
+  <button 
+    className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
+  >
+    <Image
+      src="/TPFAid-Icon-Zakat-1.svg"
+      alt="Zakat"
+      width={24}
+      height={24}
+      className="w-6 h-6"
+    />
+  </button>
+  <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
+    Zakaat
+  </span>
+</div>
 
-              {/* Dark-mode toggle */}
-             <button
-  onClick={() => setDarkMode(!darkMode)}
-  aria-label="Toggle dark mode"
-  title={darkMode ? "Light Mode" : "Dark Mode"}
-  className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
-    ${darkMode
-      ? 'bg-zinc-800/80 text-yellow-400 hover:bg-zinc-700 backdrop-blur-sm shadow-[0_0_10px_rgba(255,255,100,0.4)]'
-      : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-    }`}
->
-  {darkMode ? (
-    <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
-  ) : (
-    <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
-  )}
-</button>
+             <div className="tooltip-container">
+  <button
+    onClick={() => setDarkMode(!darkMode)}
+    className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
+  >
+    {darkMode ? (
+      <Sun className="w-6 h-6 text-white" />
+    ) : (
+      <Moon className="w-6 h-6 text-zinc-900" />
+    )}
+  </button>
+  <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
+    {darkMode ? 'Light Mode' : 'Dark Mode'}
+  </span>
+</div>
 
 
 
@@ -148,18 +144,22 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
        <option value="amiri">Amiri</option>
      </select> */}
               {/* Hamburger */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Menu"
-                title='Menu'
-                className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
-    ${darkMode
-                    ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-                    : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-                  }`}
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
-              </button>
+             <div className="tooltip-container">
+  <button
+    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+    aria-label="Menu"
+    className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+      ${darkMode
+        ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
+        : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
+      }`}
+  >
+    {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+  </button>
+  <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
+    Menu
+  </span>
+</div>
             </div>
           </div>
 
