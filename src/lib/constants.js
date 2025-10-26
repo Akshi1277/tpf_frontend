@@ -12,7 +12,7 @@ export const campaigns = [
     org: "Global Family Aid",
     verified: true,
     urgent: true,
-    validityDate: "30 Days",
+    validityDate: "30 ",
     taxBenefit: true
   },
   {
@@ -25,7 +25,7 @@ export const campaigns = [
     donors: 198,
     org: "Seed Charity",
     verified: true,
-    validityDate: "22 Days",
+    validityDate: "22 ",
     taxBenefit: true
   },
   {
@@ -38,7 +38,7 @@ export const campaigns = [
     donors: 267,
     org: "Together Organization",
     verified: true,
-    validityDate: "17 Days",
+    validityDate: "17 ",
     taxBenefit: false
   },
   {
@@ -52,7 +52,7 @@ export const campaigns = [
     org: "TPF Aid Education",
     verified: true,
     urgent: true,
-    validityDate: "3 Days",
+    validityDate: "3 ",
     taxBenefit: true
   }
 ];
