@@ -41,7 +41,7 @@ export default function CampaignTabs({ darkMode }) {
     { url: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=800&q=80', label: 'Clean Water' },
     { url: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&q=80', label: 'Education' },
     { url: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&q=80', label: 'Food Security' },
-    { url: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=800&q=80', label: 'Agriculture' },
+    // { url: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=800&q=80', label: 'Agriculture' },
     { url: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800&q=80', label: 'Empowerment' }
   ];
 
