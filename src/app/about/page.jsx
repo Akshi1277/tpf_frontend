@@ -1,4 +1,3 @@
-// app/about/page.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,18 +7,22 @@ import AboutHero from '@/components/aboutus/AboutHero';
 import MissionSection from '@/components/aboutus/MissionSection';
 import ImpactStats from '@/components/aboutus/ImpactStats';
 import TeamSection from '@/components/aboutus/TeamSection';
-import TimelineSection from '@/components/aboutus/TimelineSection';
-import ValuesSection from '@/components/aboutus/ValuesSection';
-import MediaGallery from '@/components/aboutus/MediaGallery';
+import TimelineSection from '@/components/aboutus/MissionVisionSection';
+import ValuesSection from '@/components/aboutus/OurTeamSection';
 import NewsletterBanner from '@/components/aboutus/NewsletterBanner';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from '@studio-freight/lenis';
+import MissionVisionSection from '@/components/aboutus/MissionVisionSection';
+import OurTeamSection from '@/components/aboutus/OurTeamSection';
+import CuratedSection from '@/components/home/CuratedSection';
+import WhatWeDoSection from '@/components/aboutus/WhatWeDoSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutPage() {
   const [darkMode, setDarkMode] = useState(false);
+  const [scrolled, setScrolled] = useState(true); // 👈 Always true
 
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode');
@@ -50,15 +53,12 @@ export default function AboutPage() {
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
       <AboutHero darkMode={darkMode} />
-      <MissionSection darkMode={darkMode} />
-      <ImpactStats darkMode={darkMode} />
-      <TeamSection darkMode={darkMode} />
-      <TimelineSection darkMode={darkMode} />
-      <ValuesSection darkMode={darkMode} />
-      <MediaGallery darkMode={darkMode} />
-      <NewsletterBanner darkMode={darkMode} />
+      {/* <MissionSection darkMode={darkMode} /> */}
+      <MissionVisionSection darkMode={darkMode} />
+      <OurTeamSection darkMode={darkMode} />
+      <WhatWeDoSection darkMode={darkMode} />
       <Footer darkMode={darkMode} />
     </div>
   );

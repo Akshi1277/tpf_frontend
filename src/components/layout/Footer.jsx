@@ -92,19 +92,34 @@ export default function Footer({ darkMode }) {
             </ul>
           </div>
 
-          {/* 2️⃣ About Us (moved to middle) */}
-          <div>
-            <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>About Us</div>
-            <ul className="space-y-1.5 text-sm mb-6">
-              {['About TPF', 'FAQs', 'Legal & Help', 'Contact Us'].map(item => (
-                <li key={item}>
-                  <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* 2️⃣ About Us (moved to middle) */}
+<div>
+  <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
+    About Us
+  </div>
+  <ul className="space-y-1.5 text-sm mb-6">
+    {[
+      { name: 'About TPF', path: '/about' },
+      { name: 'FAQs', path: '/faqs' },
+      { name: 'Legal & Help', path: '/helpcenter' },
+      { name: 'Contact Us', path: '/contactus' },
+      {name: 'Help Centre', path: '/helpcentre' }
+    ].map(link => (
+      <li key={link.name}>
+        <a
+          href={link.path}
+          className={`${darkMode
+            ? 'text-zinc-400 hover:text-white'
+            : 'text-gray-600 hover:text-gray-900'
+          } transition-colors`}
+        >
+          {link.name}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
 
           {/* 3️⃣ Get Involve (was at Ways to Jannah position) */}
           <div>
