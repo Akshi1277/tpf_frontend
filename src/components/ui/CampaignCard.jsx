@@ -13,9 +13,7 @@ export default function CampaignCard({ campaign, darkMode }) {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
-  useEffect(() => {
-  router.prefetch('/campaign');
-}, [router]);
+ 
 
   if (campaign.video) {
     // Video card with full coverage
