@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { campaigns, categories } from '@/lib/constants';
+import { useRouter } from 'next/navigation';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+  const router = useRouter();
 
   const filteredCampaigns = selectedCategory === 'all' 
     ? campaigns 
@@ -153,6 +156,8 @@ useEffect(() => {
               rounded-full text-white
               hover:animate-pulse cursor-pointer
             "
+            
+
           >
             Discover more
           </button>

@@ -2,10 +2,12 @@
 import Image from 'next/image';
 import { Users, CheckCircle } from 'lucide-react';
 import { currency } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 export default function CampaignCard({ campaign, darkMode }) {
   const progress = Math.min(100, Math.round((campaign.raised / campaign.goal) * 100));
 
+  const router = useRouter();
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
@@ -89,7 +91,9 @@ export default function CampaignCard({ campaign, darkMode }) {
               </span>
             </div>
 
-            <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
+            <button 
+            onClick={()=>{router.push('/campaign')}}
+            className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
               Donate Now
             </button>
 
