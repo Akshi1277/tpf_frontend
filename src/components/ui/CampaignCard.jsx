@@ -95,7 +95,7 @@ export default function CampaignCard({ campaign, darkMode }) {
             </div>
 
      <Link href="/campaign" prefetch className="w-full block">
-  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
+  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
     Donate Now
   </button>
 </Link>
@@ -198,7 +198,7 @@ export default function CampaignCard({ campaign, darkMode }) {
           </span>
         </div>
 <Link href="/campaign" prefetch className="w-full block">
-  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
+  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
     Donate Now
   </button>
 </Link>
