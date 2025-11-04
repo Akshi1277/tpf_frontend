@@ -3,8 +3,11 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Menu, X, Moon, Sun } from 'lucide-react';
 import { Plus, Heart, Leaf } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const router = useRouter();
 
   return (
     <>
@@ -32,6 +35,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                 height={120}
                 priority
                 className="cursor-pointer"
+                onClick={() => router.push('/')}
               />
             </div>
 
