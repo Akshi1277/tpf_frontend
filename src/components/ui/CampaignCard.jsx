@@ -2,6 +2,7 @@
 // components/ui/CampaignCard.jsx
 import Image from 'next/image';
 import { Users, CheckCircle, Link } from 'lucide-react';
+import Link from 'next/link';
 import { currency } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
@@ -93,7 +94,7 @@ export default function CampaignCard({ campaign, darkMode }) {
               </span>
             </div>
 
-       <Link href="/campaign" prefetch className="w-full block">
+     <Link href="/campaign" prefetch className="w-full block">
   <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
     Donate Now
   </button>
@@ -197,8 +198,7 @@ export default function CampaignCard({ campaign, darkMode }) {
           </span>
         </div>
 <Link href="/campaign" prefetch className="w-full block">
-        <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
- 
+  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
     Donate Now
   </button>
 </Link>
