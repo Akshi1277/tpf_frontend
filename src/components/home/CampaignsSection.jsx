@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { campaigns, categories } from '@/lib/constants';
-import { useRouter } from 'next/navigation';
+
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
 
-  const router = useRouter();
+ 
 
   const filteredCampaigns = selectedCategory === 'all' 
     ? campaigns 
@@ -36,6 +36,12 @@ const scrollRight = () => {
     container.scrollBy({ left: 320, behavior: 'smooth' });
   }
 };
+
+useEffect(() => {
+  const handlePause = () => setIsUserScrolling(true);
+  window.addEventListener("pauseCampaignScroll", handlePause);
+  return () => window.removeEventListener("pauseCampaignScroll", handlePause);
+}, []);
 
 useEffect(() => {
   if (isUserScrolling) return;

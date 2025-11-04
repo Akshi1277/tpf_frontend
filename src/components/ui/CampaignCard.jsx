@@ -1,6 +1,6 @@
 // components/ui/CampaignCard.jsx
 import Image from 'next/image';
-import { Users, CheckCircle } from 'lucide-react';
+import { Users, CheckCircle, Link } from 'lucide-react';
 import { currency } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
@@ -12,6 +12,9 @@ export default function CampaignCard({ campaign, darkMode }) {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
+  useEffect(() => {
+  router.prefetch('/campaign');
+}, [router]);
 
   if (campaign.video) {
     // Video card with full coverage
@@ -91,11 +94,11 @@ export default function CampaignCard({ campaign, darkMode }) {
               </span>
             </div>
 
-            <button 
-            onClick={()=>{router.push('/campaign')}}
-            className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
-              Donate Now
-            </button>
+       <Link href="/campaign" prefetch className="w-full block">
+  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
+    Donate Now
+  </button>
+</Link>
 
             <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-zinc-600/50">
               <div className="flex items-center gap-3 sm:gap-4">
