@@ -174,7 +174,7 @@ export default function FAQSection({ darkMode }) {
   return (
     <section
       ref={ref}
-      className={`py-30 sm:py-20 md:py-30 ${
+      className={`py-36 sm:py-20 md:py-30 ${
         darkMode ? 'bg-zinc-900' : 'bg-white'
       } relative overflow-hidden`}
     >
