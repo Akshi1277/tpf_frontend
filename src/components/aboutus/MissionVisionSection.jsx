@@ -6,7 +6,7 @@ export default function MissionVisionSection({ darkMode }) {
   const isInView = useInView(ref, { once: true, margin: '-100px' });
 
   return (
-    <section ref={ref} className={`py-12 sm:py-16 md:py-20 ${darkMode ? 'bg-zinc-900' : 'bg-white'} relative overflow-hidden`}>
+    <section ref={ref} className={`py-8 sm:py-16 md:py-8 ${darkMode ? 'bg-zinc-900' : 'bg-white'} relative overflow-hidden`}>
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0" style={{
