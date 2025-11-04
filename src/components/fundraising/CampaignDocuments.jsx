@@ -8,7 +8,7 @@ export default function CampaignDocuments({ darkMode }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`p-8 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-white'} shadow-lg`}
+        className={`p-8 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}
       >
         <h3 className={`text-xl md:text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
           Campaign Documents

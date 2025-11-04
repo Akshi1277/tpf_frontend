@@ -32,7 +32,7 @@ export default function DonorMessages({ darkMode }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`p-8 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-white'} shadow-lg`}
+        className={`p-8 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}
       >
         <div className="flex justify-between items-center mb-6">
           <h3 className={`text-xl md:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>

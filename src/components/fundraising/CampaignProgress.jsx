@@ -12,7 +12,7 @@ export default function CampaignProgress({ darkMode }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 text-white shadow-xl"
+        className="p-8 md:p-10 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 text-white"
       >
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-6 h-6" />

@@ -22,7 +22,7 @@ export default function RelatedCampaigns({ darkMode }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`p-8 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-white'} shadow-lg`}
+        className={`p-8 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}
       >
         <h3 className={`text-xl md:text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
           Related Campaigns
@@ -37,7 +37,7 @@ export default function RelatedCampaigns({ darkMode }) {
               transition={{ duration: 0.4, delay: i * 0.1 }}
               className={`rounded-2xl overflow-hidden ${
                 darkMode ? 'bg-zinc-900' : 'bg-zinc-50'
-              } hover:shadow-xl transition-shadow cursor-pointer`}
+              } transition-shadow cursor-pointer`}
               data-testid={`related-campaign-${i}`}
             >
               <div className="relative h-48">
