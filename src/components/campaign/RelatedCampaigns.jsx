@@ -1,113 +1,252 @@
-import { motion } from 'framer-motion';
-import { Users, ChevronRight } from 'lucide-react';
+// components/home/CampaignsSection.jsx
+'use client';
+import { useState, useEffect } from 'react';
+import CampaignCard from '@/components/ui/CampaignCard';
+import { campaigns, categories } from '@/lib/constants';
+import { useRouter } from 'next/navigation';
 
 export default function RelatedCampaigns({ darkMode }) {
-  const relatedCampaigns = [
-    {
-      title: 'Education for Children',
-      image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=80',
-      raised: '₹15,60,000',
-      goal: '₹20,00,000',
-      progress: 78,
-      donors: 342
-    },
-    {
-      title: 'Mobile Health Clinics',
-      image: 'https://images.unsplash.com/photo-1584982751601-97dcc096659c?w=600&q=80',
-      raised: '₹9,00,000',
-      goal: '₹20,00,000',
-      progress: 45,
-      donors: 198
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+  const router = useRouter();
+
+  const filteredCampaigns = selectedCategory === 'all' 
+    ? campaigns 
+    : campaigns.filter(c => c.category === selectedCategory);
+
+  const infiniteCampaigns = [...filteredCampaigns, ...filteredCampaigns];
+
+  const COLORS = {
+    neutralHeading: darkMode ? "text-white" : "text-zinc-900",
+    neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
+  };
+
+  const scrollLeft = () => {
+  const container = document.getElementById('campaigns-container');
+  if (container) {
+    container.scrollBy({ left: -320, behavior: 'smooth' });
+  }
+};
+
+const scrollRight = () => {
+  const container = document.getElementById('campaigns-container');
+  if (container) {
+    container.scrollBy({ left: 320, behavior: 'smooth' });
+  }
+};
+
+useEffect(() => {
+  if (isUserScrolling) return;
+  
+  // Auto-scroll for both mobile and desktop
+  const interval = setInterval(() => {
+    setCampaignScrollIndex(prev => prev + 1);
+  }, 2000); 
+
+  return () => clearInterval(interval);
+}, [isUserScrolling]);
+
+  // Scroll campaigns container
+  useEffect(() => {
+    const container = document.getElementById('campaigns-container');
+    if (!container) return;
+
+    const cardWidth = container.children[0]?.offsetWidth || 0;
+    const gap = 20; // 1.25rem = 20px
+    const scrollTo = (cardWidth + gap) * campaignScrollIndex;
+    
+    container.scrollTo({
+      left: scrollTo,
+      behavior: 'smooth'
+    });
+
+    if (campaignScrollIndex >= filteredCampaigns.length) {
+      setTimeout(() => {
+        container.scrollTo({
+          left: 0,
+          behavior: 'auto'
+        });
+        setCampaignScrollIndex(0);
+      }, 500);
     }
-  ];
+  }, [campaignScrollIndex, filteredCampaigns.length]);
+
+  // Handle user scrolling detection
+  useEffect(() => {
+    const container = document.getElementById('campaigns-container');
+    if (!container) return;
+
+    let scrollTimeout;
+    let isScrolling = false;
+
+    const handleScrollStart = () => {
+      if (!isScrolling) {
+        isScrolling = true;
+        setIsUserScrolling(true);
+      }
+      
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        setIsUserScrolling(false);
+      }, 2000);
+    };
+
+    container.addEventListener('scroll', handleScrollStart, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', handleScrollStart);
+    };
+  }, []);
+
+  // Handle seamless infinite loop for manual scrolling
+  useEffect(() => {
+    const container = document.getElementById('campaigns-container');
+    if (!container) return;
+
+    const handleScrollEnd = () => {
+      const cardWidth = container.children[0]?.offsetWidth || 0;
+      const gap = 20; // 1.25rem = 20px
+      const scrollLeft = container.scrollLeft;
+      const currentIndex = Math.round(scrollLeft / (cardWidth + gap));
+
+      if (currentIndex >= filteredCampaigns.length) {
+        const equivalentIndex = currentIndex - filteredCampaigns.length;
+        container.scrollTo({
+          left: equivalentIndex * (cardWidth + gap),
+          behavior: 'auto'
+        });
+        setCampaignScrollIndex(equivalentIndex);
+      } else if (currentIndex < 0) {
+        container.scrollTo({
+          left: (filteredCampaigns.length + currentIndex) * (cardWidth + gap),
+          behavior: 'auto'
+        });
+        setCampaignScrollIndex(filteredCampaigns.length + currentIndex);
+      }
+    };
+
+    let scrollTimeout;
+    const onScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(handleScrollEnd, 150);
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      container.removeEventListener('scroll', onScroll);
+    };
+  }, [filteredCampaigns.length]);
 
   return (
-    <div className="mt-12">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className={`text-2xl md:text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-          Related Campaigns
-        </h2>
-        <button className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
-          View All
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      </div>
+    <section id="campaigns" className={`py-10 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+            Related Campaigns
+          </h2>
+          <button
+            className="
+              whitespace-nowrap
+              text-xs sm:text-sm font-medium
+              bg-emerald-600 px-3 py-1.5 sm:px-4 sm:py-2
+              rounded-full text-white
+              hover:animate-pulse cursor-pointer
+            "
+            
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {relatedCampaigns.map((campaign, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            viewport={{ once: true }}
-            className={`rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all group cursor-pointer ${
-              darkMode ? 'bg-zinc-800' : 'bg-white'
-            }`}
           >
-            <div className="relative h-56 overflow-hidden">
-              <img
-                src={campaign.image}
-                alt={campaign.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute top-4 right-4 flex gap-2">
-                <span className="px-3 py-1 rounded-full bg-emerald-500 text-white text-xs font-semibold backdrop-blur-sm">
-                  ACTIVE
-                </span>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4">
-                <h4 className="text-xl font-bold text-white mb-1">
-                  {campaign.title}
-                </h4>
-              </div>
-            </div>
+            Discover more
+          </button>
+        </div>
 
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className={`font-semibold text-lg ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {campaign.raised}
-                  </span>
-                  <span className={`text-sm font-medium ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                    {campaign.progress}%
-                  </span>
-                </div>
-                
-                <div className={`relative w-full h-2.5 rounded-full overflow-hidden ${
-                  darkMode ? 'bg-zinc-700' : 'bg-gray-200'
-                }`}>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${campaign.progress}%` }}
-                    transition={{ duration: 1, delay: 0.3 }}
-                    viewport={{ once: true }}
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-500"
-                  />
-                </div>
-                
-                <p className={`text-sm mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  of {campaign.goal} goal
-                </p>
-              </div>
+        <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
+          {categories.map((cat) => (
+            <button
+              key={cat.key}
+              onClick={() => setSelectedCategory(cat.key)}
+              className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm cursor-pointer transition-colors flex items-center gap-2 ${
+                selectedCategory === cat.key
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                  : darkMode 
+                    ? "border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+<div className="relative">
+  {/* LEFT ARROW - Desktop only */}
+ <button
+  onClick={scrollLeft}
+  className="absolute left-2 md:-left-10 top-1/2 -translate-y-1/2 z-10
+             hidden md:flex items-center justify-center
+             h-9 w-9 rounded-full
+             border-2 border-emerald-600 dark:border-emerald-500/50
+             bg-gradient-to-br from-emerald-200 via-emerald-50 to-emerald-100
+             dark:bg-gradient-to-br dark:from-emerald-500/20 dark:via-zinc-800/60 dark:to-emerald-600/20
+             backdrop-blur-sm
+             shadow-[0_0_25px_rgba(5,150,105,0.7)]
+             dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]
+             hover:from-emerald-300 hover:via-emerald-100 hover:to-emerald-200
+             hover:shadow-[0_0_30px_rgba(5,150,105,0.9)]
+             dark:hover:from-emerald-500/30 dark:hover:via-zinc-700/80 dark:hover:to-emerald-600/30
+             dark:hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]
+             transition-all duration-300
+             text-emerald-700 dark:text-emerald-300"
+>
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+</button>
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-zinc-700">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-400" />
-                  <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {campaign.donors} donors
-                  </span>
-                </div>
-                <button className="text-emerald-600 hover:text-emerald-700 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                  View Campaign
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+
+  <div 
+    id="campaigns-container"
+    className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+  >
+    {infiniteCampaigns.map((campaign, index) => (
+      <div key={`campaign-${campaign.id}-${index}`} className="flex-shrink-0 w-[280px] sm:w-[285px] snap-start">
+        <CampaignCard 
+          campaign={campaign}
+          darkMode={darkMode}
+        />
       </div>
-    </div>
+    ))}
+  </div>
+
+  {/* RIGHT ARROW - Desktop only */}
+ <button
+  onClick={scrollRight}
+  className="absolute right-2 md:-right-10 top-1/2 -translate-y-1/2 z-10
+             hidden md:flex items-center justify-center
+             h-9 w-9 rounded-full
+             border-2 border-emerald-600 dark:border-emerald-500/50
+             bg-gradient-to-br from-emerald-200 via-emerald-50 to-emerald-100
+             dark:bg-gradient-to-br dark:from-emerald-500/20 dark:via-zinc-800/60 dark:to-emerald-600/20
+             backdrop-blur-sm
+             shadow-[0_0_25px_rgba(5,150,105,0.7)]
+             dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]
+             hover:from-emerald-300 hover:via-emerald-100 hover:to-emerald-200
+             hover:shadow-[0_0_30px_rgba(5,150,105,0.9)]
+             dark:hover:from-emerald-500/30 dark:hover:via-zinc-700/80 dark:hover:to-emerald-600/30
+             dark:hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]
+             transition-all duration-300
+             text-emerald-700 dark:text-emerald-300"
+>
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  </svg>
+</button>
+
+</div>
+</div>
+      
+    </section>
   );
 }

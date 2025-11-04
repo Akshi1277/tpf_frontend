@@ -19,7 +19,7 @@ export default function CampaignHero({ darkMode }) {
             ACTIVE
           </span>
           <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-semibold">
-            VERIFIED
+            Zakaat Verified
           </span>
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">

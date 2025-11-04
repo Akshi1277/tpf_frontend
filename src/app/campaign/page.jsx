@@ -51,7 +51,7 @@ export default function CampaignPage() {
 
         {/* <RelatedCampaigns darkMode={darkMode} />
          */}
-         <CampaignsSection  darkMode={darkMode}/>
+         <RelatedCampaigns  darkMode={darkMode}/>
         
         <FooterCTA darkMode={darkMode} />
       </div>
