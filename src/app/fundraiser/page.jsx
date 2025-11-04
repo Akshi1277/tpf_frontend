@@ -10,35 +10,26 @@ import CampaignProgress from '@/components/fundraising/CampaignProgress';
 import DonationForm from '@/components/fundraising/DonationForm';
 import Footer from '@/components/layout/Footer';
 export default function Fundraising() {
+
+
+
   const [darkMode, setDarkMode] = useState(false);
+  const [scrolled, setScrolled] = useState(true); // 👈 Always true
 
   useEffect(() => {
-    try {
-      const savedMode = localStorage.getItem('darkMode');
-      if (savedMode) {
-        setDarkMode(savedMode === 'true');
-      }
-    } catch (error) {
-      console.error('Error accessing localStorage:', error);
-    }
+    const savedMode = localStorage.getItem('darkMode');
+    setDarkMode(savedMode === 'true');
   }, []);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('darkMode', darkMode.toString());
-      if (darkMode) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } catch (error) {
-      console.error('Error saving to localStorage:', error);
-    }
+    localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
+
+ 
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
       <FundraisingHero darkMode={darkMode} />
       <CampaignDescription darkMode={darkMode} />
       <DonorMessages darkMode={darkMode} />

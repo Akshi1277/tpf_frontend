@@ -40,7 +40,7 @@ export default function DonationForm({ darkMode }) {
             <button
               key={amount}
               onClick={() => handleAmountSelect(amount)}
-              className={`p-4 rounded-xl font-semibold text-lg transition-all ${
+              className={`p-4 rounded-xl font-semibold text-lg cursor-pointer transition-all ${
                 selectedAmount === amount
                   ? 'bg-emerald-600 text-white'
                   : darkMode
@@ -67,7 +67,7 @@ export default function DonationForm({ darkMode }) {
 
         <button
           onClick={handleDonate}
-          className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-semibold rounded-xl mb-3 transition-colors"
+          className="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-semibold rounded-xl mb-3 transition-colors cursor-pointer"
           data-testid="button-donate-now"
         >
           Donate Now

@@ -189,7 +189,7 @@ export default function FundraisingHero({ darkMode }) {
             {/* Navigation Arrows - Hidden on mobile */}
             <button
               onClick={handlePrev}
-              className={`hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 items-center justify-center w-12 h-12 rounded-full transition-all ${
+              className={`hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 items-center justify-center w-12 h-12 rounded-full border-2 transition-all ${
                 darkMode ? "bg-zinc-700 hover:bg-zinc-600" : "bg-white hover:bg-zinc-100"
               }`}
               aria-label="Previous slide"
@@ -199,7 +199,7 @@ export default function FundraisingHero({ darkMode }) {
 
             <button
               onClick={handleNext}
-              className={`hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 items-center justify-center w-12 h-12 rounded-full transition-all ${
+              className={`hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 items-center justify-center w-12 h-12 rounded-full border-2 transition-all ${
                 darkMode ? "bg-zinc-700 hover:bg-zinc-600" : "bg-white hover:bg-zinc-100"
               }`}
               aria-label="Next slide"
