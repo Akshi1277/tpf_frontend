@@ -1,7 +1,7 @@
 "use client"
 // components/ui/CampaignCard.jsx
 import Image from 'next/image';
-import { Users, CheckCircle, Link } from 'lucide-react';
+import { Users, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { currency } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
