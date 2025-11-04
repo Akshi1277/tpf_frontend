@@ -119,13 +119,14 @@ export default function CampaignDocuments({ darkMode }) {
             </div>
           </motion.div> */}
         </div>
-
+<div className="flex justify-center">
         <button
           className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2 rounded-lg font-medium transition-colors"
           data-testid="button-view-documents"
         >
           View Documents
         </button>
+        </div>
       </motion.div>
     </div>
   )
