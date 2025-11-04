@@ -197,10 +197,13 @@ export default function CampaignCard({ campaign, darkMode }) {
             {progress}% funded
           </span>
         </div>
-
+<Link href="/campaign" prefetch className="w-full block">
         <button className="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4">
-          Donate Now
-        </button>
+ 
+    Donate Now
+  </button>
+</Link>
+         
 
         <div className={`flex items-center justify-between pt-3 sm:pt-4 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}>
           <div className="flex items-center gap-3 sm:gap-4">
