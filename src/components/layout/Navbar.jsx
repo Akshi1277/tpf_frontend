@@ -94,7 +94,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             {/* RIGHT – Actions */}
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
               {/* Start Fundraising – desktop only */}
-              <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl whitespace-nowrap">
+              <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer whitespace-nowrap">
                 Start fundraising
               </button>
            <div className="tooltip-container">
