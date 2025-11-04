@@ -1,9 +1,30 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Info, MessageCircle, Image as ImageIcon, Heart, FileText, Lock, Award, ChevronRight } from 'lucide-react';
+import { Info, MessageCircle, Image as ImageIcon,X,Smartphone,KeyRound, Heart, FileText, Lock, Award, ChevronRight } from 'lucide-react';
 
 export default function CampaignTabs({ darkMode }) {
   const [activeTab, setActiveTab] = useState('about');
+  const [showLogin, setShowLogin] = useState(false);
+  const [mobile, setMobile] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState('mobile');
+  const [loggedIn, setLoggedIn] = useState(false);
+
+    const handleLogin = () => {
+    if (step === 'mobile') {
+      if (mobile.length === 10) setStep('otp');
+    } else if (step === 'otp') {
+      if (otp.length === 6) {
+        setLoggedIn(true);
+        setShowLogin(false);
+      }
+    }
+  };
+
+    const documents = [
+    { name: 'Financial Report Q4', date: 'Updated 1 week ago' },
+    { name: 'Project Proposal', date: 'Last updated 2 days ago' }
+  ];
 
   const donorMessages = [
     {
@@ -139,38 +160,44 @@ export default function CampaignTabs({ darkMode }) {
                 </ul>
               </div>
 
-              <div className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'}`}>
-                <h4 className={`font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Campaign Documents
-                </h4>
-                <div className="grid gap-3">
-                  {[
-                    { name: 'Financial Report Q4', date: 'Updated 1 week ago' },
-                    { name: 'Project Proposal', date: 'Last updated 2 days ago' }
-                  ].map((doc, i) => (
-                    <div
-                      key={i}
-                      className={`flex items-center justify-between p-4 rounded-lg border ${
-                        darkMode ? 'border-zinc-700 hover:bg-zinc-800' : 'border-gray-200 hover:bg-white'
-                      } transition-colors cursor-pointer group`}
-                    >
+             {/* Documents Section */}
+              <div className={`p-6 rounded-xl relative overflow-hidden ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'}`}>
+                <h4 className={`font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Campaign Documents</h4>
+
+                <div className={`grid gap-3 transition-all duration-500 ${!loggedIn ? 'opacity-40 blur-sm pointer-events-none' : 'opacity-100 blur-0'}`}>
+                  {documents.map((doc, i) => (
+                    <div key={i} className={`flex items-center justify-between p-4 rounded-lg border ${darkMode ? 'border-zinc-700' : 'border-gray-200'}`}>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center">
-                          <FileText className="w-5 h-5 text-emerald-600" />
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {doc.name}
-                          </p>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {doc.date}
-                          </p>
+                          <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>{doc.name}</p>
+                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{doc.date}</p>
                         </div>
                       </div>
-                      <Lock className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform" />
                     </div>
                   ))}
                 </div>
+
+                {!loggedIn && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="absolute inset-0 flex flex-col items-center justify-center text-center backdrop-blur-md bg-black/40 rounded-xl"
+                  >
+                    <Lock className="w-10 h-10 text-white mb-3" />
+                    <p className="text-white font-semibold mb-1">Documents Locked</p>
+                    <p className="text-gray-200 text-sm mb-4">Login to view campaign files</p>
+                    <button
+                      onClick={() => setShowLogin(true)}
+                      className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-emerald-500/30 transition-all cursor-pointer"
+                    >
+                      View Documents
+                    </button>
+                  </motion.div>
+                )}
               </div>
             </div>
           )}
@@ -262,6 +289,88 @@ export default function CampaignTabs({ darkMode }) {
             </div>
           )}
         </motion.div>
+        {/* Login Modal */}
+      <AnimatePresence>
+        {showLogin && (
+          <motion.div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`${darkMode ? 'bg-zinc-900 text-white' : 'bg-white text-gray-900'} rounded-2xl p-6 w-80 shadow-xl relative`}
+            >
+              <button onClick={() => setShowLogin(false)} className="absolute top-3 right-3 text-gray-400 hover:text-red-400">
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="text-center mb-4">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
+                  Secure Access
+                </h3>
+                <p className="text-sm mt-1 text-gray-400">Verify your identity to continue</p>
+              </div>
+
+              {step === 'mobile' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Mobile Number</label>
+                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-zinc-800 rounded-lg px-3 py-2">
+                      <Smartphone className="w-4 h-4 text-gray-400" />
+                      <input
+                        type="tel"
+                        maxLength={10}
+                        value={mobile}
+                        onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
+                        className="bg-transparent flex-1 outline-none text-sm"
+                        placeholder="Enter 10-digit number"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogin}
+                    disabled={mobile.length < 10}
+                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition-all"
+                  >
+                    Send OTP
+                  </button>
+                </div>
+              )}
+
+              {step === 'otp' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Enter OTP</label>
+                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-zinc-800 rounded-lg px-3 py-2">
+                      <KeyRound className="w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        maxLength={6}
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                        className="bg-transparent flex-1 outline-none text-sm tracking-widest"
+                        placeholder="6-digit code"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogin}
+                    disabled={otp.length < 6}
+                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition-all"
+                  >
+                    Verify & Unlock
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       </AnimatePresence>
     </div>
   );

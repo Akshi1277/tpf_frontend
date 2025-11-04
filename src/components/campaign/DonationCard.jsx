@@ -72,11 +72,11 @@ export default function DonationCard({ darkMode }) {
               setCustomAmount(e.target.value);
               setSelectedAmount(null);
             }}
-            className={`w-full h-14 pl-10 pr-4 text-lg rounded-xl border-2 transition-all focus:outline-none focus:ring-4 ${
+            className={`w-full h-14 pl-10 pr-4 text-lg rounded-xl border-2 transition-all focus:outline-none focus:ring-2 ${
               customAmount
-                ? 'border-emerald-500 focus:ring-emerald-500/20'
+                ? 'border-emerald-500 focus:ring-emerald-200'
                 : darkMode
-                ? 'bg-zinc-900 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
+                ? 'text-white placeholder-zinc-500 focus:border-emerald-500'
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
             }`}
           />
