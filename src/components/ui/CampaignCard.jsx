@@ -1,3 +1,4 @@
+"use client"
 // components/ui/CampaignCard.jsx
 import Image from 'next/image';
 import { Users, CheckCircle, Link } from 'lucide-react';
