@@ -101,7 +101,7 @@ export default function Footer({ darkMode }) {
     {[
       { name: 'About TPF', path: '/about' },
       { name: 'FAQs', path: '/faqs' },
-      { name: 'Legal & Help', path: '/helpcenter' },
+      { name: 'Legal & Help', path: '/legalaid' },
       { name: 'Contact Us', path: '/contactus' },
       {name: 'Help Centre', path: '/helpcentre' }
     ].map(link => (
