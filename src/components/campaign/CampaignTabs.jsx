@@ -288,7 +288,7 @@ export default function CampaignTabs({ darkMode }) {
           )}
         </motion.div>
 
-  <AnimatePresence>
+ <AnimatePresence>
   {showLogin && (
     <motion.div
       initial={{ opacity: 0 }}
@@ -311,67 +311,101 @@ export default function CampaignTabs({ darkMode }) {
         {/* Close Button */}
         <button
           onClick={() => setShowLogin(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10"
         >
           <X className="w-6 h-6" />
         </button>
 
         {/* Logo/Brand */}
-        <div className="flex items-center gap-2 mb-6 sm:mb-8">
-          <img src="/TPFAid-Logo.png" alt="TPF Aid Logo" className="h-5 w-auto" />
+        <div className="flex items-center gap-2 mb-8 sm:mb-10">
+          <img src="/TPFAid-Logo.png" alt="TPF Aid Logo" className="h-6 w-auto" />
         </div>
 
         {/* MOBILE STEP */}
         {step === "mobile" && (
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              Login with your mobile number
-            </h2>
-            <p className="text-sm sm:text-base text-gray-500 mb-6 sm:mb-8">
-              Don't have an account?{" "}
-              <button className="text-blue-600 hover:text-blue-700 font-medium">
-                Sign up
-              </button>
-            </p>
+            {/* Header Section */}
+            <div className="mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+                Login with your mobile number
+              </h2>
+              <p className="text-sm sm:text-base text-gray-500">
+                Don't have an account?{" "}
+                <button className="text-blue-600 hover:text-blue-700 font-medium">
+                  Sign up
+                </button>
+              </p>
+            </div>
 
-            <div className="space-y-5 sm:space-y-6">
-             {/* Mobile Input */}
-<div className="relative flex items-center border-b-2 border-teal-400 pb-2">
-  <span className="flex items-center gap-2 text-base sm:text-lg font-medium mr-2 whitespace-nowrap">
-    <svg className="w-5 h-4" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
-      <rect width="30" height="6.67" fill="#FF9933"/>
-      <rect y="6.67" width="30" height="6.67" fill="#FFFFFF"/>
-      <rect y="13.33" width="30" height="6.67" fill="#138808"/>
-      <circle cx="15" cy="10" r="2.5" fill="#000080"/>
-      <circle cx="15" cy="10" r="2" fill="transparent" stroke="#000080" strokeWidth="0.3"/>
-    </svg>
-    +91
-  </span>
-  <input
-    type="tel"
-    value={mobile}
-    onChange={(e) => {
-      const value = e.target.value.replace(/\D/g, "");
-      setMobile(value.slice(0, 10));
-    }}
-    placeholder="Enter your mobile number"
-    className="flex-1 text-base sm:text-lg outline-none text-gray-900 placeholder-gray-400 bg-transparent min-w-0"
-  />
-</div>
+            {/* Info Card */}
+            <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                  <Smartphone className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">Quick & Secure Login</h3>
+                  <p className="text-sm text-gray-600">
+                    We'll send you a verification code to ensure your account security.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Mobile Input */}
+              <div className="relative flex items-center border-b-2 border-teal-400 pb-2">
+                <span className="flex items-center gap-2 text-base sm:text-lg font-medium mr-2 whitespace-nowrap">
+                  <svg className="w-5 h-4" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="30" height="6.67" fill="#FF9933"/>
+                    <rect y="6.67" width="30" height="6.67" fill="#FFFFFF"/>
+                    <rect y="13.33" width="30" height="6.67" fill="#138808"/>
+                    <circle cx="15" cy="10" r="2.5" fill="#000080"/>
+                    <circle cx="15" cy="10" r="2" fill="transparent" stroke="#000080" strokeWidth="0.3"/>
+                  </svg>
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  value={mobile}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setMobile(value.slice(0, 10));
+                  }}
+                  placeholder="Enter your mobile number"
+                  className="flex-1 text-base sm:text-lg outline-none text-gray-900 placeholder-gray-400 bg-transparent min-w-0"
+                />
+              </div>
 
               {/* Continue Button */}
               <button
                 onClick={() => {
-                  handleLogin(); // optional backend call
-                  setStep("otp"); // show OTP screen
+                  handleLogin();
+                  setStep("otp");
                 }}
                 disabled={mobile.length !== 10}
-                className="w-full py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all text-base sm:text-lg"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all text-base sm:text-lg shadow-lg shadow-blue-500/20"
               >
                 Continue
               </button>
 
-             
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+               
+              </div>
+
+            
+
+              {/* Footer Text */}
+              <p className="text-xs text-center text-gray-500 pt-4">
+                By continuing, you agree to our{" "}
+                <a href="#" className="text-blue-600 hover:underline">Terms of Service</a>
+                {" "}and{" "}
+                <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
+              </p>
             </div>
           </div>
         )}
@@ -384,8 +418,11 @@ export default function CampaignTabs({ darkMode }) {
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 Verify your account
               </h2>
-              <p className="text-gray-500 mb-6 sm:mb-8 text-sm">
+              <p className="text-gray-500 mb-2 text-sm">
                 Enter the verification code sent to your phone.
+              </p>
+              <p className="text-blue-600 font-medium text-sm mb-6 sm:mb-8">
+                +91 {mobile}
               </p>
 
               {/* OTP Input */}
@@ -415,8 +452,22 @@ export default function CampaignTabs({ darkMode }) {
                 ))}
               </div>
 
+              {/* Security Info */}
+              <div className="mb-6 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <Lock className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      <span className="font-semibold">Secure verification.</span> We never share your phone number with anyone.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Resend Link */}
-              <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+              <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left mb-4">
                 Haven't received the code?{" "}
                 <button
                   onClick={() => setStep("mobile")}
@@ -430,9 +481,9 @@ export default function CampaignTabs({ darkMode }) {
               {otp.length === 4 && (
                 <button
                   onClick={handleLogin}
-                  className="w-full mt-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/20"
                 >
-                  Verify
+                  Verify & Continue
                 </button>
               )}
             </div>
