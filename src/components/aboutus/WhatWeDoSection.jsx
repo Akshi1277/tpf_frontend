@@ -124,7 +124,7 @@ export default function WhatWeDoSection({ darkMode }) {
 
           <h2 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-3 ${COLORS.neutralHeading}`}>
             Join Us for a{' '}
-            <span className="bg-gradient-to-r from-teal-500 via-emerald-500 to-orange-500 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-teal-500 via-emerald-600 to-emerald-400 text-transparent bg-clip-text">
               Cause
             </span>
           </h2>
@@ -170,7 +170,7 @@ export default function WhatWeDoSection({ darkMode }) {
 
           <div 
             id="curated-container"
-            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide  [scrollbar-width:none] [-ms-overflow-style:none] "
           >
             {infiniteCurated.map((item, index) => (
               <div key={`curated-${item.id}-${index}`} className="flex-shrink-0 w-[200px] md:w-[280px] snap-start">
