@@ -72,7 +72,7 @@ export default function ImpactStats ({ darkMode }){
       ),
       value: `${counts.cities}+`,
       label: 'Cities Reached',
-      color: 'from-orange-500 to-teal-500',
+      color: 'from-emerald-600 to-emerald-400',
     },
     {
       icon: (
@@ -82,7 +82,7 @@ export default function ImpactStats ({ darkMode }){
       ),
       value: `${(counts.campaigns / 1000).toFixed(0)}K+`,
       label: 'Lives Impacted',
-      color: 'from-teal-500 to-orange-500',
+      color: 'from-emerald-600 to-emerald-400',
     },
   ];
 

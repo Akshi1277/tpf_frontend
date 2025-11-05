@@ -31,7 +31,7 @@ export default function AboutHero({ darkMode = false }) {
             <span className={`${darkMode ? 'text-white' : 'text-zinc-900'} block mb-1 sm:mb-2`}>
               Explore the impact of
             </span>
-            <span className="bg-gradient-to-r from-teal-500 via-emerald-500 to-orange-500 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-teal-500 via-emerald-600 to-emerald-400 text-transparent bg-clip-text">
               goodness with TPF Aid's
             </span>
             <span className={`${darkMode ? 'text-white' : 'text-zinc-900'} block mt-1 sm:mt-2`}>

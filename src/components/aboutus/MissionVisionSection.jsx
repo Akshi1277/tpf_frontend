@@ -134,7 +134,7 @@ export default function MissionVisionSection({ darkMode }) {
             
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                <div className="h-1 w-8 sm:w-12 bg-gradient-to-r from-teal-500 to-orange-500 rounded-full"></div>
+                <div className="h-1 w-8 sm:w-12 bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full"></div>
                 <h3 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
                   TPF Mission
                 </h3>
