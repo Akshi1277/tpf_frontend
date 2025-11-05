@@ -617,7 +617,7 @@ const handleSubmit = (e) => {
               <div className="flex justify-end pt-4">
                 <button
                   onClick={handleNext}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
                 >
                   Next
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -820,7 +820,7 @@ const handleSubmit = (e) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     setCurrentStep(3)
   }}
-  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
+  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
 >
   Next
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
