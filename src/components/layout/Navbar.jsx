@@ -107,6 +107,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
     className={`p-2 rounded-full transition-colors cursor-pointer ${
       darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'
     }`}
+    onClick={() => router.push('/zakat-calculator')} 
   >
     <Image
       src="/TPFAid-Icon-Zakat-1.svg"
