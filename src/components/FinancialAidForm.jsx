@@ -2,9 +2,12 @@
 
 import { motion } from "framer-motion"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { User, Calendar, MapPin, Phone, Mail, CreditCard } from "lucide-react"
 
 export default function FinancialAidForm({ darkMode }) {
+    const router = useRouter()
+const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     // Personal Information
@@ -19,6 +22,20 @@ export default function FinancialAidForm({ darkMode }) {
     email: '',
     idType:'',
     govIdNumber: '',
+    govIdDocument:'null',
+     // Financial & Employment Details
+  occupation: '',
+  monthlyIncome: '',
+  bankNameBranch: '',
+  accountNumber: '',
+  ifscCode: '',
+  numberOfDependents: '',
+
+   // Reason for Aid Request
+  aidType: '',
+  hardshipDescription: '',
+  supportingDocuments: [],
+  declarationConsent: false,
   })
 
   const handleInputChange = (e) => {
@@ -29,12 +46,53 @@ export default function FinancialAidForm({ darkMode }) {
     }))
   }
 
-  const handleNext = () => {
-    // Add validation here if needed
-    setCurrentStep(2)
+ const handleNext = () => {
+  // Add validation here if needed
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  setCurrentStep(2)
+}
+
+const handleSubmit = (e) => {
+  e.preventDefault()
+  
+  if (!formData.declarationConsent) {
+    return
   }
 
+  console.log('Form submitted:', formData)
+  
+  setShowSuccessMessage(true)
+  
+  // Redirect to home after 3 seconds
+  setTimeout(() => {
+    router.push('/')
+  }, 3000)
+}
+
+
   return (
+    <>
+    {showSuccessMessage && (
+  <motion.div
+    initial={{ opacity: 0, y: -50 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+               bg-gradient-to-r from-emerald-600 to-emerald-400 text-white px-6 py-4 rounded-lg shadow-2xl 
+               flex items-center gap-3 max-w-md w-[90%] sm:w-auto"
+  >
+    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <div>
+      <p className="font-semibold">Application Submitted Successfully!</p>
+      <p className="text-sm text-emerald-100">Redirecting to home page...</p>
+    </div>
+  </motion.div>
+  
+)}
+
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-20`}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -203,35 +261,51 @@ export default function FinancialAidForm({ darkMode }) {
                 </select>
               </div>
 
-              {/* Gender */}
+            
+{/* Gender */}
 <div>
   <label className={`block text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
     Gender <span className="text-red-500">*</span>
   </label>
   <div className="flex gap-6">
-    <label className="flex items-center cursor-pointer">
+    <label className="flex items-center cursor-pointer group">
       <input
         type="radio"
         name="gender"
         value="male"
         checked={formData.gender === 'male'}
         onChange={handleInputChange}
-        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+        className="sr-only peer"
         required
       />
-      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Male</span>
+      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${
+        darkMode ? "border-zinc-500" : "border-zinc-400"
+      }`}>
+        <div className="w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+      </div>
+      <span className={`ml-3 font-medium ${formData.gender === 'male' ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Male
+      </span>
     </label>
-    <label className="flex items-center cursor-pointer">
+    
+    <label className="flex items-center cursor-pointer group">
       <input
         type="radio"
         name="gender"
         value="female"
         checked={formData.gender === 'female'}
         onChange={handleInputChange}
-        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+        className="sr-only peer"
         required
       />
-      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Female</span>
+      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${
+        darkMode ? "border-zinc-500" : "border-zinc-400"
+      }`}>
+        <div className="w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+      </div>
+      <span className={`ml-3 font-medium ${formData.gender === 'female' ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Female
+      </span>
     </label>
   </div>
 </div>
@@ -333,6 +407,116 @@ export default function FinancialAidForm({ darkMode }) {
                 </div>
               </div>
 
+              <div>
+  <label className={`block text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+    Select ID Proof Type <span className="text-red-500">*</span>
+  </label>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <label className="cursor-pointer">
+      <input
+        type="radio"
+        name="idType"
+        value="aadhaar"
+        checked={formData.idType === 'aadhaar'}
+        onChange={handleInputChange}
+        className="peer sr-only"
+        required
+      />
+      <div className={`p-4 rounded-lg border-2 transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:dark:bg-emerald-950/30 ${
+        darkMode 
+          ? "border-zinc-600 bg-zinc-700 hover:border-zinc-500" 
+          : "border-zinc-300 bg-white hover:border-zinc-400"
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CreditCard className={`w-5 h-5 ${formData.idType === 'aadhaar' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
+            <div>
+              <p className={`font-semibold ${darkMode ? "text-black" : "text-zinc-900"}`}>Aadhaar Card</p>
+              <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>12-digit number</p>
+            </div>
+          </div>
+          {formData.idType === 'aadhaar' && (
+            <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center">
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </div>
+    </label>
+
+{/* ID Type Selection */}
+    <label className="cursor-pointer">
+      <input
+        type="radio"
+        name="idType"
+        value="pan"
+        checked={formData.idType === 'pan'}
+        onChange={handleInputChange}
+        className="peer sr-only"
+        required
+      />
+      <div className={`p-4 rounded-lg border-2 transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:dark:bg-emerald-950/30 ${
+        darkMode 
+          ? "border-zinc-600 bg-zinc-700 hover:border-zinc-500" 
+          : "border-zinc-300 bg-white hover:border-zinc-400"
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CreditCard className={`w-5 h-5 ${formData.idType === 'pan' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
+            <div>
+              <p className={`font-semibold ${darkMode ? "text-black" : "text-zinc-900"}`}>PAN Card</p>
+              <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>10 characters</p>
+            </div>
+          </div>
+          {formData.idType === 'pan' && (
+            <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center">
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </div>
+    </label>
+
+    <label className="cursor-pointer">
+      <input
+        type="radio"
+        name="idType"
+        value="voter"
+        checked={formData.idType === 'voter'}
+        onChange={handleInputChange}
+        className="peer sr-only"
+        required
+      />
+      <div className={`p-4 rounded-lg border-2 transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:dark:bg-emerald-950/30 ${
+        darkMode 
+          ? "border-zinc-600 bg-zinc-700 hover:border-zinc-500" 
+          : "border-zinc-300 bg-white hover:border-zinc-400"
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CreditCard className={`w-5 h-5 ${formData.idType === 'voter' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
+            <div>
+              <p className={`font-semibold ${darkMode ? "text-black" : "text-zinc-900"}`}>Voter ID</p>
+              <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>Alphanumeric</p>
+            </div>
+          </div>
+          {formData.idType === 'voter' && (
+            <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center">
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </div>
+    </label>
+  </div>
+</div>
+
              {/* Government ID Proof Number */}
 <div>
   <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
@@ -361,50 +545,73 @@ export default function FinancialAidForm({ darkMode }) {
   </div>
 </div>
 
-              {/* ID Type Selection */}
+{/* Government ID Document Upload */}
 <div>
-  <label className={`block text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-    Select ID Proof Type <span className="text-red-500">*</span>
+  <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+    Upload Government ID Proof <span className="text-red-500">*</span>
   </label>
-  <div className="flex flex-wrap gap-4">
-    <label className="flex items-center cursor-pointer">
-      <input
-        type="radio"
-        name="idType"
-        value="aadhaar"
-        checked={formData.idType === 'aadhaar'}
-        onChange={handleInputChange}
-        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
-        required
-      />
-      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Aadhaar Card</span>
-    </label>
-    <label className="flex items-center cursor-pointer">
-      <input
-        type="radio"
-        name="idType"
-        value="pan"
-        checked={formData.idType === 'pan'}
-        onChange={handleInputChange}
-        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
-        required
-      />
-      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>PAN Card</span>
-    </label>
-    <label className="flex items-center cursor-pointer">
-      <input
-        type="radio"
-        name="idType"
-        value="voter"
-        checked={formData.idType === 'voter'}
-        onChange={handleInputChange}
-        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
-        required
-      />
-      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Voter ID</span>
-    </label>
+  <div className={`relative border-2 border-dashed rounded-lg p-6 transition-all ${
+    darkMode 
+      ? "border-zinc-600 bg-zinc-700 hover:border-emerald-500" 
+      : "border-zinc-300 bg-zinc-50 hover:border-emerald-500"
+  }`}>
+    <input
+      type="file"
+      name="govIdDocument"
+      onChange={(e) => {
+        const file = e.target.files[0]
+        setFormData(prev => ({
+          ...prev,
+          govIdDocument: file
+        }))
+      }}
+      accept=".pdf,.jpg,.jpeg,.png"
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      required
+    />
+    <div className="text-center">
+      <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
+        darkMode ? "bg-zinc-600" : "bg-zinc-200"
+      }`}>
+        <svg className={`w-6 h-6 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+      </div>
+      {formData.govIdDocument ? (
+        <div>
+          <p className={`font-medium ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
+            {formData.govIdDocument.name}
+          </p>
+          <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+            {(formData.govIdDocument.size / 1024).toFixed(2)} KB
+          </p>
+        </div>
+      ) : (
+        <div>
+          <p className={`font-medium ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+            Click to upload or drag and drop
+          </p>
+          <p className={`text-sm mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+            PDF, JPG, JPEG or PNG (Max 5MB)
+          </p>
+        </div>
+      )}
+    </div>
   </div>
+  {formData.idType && (
+    <p className={`text-xs mt-2 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+      Please upload a clear copy of your {
+        formData.idType === 'aadhaar' ? 'Aadhaar Card' :
+        formData.idType === 'pan' ? 'PAN Card' :
+        formData.idType === 'voter' ? 'Voter ID' : 'ID'
+      }
+    </p>
+  )}
 </div>
+
+             
+
+
 
               {/* Next Button */}
               <div className="flex justify-end pt-4">
@@ -421,24 +628,412 @@ export default function FinancialAidForm({ darkMode }) {
             </div>
           )}
 
-          {/* Placeholder for Step 2 and 3 */}
-          {currentStep === 2 && (
-            <div className="text-center py-12">
-              <p className={darkMode ? "text-zinc-400" : "text-zinc-600"}>
-                Step 2 content will go here
-              </p>
-            </div>
-          )}
+         {/* Step 2: Financial & Employment Details */}
+{currentStep === 2 && (
+  <div className="space-y-6">
+    <div className="border-l-4 border-emerald-500 pl-4 mb-6">
+      <h2 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
+        Financial & Employment Details
+      </h2>
+      <p className={`text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+        Please provide your financial and employment information
+      </p>
+    </div>
 
-          {currentStep === 3 && (
-            <div className="text-center py-12">
-              <p className={darkMode ? "text-zinc-400" : "text-zinc-600"}>
-                Step 3 content will go here
+    {/* Occupation */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Occupation <span className="text-red-500">*</span>
+      </label>
+      <div className="relative">
+        <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <input
+          type="text"
+          name="occupation"
+          value={formData.occupation}
+          onChange={handleInputChange}
+          placeholder="Enter your occupation"
+          className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            darkMode
+              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+          }`}
+          required
+        />
+      </div>
+    </div>
+
+    {/* Monthly Income */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Monthly Income <span className="text-red-500">*</span>
+      </label>
+      <div className="relative">
+        <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-semibold ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+          ₹
+        </span>
+        <input
+          type="number"
+          name="monthlyIncome"
+          value={formData.monthlyIncome}
+          onChange={handleInputChange}
+          placeholder="Enter monthly income"
+          className={`w-full pl-8 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            darkMode
+              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+          }`}
+          required
+        />
+      </div>
+      <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+        Amount in INR
+      </p>
+    </div>
+
+    {/* Bank Name & Branch */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Bank Name & Branch <span className="text-red-500">*</span>
+      </label>
+      <div className="relative">
+        <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+        <input
+          type="text"
+          name="bankNameBranch"
+          value={formData.bankNameBranch}
+          onChange={handleInputChange}
+          placeholder="e.g., State Bank of India, Connaught Place Branch"
+          className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            darkMode
+              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+          }`}
+          required
+        />
+      </div>
+    </div>
+
+    {/* Account Number */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Account Number <span className="text-red-500">*</span>
+      </label>
+      <div className="relative">
+        <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+        <input
+          type="text"
+          name="accountNumber"
+          value={formData.accountNumber}
+          onChange={handleInputChange}
+          placeholder="Enter bank account number"
+          className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            darkMode
+              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+          }`}
+          required
+        />
+      </div>
+    </div>
+
+    {/* IFSC Code */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        IFSC Code <span className="text-red-500">*</span>
+      </label>
+      <div className="relative">
+        <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+        </svg>
+        <input
+          type="text"
+          name="ifscCode"
+          value={formData.ifscCode}
+          onChange={handleInputChange}
+          placeholder="Enter IFSC code"
+          className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase ${
+            darkMode
+              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+          }`}
+          maxLength="11"
+          required
+        />
+      </div>
+      <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+        11-character code (e.g., SBIN0001234)
+      </p>
+    </div>
+
+    {/* Number of Dependents */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Number of Dependents <span className="text-red-500">*</span>
+      </label>
+      <div className="relative">
+        <div className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+        <input
+          type="number"
+          name="numberOfDependents"
+          value={formData.numberOfDependents}
+          onChange={handleInputChange}
+          placeholder="Enter number of dependents"
+          min="0"
+          className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            darkMode
+              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+          }`}
+          required
+        />
+      </div>
+      <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+        Family members dependent on your income
+      </p>
+    </div>
+
+    {/* Navigation Buttons */}
+    <div className="flex justify-between pt-4">
+     <button
+  onClick={() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setCurrentStep(1)
+  }}
+  className={`px-8 py-3 rounded-lg font-semibold transition-all border ${
+    darkMode
+      ? "border-zinc-600 text-white hover:bg-zinc-700"
+      : "border-zinc-300 text-zinc-900 hover:bg-zinc-100"
+  } flex items-center gap-2`}
+>
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+  Previous
+</button>
+     <button
+  onClick={() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setCurrentStep(3)
+  }}
+  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
+>
+  Next
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  </svg>
+</button>
+    </div>
+  </div>
+)}
+         {/* Step 3: Reason for Aid Request */}
+{currentStep === 3 && (
+  <div className="space-y-6">
+    <div className="border-l-4 border-emerald-500 pl-4 mb-6">
+      <h2 className={`text-2xl font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
+        Reason for Aid Request
+      </h2>
+      <p className={`text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+        Please provide details about your aid requirements
+      </p>
+    </div>
+
+    {/* Type of Aid Required */}
+    <div>
+      <label className={`block text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Type of Aid Required <span className="text-red-500">*</span>
+      </label>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {['Medical', 'Education', 'Food', 'Shelter', 'Employment', 'Other'].map((aidType) => (
+          <label key={aidType} className="cursor-pointer">
+            <input
+              type="radio"
+              name="aidType"
+              value={aidType.toLowerCase()}
+              checked={formData.aidType === aidType.toLowerCase()}
+              onChange={handleInputChange}
+              className="peer sr-only"
+              required
+            />
+            <div className={`p-3 rounded-lg border-2 text-center transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:dark:bg-emerald-950/30 ${
+              darkMode 
+                ? "border-zinc-600 bg-zinc-700 hover:border-zinc-500" 
+                : "border-zinc-300 bg-white hover:border-zinc-400"
+            }`}>
+              <span className={`font-medium text-sm ${
+                formData.aidType === aidType.toLowerCase() 
+                  ? 'text-emerald-600' 
+                  : darkMode ? "text-white" : "text-zinc-900"
+              }`}>
+                {aidType}
+              </span>
+            </div>
+          </label>
+        ))}
+      </div>
+    </div>
+
+    {/* Description of Financial Hardship */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Description of Financial Hardship <span className="text-red-500">*</span>
+      </label>
+      <textarea
+        name="hardshipDescription"
+        value={formData.hardshipDescription}
+        onChange={handleInputChange}
+        placeholder="Please describe your financial hardship and why you need assistance..."
+        rows="6"
+        className={`w-full px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none ${
+          darkMode
+            ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+            : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+        }`}
+        required
+      />
+      <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+        Provide detailed information about your situation
+      </p>
+    </div>
+
+    {/* Supporting Documents Upload */}
+    <div>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Supporting Documents <span className="text-red-500">*</span>
+      </label>
+      <div className={`relative border-2 border-dashed rounded-lg p-6 transition-all ${
+        darkMode 
+          ? "border-zinc-600 bg-zinc-700 hover:border-emerald-500" 
+          : "border-zinc-300 bg-zinc-50 hover:border-emerald-500"
+      }`}>
+        <input
+          type="file"
+          name="supportingDocuments"
+          onChange={(e) => {
+            const files = Array.from(e.target.files)
+            setFormData(prev => ({
+              ...prev,
+              supportingDocuments: files
+            }))
+          }}
+          accept=".pdf,.jpg,.jpeg,.png"
+          multiple
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          required
+        />
+        <div className="text-center">
+          <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
+            darkMode ? "bg-zinc-600" : "bg-zinc-200"
+          }`}>
+            <svg className={`w-6 h-6 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </div>
+          {formData.supportingDocuments && formData.supportingDocuments.length > 0 ? (
+            <div>
+              <p className={`font-medium ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
+                {formData.supportingDocuments.length} file(s) selected
+              </p>
+              <div className={`text-xs mt-2 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+                {formData.supportingDocuments.map((file, idx) => (
+                  <div key={idx}>{file.name}</div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className={`font-medium ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                Click to upload or drag and drop
+              </p>
+              <p className={`text-sm mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+                Hospital Bills, Medical Reports, Fee Slips, Photos, etc.
+              </p>
+              <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+                PDF, JPG, JPEG or PNG (Multiple files allowed)
               </p>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+
+    {/* Declaration & Consent */}
+    <div className={`mt-8 p-6 rounded-lg border ${
+      darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"
+    }`}>
+      <h3 className={`font-bold text-lg mb-4 ${darkMode ? "text-white" : "text-zinc-900"}`}>
+        Declaration & Consent
+      </h3>
+      <div className={`text-sm leading-relaxed mb-4 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        <p>
+          I hereby declare that I am not getting assistance/provision from any other organization or entity in any form and the information provided above is true. Any misrepresentation may lead to disqualification. I authorize True Path Foundation to visit and contact me to verify the provided details. I understand that video verification, its online solicitation/circulation and an appeal are mandatory for funding campaigns. A copy of a document of identity proof and bank details (if available) must be attached. I/We provide free consent for this process and acknowledge full understanding of this form in vernacular.
+        </p>
+      </div>
+      
+      <label className="flex items-start cursor-pointer group">
+        <input
+          type="checkbox"
+          name="declarationConsent"
+          checked={formData.declarationConsent}
+          onChange={(e) => setFormData(prev => ({ ...prev, declarationConsent: e.target.checked }))}
+          className="sr-only peer"
+          required
+        />
+        <div className={`w-5 h-5 mt-0.5 rounded border-2 flex items-center justify-center transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${
+          darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+        }`}>
+          <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span className={`ml-3 text-sm font-medium ${
+          formData.declarationConsent 
+            ? 'text-emerald-600' 
+            : darkMode ? "text-zinc-300" : "text-zinc-700"
+        }`}>
+          I agree to the declaration and consent terms stated above <span className="text-red-500">*</span>
+        </span>
+      </label>
+    </div>
+
+    {/* Navigation Buttons */}
+    <div className="flex justify-between pt-4">
+      <button
+        onClick={() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          setCurrentStep(2)
+        }}
+        className={`px-8 py-3 rounded-lg font-semibold transition-all border ${
+          darkMode
+            ? "border-zinc-600 text-white hover:bg-zinc-700"
+            : "border-zinc-300 text-zinc-900 hover:bg-zinc-100"
+        } flex items-center gap-2`}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Previous
+      </button>
+      <button
+        onClick={handleSubmit}
+        disabled={!formData.declarationConsent}
+        className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
+      >
+        Submit Application
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+)}
         </motion.div>
       </div>
     </div>
+    </>
   )
 }
