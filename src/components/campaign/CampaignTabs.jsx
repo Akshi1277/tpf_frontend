@@ -329,12 +329,12 @@ export default function CampaignTabs({ darkMode }) {
                 {step === 'mobile' && (
                   <div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                      Create new account
+                      Login
                     </h2>
                     <p className="text-gray-500 mb-8">
-                      Have an account?{' '}
+                      Dont have an account?{' '}
                       <button className="text-blue-600 hover:text-blue-700 font-medium">
-                        Login
+                        Sign up
                       </button>
                     </p>
 
@@ -379,10 +379,7 @@ export default function CampaignTabs({ darkMode }) {
 </button>
 
 
-                      {/* Email Signup Link */}
-                      <button className="w-full text-gray-500 hover:text-gray-700 font-medium">
-                        Signup with email
-                      </button>
+                     
                     </div>
                   </div>
                 )}
