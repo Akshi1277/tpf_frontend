@@ -288,199 +288,197 @@ export default function CampaignTabs({ darkMode }) {
           )}
         </motion.div>
 
-        <AnimatePresence>
-          {showLogin && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-              onClick={() => setShowLogin(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                onClick={(e) => e.stopPropagation()}
+  <AnimatePresence>
+  {showLogin && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={() => setShowLogin(false)}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full ${
+          step === "otp"
+            ? "max-w-2xl"
+            : "max-w-md"
+        } bg-white rounded-3xl shadow-2xl p-6 sm:p-8 relative transition-all duration-300`}
+      >
+        {/* Close Button */}
+        <button
+          onClick={() => setShowLogin(false)}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <X className="w-6 h-6" />
+        </button>
 
-                
-                
-                className={`w-full ${ step === "otp" ? "max-w-2xl" : "max-w-md"
-  } bg-white rounded-3xl shadow-2xl p-8 relative`}
-              >
-                {/* Close Button */}
-                <button
-                  onClick={() => setShowLogin(false)}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-
-                {/* Logo/Brand */}
-               <div className="flex items-center gap-2 mb-8">
-          <img 
-            src="/TPFAid-Logo.png" 
-            alt="TPF Aid Logo" 
-            className="h-5 w-auto"
-          />
+        {/* Logo/Brand */}
+        <div className="flex items-center gap-2 mb-6 sm:mb-8">
+          <img src="/TPFAid-Logo.png" alt="TPF Aid Logo" className="h-5 w-auto" />
         </div>
 
-                {/* Mobile Step */}
-                {step === 'mobile' && (
-                  <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                      Login with your mobile number
-                    </h2>
-                    <p className="text-gray-500 mb-8">
-                      Dont have an account?{' '}
-                      <button className="text-blue-600 hover:text-blue-700 font-medium">
-                        Sign up
-                      </button>
-                    </p>
+        {/* MOBILE STEP */}
+        {step === "mobile" && (
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              Login with your mobile number
+            </h2>
+            <p className="text-sm sm:text-base text-gray-500 mb-6 sm:mb-8">
+              Don't have an account?{" "}
+              <button className="text-blue-600 hover:text-blue-700 font-medium">
+                Sign up
+              </button>
+            </p>
 
-                    <div className="space-y-6">
-                      {/* Phone Input */}
-                      <div className="relative">
-                <div className="pb-2 border-b-2 border-teal-400">
+            <div className="space-y-5 sm:space-y-6">
+             {/* Mobile Input */}
+<div className="relative flex items-center border-b-2 border-teal-400 pb-2">
+  <span className="flex items-center gap-2 text-base sm:text-lg font-medium mr-2 whitespace-nowrap">
+    <svg className="w-5 h-4" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+      <rect width="30" height="6.67" fill="#FF9933"/>
+      <rect y="6.67" width="30" height="6.67" fill="#FFFFFF"/>
+      <rect y="13.33" width="30" height="6.67" fill="#138808"/>
+      <circle cx="15" cy="10" r="2.5" fill="#000080"/>
+      <circle cx="15" cy="10" r="2" fill="transparent" stroke="#000080" strokeWidth="0.3"/>
+    </svg>
+    +91
+  </span>
+  <input
+    type="tel"
+    value={mobile}
+    onChange={(e) => {
+      const value = e.target.value.replace(/\D/g, "");
+      setMobile(value.slice(0, 10));
+    }}
+    placeholder="Enter your mobile number"
+    className="flex-1 text-base sm:text-lg outline-none text-gray-900 placeholder-gray-400 bg-transparent min-w-0"
+  />
+</div>
+
+              {/* Continue Button */}
+              <button
+                onClick={() => {
+                  handleLogin(); // optional backend call
+                  setStep("otp"); // show OTP screen
+                }}
+                disabled={mobile.length !== 10}
+                className="w-full py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all text-base sm:text-lg"
+              >
+                Continue
+              </button>
+
+             
+            </div>
+          </div>
+        )}
+
+        {/* OTP STEP */}
+        {step === "otp" && (
+          <div className="flex flex-col md:flex-row gap-6 sm:gap-8">
+            {/* LEFT SIDE */}
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                Verify your account
+              </h2>
+              <p className="text-gray-500 mb-6 sm:mb-8 text-sm">
+                Enter the verification code sent to your phone.
+              </p>
+
+              {/* OTP Input */}
+              <div className="flex gap-2 sm:gap-3 mb-6 sm:mb-8 justify-center sm:justify-start">
+                {[...Array(4)].map((_, index) => (
                   <input
+                    key={index}
                     type="text"
-                    value={mobile}
+                    inputMode="numeric"
+                    maxLength="1"
+                    value={otp[index] || ""}
                     onChange={(e) => {
-                      const value = e.target.value
-                      // Allow +91 at start and numbers
-                      if (value.startsWith('+91 ')) {
-                        const numbers = value.slice(4).replace(/\D/g, '').slice(0, 10)
-                        setMobile('+91 ' + numbers)
-                      } else if (value === '+91' || value === '+9' || value === '+') {
-                        setMobile(value)
-                      } else if (value === '') {
-                        setMobile('')
-                      } else if (!value.startsWith('+')) {
-                        setMobile('+91 ' + value.replace(/\D/g, '').slice(0, 10))
+                      const newOtp = otp.split("");
+                      newOtp[index] = e.target.value;
+                      setOtp(newOtp.join(""));
+                      if (e.target.value && index < 3) {
+                        e.target.nextElementSibling?.focus();
                       }
                     }}
-                    placeholder="Enter your mobile number"
-                    className="w-full text-lg outline-none text-gray-900 placeholder-gray-400"
+                    onKeyDown={(e) => {
+                      if (e.key === "Backspace" && !otp[index] && index > 0) {
+                        e.target.previousElementSibling?.focus();
+                      }
+                    }}
+                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-center text-xl sm:text-2xl font-semibold border-2 border-gray-300 rounded-xl outline-none focus:border-blue-600 transition-colors"
                   />
-                </div>
+                ))}
               </div>
 
+              {/* Resend Link */}
+              <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+                Haven't received the code?{" "}
+                <button
+                  onClick={() => setStep("mobile")}
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Send again
+                </button>
+              </p>
 
-                      {/* Continue Button */}
-                     <button
-  onClick={() => {
-    handleLogin(); // optional — keep if it actually sends OTP
-    setStep('otp'); // show OTP screen
-  }}
-  disabled={mobile.length !== 14}
-  className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all text-lg"
->
-  Continue
-</button>
+              {/* Verify Button (auto visible after typing 4 digits) */}
+              {otp.length === 4 && (
+                <button
+                  onClick={handleLogin}
+                  className="w-full mt-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+                >
+                  Verify
+                </button>
+              )}
+            </div>
 
-
-                     
+            {/* RIGHT SIDE (Illustration) - Hidden on mobile */}
+            <div className="hidden md:flex items-center justify-center flex-1 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6">
+              <div className="relative">
+                <div className="w-48 h-64 bg-white rounded-3xl shadow-xl border-4 border-slate-800 flex flex-col items-center justify-center relative overflow-hidden">
+                  <div className="absolute top-8 -right-4 w-24 h-16 bg-teal-500 rounded-2xl rounded-tr-none shadow-lg flex items-center justify-center">
+                    <div className="flex gap-1">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="w-2 h-2 bg-white rounded-full"></div>
+                      ))}
                     </div>
                   </div>
-                )}
 
-                {/* OTP Step */}
-                {step === 'otp' && (
-                  <div className="flex gap-8 ">
-                    {/* Left Side */}
-                    <div className="flex-1">
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                        Verify your account
-                      </h2>
-                      <p className="text-gray-500 mb-8 text-sm">
-                        Enter the verification code sent to your phone.
-                      </p>
-
-                      {/* OTP Input */}
-                      <div className="flex gap-3 mb-8">
-                        {[...Array(4)].map((_, index) => (
-                          <input
-                            key={index}
-                            type="text"
-                            maxLength="1"
-                            value={otp[index] || ''}
-                            onChange={(e) => {
-                              const newOtp = otp.split('')
-                              newOtp[index] = e.target.value
-                              setOtp(newOtp.join(''))
-                              // Auto-focus next input
-                              if (e.target.value && index < 3) {
-                                e.target.nextElementSibling?.focus()
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              // Handle backspace
-                              if (e.key === 'Backspace' && !otp[index] && index > 0) {
-                                e.target.previousElementSibling?.focus()
-                              }
-                            }}
-                            className="w-16 h-16 text-center text-2xl font-semibold border-2 border-gray-300 rounded-xl outline-none focus:border-blue-600 transition-colors"
-                          />
-                        ))}
-                      </div>
-
-                      {/* Resend Link */}
-                      <p className="text-sm text-gray-500">
-                        Haven't received the email?{' '}
-                        <button
-                          onClick={() => setStep('mobile')}
-                          className="text-blue-600 hover:text-blue-700 font-medium"
-                        >
-                          Send again
-                        </button>
-                      </p>
-
-                      {/* Auto Submit on 4 digits */}
-                      {otp.length === 4 && (
-                        <button
-                          onClick={handleLogin}
-                          className="w-full mt-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
-                        >
-                          Verify
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Right Side - Illustration */}
-                    <div className="hidden md:flex items-center justify-center flex-1 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6">
-                      <div className="relative">
-                        {/* Phone Illustration */}
-                        <div className="w-48 h-64 bg-white rounded-3xl shadow-xl border-4 border-slate-800 flex flex-col items-center justify-center relative overflow-hidden">
-                          {/* Message Bubble */}
-                          <div className="absolute top-8 -right-4 w-24 h-16 bg-teal-500 rounded-2xl rounded-tr-none shadow-lg flex items-center justify-center">
-                            <div className="flex gap-1">
-                              {[...Array(4)].map((_, i) => (
-                                <div key={i} className="w-2 h-2 bg-white rounded-full"></div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Shield Icon */}
-                          <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
-                            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                          </div>
-
-                          {/* Lines */}
-                          <div className="space-y-2 w-32">
-                            <div className="h-1 bg-gray-200 rounded"></div>
-                            <div className="h-1 bg-gray-200 rounded w-3/4"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
+                    <svg
+                      className="w-10 h-10 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
                   </div>
-                )}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+                  <div className="space-y-2 w-32">
+                    <div className="h-1 bg-gray-200 rounded"></div>
+                    <div className="h-1 bg-gray-200 rounded w-3/4"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
       </AnimatePresence>
     </div>
   );
