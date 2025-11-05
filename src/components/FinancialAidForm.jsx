@@ -12,10 +12,12 @@ export default function FinancialAidForm({ darkMode }) {
     parentSpouseName: '',
     dateOfBirth: '',
     maritalStatus: '',
+    gender:'',
     permanentAddress: '',
     currentAddress: '',
     contactNumber: '',
     email: '',
+    idType:'',
     govIdNumber: '',
   })
 
@@ -33,7 +35,7 @@ export default function FinancialAidForm({ darkMode }) {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-12`}>
+    <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-20`}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -201,6 +203,39 @@ export default function FinancialAidForm({ darkMode }) {
                 </select>
               </div>
 
+              {/* Gender */}
+<div>
+  <label className={`block text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+    Gender <span className="text-red-500">*</span>
+  </label>
+  <div className="flex gap-6">
+    <label className="flex items-center cursor-pointer">
+      <input
+        type="radio"
+        name="gender"
+        value="male"
+        checked={formData.gender === 'male'}
+        onChange={handleInputChange}
+        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+        required
+      />
+      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Male</span>
+    </label>
+    <label className="flex items-center cursor-pointer">
+      <input
+        type="radio"
+        name="gender"
+        value="female"
+        checked={formData.gender === 'female'}
+        onChange={handleInputChange}
+        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+        required
+      />
+      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Female</span>
+    </label>
+  </div>
+</div>
+
               {/* Permanent Address */}
               <div>
                 <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
@@ -262,7 +297,7 @@ export default function FinancialAidForm({ darkMode }) {
                     name="contactNumber"
                     value={formData.contactNumber}
                     onChange={handleInputChange}
-                    placeholder="Enter WhatsApp number"
+                    placeholder="+91"
                     className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                       darkMode
                         ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
@@ -298,28 +333,78 @@ export default function FinancialAidForm({ darkMode }) {
                 </div>
               </div>
 
-              {/* Government ID Proof Number */}
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                  Government ID Proof Number <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
-                  <input
-                    type="text"
-                    name="govIdNumber"
-                    value={formData.govIdNumber}
-                    onChange={handleInputChange}
-                    placeholder="Enter Aadhaar/PAN/Voter ID number"
-                    className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                      darkMode
-                        ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-                        : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-                    }`}
-                    required
-                  />
-                </div>
-              </div>
+             {/* Government ID Proof Number */}
+<div>
+  <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+    Government ID Proof Number <span className="text-red-500">*</span>
+  </label>
+  <div className="relative">
+    <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+    <input
+      type="text"
+      name="govIdNumber"
+      value={formData.govIdNumber}
+      onChange={handleInputChange}
+      placeholder={
+        formData.idType === 'aadhaar' ? 'Enter 12-digit Aadhaar number' :
+        formData.idType === 'pan' ? 'Enter 10-character PAN number' :
+        formData.idType === 'voter' ? 'Enter Voter ID number' :
+        'Select ID type above'
+      }
+      className={`w-full pl-11 pr-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+        darkMode
+          ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+          : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+      }`}
+      required
+    />
+  </div>
+</div>
+
+              {/* ID Type Selection */}
+<div>
+  <label className={`block text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+    Select ID Proof Type <span className="text-red-500">*</span>
+  </label>
+  <div className="flex flex-wrap gap-4">
+    <label className="flex items-center cursor-pointer">
+      <input
+        type="radio"
+        name="idType"
+        value="aadhaar"
+        checked={formData.idType === 'aadhaar'}
+        onChange={handleInputChange}
+        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+        required
+      />
+      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Aadhaar Card</span>
+    </label>
+    <label className="flex items-center cursor-pointer">
+      <input
+        type="radio"
+        name="idType"
+        value="pan"
+        checked={formData.idType === 'pan'}
+        onChange={handleInputChange}
+        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+        required
+      />
+      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>PAN Card</span>
+    </label>
+    <label className="flex items-center cursor-pointer">
+      <input
+        type="radio"
+        name="idType"
+        value="voter"
+        checked={formData.idType === 'voter'}
+        onChange={handleInputChange}
+        className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+        required
+      />
+      <span className={`ml-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>Voter ID</span>
+    </label>
+  </div>
+</div>
 
               {/* Next Button */}
               <div className="flex justify-end pt-4">
