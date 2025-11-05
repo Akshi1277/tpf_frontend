@@ -329,12 +329,7 @@ export default function CampaignTabs({ darkMode }) {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
                 Login with your mobile number
               </h2>
-              <p className="text-sm sm:text-base text-gray-500">
-                Don't have an account?{" "}
-                <button className="text-blue-600 hover:text-blue-700 font-medium">
-                  Sign up
-                </button>
-              </p>
+             
             </div>
 
             {/* Info Card */}
