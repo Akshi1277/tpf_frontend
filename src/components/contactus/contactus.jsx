@@ -100,7 +100,7 @@
                 <div className="h-1 w-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
             </div>
             <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                <span className="bg-gradient-to-r from-teal-500 via-emerald-500 to-orange-500 text-transparent bg-clip-text">
+                <span className="bg-gradient-to-r from-emerald-600 via-emerald-300 to-emerald-400 text-transparent bg-clip-text">
                 Contact Us
                 </span>
             </h1>
@@ -157,7 +157,7 @@
                 >
                     <div className="flex items-start gap-4">
                     {/* Icon */}
-                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 via-emerald-500 to-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-600 via-emerald-300 to-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         {method.iconSvg}
                     </div>
 
