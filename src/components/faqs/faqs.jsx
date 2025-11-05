@@ -201,7 +201,7 @@ export default function FAQSection({ darkMode }) {
           </div>
           <h2 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
             Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-teal-500 via-emerald-500 to-orange-500 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-emerald-600 via-emerald-300 to-emerald-400 text-transparent bg-clip-text">
               Questions
             </span>
           </h2>
