@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Info, MessageCircle, Image as ImageIcon,X,Smartphone,KeyRound, Heart, FileText, Lock, Award, ChevronRight } from 'lucide-react';
+import { Info, MessageCircle, Image as ImageIcon, X, Smartphone, KeyRound, Heart, FileText, Lock, Award, ChevronRight } from 'lucide-react';
 
 export default function CampaignTabs({ darkMode }) {
   const [activeTab, setActiveTab] = useState('about');
@@ -10,7 +10,7 @@ export default function CampaignTabs({ darkMode }) {
   const [step, setStep] = useState('mobile');
   const [loggedIn, setLoggedIn] = useState(false);
 
-    const handleLogin = () => {
+  const handleLogin = () => {
     if (step === 'mobile') {
       if (mobile.length === 10) setStep('otp');
     } else if (step === 'otp') {
@@ -21,7 +21,7 @@ export default function CampaignTabs({ darkMode }) {
     }
   };
 
-    const documents = [
+  const documents = [
     { name: 'Financial Report Q4', date: 'Updated 1 week ago' },
     { name: 'Project Proposal', date: 'Last updated 2 days ago' }
   ];
@@ -78,15 +78,14 @@ export default function CampaignTabs({ darkMode }) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 px-4 font-medium transition-colors relative ${
-              activeTab === tab.id
+            className={`flex-1 flex items-center justify-center gap-2 py-4 px-4 font-medium transition-colors relative ${activeTab === tab.id
                 ? darkMode
                   ? 'text-emerald-400'
                   : 'text-emerald-600'
                 : darkMode
-                ? 'text-gray-400 hover:text-gray-300'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
+                  ? 'text-gray-400 hover:text-gray-300'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
           >
             <tab.icon className="w-5 h-5" />
             <span className="hidden sm:inline">{tab.label}</span>
@@ -123,18 +122,18 @@ export default function CampaignTabs({ darkMode }) {
                 </h3>
                 <div className={`space-y-4 text-base leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   <p>
-                    Access to clean drinking water is a fundamental human right, yet millions of people in rural areas 
-                    lack this basic necessity. Our Clean Water Initiative aims to change this reality by building 
+                    Access to clean drinking water is a fundamental human right, yet millions of people in rural areas
+                    lack this basic necessity. Our Clean Water Initiative aims to change this reality by building
                     sustainable water infrastructure in underserved communities.
                   </p>
                   <p>
-                    Through this campaign, we will construct 25 new wells equipped with modern filtration systems, 
-                    providing clean, safe drinking water to over 5,000 families. Each well is designed to serve 
+                    Through this campaign, we will construct 25 new wells equipped with modern filtration systems,
+                    providing clean, safe drinking water to over 5,000 families. Each well is designed to serve
                     200+ people and will be maintained by trained local community members.
                   </p>
                   <p>
-                    Your donation directly funds materials, labor, and training programs that ensure long-term 
-                    sustainability. We believe in complete transparency - every rupee is tracked and reported 
+                    Your donation directly funds materials, labor, and training programs that ensure long-term
+                    sustainability. We believe in complete transparency - every rupee is tracked and reported
                     in our quarterly impact reports.
                   </p>
                 </div>
@@ -160,7 +159,7 @@ export default function CampaignTabs({ darkMode }) {
                 </ul>
               </div>
 
-             {/* Documents Section */}
+              {/* Documents Section */}
               <div className={`p-6 rounded-xl relative overflow-hidden ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'}`}>
                 <h4 className={`font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Campaign Documents</h4>
 
@@ -220,9 +219,8 @@ export default function CampaignTabs({ darkMode }) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className={`p-5 rounded-xl border-l-4 border-emerald-500 ${
-                    darkMode ? 'bg-zinc-900' : 'bg-gray-50'
-                  }`}
+                  className={`p-5 rounded-xl border-l-4 border-emerald-500 ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
+                    }`}
                 >
                   <div className="flex gap-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-semibold flex items-center justify-center flex-shrink-0">
@@ -289,88 +287,203 @@ export default function CampaignTabs({ darkMode }) {
             </div>
           )}
         </motion.div>
-        {/* Login Modal */}
-      <AnimatePresence>
-        {showLogin && (
-          <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`${darkMode ? 'bg-zinc-900 text-white' : 'bg-white text-gray-900'} rounded-2xl p-6 w-80 shadow-xl relative`}
-            >
-              <button onClick={() => setShowLogin(false)} className="absolute top-3 right-3 text-gray-400 hover:text-red-400">
-                <X className="w-5 h-5" />
-              </button>
 
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                  Secure Access
-                </h3>
-                <p className="text-sm mt-1 text-gray-400">Verify your identity to continue</p>
+        <AnimatePresence>
+          {showLogin && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              onClick={() => setShowLogin(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+
+                
+                
+                className={`w-full ${ step === "otp" ? "max-w-2xl" : "max-w-md"
+  } bg-white rounded-3xl shadow-2xl p-8 relative`}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowLogin(false)}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+
+                {/* Logo/Brand */}
+               <div className="flex items-center gap-2 mb-8">
+          <img 
+            src="/TPFAid-Logo.png" 
+            alt="TPF Aid Logo" 
+            className="h-5 w-auto"
+          />
+        </div>
+
+                {/* Mobile Step */}
+                {step === 'mobile' && (
+                  <div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                      Create new account
+                    </h2>
+                    <p className="text-gray-500 mb-8">
+                      Have an account?{' '}
+                      <button className="text-blue-600 hover:text-blue-700 font-medium">
+                        Login
+                      </button>
+                    </p>
+
+                    <div className="space-y-6">
+                      {/* Phone Input */}
+                      <div className="relative">
+                <div className="pb-2 border-b-2 border-teal-400">
+                  <input
+                    type="text"
+                    value={mobile}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      // Allow +91 at start and numbers
+                      if (value.startsWith('+91 ')) {
+                        const numbers = value.slice(4).replace(/\D/g, '').slice(0, 10)
+                        setMobile('+91 ' + numbers)
+                      } else if (value === '+91' || value === '+9' || value === '+') {
+                        setMobile(value)
+                      } else if (value === '') {
+                        setMobile('')
+                      } else if (!value.startsWith('+')) {
+                        setMobile('+91 ' + value.replace(/\D/g, '').slice(0, 10))
+                      }
+                    }}
+                    placeholder="Enter your mobile number"
+                    className="w-full text-lg outline-none text-gray-900 placeholder-gray-400"
+                  />
+                </div>
               </div>
 
-              {step === 'mobile' && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">Mobile Number</label>
-                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-zinc-800 rounded-lg px-3 py-2">
-                      <Smartphone className="w-4 h-4 text-gray-400" />
-                      <input
-                        type="tel"
-                        maxLength={10}
-                        value={mobile}
-                        onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
-                        className="bg-transparent flex-1 outline-none text-sm"
-                        placeholder="Enter 10-digit number"
-                      />
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleLogin}
-                    disabled={mobile.length < 10}
-                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition-all"
-                  >
-                    Send OTP
-                  </button>
-                </div>
-              )}
 
-              {step === 'otp' && (
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">Enter OTP</label>
-                    <div className="flex items-center gap-2 bg-gray-100 dark:bg-zinc-800 rounded-lg px-3 py-2">
-                      <KeyRound className="w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        maxLength={6}
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                        className="bg-transparent flex-1 outline-none text-sm tracking-widest"
-                        placeholder="6-digit code"
-                      />
+                      {/* Continue Button */}
+                     <button
+  onClick={() => {
+    handleLogin(); // optional — keep if it actually sends OTP
+    setStep('otp'); // show OTP screen
+  }}
+  disabled={mobile.length !== 14}
+  className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all text-lg"
+>
+  Continue
+</button>
+
+
+                      {/* Email Signup Link */}
+                      <button className="w-full text-gray-500 hover:text-gray-700 font-medium">
+                        Signup with email
+                      </button>
                     </div>
                   </div>
-                  <button
-                    onClick={handleLogin}
-                    disabled={otp.length < 6}
-                    className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-emerald-500/30 transition-all"
-                  >
-                    Verify & Unlock
-                  </button>
-                </div>
-              )}
+                )}
+
+                {/* OTP Step */}
+                {step === 'otp' && (
+                  <div className="flex gap-8 ">
+                    {/* Left Side */}
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        Verify your account
+                      </h2>
+                      <p className="text-gray-500 mb-8 text-sm">
+                        Enter the verification code sent to your phone.
+                      </p>
+
+                      {/* OTP Input */}
+                      <div className="flex gap-3 mb-8">
+                        {[...Array(4)].map((_, index) => (
+                          <input
+                            key={index}
+                            type="text"
+                            maxLength="1"
+                            value={otp[index] || ''}
+                            onChange={(e) => {
+                              const newOtp = otp.split('')
+                              newOtp[index] = e.target.value
+                              setOtp(newOtp.join(''))
+                              // Auto-focus next input
+                              if (e.target.value && index < 3) {
+                                e.target.nextElementSibling?.focus()
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              // Handle backspace
+                              if (e.key === 'Backspace' && !otp[index] && index > 0) {
+                                e.target.previousElementSibling?.focus()
+                              }
+                            }}
+                            className="w-16 h-16 text-center text-2xl font-semibold border-2 border-gray-300 rounded-xl outline-none focus:border-blue-600 transition-colors"
+                          />
+                        ))}
+                      </div>
+
+                      {/* Resend Link */}
+                      <p className="text-sm text-gray-500">
+                        Haven't received the email?{' '}
+                        <button
+                          onClick={() => setStep('mobile')}
+                          className="text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                          Send again
+                        </button>
+                      </p>
+
+                      {/* Auto Submit on 4 digits */}
+                      {otp.length === 4 && (
+                        <button
+                          onClick={handleLogin}
+                          className="w-full mt-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+                        >
+                          Verify
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Right Side - Illustration */}
+                    <div className="hidden md:flex items-center justify-center flex-1 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6">
+                      <div className="relative">
+                        {/* Phone Illustration */}
+                        <div className="w-48 h-64 bg-white rounded-3xl shadow-xl border-4 border-slate-800 flex flex-col items-center justify-center relative overflow-hidden">
+                          {/* Message Bubble */}
+                          <div className="absolute top-8 -right-4 w-24 h-16 bg-teal-500 rounded-2xl rounded-tr-none shadow-lg flex items-center justify-center">
+                            <div className="flex gap-1">
+                              {[...Array(4)].map((_, i) => (
+                                <div key={i} className="w-2 h-2 bg-white rounded-full"></div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Shield Icon */}
+                          <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
+                            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+
+                          {/* Lines */}
+                          <div className="space-y-2 w-32">
+                            <div className="h-1 bg-gray-200 rounded"></div>
+                            <div className="h-1 bg-gray-200 rounded w-3/4"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
       </AnimatePresence>
     </div>
   );
