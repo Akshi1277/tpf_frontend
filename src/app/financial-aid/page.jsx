@@ -1,6 +1,5 @@
 "use client"
-
-import FinancialAidForm from '@/components/forms/FinancialAidForm'
+import FinancialAidForm from '@/components/FinancialAidForm'
 import Footer from '@/components/layout/Footer'
 import Navbar from '@/components/layout/Navbar'
 import React from 'react'
@@ -22,11 +21,9 @@ const page = () => {
   return (
     <div>
       <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
         
         <FinancialAidForm darkMode={darkMode} />
 
-        <Footer darkMode={darkMode} />
       </div>
     </div>
   )
