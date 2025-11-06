@@ -3,12 +3,14 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Check } from "lucide-react"
+import { ArrowRight,ArrowLeft, Check } from "lucide-react"
 
 export default function LoginPage({ darkMode }) {
   const router = useRouter()
   const [mobile, setMobile] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
+const [step, setStep] = useState(1);
+const [otp, setOtp] = useState('');
 
   const handleLogin = () => {
     if (mobile.length === 10) {
@@ -18,6 +20,17 @@ export default function LoginPage({ darkMode }) {
       }, 2500)
     }
   }
+
+  const handleMobileSubmit = () => {
+  if (mobile.length === 10) setStep(2);
+};
+
+const handleOtpSubmit = () => {
+  if (otp.length === 4) {
+    setShowSuccess(true);
+    setTimeout(() => router.push('/'), 2500);
+  }
+};
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${darkMode
@@ -186,78 +199,159 @@ export default function LoginPage({ darkMode }) {
                   : "bg-white/80 backdrop-blur-xl border border-gray-100 shadow-2xl shadow-gray-200/50"
                 }`}>
 
-                <div className="space-y-6 sm:space-y-8">
-                  <div className="max-w-md mx-auto space-y-12 sm:space-y-8">
-                    <div>
-                      <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 ${darkMode ? "text-white" : "text-gray-900"
-                        }`}>
-                        Log in to your account
-                      </h2>
-                      <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"
-                        }`}>
-                        Enter your mobile number to continue
-                      </p>
-                    </div>
+             <div className="space-y-6 sm:space-y-8">
+  <div className="max-w-md mx-auto space-y-12 sm:space-y-8">
+    <AnimatePresence mode="wait">
+      {step === 1 && (
+        <motion.div
+          key="mobile"
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-6 sm:space-y-8"
+        >
+          <div>
+            <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
+              Log in to your account
+            </h2>
+            <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+              Enter your mobile number to continue
+            </p>
+          </div>
 
-                    <div className="space-y-3">
-                      <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"
-                        }`}>
-                        Mobile Number
-                      </label>
-                      <div className={`relative group`}>
-                        <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur transition-opacity`} />
-                        <div className={`relative flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all ${darkMode
-                            ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500"
-                            : "bg-white border-gray-200 group-focus-within:border-emerald-500"
-                          }`}>
-                          <div className="flex items-center gap-2 sm:gap-2.5">
-                            <svg className="w-6 h-4 sm:w-7 sm:h-5" viewBox="0 0 30 20">
-                              <rect width="30" height="6.67" fill="#FF9933" />
-                              <rect y="6.67" width="30" height="6.67" fill="#FFFFFF" />
-                              <rect y="13.33" width="30" height="6.67" fill="#138808" />
-                              <circle cx="15" cy="10" r="2.5" fill="#000080" />
-                            </svg>
-                            <span className={`text-base sm:text-lg font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"
-                              }`}>
-                              +91
-                            </span>
-                            <div className={`w-px h-5 sm:h-6 ${darkMode ? "bg-zinc-700" : "bg-gray-300"
-                              }`} />
-                          </div>
-                          <input
-                            type="tel"
-                            value={mobile}
-                            onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                            placeholder="10-digit number"
-                            className={`flex-1 text-base sm:text-lg md:text-xl font-medium outline-none bg-transparent ${darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"
-                              }`}
-                            autoFocus
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={handleLogin}
-                      disabled={mobile.length !== 10}
-                      className="w-full group relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
-                      <div className="relative flex items-center justify-center gap-2 text-white">
-                        Log In
-                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                      </div>
-                    </button>
-
-                    <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"
-                      }`}>
-                      Don't have an account?{" "}
-                      <a href="/signup" className={`font-semibold text-emerald-600 hover:text-emerald-700`}>
-                        Sign up
-                      </a>
-                    </p>
-                  </div>
+          <div className="space-y-3">
+            <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+              Mobile Number
+            </label>
+            <div className="relative group">
+              <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur transition-opacity`} />
+              <div className={`relative flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all ${darkMode
+                  ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500"
+                  : "bg-white border-gray-200 group-focus-within:border-emerald-500"
+                }`}>
+                {/* flag / +91 / input exactly as you had */}
+                <div className="flex items-center gap-2 sm:gap-2.5">
+                  <svg className="w-6 h-4 sm:w-7 sm:h-5" viewBox="0 0 30 20">
+                    <rect width="30" height="6.67" fill="#FF9933" />
+                    <rect y="6.67" width="30" height="6.67" fill="#FFFFFF" />
+                    <rect y="13.33" width="30" height="6.67" fill="#138808" />
+                    <circle cx="15" cy="10" r="2.5" fill="#000080" />
+                  </svg>
+                  <span className={`text-base sm:text-lg font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>+91</span>
+                  <div className={`w-px h-5 sm:h-6 ${darkMode ? "bg-zinc-700" : "bg-gray-300"}`} />
                 </div>
+                <input
+                  type="tel"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  placeholder="10-digit number"
+                  className={`flex-1 text-base sm:text-lg md:text-xl font-medium outline-none bg-transparent ${darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"}`}
+                  autoFocus
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleMobileSubmit}
+            disabled={mobile.length !== 10}
+            className="w-full group cursor-pointer relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
+            <div className="relative flex items-center justify-center gap-2 text-white">
+              Continue
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </div>
+          </button>
+        </motion.div>
+      )}
+
+      {step === 2 && (
+        <motion.div
+          key="otp"
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-6 sm:space-y-8"
+        >
+          <div className="max-w-md mx-auto space-y-12 px-2 sm:space-y-8">
+            <div>
+              <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                Enter verification code
+              </h2>
+              <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                Sent to <span className="font-semibold text-emerald-600">+91 {mobile}</span>
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>4-Digit Code</label>
+              <div className="flex gap-2 sm:gap-3 md:gap-4">
+                {[...Array(4)].map((_, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength="1"
+                    value={otp[index] || ''}
+                    onChange={(e) => {
+                      const newOtp = otp.split('');
+                      newOtp[index] = e.target.value;
+                      setOtp(newOtp.join(''));
+                      if (e.target.value && index < 3) e.target.nextElementSibling?.focus();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Backspace' && !otp[index] && index > 0) e.target.previousElementSibling?.focus();
+                    }}
+                    className={`flex-1 h-14 sm:h-16 md:h-20 w-14 sm:w-16 md:w-20 text-center text-2xl sm:text-3xl font-bold rounded-xl sm:rounded-2xl border-2 outline-none transition-all ${darkMode
+                        ? 'bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500 focus:bg-zinc-800'
+                        : 'bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg'}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleOtpSubmit}
+                disabled={otp.length !== 4}
+                className="w-full group relative cursor-pointer overflow-hidden py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
+                <div className="relative flex items-center justify-center gap-2 text-white">
+                  Verify & Log In
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => setStep(1)}
+                className={`py-3 px-6 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                    ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Change Number
+              </button>
+            </div>
+
+            <p className={`text-center text-xs sm:text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+              Didn't receive? <button className="font-semibold text-emerald-600 hover:text-emerald-700">Resend code</button>
+            </p>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* always-visible footer link */}
+    <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+      Don't have an account?{" "}
+      <a href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-700">Sign up</a>
+    </p>
+  </div>
+</div>
 
               </div>
             </motion.div>
