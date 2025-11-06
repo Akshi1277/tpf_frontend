@@ -94,7 +94,7 @@ const handleSubmit = (e) => {
 )}
 
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-20`}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-20 lg:pt-20 pb-24">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -111,41 +111,49 @@ const handleSubmit = (e) => {
         </motion.div>
 
         {/* Progress Indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            {[1, 2, 3].map((step) => (
-              <div key={step} className="flex items-center flex-1">
-                <div className="flex flex-col items-center flex-1">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
-                      currentStep >= step
-                        ? "bg-emerald-600 text-white"
-                        : darkMode
-                        ? "bg-zinc-700 text-zinc-400"
-                        : "bg-zinc-200 text-zinc-500"
-                    }`}
-                  >
-                    {step}
-                  </div>
-                  <span className={`text-xs mt-2 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
-                    {step === 1 ? "Personal" : step === 2 ? "Part 2" : "Part 3"}
-                  </span>
-                </div>
-                {step < 3 && (
-                  <div
-                    className={`h-1 flex-1 mx-2 rounded transition-all ${
-                      currentStep > step
-                        ? "bg-emerald-600"
-                        : darkMode
-                        ? "bg-zinc-700"
-                        : "bg-zinc-200"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
+       <div className="mb-8">
+  <div className="flex items-center justify-center gap-6 mb-2">
+    {[1, 2, 3].map((step, index) => (
+      <div key={step} className="flex items-center">
+        {/* Step Circle + Label */}
+        <div className="flex flex-col items-center">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+              currentStep >= step
+                ? "bg-emerald-600 text-white"
+                : darkMode
+                ? "bg-zinc-700 text-zinc-400"
+                : "bg-zinc-200 text-zinc-500"
+            }`}
+          >
+            {step}
           </div>
+          <span
+            className={`text-xs mt-2 ${
+              darkMode ? "text-zinc-400" : "text-zinc-600"
+            }`}
+          >
+            {step === 1 ? "Personal" : step === 2 ? "Part 2" : "Part 3"}
+          </span>
         </div>
+
+        {/* Connecting Line */}
+        {index < 2 && (
+          <div
+            className={`w-16 h-1 mx-4 rounded transition-all ${
+              currentStep > step
+                ? "bg-emerald-600"
+                : darkMode
+                ? "bg-zinc-700"
+                : "bg-zinc-200"
+            }`}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
 
         {/* Form Container */}
         <motion.div

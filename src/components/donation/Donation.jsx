@@ -55,7 +55,6 @@ export default function DonationsPage() {
       cause: "Water & Sanitation",
       status: "completed",
       paymentMethod: "UPI",
-      transactionId: "UPI/456789123"
     },
     {
       id: "TXN123456788",
@@ -80,7 +79,6 @@ export default function DonationsPage() {
       cause: "Education",
       status: "completed",
       paymentMethod: "Net Banking",
-      transactionId: "NB/789456123"
     },
     {
       id: "TXN123456786",
@@ -102,9 +100,8 @@ export default function DonationsPage() {
       amount: 2500,
       recipient: "Animal Shelter",
       cause: "Animal Welfare",
-      status: "pending",
+      status: "completed",
       paymentMethod: "UPI",
-      transactionId: "UPI/321654987"
     },
     {
       id: "TXN123456784",
@@ -116,7 +113,6 @@ export default function DonationsPage() {
       cause: "Child Welfare",
       status: "completed",
       paymentMethod: "Card",
-      transactionId: "CARD/147258369"
     }
   ]
 
@@ -141,7 +137,6 @@ export default function DonationsPage() {
   const getStatusIcon = (status) => {
     switch(status) {
       case "completed": return CheckCircle
-      case "pending": return Clock
       case "failed": return XCircle
       default: return Clock
     }
@@ -150,7 +145,6 @@ export default function DonationsPage() {
   const getStatusColor = (status) => {
     switch(status) {
       case "completed": return "emerald"
-      case "pending": return "yellow"
       case "failed": return "red"
       default: return "gray"
     }
@@ -425,26 +419,12 @@ export default function DonationsPage() {
                 </select>
               </div>
 
-              {/* Status Filter */}
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className={`px-4 py-2.5 rounded-lg border outline-none transition-all appearance-none cursor-pointer ${
-                  darkMode
-                    ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
-                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
-                }`}
-              >
-                <option value="all">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-              </select>
+             
             </div>
           </div>
 
           {/* Transaction List */}
-          <div className="divide-y divide-zinc-700">
+          <div className={`divide-y ${darkMode? "divide-zinc-800":"divide-zinc-100"}`}>
             {filteredTransactions.length === 0 ? (
               <div className="p-12 text-center">
                 <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
@@ -590,7 +570,7 @@ export default function DonationsPage() {
                             <span className={`text-xs font-mono ${
                               darkMode ? "text-zinc-500" : "text-gray-500"
                             }`}>
-                              ID: {txn.id}
+                              Transaction ID: {txn.id}
                             </span>
                             <button className={`text-xs font-medium flex items-center gap-1 ${
                               darkMode ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-600 hover:text-emerald-700"
@@ -599,13 +579,7 @@ export default function DonationsPage() {
                               <ArrowUpRight className="w-3 h-3" />
                             </button>
                           </div>
-                          {txn.transactionId && (
-                            <span className={`text-xs ${
-                              darkMode ? "text-zinc-600" : "text-gray-400"
-                            }`}>
-                              {txn.transactionId}
-                            </span>
-                          )}
+                        
                         </div>
                       </div>
                     </div>
