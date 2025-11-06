@@ -1,7 +1,7 @@
 "use client"
 import Footer from '@/components/layout/Footer';
 import Navbar from '@/components/layout/Navbar';
-import ZakatEstimator from '@/components/zakatcalculator/ZakatCalculator';
+import ZakatCalculator from '@/components/zakatCalculator/ZakaatCalculator';
 import React from 'react'
 import { useEffect, useState } from 'react';
 
@@ -23,7 +23,7 @@ const page = () => {
          <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               {/* <Navbar darkMode={darkMode} setDarkMode={setDarkMode}  /> */}
         
-        <ZakatEstimator darkMode={darkMode} />
+        <ZakatCalculator darkMode={darkMode} />
 
           <Footer darkMode={darkMode} />
         </div>
