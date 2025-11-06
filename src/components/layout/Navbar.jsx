@@ -423,7 +423,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   {/* Sign up / Log in */}
                   <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
                     <a
-                      href="#"
+                      href="/signup"
                       className={`block text-center py-2 px-4 rounded-lg transition-colors
                      ${darkMode
                           ? 'text-zinc-300 hover:bg-zinc-800'
@@ -433,7 +433,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                       Sign up
                     </a>
                     <a
-                      href="#"
+                      href="/login"
                       className={`block text-center py-2 px-4 rounded-lg transition-colors
                      ${darkMode
                           ? 'text-zinc-300 hover:bg-zinc-800'
