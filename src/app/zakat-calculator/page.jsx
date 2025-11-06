@@ -21,7 +21,7 @@ const page = () => {
   return (
     <div>
          <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-              <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
+              {/* <Navbar darkMode={darkMode} setDarkMode={setDarkMode}  /> */}
         
         <ZakatEstimator darkMode={darkMode} />
 
