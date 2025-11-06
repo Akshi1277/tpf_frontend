@@ -495,99 +495,45 @@ const handleDateSelect = (day) => {
               />
             </div>
 
+            
             {/* User Role Section */}
-            <div className={`border-t pt-8 pb-8 ${
-              darkMode ? "border-zinc-700" : "border-gray-200"
-            }`}>
-              <h3 className={`text-xl font-bold mb-4 ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                User Role
-              </h3>
-              
-              {isEditing ? (
-                <div className="space-y-3">
-                  {userRoles.map((role) => (
-                    <label 
-                      key={role.value}
-                      className={`block p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                        profileData.userRole === role.value
-                          ? darkMode
-                            ? "border-emerald-500 bg-emerald-500/10"
-                            : "border-emerald-500 bg-emerald-50"
-                          : darkMode
-                          ? "border-zinc-700 hover:border-zinc-600"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="userRole"
-                        value={role.value}
-                        checked={profileData.userRole === role.value}
-                        onChange={handleInputChange}
-                        className="sr-only"
-                      />
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className={`font-semibold mb-1 ${
-                            darkMode ? "text-white" : "text-gray-900"
-                          }`}>
-                            {role.label}
-                          </p>
-                          <p className={`text-sm ${
-                            darkMode ? "text-zinc-400" : "text-gray-600"
-                          }`}>
-                            {role.description}
-                          </p>
-                        </div>
-                        {profileData.userRole === role.value && (
-                          <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  ))}
-                  
-                  {profileData.userRole === "custom" && (
-                    <input
-                      type="text"
-                      name="customRole"
-                      value={profileData.customRole}
-                      onChange={handleInputChange}
-                      placeholder="Enter custom role"
-                      className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                        darkMode
-                          ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
-                          : "bg-white border-gray-300 text-gray-900 focus:border-emerald-500"
-                      }`}
-                    />
-                  )}
-                </div>
-              ) : (
-                <div className={`p-5 rounded-xl border ${
-                  darkMode 
-                    ? "bg-zinc-800/50 border-zinc-700" 
-                    : "bg-gray-50 border-gray-200"
-                }`}>
-                  <p className={`font-semibold mb-1 ${
-                    darkMode ? "text-white" : "text-gray-900"
-                  }`}>
-                    {profileData.userRole === "custom" && profileData.customRole 
-                      ? profileData.customRole
-                      : userRoles.find(r => r.value === profileData.userRole)?.label}
-                  </p>
-                  <p className={`text-sm ${
-                    darkMode ? "text-zinc-400" : "text-gray-600"
-                  }`}>
-                    {userRoles.find(r => r.value === profileData.userRole)?.description}
-                  </p>
-                </div>
-              )}
-            </div>
+<div className={`border-t pt-8 pb-8 ${
+  darkMode ? "border-zinc-700" : "border-gray-200"
+}`}>
+  <h3 className={`text-xl font-bold mb-4 ${
+    darkMode ? "text-white" : "text-gray-900"
+  }`}>
+    User Role
+  </h3>
+  
+  <div className={`p-5 rounded-xl border ${
+    darkMode 
+      ? "bg-zinc-800/50 border-zinc-700" 
+      : "bg-gray-50 border-gray-200"
+  }`}>
+    <div className="flex items-start gap-4">
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+        darkMode ? "bg-emerald-500/20" : "bg-emerald-100"
+      }`}>
+        <Shield className="w-6 h-6 text-emerald-600" />
+      </div>
+      <div>
+        <p className={`font-semibold text-lg mb-1 ${
+          darkMode ? "text-white" : "text-gray-900"
+        }`}>
+          {profileData.userRole === "custom" && profileData.customRole 
+            ? profileData.customRole
+            : userRoles.find(r => r.value === profileData.userRole)?.label}
+        </p>
+        <p className={`text-sm ${
+          darkMode ? "text-zinc-400" : "text-gray-600"
+        }`}>
+          {userRoles.find(r => r.value === profileData.userRole)?.description}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
           </div>
         </motion.div>
       </div>
