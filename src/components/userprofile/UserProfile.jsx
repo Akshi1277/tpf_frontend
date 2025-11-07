@@ -22,7 +22,7 @@ import {
   Check
 } from "lucide-react"
 
-export default function ProfilePage({ darkModeFromParent, setDarkModeFromParent }) {
+export default function ProfilePage({ darkModeFromParent}) {
   const [darkMode, setDarkMode] = useState(false)
   const [scrolled, setScrolled] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -39,38 +39,12 @@ export default function ProfilePage({ darkModeFromParent, setDarkModeFromParent 
     customRole: ""
   })
 
-  useEffect(() => {
-    const savedMode = localStorage.getItem('darkMode')
-    setDarkMode(savedMode === 'true')
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('darkMode', darkMode)
-  }, [darkMode])
-
-   useEffect(() => {
-    const savedMode = localStorage.getItem('darkMode')
-    const initialMode = savedMode === 'true'
-    setDarkMode(initialMode)
-    if (setDarkModeFromParent) {
-      setDarkModeFromParent(initialMode)
-    }
-  }, [])
-
-   useEffect(() => {
-    localStorage.setItem('darkMode', darkMode)
-    if (setDarkModeFromParent) {
-      setDarkModeFromParent(darkMode)
-    }
-    // Dispatch custom event
-    window.dispatchEvent(new Event('darkModeChanged'))
-  }, [darkMode, setDarkModeFromParent])
-  // Sync from parent prop
-  useEffect(() => {
-    if (darkModeFromParent !== undefined && darkModeFromParent !== darkMode) {
-      setDarkMode(darkModeFromParent)
-    }
-  }, [darkModeFromParent])
+ // Sync with parent dark mode
+useEffect(() => {
+  if (darkModeFromParent !== undefined) {
+    setDarkMode(darkModeFromParent)
+  }
+}, [darkModeFromParent])
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]

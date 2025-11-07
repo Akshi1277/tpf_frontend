@@ -17,7 +17,7 @@ import {
   XCircle
 } from "lucide-react"
 
-export default function DonationsPage({ darkModeFromParent, setDarkModeFromParent }) {
+export default function DonationsPage({ darkModeFromParent}) {
   const [darkMode, setDarkMode] = useState(false)
   const [filterType, setFilterType] = useState("all")
   const [filterStatus, setFilterStatus] = useState("all")
@@ -25,38 +25,12 @@ export default function DonationsPage({ darkModeFromParent, setDarkModeFromParen
 
  
 
-  useEffect(() => {
-    const savedMode = localStorage.getItem('darkMode')
-    setDarkMode(savedMode === 'true')
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('darkMode', darkMode)
-  }, [darkMode])
-
-   useEffect(() => {
-    const savedMode = localStorage.getItem('darkMode')
-    const initialMode = savedMode === 'true'
-    setDarkMode(initialMode)
-    if (setDarkModeFromParent) {
-      setDarkModeFromParent(initialMode)
-    }
-  }, [])
-
-   useEffect(() => {
-    localStorage.setItem('darkMode', darkMode)
-    if (setDarkModeFromParent) {
-      setDarkModeFromParent(darkMode)
-    }
-    // Dispatch custom event
-    window.dispatchEvent(new Event('darkModeChanged'))
-  }, [darkMode, setDarkModeFromParent])
-  // Sync from parent prop
-  useEffect(() => {
-    if (darkModeFromParent !== undefined && darkModeFromParent !== darkMode) {
-      setDarkMode(darkModeFromParent)
-    }
-  }, [darkModeFromParent])
+ // Sync with parent dark mode
+useEffect(() => {
+  if (darkModeFromParent !== undefined) {
+    setDarkMode(darkModeFromParent)
+  }
+}, [darkModeFromParent])
 
   // Mock data - Replace with actual API call
   const donationStats = {

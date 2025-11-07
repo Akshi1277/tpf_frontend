@@ -7,27 +7,27 @@ import { useState, useEffect } from 'react'
 import DonationsPage from '@/components/donation/Donation'
 
 export default function Page() {
-  const [darkMode, setDarkMode] = useState(false)
+ const [darkMode, setDarkMode] = useState(() => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('darkMode') === 'true'
+  }
+  return false
+})
 
-  useEffect(() => {
+useEffect(() => {
+  const handleStorageChange = () => {
     const savedMode = localStorage.getItem('darkMode')
     setDarkMode(savedMode === 'true')
-  }, [])
+  }
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const savedMode = localStorage.getItem('darkMode')
-      setDarkMode(savedMode === 'true')
-    }
+  window.addEventListener('storage', handleStorageChange)
+  window.addEventListener('darkModeChanged', handleStorageChange)
 
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('darkModeChanged', handleStorageChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('darkModeChanged', handleStorageChange)
-    }
-  }, [])
+  return () => {
+    window.removeEventListener('storage', handleStorageChange)
+    window.removeEventListener('darkModeChanged', handleStorageChange)
+  }
+}, [])
 
   return (
     <div className={`min-h-screen flex flex-col ${darkMode ? "bg-zinc-950" : "bg-gray-50"}`}>
@@ -36,7 +36,7 @@ export default function Page() {
       <div className="flex flex-1">
         <Sidebar darkMode={darkMode} />
         <div className="flex-1">
-          <DonationsPage darkModeFromParent={darkMode} setDarkModeFromParent={setDarkMode} />
+          <DonationsPage darkModeFromParent={darkMode}/>
         </div>
       </div>
 
