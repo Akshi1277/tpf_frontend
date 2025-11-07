@@ -2,8 +2,6 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
 import { 
   User, 
   Mail, 
@@ -24,7 +22,7 @@ import {
   Check
 } from "lucide-react"
 
-export default function ProfilePage() {
+export default function ProfilePage({ darkModeFromParent, setDarkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
   const [scrolled, setScrolled] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -49,6 +47,30 @@ export default function ProfilePage() {
   useEffect(() => {
     localStorage.setItem('darkMode', darkMode)
   }, [darkMode])
+
+   useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode')
+    const initialMode = savedMode === 'true'
+    setDarkMode(initialMode)
+    if (setDarkModeFromParent) {
+      setDarkModeFromParent(initialMode)
+    }
+  }, [])
+
+   useEffect(() => {
+    localStorage.setItem('darkMode', darkMode)
+    if (setDarkModeFromParent) {
+      setDarkModeFromParent(darkMode)
+    }
+    // Dispatch custom event
+    window.dispatchEvent(new Event('darkModeChanged'))
+  }, [darkMode, setDarkModeFromParent])
+  // Sync from parent prop
+  useEffect(() => {
+    if (darkModeFromParent !== undefined && darkModeFromParent !== darkMode) {
+      setDarkMode(darkModeFromParent)
+    }
+  }, [darkModeFromParent])
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0]
@@ -242,9 +264,8 @@ export default function ProfilePage() {
     )
   }
 
-  return (
-    <div className={`min-h-screen ${darkMode ? "bg-zinc-950" : "bg-gray-50"}`}>
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
+ return (
+  <div className="min-h-screen mt-5">
 
       {/* Success Toast */}
       <AnimatePresence>
@@ -285,7 +306,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+    <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
         
         {/* Hero Section with Profile Picture */}
         <motion.div
@@ -300,7 +321,7 @@ export default function ProfilePage() {
               : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
           }`}>
             {/* Gradient Header */}
-            <div className="relative h-40 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
+            <div className="relative h-40 mb-10 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
               <div className="absolute inset-0">
                 <div 
                   className="absolute inset-0 opacity-20"
@@ -376,7 +397,7 @@ export default function ProfilePage() {
 
                 {/* Name and Role */}
                 <div className="flex-1">
-                  <h1 className={`text-3xl sm:text-4xl font-bold mb-2 ${
+                  <h1 className={`text-3xl sm:text-4xl font-bold mb-5 ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}>
                     {profileData.fullName}
@@ -531,7 +552,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Detailed Information */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-1">
                 {/* Date of Birth */}
                 <div>
                   <label className={`block text-sm font-semibold mb-3 ${
@@ -658,7 +679,6 @@ export default function ProfilePage() {
         </motion.div>
       </div>
 
-      <Footer darkMode={darkMode} />
     </div>
   )
 }
