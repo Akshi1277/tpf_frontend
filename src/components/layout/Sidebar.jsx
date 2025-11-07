@@ -207,16 +207,17 @@ function Sidebar({ darkMode }) {
   return (
     <>
       {/* Mobile Menu Button */}
-      <button
-        onClick={toggleMobileMenu}
-        className={`lg:hidden fixed top-32 left-4 z-40 p-3 rounded-xl shadow-lg transition-all ${
-          darkMode
-            ? "bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800"
-            : "bg-white border border-gray-200 text-gray-900 hover:bg-gray-50"
-        }`}
-      >
-        <Menu className="w-5 h-5" />
-      </button>
+<button
+  onClick={toggleMobileMenu}
+  className={`lg:hidden fixed right-6 bottom-24 z-40 p-4 rounded-full shadow-2xl transition-all ${
+    darkMode
+      ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white"
+      : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+  }`}
+  aria-label="Open sidebar menu"
+>
+  <Menu className="w-6 h-6" strokeWidth={2.5} />
+</button>
 
       {/* Mobile Overlay */}
       <AnimatePresence>
