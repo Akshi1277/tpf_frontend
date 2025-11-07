@@ -198,6 +198,17 @@ body, html {
   display: none;
 }
 
+@keyframes gradient-xy {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient-xy {
+  background-size: 400% 400%;
+  animation: gradient-xy 3s ease infinite;
+}
+
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
