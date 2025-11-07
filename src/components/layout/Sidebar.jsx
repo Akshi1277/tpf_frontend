@@ -36,16 +36,18 @@ export default function Sidebar({ darkMode }) {
   const menuItems = [
     {
       name: "Profile",
-      path: "/profile",
+      path: "/userprofile",
       icon: User,
       gradient: "from-blue-500 to-indigo-600",
+      activeColor: "blue",
       description: "Manage your account"
     },
     {
       name: "Donations",
-      path: "/donations",
+      path: "/donation",
       icon: Heart,
       gradient: "from-emerald-500 to-teal-600",
+      activeColor: "emerald",
       description: "View your contributions"
     },
     {
@@ -53,6 +55,7 @@ export default function Sidebar({ darkMode }) {
       path: "/kyc",
       icon: FileCheck,
       gradient: "from-purple-500 to-pink-600",
+      activeColor: "purple",
       description: "Verify your identity"
     },
     {
@@ -60,6 +63,7 @@ export default function Sidebar({ darkMode }) {
       path: "/tax-benefit",
       icon: Receipt,
       gradient: "from-orange-500 to-red-600",
+      activeColor: "orange",
       description: "Download tax receipts"
     }
   ]
@@ -106,28 +110,35 @@ export default function Sidebar({ darkMode }) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative group rounded-2xl transition-all duration-300 ${
+                className={`relative group rounded-2xl transition-all duration-300 border-2 ${
                   isActive
                     ? darkMode
-                      ? "bg-zinc-800 shadow-lg"
-                      : "bg-white shadow-lg shadow-gray-200/50"
+                      ? "bg-zinc-800/80 shadow-xl border-transparent"
+                      : "bg-gradient-to-r from-gray-50 to-white shadow-xl border-gray-200"
                     : darkMode
-                    ? "hover:bg-zinc-800/50"
-                    : "hover:bg-gray-50"
+                    ? "hover:bg-zinc-800/50 border-transparent"
+                    : "hover:bg-gray-50 border-transparent"
                 }`}
               >
+                {/* Active indicator bar - MORE PROMINENT */}
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className={`absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-gradient-to-b ${item.gradient}`}
+                    className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-r-full bg-gradient-to-b ${item.gradient} shadow-lg`}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
 
+                {/* Glow effect for active item */}
+                {isActive && (
+                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${item.gradient} opacity-5`} />
+                )}
+
                 <div className="flex items-center gap-4 p-4">
+                  {/* Icon */}
                   <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
                     isActive
-                      ? `bg-gradient-to-br ${item.gradient} shadow-lg`
+                      ? `bg-gradient-to-br ${item.gradient} shadow-lg shadow-${item.activeColor}-500/30`
                       : darkMode 
                       ? "bg-zinc-800" 
                       : "bg-gray-100"
@@ -141,21 +152,25 @@ export default function Sidebar({ darkMode }) {
                     )}
                   </div>
 
+                  {/* Text */}
                   <div className="flex-1 min-w-0">
-                    <h3 className={`font-semibold mb-0.5 ${
+                    <h3 className={`font-semibold mb-0.5 transition-colors ${
                       isActive
                         ? darkMode ? "text-white" : "text-gray-900"
                         : darkMode ? "text-zinc-300" : "text-gray-700"
                     }`}>
                       {item.name}
                     </h3>
-                    <p className={`text-xs truncate ${
-                      darkMode ? "text-zinc-500" : "text-gray-500"
+                    <p className={`text-xs truncate transition-colors ${
+                      isActive
+                        ? darkMode ? "text-zinc-400" : "text-gray-600"
+                        : darkMode ? "text-zinc-500" : "text-gray-500"
                     }`}>
                       {item.description}
                     </p>
                   </div>
 
+                  {/* Arrow */}
                   <ChevronRight className={`w-5 h-5 transition-all ${
                     isActive
                       ? darkMode ? "text-white translate-x-1" : "text-gray-900 translate-x-1"
@@ -163,16 +178,15 @@ export default function Sidebar({ darkMode }) {
                   }`} />
                 </div>
 
+                {/* Bottom gradient line for active */}
                 {isActive && (
-                  <div className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r ${item.gradient} opacity-20`} />
+                  <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${item.gradient} opacity-30`} />
                 )}
               </motion.div>
             </Link>
           )
         })}
       </nav>
-
-     
     </div>
   )
 
@@ -220,17 +234,14 @@ export default function Sidebar({ darkMode }) {
         )}
       </AnimatePresence>
 
-{/* Desktop Sidebar */}
-<aside className={`hidden lg:block fixed left-0 w-80 border-r ${
-  darkMode 
-    ? "bg-zinc-900 border-zinc-800" 
-    : "bg-white border-gray-200"
-} shadow-xl overflow-y-auto`} style={{ top: '64px', bottom: '0', zIndex: 20 }}> {/* Changed z-30 to z-20 */}
-  <SidebarContent />
-</aside>
-
-      {/* Spacer for desktop layout */}
-      <div className="hidden lg:block w-80 flex-shrink-0" />
+      {/* Desktop Sidebar */}
+      <aside className={`hidden lg:block sticky w-80 border-r ${
+        darkMode 
+          ? "bg-zinc-900 border-zinc-800" 
+          : "bg-white border-gray-200"
+      } shadow-xl overflow-y-auto`} style={{ top: '64px', height: 'calc(100vh - 64px)', zIndex: 20 }}>
+        <SidebarContent />
+      </aside>
     </>
   )
 }

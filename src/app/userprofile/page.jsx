@@ -2,6 +2,7 @@
 import ProfilePage from '@/components/userprofile/UserProfile'
 import Sidebar from '@/components/layout/Sidebar'
 import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
 import { useState, useEffect } from 'react'
 
 export default function Page() {
@@ -28,14 +29,18 @@ export default function Page() {
   }, [])
 
   return (
-    <div className={darkMode ? "bg-zinc-950" : "bg-gray-50"}>
+    <div className={`min-h-screen flex flex-col ${darkMode ? "bg-zinc-950" : "bg-gray-50"}`}>
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={true} />
-      <div className="flex min-h-screen"> {/* Remove pt-20 */}
+      
+      <div className="flex flex-1">
         <Sidebar darkMode={darkMode} />
         <div className="flex-1">
           <ProfilePage darkModeFromParent={darkMode} setDarkModeFromParent={setDarkMode} />
         </div>
       </div>
+
+      {/* Normal footer at the bottom - not fixed */}
+      <Footer darkMode={darkMode} />
     </div>
   )
 }

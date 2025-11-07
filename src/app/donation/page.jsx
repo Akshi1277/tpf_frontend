@@ -1,7 +1,47 @@
 "use client"
-
-import DonationsPage from "@/components/donation/Donation"
+import ProfilePage from '@/components/userprofile/UserProfile'
+import Sidebar from '@/components/layout/Sidebar'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
+import { useState, useEffect } from 'react'
+import DonationsPage from '@/components/donation/Donation'
 
 export default function Page() {
-  return <DonationsPage />
+  const [darkMode, setDarkMode] = useState(false)
+
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode')
+    setDarkMode(savedMode === 'true')
+  }, [])
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedMode = localStorage.getItem('darkMode')
+      setDarkMode(savedMode === 'true')
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('darkModeChanged', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('darkModeChanged', handleStorageChange)
+    }
+  }, [])
+
+  return (
+    <div className={`min-h-screen flex flex-col ${darkMode ? "bg-zinc-950" : "bg-gray-50"}`}>
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={true} />
+      
+      <div className="flex flex-1">
+        <Sidebar darkMode={darkMode} />
+        <div className="flex-1">
+          <DonationsPage darkModeFromParent={darkMode} setDarkModeFromParent={setDarkMode} />
+        </div>
+      </div>
+
+      {/* Normal footer at the bottom - not fixed */}
+      <Footer darkMode={darkMode} />
+    </div>
+  )
 }

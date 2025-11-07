@@ -265,7 +265,7 @@ export default function ProfilePage({ darkModeFromParent, setDarkModeFromParent 
   }
 
  return (
-  <div className="min-h-screen mt-5">
+  <div className="mt-5">
 
       {/* Success Toast */}
       <AnimatePresence>

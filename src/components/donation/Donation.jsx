@@ -2,8 +2,6 @@
 
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
 import { 
   Heart, 
   Droplet, 
@@ -19,12 +17,13 @@ import {
   XCircle
 } from "lucide-react"
 
-export default function DonationsPage() {
+export default function DonationsPage({ darkModeFromParent, setDarkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
-  const [scrolled, setScrolled] = useState(true)
-  const [filterType, setFilterType] = useState("all") // all, money, blood, food, other
-  const [filterStatus, setFilterStatus] = useState("all") // all, completed, pending, failed
+  const [filterType, setFilterType] = useState("all")
+  const [filterStatus, setFilterStatus] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+
+ 
 
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode')
@@ -34,6 +33,30 @@ export default function DonationsPage() {
   useEffect(() => {
     localStorage.setItem('darkMode', darkMode)
   }, [darkMode])
+
+   useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode')
+    const initialMode = savedMode === 'true'
+    setDarkMode(initialMode)
+    if (setDarkModeFromParent) {
+      setDarkModeFromParent(initialMode)
+    }
+  }, [])
+
+   useEffect(() => {
+    localStorage.setItem('darkMode', darkMode)
+    if (setDarkModeFromParent) {
+      setDarkModeFromParent(darkMode)
+    }
+    // Dispatch custom event
+    window.dispatchEvent(new Event('darkModeChanged'))
+  }, [darkMode, setDarkModeFromParent])
+  // Sync from parent prop
+  useEffect(() => {
+    if (darkModeFromParent !== undefined && darkModeFromParent !== darkMode) {
+      setDarkMode(darkModeFromParent)
+    }
+  }, [darkModeFromParent])
 
   // Mock data - Replace with actual API call
   const donationStats = {
@@ -162,7 +185,6 @@ export default function DonationsPage() {
 
   return (
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-white"}`}>
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
 
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -591,7 +613,6 @@ export default function DonationsPage() {
         </motion.div>
       </div>
 
-      <Footer darkMode={darkMode} />
     </div>
   )
 }
