@@ -204,9 +204,9 @@ export default function SignUpPage({ darkMode }) {
               transition={{ duration: 0.6 }}
               className="lg:col-span-3"
             >
-              <div className={`rounded-2xl mt-24 sm:mt-5 lg:mt-5 sm:rounded-3xl py-10 px-2 sm:p-8 lg:p-12 border-2 border-emerald-500 ${darkMode
-                  ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
-                  : "bg-white/80 backdrop-blur-xl border border-gray-100 shadow-2xl shadow-gray-200/50"
+              <div className={`rounded-2xl mt-24 sm:mt-5 lg:mt-5 sm:rounded-3xl py-10 px-2 sm:p-8 lg:p-12${darkMode
+                  ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-600"
+                  : "bg-white/80 backdrop-blur-xl border border-zinc-400 shadow-2xl shadow-gray-200/50"
                 }`}>
 
               
