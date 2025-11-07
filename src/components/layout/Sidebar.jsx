@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, memo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
@@ -14,61 +14,47 @@ import {
   Menu
 } from "lucide-react"
 
-export default function Sidebar({ darkMode }) {
+// Menu items defined outside component to prevent recreation on each render
+const menuItems = [
+  {
+    name: "Profile",
+    path: "/userprofile",
+    icon: User,
+    gradient: "from-blue-500 to-indigo-600",
+    activeColor: "blue",
+    description: "Manage your account"
+  },
+  {
+    name: "Donations",
+    path: "/donation",
+    icon: Heart,
+    gradient: "from-emerald-500 to-teal-600",
+    activeColor: "emerald",
+    description: "View your contributions"
+  },
+  {
+    name: "KYC Details",
+    path: "/kyc",
+    icon: FileCheck,
+    gradient: "from-purple-500 to-pink-600",
+    activeColor: "purple",
+    description: "Verify your identity"
+  },
+  {
+    name: "Tax Benefit",
+    path: "/tax-benefit",
+    icon: Receipt,
+    gradient: "from-orange-500 to-red-600",
+    activeColor: "orange",
+    description: "Download tax receipts"
+  }
+]
+
+// Memoized sidebar content component
+const SidebarContent = memo(({ onClose, darkMode }) => {
   const pathname = usePathname()
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
-
-  useEffect(() => {
-    setIsMobileOpen(false)
-  }, [pathname])
-
-  useEffect(() => {
-    if (isMobileOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isMobileOpen])
-
-  const menuItems = [
-    {
-      name: "Profile",
-      path: "/userprofile",
-      icon: User,
-      gradient: "from-blue-500 to-indigo-600",
-      activeColor: "blue",
-      description: "Manage your account"
-    },
-    {
-      name: "Donations",
-      path: "/donation",
-      icon: Heart,
-      gradient: "from-emerald-500 to-teal-600",
-      activeColor: "emerald",
-      description: "View your contributions"
-    },
-    {
-      name: "KYC Details",
-      path: "/kyc",
-      icon: FileCheck,
-      gradient: "from-purple-500 to-pink-600",
-      activeColor: "purple",
-      description: "Verify your identity"
-    },
-    {
-      name: "Tax Benefit",
-      path: "/tax-benefit",
-      icon: Receipt,
-      gradient: "from-orange-500 to-red-600",
-      activeColor: "orange",
-      description: "Download tax receipts"
-    }
-  ]
-
-  const SidebarContent = () => (
+  
+  return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className={`p-6 border-b ${
@@ -81,7 +67,7 @@ export default function Sidebar({ darkMode }) {
             Dashboard
           </h2>
           <button
-            onClick={() => setIsMobileOpen(false)}
+            onClick={onClose}
             className={`lg:hidden p-2 rounded-lg transition-colors ${
               darkMode 
                 ? "hover:bg-zinc-800 text-zinc-400" 
@@ -189,12 +175,40 @@ export default function Sidebar({ darkMode }) {
       </nav>
     </div>
   )
+})
+
+function Sidebar({ darkMode }) {
+  const pathname = usePathname()
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileOpen(prev => !prev)
+  }, [])
+
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileOpen(false)
+  }, [])
+
+  useEffect(() => {
+    closeMobileMenu()
+  }, [pathname, closeMobileMenu])
+
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMobileOpen])
 
   return (
     <>
       {/* Mobile Menu Button */}
       <button
-        onClick={() => setIsMobileOpen(true)}
+        onClick={toggleMobileMenu}
         className={`lg:hidden fixed top-32 left-4 z-40 p-3 rounded-xl shadow-lg transition-all ${
           darkMode
             ? "bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800"
@@ -211,7 +225,7 @@ export default function Sidebar({ darkMode }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setIsMobileOpen(false)}
+            onClick={closeMobileMenu}
             className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
           />
         )}
@@ -229,7 +243,7 @@ export default function Sidebar({ darkMode }) {
               darkMode ? "bg-zinc-900" : "bg-white"
             } shadow-2xl`}
           >
-            <SidebarContent />
+            <SidebarContent onClose={closeMobileMenu} darkMode={darkMode} />
           </motion.aside>
         )}
       </AnimatePresence>
@@ -240,8 +254,11 @@ export default function Sidebar({ darkMode }) {
           ? "bg-zinc-900 border-zinc-800" 
           : "bg-white border-gray-200"
       } shadow-xl overflow-y-auto`} style={{ top: '64px', height: 'calc(100vh - 64px)', zIndex: 20 }}>
-        <SidebarContent />
+        <SidebarContent onClose={closeMobileMenu} darkMode={darkMode} />
       </aside>
     </>
   )
 }
+
+// Export memoized component
+export default memo(Sidebar)
