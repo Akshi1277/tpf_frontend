@@ -13,7 +13,8 @@ import {
   X,
   Menu,
   Wrench,
-  AlertTriangle
+  AlertTriangle,
+  ClipboardList
 } from "lucide-react"
 
 // Menu items defined outside component to prevent recreation on each render
@@ -49,6 +50,14 @@ const menuItems = [
     gradient: "from-orange-500 to-red-600",
     activeColor: "orange",
     description: "Download tax receipts"
+  },
+  {
+    name: "My Campaigns",
+    path: "/profile/mycampaigns",
+    icon: ClipboardList,
+    gradient: "from-rose-500 to-red-600",
+    activeColor: "orange",
+    description: "Manage your Fundraisers"
   },
   {
     name: "My Service Requests",
