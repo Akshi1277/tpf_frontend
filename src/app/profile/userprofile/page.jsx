@@ -1,5 +1,5 @@
 "use client"
-import ProfilePage from '@/components/userprofile/UserProfile'
+import ProfilePage from '@/components/profile/userprofile/UserProfile'
 import Sidebar from '@/components/layout/Sidebar'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'

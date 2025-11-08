@@ -11,22 +11,24 @@ import {
   Receipt,
   ChevronRight,
   X,
-  Menu
+  Menu,
+  Wrench,
+  AlertTriangle
 } from "lucide-react"
 
 // Menu items defined outside component to prevent recreation on each render
 const menuItems = [
   {
     name: "Profile",
-    path: "/userprofile",
+    path: "/profile/userprofile",
     icon: User,
     gradient: "from-blue-500 to-indigo-600",
     activeColor: "blue",
     description: "Manage your account"
   },
   {
-    name: "Donations",
-    path: "/donation",
+    name: "My Donations",
+    path: "/profile/mydonation",
     icon: Heart,
     gradient: "from-emerald-500 to-teal-600",
     activeColor: "emerald",
@@ -34,7 +36,7 @@ const menuItems = [
   },
   {
     name: "KYC Details",
-    path: "/kyc",
+    path: "/profile/kycdetails",
     icon: FileCheck,
     gradient: "from-purple-500 to-pink-600",
     activeColor: "purple",
@@ -42,12 +44,28 @@ const menuItems = [
   },
   {
     name: "Tax Benefit",
-    path: "/tax-benefit",
+    path: "/profile/tax-benefit",
     icon: Receipt,
     gradient: "from-orange-500 to-red-600",
     activeColor: "orange",
     description: "Download tax receipts"
-  }
+  },
+  {
+    name: "My Service Requests",
+    path: "/profile/service-requests",
+    icon: Wrench,
+    gradient: "from-cyan-500 to-blue-600",
+    activeColor: "cyan",
+    description: "View and manage your service requests"
+  },
+  {
+    name: "My Complaints",
+    path: "/profile/mycomplaints",
+    icon: AlertTriangle,
+    gradient: "from-rose-500 to-red-600",
+    activeColor: "rose",
+    description: "Track your submitted complaints"
+  },
 ]
 
 // Memoized sidebar content component
@@ -55,16 +73,16 @@ const SidebarContent = memo(({ onClose, darkMode }) => {
   const pathname = usePathname()
   
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
-      <div className={`p-6 border-b ${
+      <div className={`px-4 py-4 sm:px-6 sm:py-5 border-b flex-shrink-0 ${
         darkMode ? "border-zinc-800" : "border-gray-200"
       }`}>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className={`text-xl font-bold ${
+        <div className="flex items-center justify-between mb-1">
+          <h2 className={`text-lg sm:text-xl font-bold ${
             darkMode ? "text-white" : "text-gray-900"
           }`}>
-            Dashboard
+            My Profile
           </h2>
           <button
             onClick={onClose}
@@ -77,101 +95,103 @@ const SidebarContent = memo(({ onClose, darkMode }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className={`text-sm ${
+        <p className={`text-xs sm:text-sm ${
           darkMode ? "text-zinc-400" : "text-gray-600"
         }`}>
           Manage your account
         </p>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        {menuItems.map((item, index) => {
-          const isActive = pathname === item.path
-          const Icon = item.icon
+      {/* Navigation - Scrollable with all items visible */}
+      <nav className="flex-1 p-2 sm:p-3 pb-6">
+        <div className="flex flex-col space-y-1.5 sm:space-y-2">
+          {menuItems.map((item, index) => {
+            const isActive = pathname === item.path
+            const Icon = item.icon
 
-          return (
-            <Link key={item.path} href={item.path} className="block">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`relative group rounded-2xl transition-all duration-300 border-2 ${
-                  isActive
-                    ? darkMode
-                      ? "bg-zinc-800/80 shadow-xl border-transparent"
-                      : "bg-gradient-to-r from-gray-50 to-white shadow-xl border-gray-200"
-                    : darkMode
-                    ? "hover:bg-zinc-800/50 border-transparent"
-                    : "hover:bg-gray-50 border-transparent"
-                }`}
-              >
-                {/* Active indicator bar - MORE PROMINENT */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-r-full bg-gradient-to-b ${item.gradient} shadow-lg`}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                )}
-
-                {/* Glow effect for active item */}
-                {isActive && (
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${item.gradient} opacity-5`} />
-                )}
-
-                <div className="flex items-center gap-4 p-4">
-                  {/* Icon */}
-                  <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+            return (
+              <Link key={item.path} href={item.path} className="block">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`relative group rounded-xl sm:rounded-2xl transition-all duration-300 border-2 ${
                     isActive
-                      ? `bg-gradient-to-br ${item.gradient} shadow-lg shadow-${item.activeColor}-500/30`
-                      : darkMode 
-                      ? "bg-zinc-800" 
-                      : "bg-gray-100"
-                  }`}>
-                    <Icon className={`w-6 h-6 transition-colors ${
-                      isActive ? "text-white" : darkMode ? "text-zinc-400" : "text-gray-600"
+                      ? darkMode
+                        ? "bg-zinc-800/80 shadow-xl border-transparent"
+                        : "bg-gradient-to-r from-gray-50 to-white shadow-xl border-gray-200"
+                      : darkMode
+                      ? "hover:bg-zinc-800/50 border-transparent"
+                      : "hover:bg-gray-50 border-transparent"
+                  }`}
+                >
+                  {/* Active indicator bar */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-r-full bg-gradient-to-b ${item.gradient} shadow-lg`}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+
+                  {/* Glow effect for active item */}
+                  {isActive && (
+                    <div className={`absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-r ${item.gradient} opacity-5`} />
+                  )}
+
+                  <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5">
+                    {/* Icon */}
+                    <div className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
+                      isActive
+                        ? `bg-gradient-to-br ${item.gradient} shadow-lg shadow-${item.activeColor}-500/30`
+                        : darkMode 
+                        ? "bg-zinc-800" 
+                        : "bg-gray-100"
+                    }`}>
+                      <Icon className={`w-5 h-5 transition-colors ${
+                        isActive ? "text-white" : darkMode ? "text-zinc-400" : "text-gray-600"
+                      }`} />
+                      
+                      {!isActive && (
+                        <div className={`absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-20 transition-opacity`} />
+                      )}
+                    </div>
+
+                    {/* Text */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`text-sm sm:text-base font-semibold mb-0.5 transition-colors ${
+                        isActive
+                          ? darkMode ? "text-white" : "text-gray-900"
+                          : darkMode ? "text-zinc-300" : "text-gray-700"
+                      }`}>
+                        {item.name}
+                      </h3>
+                      <p className={`text-[10px] sm:text-xs truncate transition-colors ${
+                        isActive
+                          ? darkMode ? "text-zinc-400" : "text-gray-600"
+                          : darkMode ? "text-zinc-500" : "text-gray-500"
+                      }`}>
+                        {item.description}
+                      </p>
+                    </div>
+
+                    {/* Arrow */}
+                    <ChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 transition-all ${
+                      isActive
+                        ? darkMode ? "text-white translate-x-1" : "text-gray-900 translate-x-1"
+                        : darkMode ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1" : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
                     }`} />
-                    
-                    {!isActive && (
-                      <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-20 transition-opacity`} />
-                    )}
                   </div>
 
-                  {/* Text */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className={`font-semibold mb-0.5 transition-colors ${
-                      isActive
-                        ? darkMode ? "text-white" : "text-gray-900"
-                        : darkMode ? "text-zinc-300" : "text-gray-700"
-                    }`}>
-                      {item.name}
-                    </h3>
-                    <p className={`text-xs truncate transition-colors ${
-                      isActive
-                        ? darkMode ? "text-zinc-400" : "text-gray-600"
-                        : darkMode ? "text-zinc-500" : "text-gray-500"
-                    }`}>
-                      {item.description}
-                    </p>
-                  </div>
-
-                  {/* Arrow */}
-                  <ChevronRight className={`w-5 h-5 transition-all ${
-                    isActive
-                      ? darkMode ? "text-white translate-x-1" : "text-gray-900 translate-x-1"
-                      : darkMode ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1" : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
-                  }`} />
-                </div>
-
-                {/* Bottom gradient line for active */}
-                {isActive && (
-                  <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${item.gradient} opacity-30`} />
-                )}
-              </motion.div>
-            </Link>
-          )
-        })}
+                  {/* Bottom gradient line for active */}
+                  {isActive && (
+                    <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${item.gradient} opacity-30`} />
+                  )}
+                </motion.div>
+              </Link>
+            )
+          })}
+        </div>
       </nav>
     </div>
   )
@@ -207,17 +227,17 @@ function Sidebar({ darkMode }) {
   return (
     <>
       {/* Mobile Menu Button */}
-<button
-  onClick={toggleMobileMenu}
-  className={`lg:hidden fixed right-6 bottom-24 z-40 p-4 rounded-full shadow-2xl transition-all ${
-    darkMode
-      ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white"
-      : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
-  }`}
-  aria-label="Open sidebar menu"
->
-  <Menu className="w-6 h-6" strokeWidth={2.5} />
-</button>
+      <button
+        onClick={toggleMobileMenu}
+        className={`lg:hidden fixed right-4 sm:right-6 bottom-20 sm:bottom-24 z-40 p-3 sm:p-4 rounded-full shadow-2xl transition-all ${
+          darkMode
+            ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white"
+            : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
+        }`}
+        aria-label="Open sidebar menu"
+      >
+        <Menu className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
+      </button>
 
       {/* Mobile Overlay */}
       <AnimatePresence>
@@ -240,7 +260,7 @@ function Sidebar({ darkMode }) {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className={`lg:hidden fixed top-0 left-0 bottom-0 w-80 z-50 ${
+            className={`lg:hidden fixed top-0 left-0 bottom-0 w-72 sm:w-80 z-50 ${
               darkMode ? "bg-zinc-900" : "bg-white"
             } shadow-2xl`}
           >
@@ -250,11 +270,18 @@ function Sidebar({ darkMode }) {
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <aside className={`hidden lg:block sticky w-80 border-r ${
-        darkMode 
-          ? "bg-zinc-900 border-zinc-800" 
-          : "bg-white border-gray-200"
-      } shadow-xl overflow-y-auto`} style={{ top: '64px', height: 'calc(100vh - 64px)', zIndex: 20 }}>
+      <aside 
+        className={`hidden lg:block sticky w-64 xl:w-80 border-r ${
+          darkMode 
+            ? "bg-zinc-900 border-zinc-800" 
+            : "bg-white border-gray-200"
+        } shadow-xl`} 
+        style={{ 
+          top: '64px', 
+          height: 'calc(100vh - 64px)', 
+          zIndex: 20 
+        }}
+      >
         <SidebarContent onClose={closeMobileMenu} darkMode={darkMode} />
       </aside>
     </>
