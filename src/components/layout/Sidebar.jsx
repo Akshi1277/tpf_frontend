@@ -85,7 +85,7 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion = 65 }) => {
   const pathname = usePathname()
   
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col h-full overflow-y-auto scrollbar-hide">
       {/* Header */}
       <div className={`px-4 py-4 sm:px-6 sm:py-5 border-b flex-shrink-0 ${
         darkMode ? "border-zinc-800" : "border-gray-200"
