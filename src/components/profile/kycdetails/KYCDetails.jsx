@@ -30,7 +30,6 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
-    nationality: "",
     addressLine1: "",
     addressLine2: "",
     city: "",
@@ -459,23 +458,7 @@ return (
                         />
                       </div>
 
-                      <div>
-                        <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                          Nationality <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="nationality"
-                          value={formData.nationality}
-                          onChange={handleInputChange}
-                          placeholder="e.g., Indian"
-                          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                            darkMode
-                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                          }`}
-                        />
-                      </div>
+                     
 
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
@@ -561,7 +544,7 @@ return (
                     <div className="space-y-6">
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                          Address Line 1 <span className="text-red-500">*</span>
+                          Address<span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                           <MapPin className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
@@ -580,23 +563,6 @@ return (
                         </div>
                       </div>
 
-                      <div>
-                        <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                          Address Line 2 (Optional)
-                        </label>
-                        <input
-                          type="text"
-                          name="addressLine2"
-                          value={formData.addressLine2}
-                          onChange={handleInputChange}
-                          placeholder="Apartment, suite, unit number"
-                          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                            darkMode
-                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                          }`}
-                        />
-                      </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -653,23 +619,7 @@ return (
                           />
                         </div>
 
-                        <div>
-                          <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                            Country <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="country"
-                            value={formData.country}
-                            onChange={handleInputChange}
-                            placeholder="Country name"
-                            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
-                          />
-                        </div>
+                       
                       </div>
 
                       {/* Identity Document */}
