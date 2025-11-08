@@ -1,139 +1,240 @@
+import { motion } from 'framer-motion';
+import { CheckCircle2, Download, RotateCcw, Sparkles, TrendingUp, Minus, DollarSign, Calculator, Heart } from 'lucide-react';
 
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { InputField, InfoButton, Modal, MultiFieldAdder, YesNoToggle } from './SharedComponents';
 // ===== 7. RESULTS =====
-const Results = ({ results, onReset, formatCurrency }) => {
-  const pageVariants = {
-    initial: { opacity: 0, x: 50 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -50 }
-  };
-
-  const pageTransition = {
-    type: "tween",
-    ease: [0.22, 1, 0.36, 1],
-    duration: 0.5
-  };
+const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
+  // Safety check
+  if (!results) return null;
 
   return (
     <motion.div
-      key="step5"
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      transition={pageTransition}
-      className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -30 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="max-w-4xl mx-auto"
     >
+      {/* Celebration Header */}
       <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="bg-gradient-to-r from-emerald-600 to-emerald-500 p-5 sm:p-6 text-center relative overflow-hidden"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+        className={`rounded-3xl overflow-hidden shadow-2xl border-2 mb-8 ${
+          darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'
+        }`}
       >
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.2, 0.3, 0.2],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl"
-        />
-        <div className="relative">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-            Zakat Calculation Complete
-          </h2>
-          <p className="text-emerald-50 text-sm sm:text-base">Your detailed breakdown</p>
+        {/* Animated Gradient Header */}
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 p-10 text-center relative overflow-hidden">
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"
+          />
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            className="relative"
+          >
+            <CheckCircle2 className="w-20 h-20 text-white mx-auto mb-4" strokeWidth={2} />
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-3">
+              Calculation Complete
+            </h2>
+            <p className="text-emerald-50 text-lg">Your comprehensive Zakat breakdown</p>
+          </motion.div>
         </div>
-      </motion.div>
 
-      <div className="p-5 sm:p-6 md:p-8">
-        <div className="space-y-3 mb-6">
-          {[
-            { label: 'Total Assets', value: results.totalAssets, delay: 0.3 },
-            { label: 'Total Liabilities', value: results.totalLiabilities, delay: 0.4, negative: true },
-            { label: 'Net Zakatable Wealth', value: results.zakatableWealth, delay: 0.5, highlight: true },
-            { label: 'Nisab Threshold', value: results.nisab, delay: 0.6, small: true },
-            { label: 'Zakat Due (2.5%)', value: results.zakatDue, delay: 0.7, zakat: true }
-          ].map((item, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: item.delay }}
-              className={`flex justify-between items-center py-3 px-4 rounded-xl transition-all ${
-                item.highlight ? 'bg-emerald-50 border-2 border-emerald-200' :
-                item.zakat ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-300' :
-                'border-b border-gray-100'
+        {/* Breakdown Section */}
+        <div className="p-8 sm:p-10">
+          <div className="space-y-4 mb-8">
+            {[
+              { 
+                label: 'Total Assets', 
+                value: results.totalAssets || 0, 
+                delay: 0.4, 
+                icon: TrendingUp,
+                color: darkMode ? 'text-blue-400' : 'text-blue-600',
+                bgColor: darkMode ? 'bg-blue-950/30' : 'bg-blue-50'
+              },
+              { 
+                label: 'Total Liabilities', 
+                value: results.totalLiabilities || 0, 
+                delay: 0.5, 
+                negative: true,
+                icon: Minus,
+                color: 'text-red-600',
+                bgColor: darkMode ? 'bg-red-950/30' : 'bg-red-50'
+              },
+              { 
+                label: 'Net Zakatable Wealth', 
+                value: results.zakatableWealth || 0, 
+                delay: 0.6, 
+                highlight: true,
+                icon: DollarSign,
+                color: darkMode ? 'text-purple-400' : 'text-purple-600',
+                bgColor: darkMode ? 'bg-purple-950/30' : 'bg-purple-50'
+              },
+              { 
+                label: 'Nisab Threshold', 
+                value: results.nisab || 0, 
+                delay: 0.7, 
+                small: true,
+                icon: Calculator,
+                color: darkMode ? 'text-zinc-400' : 'text-gray-600',
+                bgColor: darkMode ? 'bg-zinc-800/30' : 'bg-gray-50'
+              },
+              { 
+                label: 'Zakat Due (2.5%)', 
+                value: results.zakatDue || 0, 
+                delay: 0.8, 
+                zakat: true,
+                icon: Sparkles,
+                color: darkMode ? 'text-emerald-400' : 'text-emerald-600',
+                bgColor: darkMode ? 'bg-emerald-950/30' : 'bg-emerald-50'
+              }
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: item.delay }}
+                  className={`flex justify-between items-center py-5 px-6 rounded-xl border-2 transition-all ${
+                    item.zakat 
+                      ? darkMode
+                        ? 'bg-gradient-to-r from-emerald-950/50 to-teal-950/30 border-emerald-600/50 shadow-lg'
+                        : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-300 shadow-md'
+                      : item.highlight
+                      ? darkMode
+                        ? 'border-purple-600/50 ' + item.bgColor
+                        : 'border-purple-200 ' + item.bgColor
+                      : darkMode
+                      ? 'border-zinc-700 ' + item.bgColor
+                      : 'border-gray-200 ' + item.bgColor
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-2.5 rounded-lg ${
+                      item.zakat
+                        ? darkMode ? 'bg-emerald-500/20' : 'bg-emerald-100'
+                        : darkMode ? 'bg-zinc-800' : 'bg-white'
+                    }`}>
+                      <Icon className={`w-5 h-5 ${item.color}`} />
+                    </div>
+                    <span className={`font-semibold text-base sm:text-lg ${
+                      darkMode ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {item.label}
+                    </span>
+                  </div>
+                  <span className={`font-bold text-xl sm:text-2xl ${item.color}`}>
+                    {item.negative && '−'}{formatCurrency(Math.abs(item.value))}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Eligibility Message */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className={`rounded-xl p-6 mb-8 text-center border-2 ${
+              results.isEligible 
+                ? darkMode
+                  ? 'bg-emerald-950/30 border-emerald-600/50'
+                  : 'bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-300'
+                : darkMode
+                ? 'bg-blue-950/30 border-blue-600/50'
+                : 'bg-blue-50 border-blue-200'
+            }`}>
+           
+            <h3 className={`text-xl font-bold mb-3 ${
+              results.isEligible 
+                ? darkMode ? 'text-emerald-300' : 'text-emerald-900'
+                : darkMode ? 'text-blue-300' : 'text-blue-900'
+            }`}>
+              {results.isEligible ? 'Zakat is Due' : 'Zakat Not Required'}
+            </h3>
+            <p className={`text-sm sm:text-base leading-relaxed ${
+              results.isEligible 
+                ? darkMode ? 'text-emerald-200/90' : 'text-emerald-900/90'
+                : darkMode ? 'text-blue-200/90' : 'text-blue-900/90'
+            }`}>
+              {results.isEligible 
+                ? "Your wealth exceeds the Nisab threshold. Zakat is obligatory if you have maintained this wealth for one complete lunar year."
+                : "Your wealth is below the Nisab threshold. While Zakat is not obligatory at this time, voluntary charity (Sadaqah) is always encouraged and rewarded."}
+            </p>
+          </motion.div>
+
+          {/* Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1 }}
+            className="flex flex-col sm:flex-row gap-4"
+          >
+            <button 
+              className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center gap-2 ${
+                darkMode
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-900/30'
+                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-300/50'
               }`}
             >
-              <span className={`font-semibold text-sm sm:text-base ${
-                item.small ? 'text-gray-600' : 'text-gray-800'
-              }`}>
-                {item.label}
-              </span>
-              <span className={`font-bold text-lg sm:text-xl ${
-                item.zakat ? 'text-emerald-700' :
-                item.highlight ? 'text-emerald-600' :
-                item.negative ? 'text-red-600' :
-                'text-gray-900'
-              }`}>
-                {item.negative && '−'}{formatCurrency(Math.abs(item.value))}
-              </span>
-            </motion.div>
-          ))}
-        </div>
+              <Download className="w-5 h-5" />
+              Download Summary
+            </button>
+            <button
+              onClick={onReset}
+              className={`flex-1 py-4 px-6 rounded-xl font-semibold transition-all border-2 flex items-center justify-center gap-2 ${
+                darkMode
+                  ? 'bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700'
+                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <RotateCcw className="w-5 h-5" />
+              New Calculation
+            </button>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className={`rounded-xl p-5 mb-5 text-center ${
-            results.isEligible 
-              ? 'bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200'
-              : 'bg-blue-50 border-2 border-blue-200'
-          }`}
-        >
-          <p className={`text-sm sm:text-base font-medium leading-relaxed ${
-            results.isEligible ? 'text-emerald-900' : 'text-blue-900'
-          }`}>
-            {results.isEligible 
-              ? "Your wealth exceeds the Nisab threshold. Zakat is obligatory if you have held this wealth for one lunar year."
-              : "Your wealth is below the Nisab threshold. Zakat is not obligatory at this time, though voluntary charity (Sadaqah) is always encouraged."}
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <button className="flex-1 py-4 text-sm sm:text-base bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all">
-            Save Calculation
-          </button>
-          <button
-            onClick={onReset}
-            className="flex-1 py-4 text-sm sm:text-base bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all"
+          {/* Blessing Message */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className={`mt-8 text-center p-6 rounded-xl border ${
+              darkMode
+                ? 'bg-zinc-800/30 border-zinc-700'
+                : 'bg-gray-50 border-gray-200'
+            }`}
           >
-            Start New Calculation
-          </button>
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="text-center text-sm text-gray-600 italic mt-5 leading-relaxed"
-        >
-          May your contribution bring blessings to you and those in need.
-        </motion.p>
-      </div>
+            <Heart className={`w-6 h-6 mx-auto mb-3 ${
+              darkMode ? 'text-emerald-400' : 'text-emerald-600'
+            }`} />
+            <p className={`text-sm leading-relaxed italic ${
+              darkMode ? 'text-zinc-400' : 'text-gray-600'
+            }`}>
+              May your contribution purify your wealth and bring blessings to you and those in need.
+              <br />
+              <span className="font-semibold mt-2 block not-italic">
+                "The example of those who spend their wealth in the way of Allah is like a seed of grain that sprouts seven ears; in every ear there are a hundred grains."
+              </span>
+              <span className={`text-xs mt-1 block ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                — Quran 2:261
+              </span>
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 };

@@ -1,6 +1,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 // Multi-field Adder Component
 const MultiFieldAdder = ({ fields, setFields, fieldLabels, placeholder = "Add item" }) => {
   const addField = () => {
@@ -64,7 +65,8 @@ const MultiFieldAdder = ({ fields, setFields, fieldLabels, placeholder = "Add it
 };
 
 // Modal Component
-const Modal = ({ isOpen, onClose, title, children }) => {
+// Modal Component
+const Modal = ({ isOpen, onClose, title, children, darkMode = false }) => {
   if (!isOpen) return null;
 
   return (
@@ -73,30 +75,41 @@ const Modal = ({ isOpen, onClose, title, children }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 shadow-2xl backdrop-blur bg-opacity-200"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+          className={`rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl border-2 ${
+            darkMode 
+              ? 'bg-zinc-900 border-zinc-700 shadow-black/50' 
+              : 'bg-white border-gray-200 shadow-gray-400/30'
+          }`}
         >
-          <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-emerald-500 p-6 rounded-t-2xl">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl sm:text-2xl font-bold text-white">{title}</h3>
+          {/* Header */}
+          <div className="sticky top-0 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 p-6 shadow-lg">
+            <div className="flex justify-between items-start gap-4">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-1">{title}</h3>
+                <div className="h-1 w-20 bg-white/30 rounded-full" />
+              </div>
               <button
                 onClick={onClose}
-                className="text-white hover:text-emerald-100 transition-colors"
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all backdrop-blur-sm hover:scale-110 active:scale-95"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
-          <div className="p-6 sm:p-8">
+
+          {/* Content */}
+          <div className={`p-6 sm:p-8 overflow-y-auto max-h-[calc(85vh-88px)] ${
+            darkMode ? 'bg-zinc-900' : 'bg-white'
+          }`}>
             {children}
           </div>
         </motion.div>
