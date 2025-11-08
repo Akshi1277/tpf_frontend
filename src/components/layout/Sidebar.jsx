@@ -78,7 +78,7 @@ const menuItems = [
 ]
 
 // Memoized sidebar content component
-const SidebarContent = memo(({ onClose, darkMode }) => {
+const SidebarContent = memo(({ onClose, darkMode, profileCompletion = 65 }) => {
   const pathname = usePathname()
   
   return (
@@ -104,11 +104,49 @@ const SidebarContent = memo(({ onClose, darkMode }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className={`text-xs sm:text-sm ${
-          darkMode ? "text-zinc-400" : "text-gray-600"
-        }`}>
-          Manage your account
-        </p>
+        
+        {/* Profile Completion Indicator */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className={`text-xs sm:text-sm font-medium ${
+              darkMode ? "text-zinc-300" : "text-gray-700"
+            }`}>
+              Profile Completion
+            </span>
+            <span className={`text-xs sm:text-sm font-bold ${
+              profileCompletion === 100
+                ? "text-emerald-500"
+                : darkMode ? "text-zinc-400" : "text-gray-600"
+            }`}>
+              {profileCompletion}%
+            </span>
+          </div>
+          <div className={`w-full h-2 rounded-full overflow-hidden ${
+            darkMode ? "bg-zinc-800" : "bg-gray-200"
+          }`}>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${profileCompletion}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className={`h-full rounded-full ${
+                profileCompletion === 100
+                  ? "bg-gradient-to-r from-emerald-500 to-teal-500"
+                  : profileCompletion >= 75
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-500"
+                  : profileCompletion >= 50
+                  ? "bg-gradient-to-r from-orange-500 to-amber-500"
+                  : "bg-gradient-to-r from-red-500 to-rose-500"
+              }`}
+            />
+          </div>
+          {profileCompletion < 100 && (
+            <p className={`text-[10px] sm:text-xs mt-1.5 ${
+              darkMode ? "text-zinc-500" : "text-gray-500"
+            }`}>
+              Complete your profile to unlock all features
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Navigation - Scrollable with all items visible */}
@@ -206,6 +244,8 @@ const SidebarContent = memo(({ onClose, darkMode }) => {
   )
 })
 
+SidebarContent.displayName = 'SidebarContent'
+
 function Sidebar({ darkMode }) {
   const pathname = usePathname()
   const [isMobileOpen, setIsMobileOpen] = useState(false)
@@ -273,7 +313,7 @@ function Sidebar({ darkMode }) {
               darkMode ? "bg-zinc-900" : "bg-white"
             } shadow-2xl`}
           >
-            <SidebarContent onClose={closeMobileMenu} darkMode={darkMode} />
+            <SidebarContent onClose={closeMobileMenu} darkMode={darkMode} profileCompletion={65} />
           </motion.aside>
         )}
       </AnimatePresence>
@@ -291,7 +331,7 @@ function Sidebar({ darkMode }) {
           zIndex: 20 
         }}
       >
-        <SidebarContent onClose={closeMobileMenu} darkMode={darkMode} />
+        <SidebarContent onClose={closeMobileMenu} darkMode={darkMode} profileCompletion={65} />
       </aside>
     </>
   )
