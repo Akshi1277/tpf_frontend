@@ -36,9 +36,12 @@ const menuItems = [
   },
   {
     name: "KYC Details",
-    path: "/profile/kycdetails",
+    path: "/profile/kyc-details",
     icon: FileCheck,
-    gradient: "from-purple-500 to-pink-600",
+   gradient: "from-blue-400 via-cyan-500 to-teal-400",
+
+
+
     activeColor: "purple",
     description: "Verify your identity"
   },
