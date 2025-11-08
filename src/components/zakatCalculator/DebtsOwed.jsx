@@ -12,21 +12,16 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="max-w-4xl mx-auto"
     >
-      {/* <div className="mb-10">
+      {/* Elegant Header */}
+      <div className="mb-10">
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
           className="flex items-center gap-3 mb-4"
         >
-          <div className={`h-1 w-12 rounded-full ${
-            darkMode ? 'bg-gradient-to-r from-emerald-500 to-teal-500' : 'bg-gradient-to-r from-emerald-600 to-teal-600'
-          }`} />
-          <span className={`text-sm font-semibold tracking-wider uppercase ${
-            darkMode ? 'text-emerald-400' : 'text-emerald-600'
-          }`}>
-            Step 2 of 4
-          </span>
+        
+        
         </motion.div>
         <h2 className={`text-4xl sm:text-5xl font-bold mb-3 ${
           darkMode ? 'text-white' : 'text-gray-900'
@@ -38,7 +33,7 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
         }`}>
           Money owed to you by others
         </p>
-      </div> */}
+      </div>
 
       <div className="space-y-8">
         {/* Main Question Card */}

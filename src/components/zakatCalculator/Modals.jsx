@@ -434,7 +434,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
             ].map((expense, idx) => (
               <div
                 key={idx}
-                className={`p-5 rounded-xl border ${
+                className={`p-2 rounded-xl border ${
                   darkMode
                     ? 'bg-zinc-800/50 border-zinc-700 hover:bg-zinc-800 transition-colors'
                     : 'bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors'
