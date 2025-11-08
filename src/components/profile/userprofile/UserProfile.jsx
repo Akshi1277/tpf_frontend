@@ -29,8 +29,8 @@ export default function ProfilePage({ darkModeFromParent}) {
   const [showSuccess, setShowSuccess] = useState(false)
   const [profileData, setProfileData] = useState({
     profilePicture: null,
-    fullName: "Rajesh Kumar",
-    email: "rajesh.kumar@example.com",
+    fullName: "Ahmed Khan",
+    email: "ahmed.khan@example.com",
     mobile: "+91 9876543210",
     address: "123, MG Road, Bangalore, Karnataka - 560001",
     bloodGroup: "O+",
