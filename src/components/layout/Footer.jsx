@@ -55,10 +55,10 @@ export default function Footer({ darkMode }) {
   return (
     <footer className={`py-12 border-t ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           
           {/* Logo and Tagline */}
-          <div className="md:col-span-1">
+          <div className="md:col-span-1"> 
             <img
               src={darkMode ? "/TPFAid-Logo1.png" : "/TPFAid-Logo.png"}
               alt="TPF Aid Logo"
@@ -141,6 +141,34 @@ export default function Footer({ darkMode }) {
               ))}
             </ul>
           </div>
+
+          {/* 4️⃣ Policies Section */}
+<div>
+  <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
+    Policies
+  </div>
+  <ul className="space-y-1.5 text-sm">
+    {[
+      { name: 'Privacy Policy', path: '/privacy-policy' },
+      { name: 'Terms & Conditions', path: '/terms' },
+      { name: 'Use of Cookies', path: '/cookies' },
+      { name: 'Legal', path: '/legal' },
+    ].map(link => (
+      <li key={link.name}>
+        <a
+          href={link.path}
+          className={`${darkMode
+            ? 'text-zinc-400 hover:text-white'
+            : 'text-gray-600 hover:text-gray-900'
+          } transition-colors`}
+        >
+          {link.name}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
         </div>
 
         {/* Islamic Calendar */}
