@@ -1,14 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Menu, X, Moon, Sun } from 'lucide-react';
 import { Plus, Heart, Leaf } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
+
+  useEffect(() => {
+  const savedMode = localStorage.getItem('darkMode')
+  if (savedMode !== null) {
+    setDarkMode(savedMode === 'true')
+  }
+}, [setDarkMode])
+
+useEffect(() => {
+  localStorage.setItem('darkMode', darkMode)
+  window.dispatchEvent(new Event('darkModeChanged'))
+}, [darkMode])
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const router = useRouter();
-
+  
   return (
     <>
 
