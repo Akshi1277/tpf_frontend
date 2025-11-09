@@ -1,10 +1,11 @@
 // components/home/HeroSection.jsx
 import { useState, useEffect } from 'react';
 import { heroImages } from '@/lib/constants';
+import { useRouter } from 'next/navigation';
 
 export default function HeroSection({ darkMode }) {
   const [currentHeroImage, setCurrentHeroImage] = useState(0);
-
+  const router = useRouter();
   // useEffect(() => {
   //   const interval = setInterval(() => {
   //     setCurrentHeroImage(prev => (prev + 1) % heroImages.length);
@@ -46,10 +47,14 @@ export default function HeroSection({ darkMode }) {
               
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-4">
-                <button className="w-full cursor-pointer sm:w-auto px-6 md:px-8 lg:px-10 py-3 md:py-3.5 lg:py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg lg:text-xl transition-colors shadow-lg">
+                <button 
+                onClick={()=> router.push('/#campaigns')}
+                className="w-full cursor-pointer sm:w-auto px-6 md:px-8 lg:px-10 py-3 md:py-3.5 lg:py-4 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-base md:text-lg lg:text-xl transition-colors shadow-lg">
                   Start Giving
                 </button>
-                <button className={`w-full cursor-pointer sm:w-auto px-6 md:px-8 lg:px-10 py-3 md:py-3.5 lg:py-4 rounded-lg font-semibold text-base md:text-lg lg:text-xl transition-colors border-2
+                <button 
+                onClick={() => router.push('/about')}
+                className={`w-full cursor-pointer sm:w-auto px-6 md:px-8 lg:px-10 py-3 md:py-3.5 lg:py-4 rounded-lg font-semibold text-base md:text-lg lg:text-xl transition-colors border-2
                   ${darkMode 
                     ? 'border-white text-white hover:bg-white/10' 
                     : 'border-white text-white hover:bg-white/20'
