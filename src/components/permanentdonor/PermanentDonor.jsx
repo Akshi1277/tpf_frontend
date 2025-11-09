@@ -241,7 +241,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex items-center justify-center gap-3 mb-6 mt-15 md:mt-0">
             <motion.div 
               animate={{ scaleX: [0, 1] }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -297,119 +297,174 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
           </div>
         </motion.div>
 
-        {/* Card Deck - Fanned Out */}
-        <div className="relative h-[600px] flex items-center justify-center mb-16">
-          <div className="relative w-full max-w-5xl h-[500px]">
-            {donationPlans.map((plan, index) => {
-              const Icon = plan.icon
-              const isSelected = selectedCard?.id === plan.id
-              const isHovered = hoveredCard === plan.id
-              const othersSelected = selectedCard && selectedCard.id !== plan.id
+      {/* Card Deck - Fanned Out (Desktop) / Stacked (Mobile) */}
+<div className="relative mb-16">
+  {/* Desktop Fanned Layout */}
+  <div className="hidden md:flex md:items-center md:justify-center md:h-[600px]">
+    <div className="relative w-full max-w-5xl h-[500px]">
+      {donationPlans.map((plan, index) => {
+        const Icon = plan.icon
+        const isSelected = selectedCard?.id === plan.id
+        const isHovered = hoveredCard === plan.id
+        const othersSelected = selectedCard && selectedCard.id !== plan.id
 
-              return (
-               <motion.div
-  key={plan.id}
-  initial={{ 
-    x: plan.translateX,
-    y: 0,
-    rotate: plan.rotation,
-    scale: 0.9,
-    opacity: 0
-  }}
-  animate={{
-    x: isSelected ? 0 : othersSelected ? (index < 2 ? -500 : 500) : plan.translateX,
-    y: isSelected ? 0 : othersSelected ? 150 : 0,
-    rotate: isSelected ? 0 : othersSelected ? plan.rotation * 2 : isHovered ? plan.rotation * 0.5 : plan.rotation,
-    scale: isSelected ? 1 : othersSelected ? 0.6 : isHovered ? 0.95 : 0.88,
-    opacity: isSelected ? 1 : othersSelected ? 0.2 : 1,
-    zIndex: isSelected ? 50 : isHovered ? 40 : plan.zIndex
-  }}
-  transition={{
-    type: "spring",
-    stiffness: 300,
-    damping: 30,
-    delay: isSelected ? 0 : index * 0.1
-  }}
-  onMouseEnter={() => !selectedCard && setHoveredCard(plan.id)}
-  onMouseLeave={() => setHoveredCard(null)}
-  onClick={() => !selectedCard && handleCardClick(plan)}
-  className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] cursor-pointer ${
-    othersSelected ? 'pointer-events-none blur-sm' : ''
-  }`}
-  style={{
-    transformOrigin: 'center bottom'
-  }}
->
-                  {/* Card */}
-                  <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
-                    darkMode 
-                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
-                      : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
-                  } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'}`}>
-                    
-                    {/* Gradient Overlay */}
-                    <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
+        return (
+          <motion.div
+            key={plan.id}
+            initial={{ 
+              x: plan.translateX,
+              y: 0,
+              rotate: plan.rotation,
+              scale: 0.9,
+              opacity: 0
+            }}
+            animate={{
+              x: isSelected ? 0 : othersSelected ? (index < 2 ? -500 : 500) : plan.translateX,
+              y: isSelected ? 0 : othersSelected ? 150 : 0,
+              rotate: isSelected ? 0 : othersSelected ? plan.rotation * 2 : isHovered ? plan.rotation * 0.5 : plan.rotation,
+              scale: isSelected ? 1 : othersSelected ? 0.6 : isHovered ? 0.95 : 0.88,
+              opacity: isSelected ? 1 : othersSelected ? 0.2 : 1,
+              zIndex: isSelected ? 50 : isHovered ? 40 : plan.zIndex
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+              delay: isSelected ? 0 : index * 0.1
+            }}
+            onMouseEnter={() => !selectedCard && setHoveredCard(plan.id)}
+            onMouseLeave={() => setHoveredCard(null)}
+            onClick={() => !selectedCard && handleCardClick(plan)}
+            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] cursor-pointer ${
+              othersSelected ? 'pointer-events-none blur-sm' : ''
+            }`}
+            style={{
+              transformOrigin: 'center bottom'
+            }}
+          >
+            {/* Keep all your existing card JSX here - don't change anything */}
+            <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
+              darkMode 
+                ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
+                : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
+            } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'}`}>
+              
+              <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
 
-                    {/* Badge */}
-                    <div className="absolute top-4 right-4 z-10">
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
-                        darkMode
-                          ? "bg-zinc-900/80 text-white"
-                          : "bg-white/80 text-gray-900"
-                      }`}>
-                        {plan.badge}
-                      </div>
-                    </div>
+              <div className="absolute top-4 right-4 z-10">
+                <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                  darkMode
+                    ? "bg-zinc-900/80 text-white"
+                    : "bg-white/80 text-gray-900"
+                }`}>
+                  {plan.badge}
+                </div>
+              </div>
 
-                    <div className="relative p-8">
-                      {/* Icon */}
-                      <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)}`}>
-                        <Icon className="w-10 h-10 text-white" strokeWidth={2} />
-                      </div>
-                      
-                      {/* Title */}
-                      <h3 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {plan.title}
-                      </h3>
-                      
-                      <p className={`text-sm font-semibold mb-4 ${plan.color.text(darkMode)}`}>
-                        {plan.subtitle}
-                      </p>
+              <div className="relative p-8">
+                <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)}`}>
+                  <Icon className="w-10 h-10 text-white" strokeWidth={2} />
+                </div>
+                
+                <h3 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                  {plan.title}
+                </h3>
+                
+                <p className={`text-sm font-semibold mb-4 ${plan.color.text(darkMode)}`}>
+                  {plan.subtitle}
+                </p>
 
-                      {/* Price */}
-                      <div className="flex items-end gap-2 mb-6">
-                        <span className={`text-5xl font-bold bg-gradient-to-r ${plan.color.gradient(darkMode)} bg-clip-text text-transparent`}>
-                          {plan.minAmount}
-                        </span>
-                        <span className={`text-lg font-semibold mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                          {plan.period}
-                        </span>
-                      </div>
+                <div className="flex items-end gap-2 mb-6">
+                  <span className={`text-5xl font-bold bg-gradient-to-r ${plan.color.gradient(darkMode)} bg-clip-text text-transparent`}>
+                    {plan.minAmount}
+                  </span>
+                  <span className={`text-lg font-semibold mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    {plan.period}
+                  </span>
+                </div>
 
-                      {/* Description */}
-                      <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                        {plan.description}
-                      </p>
+                <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                  {plan.description}
+                </p>
 
-                      {/* Tap to explore indicator */}
-                      {!isSelected && (
-                        <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
-                          <motion.div
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ repeat: Infinity, duration: 2 }}
-                          >
-                            Click to explore
-                          </motion.div>
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
-                      )}
-                    </div>
+                {!isSelected && (
+                  <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                    >
+                      Click to explore
+                    </motion.div>
+                    <ArrowRight className="w-4 h-4" />
                   </div>
-                </motion.div>
-              )
-            })}
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )
+      })}
+    </div>
+  </div>
+
+  {/* Mobile Stacked Layout */}
+  <div className="block md:hidden space-y-6">
+    {donationPlans.map((plan, index) => {
+      const Icon = plan.icon
+      
+      return (
+        <motion.div
+          key={plan.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          onClick={() => handleCardClick(plan)}
+          className="cursor-pointer"
+        >
+          <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
+            darkMode 
+              ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
+              : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
+          } shadow-2xl active:scale-[0.98]`}>
+            <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
+            <div className="absolute top-4 right-4 z-10">
+              <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                darkMode ? "bg-zinc-900/80 text-white" : "bg-white/80 text-gray-900"
+              }`}>
+                {plan.badge}
+              </div>
+            </div>
+            <div className="relative p-8">
+              <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)}`}>
+                <Icon className="w-10 h-10 text-white" strokeWidth={2} />
+              </div>
+              <h3 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                {plan.title}
+              </h3>
+              <p className={`text-sm font-semibold mb-4 ${plan.color.text(darkMode)}`}>
+                {plan.subtitle}
+              </p>
+              <div className="flex items-end gap-2 mb-6">
+                <span className={`text-5xl font-bold bg-gradient-to-r ${plan.color.gradient(darkMode)} bg-clip-text text-transparent`}>
+                  {plan.minAmount}
+                </span>
+                <span className={`text-lg font-semibold mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                  {plan.period}
+                </span>
+              </div>
+              <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                {plan.description}
+              </p>
+              <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
+                <span>Tap to explore</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
+      )
+    })}
+  </div>
+</div>
 
         {/* Expanded Card Details Modal */}
         <AnimatePresence>
@@ -418,7 +473,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
   initial={{ opacity: 0 }}
   animate={{ opacity: 1 }}
   exit={{ opacity: 0 }}
-  className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 pt-20"
+  className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 pt-44 md:pt-20"
   onClick={handleClose}
 >
 <motion.div
