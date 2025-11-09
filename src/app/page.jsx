@@ -78,16 +78,45 @@ export default function Page() {
 
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
       
-      <HeroSection darkMode={darkMode} />
-      <ImpactStatsBar darkMode={darkMode} totalRaised={totalRaised} />
-      <StoriesSection darkMode={darkMode} />
-      <CampaignsSection darkMode={darkMode} />
-      <CuratedSection darkMode={darkMode} />
-      <ImpactBanner darkMode={darkMode} />
-      <CommunitiesSection darkMode={darkMode} />
-      <PartnersSection darkMode={darkMode} />
-      <PulseSection darkMode={darkMode} totalRaised={totalRaised} />
-      <StartFundraiserBanner darkMode={darkMode} />
+    <section id="hero">
+  <HeroSection darkMode={darkMode} />
+</section>
+
+<section id="impact-stats">
+  <ImpactStatsBar darkMode={darkMode} totalRaised={totalRaised} />
+</section>
+
+<section id="stories">
+  <StoriesSection darkMode={darkMode} />
+</section>
+
+<section id="campaigns">
+  <CampaignsSection darkMode={darkMode} />
+</section>
+
+<section id="curated">
+  <CuratedSection darkMode={darkMode} />
+</section>
+
+<section id="impact-banner">
+  <ImpactBanner darkMode={darkMode} />
+</section>
+
+<section id="communities">
+  <CommunitiesSection darkMode={darkMode} />
+</section>
+
+<section id="partners">
+  <PartnersSection darkMode={darkMode} />
+</section>
+
+<section id="pulse">
+  <PulseSection darkMode={darkMode} totalRaised={totalRaised} />
+</section>
+
+<section id="fundraiser-banner">
+  <StartFundraiserBanner darkMode={darkMode} />
+</section>
       
       <Footer darkMode={darkMode} />
       <ScrollToTop scrolled={scrolled} />
