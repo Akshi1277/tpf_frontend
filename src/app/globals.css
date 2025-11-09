@@ -198,6 +198,17 @@ body, html {
   display: none;
 }
 
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
 @keyframes gradient-xy {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
