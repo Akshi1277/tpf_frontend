@@ -23,8 +23,7 @@ const page = () => {
          <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
         
-        <ContactPage darkMode={darkMode} />
-
+          <ContactPage darkMode={darkMode} />
           <Footer darkMode={darkMode} />
         </div>
     </div>
