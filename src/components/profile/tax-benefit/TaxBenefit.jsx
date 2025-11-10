@@ -13,7 +13,10 @@ import {
   Filter,
   Search,
   Receipt,
-  TrendingUp
+  TrendingUp,
+  ChevronDown,
+  ChevronUp,
+  FileCheck
 } from "lucide-react"
 
 export default function TaxBenefitPage({ darkModeFromParent }) {
@@ -21,6 +24,9 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
   const [showDownloadSuccess, setShowDownloadSuccess] = useState(false)
+  const [showGenerateSuccess, setShowGenerateSuccess] = useState(false)
+  const [activeTab, setActiveTab] = useState("donations") // "donations" or "receipts"
+  const [expandedReceipt, setExpandedReceipt] = useState(null)
 
   // Sync with parent dark mode
   useEffect(() => {
@@ -29,67 +35,114 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
-  // Mock data - replace with actual API data
-  const [taxBenefits] = useState([
+  // Mock data for donations eligible for 80G
+  const [donations, setDonations] = useState([
     {
-      id: "TB001",
+      id: "DON001",
       campaignName: "Education for Underprivileged Children",
-      campaignId: "CAMP2024001",
+      transactionId: "TXN2024001",
       donationAmount: 5000,
       donationDate: "2024-10-15",
-      status: "approved",
-      receiptNumber: "REC-2024-001",
-      financialYear: "2024-25"
+      financialYear: "2024-25",
+      receiptGenerated: false
     },
     {
-      id: "TB002",
+      id: "DON002",
       campaignName: "Medical Aid for Cancer Patients",
-      campaignId: "CAMP2024002",
+      transactionId: "TXN2024002",
       donationAmount: 10000,
       donationDate: "2024-09-20",
-      status: "approved",
-      receiptNumber: "REC-2024-002",
-      financialYear: "2024-25"
+      financialYear: "2024-25",
+      receiptGenerated: false
     },
     {
-      id: "TB003",
+      id: "DON003",
       campaignName: "Clean Water Initiative",
-      campaignId: "CAMP2024003",
+      transactionId: "TXN2024003",
       donationAmount: 3000,
       donationDate: "2024-11-05",
-      status: "pending",
-      receiptNumber: null,
-      financialYear: "2024-25"
+      financialYear: "2024-25",
+      receiptGenerated: false
     },
     {
-      id: "TB004",
+      id: "DON004",
       campaignName: "Disaster Relief Fund",
-      campaignId: "CAMP2024004",
+      transactionId: "TXN2024004",
       donationAmount: 7500,
       donationDate: "2024-08-12",
-      status: "approved",
-      receiptNumber: "REC-2024-003",
-      financialYear: "2024-25"
+      financialYear: "2024-25",
+      receiptGenerated: true
     }
   ])
 
-  const handleDownloadReceipt = (benefit) => {
-    // Add your download logic here
-    console.log("Downloading receipt for:", benefit)
+  // Mock data for generated receipts
+  const [receipts, setReceipts] = useState([
+    {
+      id: "REC001",
+      receiptNumber: "REC-2024-001",
+      generatedDate: "2024-08-15",
+      financialYear: "2024-25",
+      totalAmount: 7500,
+      donationCount: 1,
+      status: "approved"
+    }
+  ])
+
+  const handleGenerateReceipt = () => {
+    // Get all donations that don't have receipts yet
+    const pendingDonations = donations.filter(d => !d.receiptGenerated)
+    
+    if (pendingDonations.length === 0) return
+
+    // Calculate total amount from all pending donations
+    const totalAmount = pendingDonations.reduce((sum, d) => sum + d.donationAmount, 0)
+
+    // Generate a new receipt for all pending donations
+    const newReceipt = {
+      id: `REC${String(receipts.length + 1).padStart(3, '0')}`,
+      receiptNumber: `REC-2024-${String(receipts.length + 1).padStart(3, '0')}`,
+      generatedDate: new Date().toISOString().split('T')[0],
+      financialYear: pendingDonations[0].financialYear,
+      totalAmount: totalAmount,
+      donationCount: pendingDonations.length,
+      status: "approved"
+    }
+
+    // Add to receipts
+    setReceipts([newReceipt, ...receipts])
+
+    // Mark all donations as receipt generated
+    setDonations(donations.map(d => ({ ...d, receiptGenerated: true })))
+
+    // Show success message
+    setShowGenerateSuccess(true)
+    setTimeout(() => setShowGenerateSuccess(false), 3000)
+
+    // Switch to receipts tab after a short delay
+    setTimeout(() => setActiveTab("receipts"), 1000)
+  }
+
+  const handleDownloadReceipt = (receipt) => {
+    console.log("Downloading receipt for:", receipt)
     setShowDownloadSuccess(true)
     setTimeout(() => setShowDownloadSuccess(false), 3000)
   }
 
-  const filteredBenefits = taxBenefits.filter(benefit => {
-    const matchesSearch = benefit.campaignName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         benefit.campaignId.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFilter = filterStatus === "all" || benefit.status === filterStatus
+  const filteredDonations = donations.filter(donation => {
+    const matchesSearch = donation.campaignName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         donation.transactionId.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesSearch && !donation.receiptGenerated
+  })
+
+  const filteredReceipts = receipts.filter(receipt => {
+    const matchesSearch = receipt.receiptNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesFilter = filterStatus === "all" || receipt.status === filterStatus
     return matchesSearch && matchesFilter
   })
 
-  const totalDonations = taxBenefits.reduce((sum, b) => sum + b.donationAmount, 0)
-  const approvedDonations = taxBenefits.filter(b => b.status === "approved").reduce((sum, b) => sum + b.donationAmount, 0)
-  const pendingCount = taxBenefits.filter(b => b.status === "pending").length
+  const totalDonations = donations.reduce((sum, d) => sum + d.donationAmount, 0)
+  const totalReceipts = receipts.length
+  const pendingDonations = donations.filter(d => !d.receiptGenerated).length
 
   const getStatusConfig = (status) => {
     switch(status) {
@@ -109,21 +162,13 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
           bgColor: darkMode ? "bg-yellow-950/30" : "bg-yellow-50",
           borderColor: darkMode ? "border-yellow-600/50" : "border-yellow-200"
         }
-      case "rejected":
-        return {
-          icon: XCircle,
-          text: "Rejected",
-          color: darkMode ? "text-red-400" : "text-red-600",
-          bgColor: darkMode ? "bg-red-950/30" : "bg-red-50",
-          borderColor: darkMode ? "border-red-600/50" : "border-red-200"
-        }
       default:
         return {
           icon: Clock,
-          text: "Unknown",
-          color: darkMode ? "text-zinc-400" : "text-gray-600",
-          bgColor: darkMode ? "bg-zinc-800/30" : "bg-gray-50",
-          borderColor: darkMode ? "border-zinc-700" : "border-gray-200"
+          text: "Eligible",
+          color: darkMode ? "text-blue-400" : "text-blue-600",
+          bgColor: darkMode ? "bg-blue-950/30" : "bg-blue-50",
+          borderColor: darkMode ? "border-blue-600/50" : "border-blue-200"
         }
     }
   }
@@ -156,6 +201,31 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
             </div>
           </motion.div>
         )}
+
+        {showGenerateSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl flex items-center gap-3 ${
+              darkMode
+                ? "bg-zinc-900 border border-emerald-500/20"
+                : "bg-white border border-emerald-200"
+            }`}
+          >
+            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
+              <FileCheck className="w-5 h-5 text-white" strokeWidth={3} />
+            </div>
+            <div>
+              <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                Receipt Generated!
+              </p>
+              <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                Check the My Receipts tab
+              </p>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Background Effects */}
@@ -178,19 +248,15 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
           transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <div className="flex items-center gap-3 mb-4">
-            
-           
-          </div>
           <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-3 ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
-            Your Tax Receipts
+            Tax Benefits
           </h1>
           <p className={`text-base sm:text-lg ${
             darkMode ? 'text-zinc-400' : 'text-gray-600'
           }`}>
-            Download receipts for your charitable donations under Section 80G
+            Manage your 80G eligible donations and tax receipts
           </p>
         </motion.div>
 
@@ -229,14 +295,14 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
             <div className="flex items-start justify-between">
               <div>
                 <p className={`text-sm font-medium mb-2 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                  Approved for Tax Benefit
+                  Receipts Generated
                 </p>
                 <p className={`text-2xl sm:text-3xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                  ₹{approvedDonations.toLocaleString('en-IN')}
+                  {totalReceipts}
                 </p>
               </div>
               <div className={`p-3 rounded-xl ${darkMode ? "bg-teal-500/20" : "bg-teal-100"}`}>
-                <TrendingUp className={`w-6 h-6 ${darkMode ? "text-teal-400" : "text-teal-600"}`} />
+                <Receipt className={`w-6 h-6 ${darkMode ? "text-teal-400" : "text-teal-600"}`} />
               </div>
             </div>
           </div>
@@ -246,27 +312,66 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
               ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800" 
               : "bg-white backdrop-blur-xl border-gray-200 shadow-lg"
           }`}>
-            <div className="flex items-start justify-between">
+            {/* <div className="flex items-start justify-between">
               <div>
                 <p className={`text-sm font-medium mb-2 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                  Pending Requests
+                  Pending Receipts
                 </p>
                 <p className={`text-2xl sm:text-3xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                  {pendingCount}
+                  {pendingDonations}
                 </p>
               </div>
               <div className={`p-3 rounded-xl ${darkMode ? "bg-yellow-500/20" : "bg-yellow-100"}`}>
                 <Clock className={`w-6 h-6 ${darkMode ? "text-yellow-400" : "text-yellow-600"}`} />
               </div>
-            </div>
+            </div> */}
           </div>
         </motion.div>
 
-        {/* Filters and Search */}
+        {/* Tabs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-6"
+        >
+          <div className={`inline-flex rounded-2xl p-1.5 border ${
+            darkMode 
+              ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800" 
+              : "bg-white backdrop-blur-xl border-gray-200 shadow-lg"
+          }`}>
+            <button
+              onClick={() => setActiveTab("donations")}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === "donations"
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
+                  : darkMode
+                  ? "text-zinc-400 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              My Donations
+            </button>
+            <button
+              onClick={() => setActiveTab("receipts")}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === "receipts"
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
+                  : darkMode
+                  ? "text-zinc-400 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              My Receipts
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Search and Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           className={`rounded-2xl p-4 sm:p-6 mb-6 border ${
             darkMode 
               ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800" 
@@ -281,7 +386,7 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
               }`} />
               <input
                 type="text"
-                placeholder="Search campaigns..."
+                placeholder={activeTab === "donations" ? "Search donations..." : "Search receipts..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
@@ -292,164 +397,337 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
               />
             </div>
 
-            {/* Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className={`w-5 h-5 ${darkMode ? "text-zinc-400" : "text-gray-600"}`} />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className={`px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                  darkMode
-                    ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
-                    : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+            {/* Generate Receipt Button for Donations Tab */}
+            {activeTab === "donations" && (
+              <button
+                onClick={handleGenerateReceipt}
+                disabled={pendingDonations === 0}
+                className={`px-6 py-3 rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center gap-2 whitespace-nowrap ${
+                  pendingDonations === 0
+                    ? darkMode
+                      ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white cursor-pointer"
                 }`}
               >
-                <option value="all">All Status</option>
-                <option value="approved">Approved</option>
-                <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
-              </select>
-            </div>
+                <FileCheck className="w-5 h-5" />
+                Generate Receipt
+              </button>
+            )}
+
+            {/* Filter - Only show for receipts tab */}
+            {activeTab === "receipts" && (
+              <div className="flex items-center gap-2">
+                <Filter className={`w-5 h-5 ${darkMode ? "text-zinc-400" : "text-gray-600"}`} />
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className={`px-4 py-3 rounded-xl border-2 outline-none transition-all ${
+                    darkMode
+                      ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
+                      : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                  }`}
+                >
+                  <option value="all">All Status</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+            )}
           </div>
         </motion.div>
 
-        {/* Tax Benefits List */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="space-y-4"
-        >
-          {filteredBenefits.length === 0 ? (
-            <div className={`rounded-2xl p-12 text-center border ${
-              darkMode 
-                ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800" 
-                : "bg-white backdrop-blur-xl border-gray-200 shadow-lg"
-            }`}>
-              <Receipt className={`w-16 h-16 mx-auto mb-4 ${darkMode ? "text-zinc-600" : "text-gray-400"}`} />
-              <p className={`text-lg font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                No tax benefits found
-              </p>
-              <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                Try adjusting your search or filters
-              </p>
-            </div>
-          ) : (
-            filteredBenefits.map((benefit, index) => {
-              const statusConfig = getStatusConfig(benefit.status)
-              const StatusIcon = statusConfig.icon
+        {/* Content based on active tab */}
+        <AnimatePresence mode="wait">
+          {activeTab === "donations" ? (
+            <motion.div
+              key="donations"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Info Banner */}
+              <div className={`mb-6 p-4 sm:p-6 rounded-2xl border ${
+                darkMode
+                  ? "bg-blue-950/20 border-blue-900/30"
+                  : "bg-blue-50 border-blue-200"
+              }`}>
+                <p className={`text-sm ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
+                  All donations eligible for 80G tax benefit are listed below. Click "Generate Receipt" to create your tax receipt.
+                </p>
+              </div>
 
-              return (
-                <motion.div
-                  key={benefit.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`rounded-2xl p-4 sm:p-6 border hover:shadow-xl transition-all ${
+              {/* Donations List */}
+              <div className="space-y-4">
+                {filteredDonations.length === 0 ? (
+                  <div className={`rounded-2xl p-12 text-center border ${
                     darkMode 
-                      ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800 hover:border-zinc-700" 
-                      : "bg-white backdrop-blur-xl border-gray-200 shadow-lg hover:border-emerald-200"
-                  }`}
-                >
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    {/* Left Section */}
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h3 className={`text-lg font-bold mb-1 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                            {benefit.campaignName}
-                          </h3>
-                          <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                            Campaign ID: {benefit.campaignId}
-                          </p>
-                        </div>
-                        <div className={`px-3 py-1.5 rounded-lg border flex items-center gap-2 ${statusConfig.bgColor} ${statusConfig.borderColor}`}>
-                          <StatusIcon className={`w-4 h-4 ${statusConfig.color}`} />
-                          <span className={`text-sm font-semibold ${statusConfig.color}`}>
-                            {statusConfig.text}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div className="flex items-center gap-2">
-                          <IndianRupee className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
-                          <div>
-                            <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-                              Donation Amount
-                            </p>
-                            <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                              ₹{benefit.donationAmount.toLocaleString('en-IN')}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <Calendar className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
-                          <div>
-                            <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-                              Donation Date
-                            </p>
-                            <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                              {new Date(benefit.donationDate).toLocaleDateString('en-IN', { 
-                                day: 'numeric', 
-                                month: 'short', 
-                                year: 'numeric' 
-                              })}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <FileText className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
-                          <div>
-                            <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-                              Financial Year
-                            </p>
-                            <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                              {benefit.financialYear}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {benefit.receiptNumber && (
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${
-                          darkMode ? "bg-zinc-800/50" : "bg-gray-100"
-                        }`}>
-                          <Receipt className={`w-4 h-4 ${darkMode ? "text-zinc-400" : "text-gray-600"}`} />
-                          <span className={`text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                            Receipt: {benefit.receiptNumber}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right Section - Download Button */}
-                    {benefit.status === "approved" && (
-                      <button
-                        onClick={() => handleDownloadReceipt(benefit)}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold transition-all shadow-lg flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
-                      >
-                        <Download className="w-5 h-5" />
-                        Download Receipt
-                      </button>
-                    )}
-
-                    {benefit.status === "pending" && (
-                      <div className={`px-6 py-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 ${
-                        darkMode ? "border-zinc-700 text-zinc-400" : "border-gray-300 text-gray-500"
-                      }`}>
-                        <Clock className="w-5 h-5" />
-                        <span className="font-medium">Under Review</span>
-                      </div>
-                    )}
+                      ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800" 
+                      : "bg-white backdrop-blur-xl border-gray-200 shadow-lg"
+                  }`}>
+                    <Receipt className={`w-16 h-16 mx-auto mb-4 ${darkMode ? "text-zinc-600" : "text-gray-400"}`} />
+                    <p className={`text-lg font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                      No pending donations
+                    </p>
+                    <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                      All eligible donations have receipts generated
+                    </p>
                   </div>
-                </motion.div>
-              )
-            })
+                ) : (
+                  filteredDonations.map((donation, index) => (
+                    <motion.div
+                      key={donation.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`rounded-2xl p-4 sm:p-6 border hover:shadow-xl transition-all ${
+                        darkMode 
+                          ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800 hover:border-zinc-700" 
+                          : "bg-white backdrop-blur-xl border-gray-200 shadow-lg hover:border-emerald-200"
+                      }`}
+                    >
+                      <div className="space-y-3">
+                        <h3 className={`text-lg font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                          {donation.campaignName}
+                        </h3>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="flex items-center gap-2">
+                            <IndianRupee className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
+                            <div>
+                              <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                Amount
+                              </p>
+                              <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                ₹{donation.donationAmount.toLocaleString('en-IN')}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Receipt className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
+                            <div>
+                              <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                Transaction ID
+                              </p>
+                              <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                {donation.transactionId}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Calendar className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
+                            <div>
+                              <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                Date
+                              </p>
+                              <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                {new Date(donation.donationDate).toLocaleDateString('en-IN', { 
+                                  day: 'numeric', 
+                                  month: 'short', 
+                                  year: 'numeric' 
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="receipts"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Receipts List */}
+              <div className="space-y-4">
+                {filteredReceipts.length === 0 ? (
+                  <div className={`rounded-2xl p-12 text-center border ${
+                    darkMode 
+                      ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800" 
+                      : "bg-white backdrop-blur-xl border-gray-200 shadow-lg"
+                  }`}>
+                    <Receipt className={`w-16 h-16 mx-auto mb-4 ${darkMode ? "text-zinc-600" : "text-gray-400"}`} />
+                    <p className={`text-lg font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                      No receipts found
+                    </p>
+                    <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                      Generate receipts from the My Donations tab
+                    </p>
+                  </div>
+                ) : (
+                  filteredReceipts.map((receipt, index) => {
+                    const statusConfig = getStatusConfig(receipt.status)
+                    const StatusIcon = statusConfig.icon
+                    const isExpanded = expandedReceipt === receipt.id
+
+                    return (
+                      <motion.div
+                        key={receipt.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`rounded-2xl border hover:shadow-xl transition-all ${
+                          darkMode 
+                            ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800 hover:border-zinc-700" 
+                            : "bg-white backdrop-blur-xl border-gray-200 shadow-lg hover:border-emerald-200"
+                        }`}
+                      >
+                        {/* Receipt Header */}
+                        <div className="p-4 sm:p-6">
+                          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between gap-4 mb-3">
+                                <div>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h3 className={`text-lg font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                      {receipt.receiptNumber}
+                                    </h3>
+                                    <div className={`px-3 py-1 rounded-lg border flex items-center gap-2 ${statusConfig.bgColor} ${statusConfig.borderColor}`}>
+                                      <StatusIcon className={`w-3.5 h-3.5 ${statusConfig.color}`} />
+                                      <span className={`text-xs font-semibold ${statusConfig.color}`}>
+                                        {statusConfig.text}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                                    {receipt.donationCount} {receipt.donationCount === 1 ? 'donation' : 'donations'} included
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                  <IndianRupee className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
+                                  <span className={`text-lg font-bold ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
+                                    ₹{receipt.totalAmount.toLocaleString('en-IN')}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Calendar className={`w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-500"}`} />
+                                  <span className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                                    {new Date(receipt.generatedDate).toLocaleDateString('en-IN', { 
+                                      day: 'numeric', 
+                                      month: 'short', 
+                                      year: 'numeric' 
+                                    })}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleDownloadReceipt(receipt)}
+                                className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                              >
+                                <Download className="w-5 h-5" />
+                                Download
+                              </button>
+                              <button
+                                onClick={() => setExpandedReceipt(isExpanded ? null : receipt.id)}
+                                className={`p-3 rounded-xl border-2 transition-all ${
+                                  darkMode
+                                    ? "border-zinc-700 hover:border-zinc-600 text-zinc-400 hover:text-white"
+                                    : "border-gray-300 hover:border-gray-400 text-gray-600 hover:text-gray-900"
+                                }`}
+                              >
+                                {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Expanded Details */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="overflow-hidden"
+                            >
+                              <div className={`px-4 sm:px-6 pb-4 sm:pb-6 pt-4 border-t ${
+                                darkMode ? "border-zinc-800" : "border-gray-200"
+                              }`}>
+                                <h4 className={`text-sm font-semibold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                  Receipt Details
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div>
+                                    <p className={`text-xs mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                      Receipt Number
+                                    </p>
+                                    <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                      {receipt.receiptNumber}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className={`text-xs mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                      Receipt Date
+                                    </p>
+                                    <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                      {new Date(receipt.generatedDate).toLocaleDateString('en-IN', { 
+                                        day: 'numeric', 
+                                        month: 'long', 
+                                        year: 'numeric' 
+                                      })}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className={`text-xs mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                      Financial Year
+                                    </p>
+                                    <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                      {receipt.financialYear}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className={`text-xs mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                      Total Amount
+                                    </p>
+                                    <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                      ₹{receipt.totalAmount.toLocaleString('en-IN')}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className={`text-xs mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                      Donations Included
+                                    </p>
+                                    <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                      {receipt.donationCount} {receipt.donationCount === 1 ? 'donation' : 'donations'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className={`text-xs mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                      Status
+                                    </p>
+                                    <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                      {statusConfig.text}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    )
+                  })
+                )}
+              </div>
+            </motion.div>
           )}
-        </motion.div>
+        </AnimatePresence>
 
         {/* Info Note */}
         <motion.div
@@ -464,7 +742,7 @@ export default function TaxBenefitPage({ darkModeFromParent }) {
         >
           <p className={`text-sm ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
             <strong>Note:</strong> These receipts are valid for claiming tax deductions under Section 80G of the Income Tax Act. 
-            Please consult with your tax advisor for proper filing. Receipts are generated within 7-10 business days after donation approval.
+            Please consult with your tax advisor for proper filing.
           </p>
         </motion.div>
       </div>
