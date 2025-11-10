@@ -1,5 +1,4 @@
 "use client"
-import ContactPage from '@/components/contactus/ContactUs';
 import Footer from '@/components/layout/Footer';
 import Navbar from '@/components/layout/Navbar';
 import LegalAidPage from '@/components/legalaid/LegalAid';
