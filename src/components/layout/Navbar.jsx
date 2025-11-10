@@ -331,7 +331,7 @@ useEffect(() => {
                  <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
   {[
     { name: 'My Deeds', icon: Plus, isLucide: true },
-    { name: 'Palestine', icon: Heart, isLucide: true },
+    { name: 'My Wishlist', icon: Heart, isLucide: true },
     { name: 'Daily Givers', icon: Leaf, isLucide: true },
     { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false }
   ].map(item => (

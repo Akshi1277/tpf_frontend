@@ -28,7 +28,7 @@ const [otp, setOtp] = useState('');
 const handleOtpSubmit = () => {
   if (otp.length === 4) {
     setShowSuccess(true);
-    setTimeout(() => router.push('/'), 2500);
+    setTimeout(() => router.push('/profile/userprofile'), 2500);
   }
 };
 
