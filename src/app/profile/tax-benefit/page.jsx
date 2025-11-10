@@ -3,7 +3,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useState, useEffect } from 'react'
-import TaxBenefitPage from '@/components/profile/taxbenefit/TaxBenefit'
+import TaxBenefitPage from '@/components/profile/tax-benefit/TaxBenefit'
 
 export default function Page() {
   const [darkMode, setDarkMode] = useState(() => {
