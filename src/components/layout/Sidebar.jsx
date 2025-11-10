@@ -63,20 +63,20 @@ const menuItems = [
     description: "Manage your Fundraisers"
   },
   {
-    name: "My Service Requests",
-    path: "/profile/service-requests",
+    name: "Feedback",
+    path: "/profile/feedback",
     icon: Wrench,
     gradient: "from-cyan-500 to-blue-600",
     activeColor: "cyan",
-    description: "View and manage your service requests"
+    description: "View and manage your feedbacks"
   },
   {
-    name: "My Complaints",
-    path: "/profile/mycomplaints",
+    name: "Raise a Query",
+    path: "/profile/raise-query",
     icon: AlertTriangle,
     gradient: "from-rose-500 to-red-600",
     activeColor: "rose",
-    description: "Track your submitted complaints"
+    description: "Track your submitted queries"
   },
 ]
 
