@@ -261,7 +261,7 @@ export default function DonationsPage({ darkModeFromParent }) {
                   transition={{ duration: 0.5, delay: 0.3 }}
                 >
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white">
-                    𝒮𝒶𝓁𝒶𝒶𝓂! {currentUser.name}! 👋
+                    Salam! {currentUser.name}! 👋
                   </h1>
                   <p className="text-sm md:text-base mb-3 text-white/90">
                     Your generosity is making a real difference in people's lives
@@ -325,12 +325,12 @@ export default function DonationsPage({ darkModeFromParent }) {
                   <h2 className={`text-2xl font-bold ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}>
-                    80G Tax Receipts
+                    Form 10BE
                   </h2>
                   <p className={`text-sm ${
                     darkMode ? "text-zinc-400" : "text-gray-600"
                   }`}>
-                    Download consolidated receipts for tax filing
+                    Download consolidated form 10BE.
                   </p>
                 </div>
               </div>
@@ -362,7 +362,7 @@ export default function DonationsPage({ darkModeFromParent }) {
                             ? "bg-emerald-500/20 text-emerald-400"
                             : "bg-emerald-100 text-emerald-700"
                         }`}>
-                          80G
+                          10BE
                         </div>
                       </div>
 
@@ -389,8 +389,7 @@ export default function DonationsPage({ darkModeFromParent }) {
                   : "bg-blue-50 border-blue-200"
               }`}>
                 <p className={`text-sm ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
-                  <strong>Note:</strong> Only donations eligible for 80G tax deductions are included in these receipts. 
-                  Receipts are available for completed financial years and the current ongoing year.
+                  <strong>Note:</strong> Only donations eligible for 80G tax deductions are included in these receipts.
                 </p>
               </div>
             </div>
