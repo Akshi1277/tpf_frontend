@@ -49,7 +49,7 @@ const menuItems = [
   },
   {
     name: "My Communities",
-    path: "/profile/mycommunities",
+    path: "/profile/my-communities",
     icon: HandHeartIcon,
     gradient: "from-orange-500 to-red-600",
     activeColor: "orange",
