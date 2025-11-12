@@ -103,7 +103,6 @@ export default function Footer({ darkMode }) {
       { name: 'FAQs', path: '/faqs' },
       { name: 'Legal Aid Centre', path: '/legalaid' },
       { name: 'Contact Us', path: '/contactus' },
-      {name: 'Help Centre', path: '/helpcentre' },
       {name: 'Policies', path: '/policies' }
       
     ].map(link => (

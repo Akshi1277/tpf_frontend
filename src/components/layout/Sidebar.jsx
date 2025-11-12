@@ -57,7 +57,7 @@ const menuItems = [
   },
   {
     name: "My Campaigns",
-    path: "/profile/mycampaigns",
+    path: "/profile/my-campaign",
     icon: ClipboardList,
     gradient: "from-rose-500 to-red-600",
     activeColor: "orange",

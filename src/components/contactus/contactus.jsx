@@ -2,6 +2,327 @@
 import { motion, useInView } from 'framer-motion';
 import { useState, useRef } from 'react';
 
+// Help Centre Section Component
+function HelpCentreSection({ darkMode, isInView }) {
+  const [expandedSection, setExpandedSection] = useState(null);
+  const [expandedStage, setExpandedStage] = useState(null);
+
+  const reportableIssues = [
+    'Delay or non-receipt of aid or donation receipt',
+    'Fraudulent campaigns or suspected misuse',
+    'Misbehaviour by any staff or volunteer',
+    'Violation of privacy or misuse of information',
+    'Technical issues with website, forms, or application',
+    'Dispute regarding eligibility or verification',
+    'Unethical or offensive content associated with the platform',
+    'Feedback, suggestions, or service dissatisfaction'
+  ];
+
+  const grievanceStages = [
+    {
+      stage: 1,
+      title: 'Initial Complaint',
+      time: '7 working days',
+      description: 'Submit your complaint and we\'ll address it promptly',
+      required: [
+        'Your full name, mobile number, and email',
+        'Nature of complaint (with details and proof, if any)',
+        'Reference ID or case number (if related to a campaign or donation)'
+      ]
+    },
+    {
+      stage: 2,
+      title: 'Appeal Authority',
+      time: '10 working days',
+      description: 'Not satisfied? Escalate to our Appeal Authority for senior review',
+      required: [
+        'Your appeal will be reviewed by a senior representative not involved in the original decision',
+        'Subject: Appeal for Unresolved Complaint – [Your Name]',
+        'Ensures impartial review and resolution'
+      ]
+    },
+    {
+      stage: 3,
+      title: 'Ombudsman-Level Authority',
+      time: '15 working days',
+      description: 'Final internal review by our independent Ombudsman desk',
+      required: [
+        'All previous correspondence and responses',
+        'Clear summary of your grievance and what you seek',
+        'Any legal document (if applicable)',
+        'Functions independently of day-to-day operations'
+      ]
+    }
+  ];
+
+  const legalMatters = [
+    'Fraud',
+    'Legal liability',
+    'Financial disputes',
+    'Reputational harm',
+    'Breach of terms of use or trust'
+  ];
+
+  const principles = [
+    {
+      title: 'Confidentiality',
+      description: 'All complaints are handled with strict confidentiality and respect'
+    },
+    {
+      title: 'Protection',
+      description: 'Whistleblowers and concerned users are protected from retaliation'
+    },
+    {
+      title: 'Communication',
+      description: 'You will be updated via email or phone throughout your complaint process'
+    },
+    {
+      title: 'Integrity',
+      description: 'False, malicious, or defamatory complaints may result in blacklisting or legal action'
+    }
+  ];
+
+  const sections = [
+    {
+      id: 'issues',
+      title: 'Issues You Can Report',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+        </svg>
+      ),
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          {reportableIssues.map((issue, index) => (
+            <div
+              key={index}
+              className={`flex items-start gap-3 p-4 rounded-lg border ${
+                darkMode 
+                  ? 'bg-zinc-800/50 border-zinc-700/50 hover:border-zinc-600' 
+                  : 'bg-white border-zinc-200 hover:border-zinc-300'
+              } transition-colors duration-200`}
+            >
+              <svg className={`w-5 h-5 flex-shrink-0 mt-0.5 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <p className={`text-sm sm:text-base ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                {issue}
+              </p>
+            </div>
+          ))}
+        </div>
+      )
+    },
+    {
+      id: 'grievance',
+      title: 'Step-by-Step Grievance Redressal Process',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+        </svg>
+      ),
+      content: (
+        <div className="space-y-4">
+          {grievanceStages.map((stage, index) => (
+            <div
+              key={stage.stage}
+              className={`rounded-xl border overflow-hidden ${
+                darkMode 
+                  ? 'bg-zinc-800/50 border-zinc-700/50' 
+                  : 'bg-white border-zinc-200'
+              }`}
+            >
+              <button
+                onClick={() => setExpandedStage(expandedStage === stage.stage ? null : stage.stage)}
+                className={`w-full p-6 flex items-center justify-between text-left ${
+                  darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-gray-50'
+                } transition-colors duration-200`}
+              >
+                <div className="flex items-center gap-4 flex-1">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl flex-shrink-0 ${
+                    darkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-100 text-teal-700'
+                  }`}>
+                    {stage.stage}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`text-lg sm:text-xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                      Stage {stage.stage}: {stage.title}
+                    </h3>
+                    <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                      {stage.description}
+                    </p>
+                    <div className={`mt-2 inline-flex items-center gap-2 text-xs sm:text-sm font-medium px-3 py-1 rounded-full ${
+                      darkMode ? 'bg-zinc-700 text-zinc-300' : 'bg-gray-100 text-zinc-700'
+                    }`}>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Resolution: {stage.time}
+                    </div>
+                  </div>
+                </div>
+                <svg
+                  className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${
+                    expandedStage === stage.stage ? 'rotate-180' : ''
+                  } ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {expandedStage === stage.stage && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className={`px-6 pb-6 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}
+                >
+                  <div className="mt-6">
+                    <h4 className={`text-sm font-semibold mb-3 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                      {stage.stage === 1 ? 'Please Provide:' : 'Required Information:'}
+                    </h4>
+                    <div className="space-y-2">
+                      {stage.required.map((req, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${
+                            darkMode ? 'bg-teal-400' : 'bg-teal-600'
+                          }`}></div>
+                          <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                            {req}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    },
+    {
+      id: 'legal',
+      title: 'Final Legal Oversight',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z" />
+        </svg>
+      ),
+      content: (
+        <div>
+          <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+            In rare and serious cases, the matter shall be referred to the Legal Wing of True Path Foundation, whose decision shall be final, binding, and enforceable within the framework of Indian law.
+          </p>
+          
+          <h3 className={`text-lg font-semibold mb-3 ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
+            Serious Cases Include:
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {legalMatters.map((matter, index) => (
+              <div
+                key={index}
+                className={`flex items-center gap-2 p-3 rounded-lg ${
+                  darkMode ? 'bg-zinc-700/30' : 'bg-white'
+                }`}
+              >
+                <svg className="w-4 h-4 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <p className={`text-sm ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                  {matter}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'transparency',
+      title: 'Transparency, Confidentiality & Respect',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+        </svg>
+      ),
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {principles.map((principle, index) => (
+            <div
+              key={index}
+              className={`p-6 rounded-xl ${
+                darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
+              }`}
+            >
+              <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                {principle.title}
+              </h3>
+              <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                {principle.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <div className="space-y-4">
+      {sections.map((section, index) => (
+        <div
+          key={section.id}
+          className={`rounded-xl border overflow-hidden ${
+            darkMode 
+              ? 'bg-zinc-800/50 border-zinc-700/50' 
+              : 'bg-white border-zinc-200'
+          }`}
+        >
+          <button
+            onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
+            className={`w-full p-6 flex items-center justify-between text-left ${
+              darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-gray-50'
+            } transition-colors duration-200`}
+          >
+            <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+              {section.title}
+            </h2>
+            <svg
+              className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${
+                expandedSection === section.id ? 'rotate-180' : ''
+              } ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {expandedSection === section.id && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className={`px-6 pb-6 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}
+            >
+              <div className="mt-6">
+                {section.content}
+              </div>
+            </motion.div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ContactPage({ darkMode }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
@@ -290,7 +611,7 @@ export default function ContactPage({ darkMode }) {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="max-w-3xl mx-auto"
+          className="max-w-3xl mx-auto mb-12"
         >
           {!submitted ? (
             <div className={`p-6 sm:p-8 rounded-2xl backdrop-blur-sm border ${
@@ -559,19 +880,30 @@ export default function ContactPage({ darkMode }) {
               >
                 Thank you for reaching out to us.
               </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${
-                  darkMode ? 'bg-zinc-700/50 text-zinc-300' : 'bg-zinc-100 text-zinc-700'
-                }`}
-              >
-                
-                
-              </motion.div>
             </motion.div>
           )}
+        </motion.div>
+
+        {/* Help Centre Content - Collapsed Sections */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="max-w-5xl mx-auto mt-12"
+        >
+          <div className={`text-center mb-8 p-6 sm:p-8 rounded-xl ${
+            darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
+          }`}>
+            <h2 className={`text-lg sm:text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+              Raise Your Concerns — We're Here to Listen, Solve, and Support
+            </h2>
+            <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+              At TPF Aid, we see every concern as an opportunity to improve — and every question as a responsibility before Allah and humanity. 
+              <span className="font-semibold"> You will never be ignored. You will never be alone.</span> If something goes wrong — we'll make it right.
+            </p>
+          </div>
+
+          <HelpCentreSection darkMode={darkMode} isInView={isInView} />
         </motion.div>
       </div>
     </section>
