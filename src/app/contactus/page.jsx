@@ -1,5 +1,6 @@
 "use client"
 import ContactPage from '@/components/contactus/contactus';
+
 import Footer from '@/components/layout/Footer';
 import Navbar from '@/components/layout/Navbar';
 import React from 'react'
@@ -23,8 +24,7 @@ const page = () => {
          <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
         
-        <ContactPage darkMode={darkMode} />
-
+          <ContactPage darkMode={darkMode} />
           <Footer darkMode={darkMode} />
         </div>
     </div>

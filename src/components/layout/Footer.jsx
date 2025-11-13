@@ -55,7 +55,7 @@ export default function Footer({ darkMode }) {
   return (
     <footer className={`py-12 border-t z-30 ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           
           {/* Logo and Tagline */}
           <div className="md:col-span-1"> 
@@ -101,9 +101,10 @@ export default function Footer({ darkMode }) {
     {[
       { name: 'About TPF', path: '/about' },
       { name: 'FAQs', path: '/faqs' },
-      { name: 'Legal & Help', path: '/legalaid' },
+      { name: 'Legal Aid Centre', path: '/legalaid' },
       { name: 'Contact Us', path: '/contactus' },
-      {name: 'Help Centre', path: '/helpcentre' }
+      {name: 'Policies', path: '/policies' }
+      
     ].map(link => (
       <li key={link.name}>
         <a
@@ -143,7 +144,7 @@ export default function Footer({ darkMode }) {
           </div>
 
           {/* 4️⃣ Policies Section */}
-<div>
+{/* <div>
   <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
     Policies
   </div>
@@ -167,7 +168,7 @@ export default function Footer({ darkMode }) {
       </li>
     ))}
   </ul>
-</div>
+</div> */}
 
         </div>
 

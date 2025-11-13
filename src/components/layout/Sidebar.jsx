@@ -14,7 +14,8 @@ import {
   Menu,
   Wrench,
   AlertTriangle,
-  ClipboardList
+  ClipboardList,
+  HandHeartIcon
 } from "lucide-react"
 
 // Menu items defined outside component to prevent recreation on each render
@@ -47,36 +48,36 @@ const menuItems = [
     description: "Verify your identity"
   },
   {
-    name: "Tax Benefit",
-    path: "/profile/tax-benefit",
-    icon: Receipt,
+    name: "My Communities",
+    path: "/profile/my-communities",
+    icon: HandHeartIcon,
     gradient: "from-orange-500 to-red-600",
     activeColor: "orange",
-    description: "Download tax receipts"
+    description: "Manage your Communities"
   },
   {
     name: "My Campaigns",
-    path: "/profile/mycampaigns",
+    path: "/profile/my-campaign",
     icon: ClipboardList,
     gradient: "from-rose-500 to-red-600",
     activeColor: "orange",
     description: "Manage your Fundraisers"
   },
   {
-    name: "My Service Requests",
-    path: "/profile/service-requests",
+    name: "Feedback",
+    path: "/profile/feedback",
     icon: Wrench,
     gradient: "from-cyan-500 to-blue-600",
     activeColor: "cyan",
-    description: "View and manage your service requests"
+    description: "View and manage your feedbacks"
   },
   {
-    name: "My Complaints",
-    path: "/profile/mycomplaints",
+    name: "Raise a Query",
+    path: "/profile/raise-query",
     icon: AlertTriangle,
     gradient: "from-rose-500 to-red-600",
     activeColor: "rose",
-    description: "Track your submitted complaints"
+    description: "Track your submitted queries"
   },
 ]
 

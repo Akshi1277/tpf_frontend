@@ -358,13 +358,41 @@ export default function FAQSection({ darkMode }) {
   const [openQuestion, setOpenQuestion] = useState(null);
 
   const categories = [
-    { id: 'general', label: 'General', icon: '🏛️' },
-    { id: 'donors', label: 'For Donors', icon: '❤️' },
-    { id: 'beneficiaries', label: 'For Beneficiaries', icon: '🤝' },
-    { id: 'volunteers', label: 'For Volunteers', icon: '🌟' },
-    { id: 'issues', label: 'Issues & Support', icon: '🛟' },
-    { id: 'legal', label: 'Legal', icon: '⚖️' },
-    { id: 'other', label: 'Other', icon: '💬' }
+    { id: 'general', label: 'General', icon: (
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    )},
+    { id: 'donors', label: 'For Donors', icon: (
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    )},
+    { id: 'beneficiaries', label: 'For Beneficiaries', icon: (
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    )},
+    { id: 'volunteers', label: 'For Volunteers', icon: (
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+      </svg>
+    )},
+    { id: 'issues', label: 'Issues & Support', icon: (
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    )},
+    { id: 'legal', label: 'Legal', icon: (
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+      </svg>
+    )},
+    { id: 'other', label: 'Other', icon: (
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+      </svg>
+    )}
   ];
 
   const faqData = {
@@ -573,7 +601,7 @@ export default function FAQSection({ darkMode }) {
                 setOpenCategory(cat.id);
                 setOpenQuestion(null);
               }}
-              className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all duration-300 ${
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 inline-flex items-center gap-2 ${
                 openCategory === cat.id
                   ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg scale-105'
                   : darkMode
@@ -581,8 +609,8 @@ export default function FAQSection({ darkMode }) {
                   : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
               }`}
             >
-              <span className="mr-2">{cat.icon}</span>
-              {cat.label}
+              <span className="flex items-center">{cat.icon}</span>
+              <span className="whitespace-nowrap">{cat.label}</span>
             </button>
           ))}
         </motion.div>
