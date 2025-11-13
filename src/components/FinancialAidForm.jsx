@@ -62,7 +62,7 @@ export default function FinancialAidPage({ darkModeFromParent }) {
   }
 
  return (
-    <div className="min-h-screen pt-10">
+    <div className="min-h-screen pt-10 md:pt-5">
     {/* Background Effects */}
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
