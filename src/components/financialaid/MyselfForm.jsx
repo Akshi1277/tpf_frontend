@@ -39,13 +39,24 @@ const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   declarationConsent: false,
   })
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+ const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  // If this is a file input
+  if (e.target.type === "file") {
+    setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
-    }))
+      [name]: e.target.files[0], // store the file
+    }));
+  } else {
+    // Normal text/select/radio inputs
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   }
+};
+
 
  const handleNext = (nextStep) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -140,7 +151,7 @@ const handleSubmit = (e) => {
                 {/* Connecting Line */}
                 {index < 3 && (
                   <div
-                    className={`w-8 sm:w-12 md:w-16 h-1 mx-2 sm:mx-4 rounded transition-all ${
+                    className={`w-8 sm:w-12 md:w-16 -mt-5 md:-mt-5 h-1 mx-2 sm:mx-4 rounded transition-all ${
                       currentStep > step
                         ? "bg-emerald-600"
                         : darkMode
