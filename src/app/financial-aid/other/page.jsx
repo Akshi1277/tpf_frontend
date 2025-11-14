@@ -1,5 +1,6 @@
 "use client"
-import FinancialAidPage from '@/components/financialaid/FinancialAid'
+
+import OthersForm from '@/components/financialaid/OthersForm'
 import Footer from '@/components/layout/Footer'
 import Navbar from '@/components/layout/Navbar'
 import React, { useEffect, useState } from 'react'
@@ -46,7 +47,7 @@ const Page = () => {
       
       <main className="flex-1 w-full overflow-x-hidden pt-16">
         <div className={`min-h-[calc(100vh-64px)] ${darkMode ? "bg-zinc-950" : "bg-gray-50"}`}>
-          <FinancialAidPage darkModeFromParent={darkMode} />
+          <OthersForm darkModeFromParent={darkMode} />
         </div>
       </main>
 

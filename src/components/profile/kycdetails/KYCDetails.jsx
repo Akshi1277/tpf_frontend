@@ -358,6 +358,152 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     )
   }
 
+  // Custom Dropdown Component
+const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder, loading }) => {
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false)
+        setSearchQuery("")
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const filteredOptions = options.filter(option =>
+    option.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const handleSelect = (optionName) => {
+    onChange({ target: { name, value: optionName } })
+    setShowDropdown(false)
+    setSearchQuery("")
+  }
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setShowDropdown(!showDropdown)}
+        disabled={loading}
+        className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between ${
+          darkMode
+            ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500 disabled:opacity-50"
+            : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:opacity-50"
+        }`}
+      >
+        <span className={!value ? (darkMode ? "text-zinc-500" : "text-gray-400") : ""}>
+          {loading ? "Loading..." : value || placeholder}
+        </span>
+        <ChevronRight className={`w-5 h-5 transition-transform ${showDropdown ? 'rotate-90' : ''} ${
+          darkMode ? "text-zinc-400" : "text-gray-400"
+        }`} />
+      </button>
+
+      {showDropdown && !loading && (
+        <>
+          {/* Mobile backdrop */}
+          <div 
+            className="fixed inset-0 z-[99] sm:hidden bg-black/20"
+            onClick={() => setShowDropdown(false)}
+          />
+          
+          <div 
+            className={`fixed sm:absolute left-1/2 top-1/2 sm:top-full sm:left-0 -translate-x-1/2 sm:translate-x-0 -translate-y-1/2 sm:translate-y-0 sm:mt-2 z-[100] rounded-2xl border shadow-2xl overflow-hidden ${
+              darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
+            }`} 
+            style={{ 
+              width: '320px',
+              maxWidth: 'calc(100vw - 2rem)'
+            }}
+          >
+            {/* Search Input */}
+            <div className={`p-3 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"}`}>
+              <input
+                type="text"
+                placeholder={`Search ${placeholder.toLowerCase()}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm ${
+                  darkMode
+                    ? "bg-zinc-900/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+                }`}
+                autoFocus
+              />
+            </div>
+
+            {/* Options List with Hidden Scrollbar */}
+            <div 
+              className="max-h-64 overflow-y-auto scrollbar-hide"
+              style={{
+                scrollbarWidth: 'none', /* Firefox */
+                msOverflowStyle: 'none' /* IE and Edge */
+              }}
+            >
+              {/* Placeholder option */}
+              <button
+                type="button"
+                onClick={() => handleSelect("")}
+                className={`w-full px-4 py-3 text-left transition-all border-b ${
+                  !value
+                    ? darkMode
+                      ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
+                      : "bg-emerald-50 text-emerald-600 border-gray-200"
+                    : darkMode
+                    ? "hover:bg-zinc-700 text-zinc-400 border-zinc-700"
+                    : "hover:bg-gray-50 text-gray-500 border-gray-200"
+                }`}
+              >
+                {placeholder}
+              </button>
+
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => (
+                  <button
+                    key={option.iso2 || option.id}
+                    type="button"
+                    onClick={() => handleSelect(option.name)}
+                    className={`w-full px-4 py-3 text-left transition-all border-b last:border-b-0 ${
+                      value === option.name
+                        ? darkMode
+                          ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
+                          : "bg-emerald-50 text-emerald-600 border-gray-200"
+                        : darkMode
+                        ? "hover:bg-zinc-700 text-white border-zinc-700"
+                        : "hover:bg-gray-50 text-gray-900 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{option.name}</span>
+                      {value === option.name && (
+                        <CheckCircle2 className={`w-4 h-4 ${
+                          darkMode ? "text-emerald-400" : "text-emerald-600"
+                        }`} />
+                      )}
+                    </div>
+                  </button>
+                ))
+              ) : (
+                <div className={`px-4 py-8 text-center ${
+                  darkMode ? "text-zinc-500" : "text-gray-500"
+                }`}>
+                  <p className="text-sm">No results found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
   const steps = [
     { number: 1, title: "Personal Info", icon: User },
     { number: 2, title: "Address & PAN", icon: MapPin },
@@ -805,61 +951,37 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                            State <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            name="state"
-                            value={formData.state}
-                            onChange={handleStateChange}
-                            disabled={loadingStates}
-                            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
-                          >
-                            <option value="">
-                              {loadingStates ? "Loading states..." : "Select state"}
-                            </option>
-                            {states.map((state) => (
-                              <option key={state.iso2} value={state.name}>
-                                {state.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                       {/* State Dropdown */}
+<div>
+  <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+    State <span className="text-red-500">*</span>
+  </label>
+  <CustomDropdown
+    darkMode={darkMode}
+    value={formData.state}
+    onChange={handleStateChange}
+    name="state"
+    options={states}
+    placeholder="Select state"
+    loading={loadingStates}
+  />
+</div>
 
-                        <div>
-                          <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                            City <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            name="city"
-                            value={formData.city}
-                            onChange={handleInputChange}
-                            disabled={!formData.state || loadingCities}
-                            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
-                          >
-                            <option value="">
-                              {loadingCities
-                                ? "Loading cities..."
-                                : !formData.state
-                                ? "Select state first"
-                                : "Select city"}
-                            </option>
-                            {cities.map((city) => (
-                              <option key={city.id} value={city.name}>
-                                {city.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+{/* City Dropdown */}
+<div>
+  <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+    City <span className="text-red-500">*</span>
+  </label>
+  <CustomDropdown
+    darkMode={darkMode}
+    value={formData.city}
+    onChange={handleInputChange}
+    name="city"
+    options={cities}
+    placeholder="Select city"
+    loading={loadingCities}
+  />
+</div>
 
                         <div>
                           <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>

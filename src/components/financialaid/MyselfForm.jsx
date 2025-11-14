@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { User, Calendar, MapPin, Phone, Mail, CreditCard } from "lucide-react"
 
-export default function FinancialAidForm({ darkMode }) {
+export default function MyselfForm({ darkMode }) {
     const router = useRouter()
 const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
@@ -18,6 +18,7 @@ const [showSuccessMessage, setShowSuccessMessage] = useState(false)
     gender:'',
     permanentAddress: '',
     currentAddress: '',
+    sameAddress: false,
     contactNumber: '',
     email: '',
     idType:'',
@@ -38,13 +39,24 @@ const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   declarationConsent: false,
   })
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+ const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  // If this is a file input
+  if (e.target.type === "file") {
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
+      [name]: e.target.files[0], // store the file
+    }));
+  } else {
+    // Normal text/select/radio inputs
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   }
+};
+
 
  const handleNext = (nextStep) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -93,7 +105,7 @@ const handleSubmit = (e) => {
 )}
 
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-12 sm:py-20`}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-20 pb-12 sm:pb-24">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-2 pb-12 sm:pb-24">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -139,7 +151,7 @@ const handleSubmit = (e) => {
                 {/* Connecting Line */}
                 {index < 3 && (
                   <div
-                    className={`w-8 sm:w-12 md:w-16 h-1 mx-2 sm:mx-4 rounded transition-all ${
+                    className={`w-8 sm:w-12 md:w-16 -mt-5 md:-mt-5 h-1 mx-2 sm:mx-4 rounded transition-all ${
                       currentStep > step
                         ? "bg-emerald-600"
                         : darkMode
@@ -202,20 +214,44 @@ const handleSubmit = (e) => {
         Father/Mother/Husband Name <span className="text-red-500">*</span>
       </label>
       <div className="relative">
-        <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
-        <input
-          type="text"
-          name="parentSpouseName"
-          value={formData.parentSpouseName}
-          onChange={handleInputChange}
-          placeholder="Enter father/mother/husband name"
-          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          required
-        />
+        <User className={`absolute left-3 top-6 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+       {/* Relationship Dropdown */}
+<select
+  name="relation"
+  value={formData.relation}
+  onChange={handleInputChange}
+  className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+    darkMode
+      ? "bg-zinc-700 border-zinc-600 text-white"
+      : "bg-white border-zinc-300 text-zinc-900"
+  }`}
+  required
+>
+  <option value="" disabled>Select Relation</option>
+  <option value="Father">Father</option>
+  <option value="Mother">Mother</option>
+  <option value="Wife">Wife</option>
+  <option value="Husband">Husband</option>
+  <option value="Sibling">Sibling</option>
+  <option value="Other">Other</option>
+</select>
+
+{/* Name Input Field Under Dropdown */}
+<input
+  type="text"
+  name="relationName"
+  value={formData.relationName}
+  onChange={handleInputChange}
+  placeholder="Enter the name"
+  className={`mt-3 w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+    darkMode
+      ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+      : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+  }`}
+  required
+/>
+
+
       </div>
     </div>
 
@@ -314,6 +350,45 @@ const handleSubmit = (e) => {
           </span>
         </label>
       </div>
+       {/* Declaration & Consent */}
+    <div className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-lg border ${
+      darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"
+    }`}>
+      <h3 className={`font-bold text-base sm:text-lg mb-3 sm:mb-4 ${darkMode ? "text-white" : "text-zinc-900"}`}>
+        Declaration & Consent
+      </h3>
+      <div className={`text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        <p>
+          I hereby declare that I am not getting assistance/provision from any other organization or entity in any form and the information provided above is true. Any misrepresentation may lead to disqualification. I authorize True Path Foundation to visit and contact me to verify the provided details. I understand that video verification, its online solicitation/circulation and an appeal are mandatory for funding campaigns. A copy of a document of identity proof and bank details (if available) must be attached. I/We provide free consent for this process and acknowledge full understanding of this form in vernacular.
+        </p>
+      </div>
+      
+      <label className="flex items-start cursor-pointer group">
+        <input
+          type="checkbox"
+          name="declarationConsent"
+          checked={formData.declarationConsent}
+          onChange={(e) => setFormData(prev => ({ ...prev, declarationConsent: e.target.checked }))}
+          className="sr-only peer"
+          required
+        />
+        <div className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${
+          darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+        }`}>
+          <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${
+          formData.declarationConsent 
+            ? 'text-emerald-600' 
+            : darkMode ? "text-zinc-300" : "text-zinc-700"
+        }`}>
+          I agree to the declaration and consent terms stated above <span className="text-red-500">*</span>
+        </span>
+      </label>
+    </div>
+
     </div>
 
     {/* Next Button */}
@@ -343,28 +418,7 @@ const handleSubmit = (e) => {
       </p>
     </div>
 
-    {/* Permanent Address */}
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        Permanent Address <span className="text-red-500">*</span>
-      </label>
-      <div className="relative">
-        <MapPin className={`absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
-        <textarea
-          name="permanentAddress"
-          value={formData.permanentAddress}
-          onChange={handleInputChange}
-          placeholder="Enter your permanent address"
-          rows="3"
-          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          required
-        />
-      </div>
-    </div>
+   
 
     {/* Current Address */}
     <div>
@@ -388,6 +442,57 @@ const handleSubmit = (e) => {
         />
       </div>
     </div>
+
+ {/* Permanent Address */}
+ <div>
+      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        Permanent Address <span className="text-red-500">*</span>
+      </label>
+      <div className="relative">
+        <MapPin className={`absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+        <textarea
+          name="permanentAddress"
+          value={formData.permanentAddress}
+          onChange={handleInputChange}
+          placeholder="Enter your permanent address"
+          rows="3"
+          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none ${
+            darkMode
+              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+          }`}
+          required
+        />
+      </div>
+    </div>
+
+    {/* Checkbox: Same as Current Address */}
+<div className="flex items-center gap-2">
+  <input
+    type="checkbox"
+    id="sameAddress"
+    checked={formData.sameAddress || false}
+    onChange={(e) => {
+      const checked = e.target.checked;
+
+      setFormData((prev) => ({
+        ...prev,
+        sameAddress: checked,
+        permanentAddress: checked ? prev.currentAddress : ""  
+      }));
+    }}
+    className="w-4 h-4 cursor-pointer"
+  />
+  <label
+    htmlFor="sameAddress"
+    className={`text-xs sm:text-sm cursor-pointer ${
+      darkMode ? "text-zinc-300" : "text-zinc-700"
+    }`}
+  >
+    Same as Current Address
+  </label>
+</div>
+
 
     {/* Contact Number */}
     <div>
@@ -484,8 +589,8 @@ const handleSubmit = (e) => {
           <input
             type="radio"
             name="idType"
-            value="voter"
-            checked={formData.idType === 'voter'}
+            value="aadhar"
+            checked={formData.idType === 'aadhar'}
             onChange={handleInputChange}
             className="peer sr-only"
             required
@@ -497,13 +602,13 @@ const handleSubmit = (e) => {
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-3">
-                <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${formData.idType === 'voter' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
+                <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${formData.idType === 'aadhar' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
                 <div>
-                  <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-white" : "text-zinc-900"}`}>Voter ID</p>
-                  <p className={`text-[10px] sm:text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>Alphanumeric</p>
+                  <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-white" : "text-zinc-900"}`}>Aadhar Card</p>
+                  <p className={`text-[10px] sm:text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>12 characters</p>
                 </div>
               </div>
-              {formData.idType === 'voter' && (
+              {formData.idType === 'aadhar' && (
                 <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0">
                   <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -518,9 +623,15 @@ const handleSubmit = (e) => {
 
     {/* Government ID Proof Number */}
     <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        Government ID Proof Number <span className="text-red-500">*</span>
-      </label>
+     <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+  {formData.idType === "pan"
+    ? "PAN Number"
+    : formData.idType === "aadhar"
+    ? "Aadhaar Number"
+    : "Government ID Proof Number"
+  } <span className="text-red-500">*</span>
+</label>
+
       <div className="relative">
         <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
         <input
@@ -530,7 +641,7 @@ const handleSubmit = (e) => {
           onChange={handleInputChange}
           placeholder={
             formData.idType === 'pan' ? 'Enter 10-character PAN number' :
-            formData.idType === 'voter' ? 'Enter Voter ID number' :
+            formData.idType === 'aadhar' ? 'Enter 12-character Aadhaar number' :
             'Select ID type above'
           }
           className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
@@ -600,7 +711,7 @@ const handleSubmit = (e) => {
         <p className={`text-[10px] sm:text-xs mt-2 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
           Please upload a clear copy of your {
             formData.idType === 'pan' ? 'PAN Card' :
-            formData.idType === 'voter' ? 'Voter ID' : 'ID'
+            formData.idType === 'aadhar' ? 'Aadhar Card' : 'ID'
           }
         </p>
       )}
@@ -637,7 +748,7 @@ const handleSubmit = (e) => {
 
 {/* Step 3: Financial & Employment Details */}
 {currentStep === 3 && (
-  <div className="space-y-4 sm:space-y-6">
+  <div className="space-y-4 sm:space-y-6 ">
     <div className="border-l-4 border-emerald-500 pl-3 sm:pl-4 mb-4 sm:mb-6">
       <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
         Financial & Employment Details
@@ -647,164 +758,222 @@ const handleSubmit = (e) => {
       </p>
     </div>
 
-    {/* Occupation */}
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        Occupation <span className="text-red-500">*</span>
-      </label>
-      <div className="relative">
-        <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-        <input
-          type="text"
-          name="occupation"
-          value={formData.occupation}
-          onChange={handleInputChange}
-          placeholder="Enter your occupation"
-          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          required
+{/* Wrap all fields in a 2-column grid */}
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+
+  {/* Occupation */}
+  <div>
+    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+      Occupation <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+      <input
+        type="text"
+        name="occupation"
+        value={formData.occupation}
+        onChange={handleInputChange}
+        placeholder="Enter your occupation"
+        className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
+        required
+      />
+    </div>
+  </div>
+
+  {/* Monthly Income */}
+  <div>
+    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+      Monthly Income <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+      <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-sm sm:text-base ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+        ₹
+      </span>
+      <input
+        type="number"
+        name="monthlyIncome"
+        value={formData.monthlyIncome}
+        onChange={handleInputChange}
+        placeholder="Enter monthly income"
+        className={`w-full pl-7 sm:pl-8 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
+        required
+      />
+    </div>
+    <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+      Amount in INR
+    </p>
+  </div>
+
+  {/* Bank Name & Branch */}
+  <div>
+    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+      Bank Name & Branch <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+      <input
+        type="text"
+        name="bankNameBranch"
+        value={formData.bankNameBranch}
+        onChange={handleInputChange}
+        placeholder="e.g., SBI, CP Branch"
+        className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
+        required
+      />
+    </div>
+  </div>
+
+  {/* Account Number */}
+  <div>
+    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+      Account Number <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+      <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+      <input
+        type="text"
+        name="accountNumber"
+        value={formData.accountNumber}
+        onChange={handleInputChange}
+        placeholder="Enter bank account number"
+        className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
+        required
+      />
+    </div>
+  </div>
+
+  {/* IFSC Code */}
+  <div>
+    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+      IFSC Code <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+      </svg>
+      <input
+        type="text"
+        name="ifscCode"
+        value={formData.ifscCode}
+        onChange={handleInputChange}
+        placeholder="Enter IFSC code"
+        className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 uppercase ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
+        maxLength="11"
+        required
+      />
+    </div>
+    <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+      11-character code (e.g., SBIN0001234)
+    </p>
+  </div>
+
+  {/* Number of Dependents */}
+  <div>
+    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+      Number of Dependents <span className="text-red-500">*</span>
+    </label>
+    <div className="relative">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      <input
+        type="number"
+        name="numberOfDependents"
+        value={formData.numberOfDependents}
+        onChange={handleInputChange}
+        placeholder="Enter number of dependents"
+        min="0"
+        className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
+        required
+      />
+    </div>
+    <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+      Family members dependent on your income
+    </p>
+  </div>
+  {/* Bank Statement Upload */}
+<div className="sm:col-span-2">
+  <label
+    className={`block text-xs sm:text-sm font-medium mb-2 ${
+      darkMode ? "text-zinc-300" : "text-zinc-700"
+    }`}
+  >
+    Bank Statement <span className="text-red-500">*</span>
+  </label>
+
+  <div
+    className={`relative border-2 border-dashed rounded-lg p-4 sm:p-5 cursor-pointer transition-all ${
+      darkMode
+        ? "border-zinc-600 bg-zinc-700/50 hover:bg-zinc-700"
+        : "border-zinc-300 bg-zinc-50 hover:bg-zinc-100"
+    }`}
+    onClick={() => document.getElementById("bankStatementInput").click()}
+  >
+    <input
+      id="bankStatementInput"
+      type="file"
+      name="bankStatement"
+      accept="image/*,application/pdf"
+      onChange={handleInputChange}
+      className="hidden"
+      required
+    />
+
+    <div className="flex items-center space-x-3">
+      <svg
+        className={`w-8 h-8 ${
+          darkMode ? "text-zinc-400" : "text-zinc-500"
+        }`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m-9 4h8m-4-4v4"
         />
+      </svg>
+
+      <div>
+        <p
+          className={`text-sm sm:text-base font-medium ${
+            darkMode ? "text-zinc-300" : "text-zinc-700"
+          }`}
+        >
+          Upload Bank Statement
+        </p>
+        <p
+          className={`text-xs ${
+            darkMode ? "text-zinc-400" : "text-zinc-500"
+          }`}
+        >
+          JPG, PNG, or PDF — Max 5 MB
+        </p>
       </div>
     </div>
 
-    {/* Monthly Income */}
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        Monthly Income <span className="text-red-500">*</span>
-      </label>
-      <div className="relative">
-        <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-sm sm:text-base ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>
-          ₹
-        </span>
-        <input
-          type="number"
-          name="monthlyIncome"
-          value={formData.monthlyIncome}
-          onChange={handleInputChange}
-          placeholder="Enter monthly income"
-          className={`w-full pl-7 sm:pl-8 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          required
-        />
-      </div>
-      <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
-        Amount in INR
+    {/* File name preview */}
+    {formData.bankStatement && (
+      <p
+        className={`mt-3 text-xs break-all ${
+          darkMode ? "text-zinc-400" : "text-zinc-600"
+        }`}
+      >
+        Selected: {formData.bankStatement.name}
       </p>
-    </div>
+    )}
+  </div>
+</div>
 
-    {/* Bank Name & Branch */}
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        Bank Name & Branch <span className="text-red-500">*</span>
-      </label>
-      <div className="relative">
-        <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-        <input
-          type="text"
-          name="bankNameBranch"
-          value={formData.bankNameBranch}
-          onChange={handleInputChange}
-          placeholder="e.g., SBI, CP Branch"
-          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          required
-        />
-      </div>
-    </div>
 
-    {/* Account Number */}
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        Account Number <span className="text-red-500">*</span>
-      </label>
-      <div className="relative">
-        <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
-        <input
-          type="text"
-          name="accountNumber"
-          value={formData.accountNumber}
-          onChange={handleInputChange}
-          placeholder="Enter bank account number"
-          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          required
-        />
-      </div>
-    </div>
+</div>
 
-    {/* IFSC Code */}
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        IFSC Code <span className="text-red-500">*</span>
-      </label>
-      <div className="relative">
-        <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-        </svg>
-        <input
-          type="text"
-          name="ifscCode"
-          value={formData.ifscCode}
-          onChange={handleInputChange}
-          placeholder="Enter IFSC code"
-          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          maxLength="11"
-          required
-        />
-      </div>
-      <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
-        11-character code (e.g., SBIN0001234)
-      </p>
-    </div>
-
-    {/* Number of Dependents */}
-    <div>
-      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        Number of Dependents <span className="text-red-500">*</span>
-      </label>
-      <div className="relative">
-        <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-        <input
-          type="number"
-          name="numberOfDependents"
-          value={formData.numberOfDependents}
-          onChange={handleInputChange}
-          placeholder="Enter number of dependents"
-          min="0"
-          className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-            darkMode
-              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-          }`}
-          required
-        />
-      </div>
-      <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
-        Family members dependent on your income
-      </p>
-    </div>
 
     {/* Navigation Buttons */}
     <div className="flex justify-between pt-4 gap-3">
@@ -952,10 +1121,10 @@ const handleSubmit = (e) => {
           ) : (
             <div>
               <p className={`font-medium text-sm sm:text-base ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                Click to upload or drag and drop
+                Click to upload or drag and drop only one document
               </p>
               <p className={`text-xs sm:text-sm mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
-                Hospital Bills, Medical Reports, etc.
+                Hospital Bills or Medical Reports or Prescriptions, etc.
               </p>
               <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
                 PDF, JPG, JPEG or PNG (Multiple files allowed)
@@ -966,45 +1135,7 @@ const handleSubmit = (e) => {
       </div>
     </div>
 
-    {/* Declaration & Consent */}
-    <div className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-lg border ${
-      darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"
-    }`}>
-      <h3 className={`font-bold text-base sm:text-lg mb-3 sm:mb-4 ${darkMode ? "text-white" : "text-zinc-900"}`}>
-        Declaration & Consent
-      </h3>
-      <div className={`text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-        <p>
-          I hereby declare that I am not getting assistance/provision from any other organization or entity in any form and the information provided above is true. Any misrepresentation may lead to disqualification. I authorize True Path Foundation to visit and contact me to verify the provided details. I understand that video verification, its online solicitation/circulation and an appeal are mandatory for funding campaigns. A copy of a document of identity proof and bank details (if available) must be attached. I/We provide free consent for this process and acknowledge full understanding of this form in vernacular.
-        </p>
-      </div>
-      
-      <label className="flex items-start cursor-pointer group">
-        <input
-          type="checkbox"
-          name="declarationConsent"
-          checked={formData.declarationConsent}
-          onChange={(e) => setFormData(prev => ({ ...prev, declarationConsent: e.target.checked }))}
-          className="sr-only peer"
-          required
-        />
-        <div className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${
-          darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
-        }`}>
-          <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-        <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${
-          formData.declarationConsent 
-            ? 'text-emerald-600' 
-            : darkMode ? "text-zinc-300" : "text-zinc-700"
-        }`}>
-          I agree to the declaration and consent terms stated above <span className="text-red-500">*</span>
-        </span>
-      </label>
-    </div>
-
+   
     {/* Navigation Buttons */}
     <div className="flex justify-between pt-4 gap-3">
       <button
