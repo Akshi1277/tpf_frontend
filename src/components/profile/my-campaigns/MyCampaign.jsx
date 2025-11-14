@@ -20,7 +20,7 @@ import {
 
 export default function MyCampaignsPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
-  const [activeTab, setActiveTab] = useState("my-campaigns")
+  const [activeTab, setActiveTab] = useState("wishlist")
 
   // Sync with parent dark mode
   useEffect(() => {
@@ -423,20 +423,6 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             darkMode ? "bg-zinc-800/50" : "bg-white shadow-md"
           }`}>
             <button
-              onClick={() => setActiveTab("my-campaigns")}
-              className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm md:text-base transition-all whitespace-nowrap ${
-                activeTab === "my-campaigns"
-                  ? darkMode
-                    ? "bg-emerald-500/20 text-emerald-400"
-                    : "bg-emerald-500 text-white"
-                  : darkMode
-                    ? "text-zinc-400 hover:text-white"
-                    : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              My Campaigns ({myCampaigns.length})
-            </button>
-            <button
               onClick={() => setActiveTab("wishlist")}
               className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm md:text-base transition-all whitespace-nowrap ${
                 activeTab === "wishlist"
@@ -450,6 +436,21 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             >
               Wishlist ({wishlistedCampaigns.length})
             </button>
+            <button
+              onClick={() => setActiveTab("my-campaigns")}
+              className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm md:text-base transition-all whitespace-nowrap ${
+                activeTab === "my-campaigns"
+                  ? darkMode
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : "bg-emerald-500 text-white"
+                  : darkMode
+                    ? "text-zinc-400 hover:text-white"
+                    : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              My Campaigns ({myCampaigns.length})
+            </button>
+            
           </div>
         </motion.div>
 

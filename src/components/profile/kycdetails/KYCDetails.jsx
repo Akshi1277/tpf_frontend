@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect, useRef } from "react"
+import axios from "axios"
 import { 
   User, 
   Mail, 
@@ -14,13 +15,19 @@ import {
   ChevronRight,
   CreditCard,
   CheckCircle2,
-  Building
+  Building,
+  Eye,
+  Lock,
+  AlertCircle,
+  Search,
+  ChevronDown
 } from "lucide-react"
 
 export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const [darkMode, setDarkMode] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitted, setIsSubmitted] = useState(false)
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
@@ -40,6 +47,12 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const [states, setStates] = useState([])
   const [loadingCities, setLoadingCities] = useState(false)
   const [loadingStates, setLoadingStates] = useState(false)
+  
+  // Occupation dropdown states
+  const [occupations, setOccupations] = useState([])
+  const [occupationSearch, setOccupationSearch] = useState("")
+  const [showOccupationDropdown, setShowOccupationDropdown] = useState(false)
+  const occupationRef = useRef(null)
 
   // Sync with parent dark mode
   useEffect(() => {
@@ -51,6 +64,18 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   // Fetch Indian states on component mount
   useEffect(() => {
     fetchStates()
+    fetchOccupations()
+  }, [])
+
+  // Handle click outside for occupation dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (occupationRef.current && !occupationRef.current.contains(event.target)) {
+        setShowOccupationDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
   const fetchStates = async () => {
@@ -87,6 +112,27 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     }
   }
 
+  const fetchOccupations = async () => {
+    try {
+      // Fallback to common occupations
+      const commonOccupations = [
+        "Accountant", "Actor/Actress", "Architect", "Artist", "Banker",
+        "Business Owner", "Chef", "Civil Engineer", "Consultant", "Data Analyst",
+        "Data Scientist", "Designer", "Developer", "Doctor", "Driver",
+        "Electrician", "Engineer", "Entrepreneur", "Farmer", "Fashion Designer",
+        "Financial Analyst", "Freelancer", "Government Employee", "Graphic Designer",
+        "HR Manager", "IT Professional", "Journalist", "Lawyer", "Manager",
+        "Marketing Manager", "Mechanic", "Musician", "Nurse", "Pharmacist",
+        "Photographer", "Pilot", "Plumber", "Professor", "Project Manager",
+        "Real Estate Agent", "Researcher", "Sales Representative", "Scientist",
+        "Self Employed", "Software Engineer", "Student", "Teacher", "Writer"
+      ]
+      setOccupations(commonOccupations.sort())
+    } catch (error) {
+      console.error('Error fetching occupations:', error)
+    }
+  }
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -100,12 +146,19 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     }
   }
 
+  const handleOccupationSelect = (occupation) => {
+    setFormData(prev => ({ ...prev, occupation }))
+    setShowOccupationDropdown(false)
+    setOccupationSearch("")
+  }
+
   const handlePaste = (e) => {
     e.preventDefault()
     return false
   }
 
   const handleSubmit = () => {
+    setIsSubmitted(true)
     setShowSuccess(true)
     setTimeout(() => {
       setShowSuccess(false)
@@ -113,14 +166,22 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     }, 3000)
   }
 
-  // Custom Date Picker Component
-  const CustomDatePicker = ({ darkMode, value, onChange, name }) => {
+  const filteredOccupations = occupations.filter(occ => 
+    occ.toLowerCase().includes(occupationSearch.toLowerCase())
+  )
+
+  // Improved Date Picker Component
+  const ImprovedDatePicker = ({ darkMode, value, onChange, name }) => {
     const [showCalendar, setShowCalendar] = useState(false)
-    const [currentMonth, setCurrentMonth] = useState(new Date())
+    const [selectedYear, setSelectedYear] = useState(value ? new Date(value + 'T00:00:00').getFullYear() : new Date().getFullYear())
+    const [selectedMonth, setSelectedMonth] = useState(value ? new Date(value + 'T00:00:00').getMonth() : new Date().getMonth())
     const calendarRef = useRef(null)
 
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+    
+    const currentYear = new Date().getFullYear()
+    const years = Array.from({ length: 100 }, (_, i) => currentYear - i)
 
     useEffect(() => {
       const handleClickOutside = (event) => {
@@ -132,15 +193,14 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
       return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
-    const getDaysInMonth = (date) => {
-      const year = date.getFullYear()
-      const month = date.getMonth()
+    const getDaysInMonth = (year, month) => {
       const firstDay = new Date(year, month, 1)
       const daysInMonth = new Date(year, month + 1, 0).getDate()
       const startingDayOfWeek = firstDay.getDay()
       
       const days = []
       const prevMonthLastDay = new Date(year, month, 0).getDate()
+      
       for (let i = startingDayOfWeek - 1; i >= 0; i--) {
         days.push({ day: prevMonthLastDay - i, isCurrentMonth: false })
       }
@@ -156,25 +216,16 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
     const handleDateSelect = (day) => {
       if (day.isCurrentMonth) {
-        const year = currentMonth.getFullYear()
-        const month = String(currentMonth.getMonth() + 1).padStart(2, '0')
+        const month = String(selectedMonth + 1).padStart(2, '0')
         const dayStr = String(day.day).padStart(2, '0')
-        const formattedDate = `${year}-${month}-${dayStr}`
+        const formattedDate = `${selectedYear}-${month}-${dayStr}`
         onChange({ target: { name, value: formattedDate } })
         setShowCalendar(false)
       }
     }
 
-    const changeMonth = (offset) => {
-      setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + offset, 1))
-    }
-
-    const changeYear = (offset) => {
-      setCurrentMonth(new Date(currentMonth.getFullYear() + offset, currentMonth.getMonth(), 1))
-    }
-
     const formatDisplayDate = (dateString) => {
-      if (!dateString) return "Select date of birth"
+      if (!dateString) return "Select date of birth (Optional)"
       const date = new Date(dateString + 'T00:00:00')
       return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
     }
@@ -183,8 +234,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     const isSelectedDate = (day) => {
       if (!selectedDate || !day.isCurrentMonth) return false
       return day.day === selectedDate.getDate() && 
-             currentMonth.getMonth() === selectedDate.getMonth() && 
-             currentMonth.getFullYear() === selectedDate.getFullYear()
+             selectedMonth === selectedDate.getMonth() && 
+             selectedYear === selectedDate.getFullYear()
     }
 
     return (
@@ -212,7 +263,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
             />
             
             <div 
-              className={`fixed sm:absolute left-1/2 top-1/2 sm:top-full sm:left-1/2 -translate-x-1/2 -translate-y-1/2 sm:translate-y-0 sm:mt-2 z-[100] rounded-2xl border shadow-2xl ${
+              className={`fixed sm:absolute left-1/2 top-1/2 sm:top-full sm:left-0 -translate-x-1/2 -translate-y-1/2 sm:translate-x-0 sm:translate-y-0 sm:mt-2 z-[100] rounded-2xl border shadow-2xl ${
                 darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
               }`} 
               style={{ 
@@ -221,31 +272,49 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
               }}
             >
               
+              {/* Year and Month Selectors */}
               <div className={`p-4 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"}`}>
-                <div className="flex items-center justify-between mb-3">
-                  <button type="button" onClick={() => changeYear(-1)} className={`p-2 rounded-lg transition-all ${darkMode ? "hover:bg-zinc-700" : "hover:bg-gray-100"}`}>
-                    <ChevronLeft className="w-4 h-4" strokeWidth={3} />
-                  </button>
-                  <span className={`font-bold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {currentMonth.getFullYear()}
-                  </span>
-                  <button type="button" onClick={() => changeYear(1)} className={`p-2 rounded-lg transition-all ${darkMode ? "hover:bg-zinc-700" : "hover:bg-gray-100"}`}>
-                    <ChevronRight className="w-4 h-4" strokeWidth={3} />
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <button type="button" onClick={() => changeMonth(-1)} className={`p-2 rounded-lg transition-all ${darkMode ? "hover:bg-zinc-700" : "hover:bg-gray-100"}`}>
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {months[currentMonth.getMonth()]}
-                  </span>
-                  <button type="button" onClick={() => changeMonth(1)} className={`p-2 rounded-lg transition-all ${darkMode ? "hover:bg-zinc-700" : "hover:bg-gray-100"}`}>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label className={`text-xs font-medium mb-1 block ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                      Year
+                    </label>
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(Number(e.target.value))}
+                      className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${
+                        darkMode 
+                          ? "bg-zinc-900 border-zinc-700 text-white" 
+                          : "bg-gray-50 border-gray-200 text-gray-900"
+                      }`}
+                    >
+                      {years.map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={`text-xs font-medium mb-1 block ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                      Month
+                    </label>
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                      className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${
+                        darkMode 
+                          ? "bg-zinc-900 border-zinc-700 text-white" 
+                          : "bg-gray-50 border-gray-200 text-gray-900"
+                      }`}
+                    >
+                      {months.map((month, idx) => (
+                        <option key={idx} value={idx}>{month.slice(0, 3)}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
+              {/* Calendar Days */}
               <div className="p-4">
                 <div className="grid grid-cols-7 gap-1 mb-2">
                   {days.map((day) => (
@@ -255,7 +324,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                   ))}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
-                  {getDaysInMonth(currentMonth).map((day, index) => (
+                  {getDaysInMonth(selectedYear, selectedMonth).map((day, index) => (
                     <button
                       key={index}
                       type="button"
@@ -291,8 +360,85 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
   const steps = [
     { number: 1, title: "Personal Info", icon: User },
-    { number: 2, title: "Address & PAN", icon: MapPin }
+    { number: 2, title: "Address & PAN", icon: MapPin },
+    { number: 3, title: "Preview", icon: Eye }
   ]
+
+  // If already submitted, show lock message
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
+            darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+          }`} />
+          <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
+            darkMode ? "bg-teal-950/20" : "bg-teal-50"
+          }`} />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className={`relative z-10 max-w-2xl w-full rounded-3xl overflow-hidden ${
+            darkMode 
+              ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800" 
+              : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
+          }`}
+        >
+          <div className="relative h-32 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
+            <div className="absolute inset-0 opacity-20">
+              <div 
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+                  backgroundSize: "32px 32px"
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="p-8 text-center -mt-16">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-6">
+              <Lock className="w-12 h-12 text-emerald-600" />
+            </div>
+
+            <h2 className={`text-2xl sm:text-3xl font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
+              KYC Submitted Successfully
+            </h2>
+
+            <div className={`p-6 rounded-2xl mb-6 ${
+              darkMode ? "bg-zinc-800/50 border border-zinc-700" : "bg-blue-50 border border-blue-200"
+            }`}>
+              <div className="flex items-start gap-3">
+                <AlertCircle className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
+                  darkMode ? "text-blue-400" : "text-blue-600"
+                }`} />
+                <div className="text-left">
+                  <p className={`font-semibold mb-2 ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
+                    Your KYC is Under Review
+                  </p>
+                  <p className={`text-sm ${darkMode ? "text-blue-400" : "text-blue-700"}`}>
+                    Our admin team is reviewing your KYC details. You'll be notified once the verification is complete. 
+                    Your KYC details cannot be changed during the review process.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className={`p-4 rounded-xl ${
+              darkMode ? "bg-yellow-900/20 border border-yellow-800/50" : "bg-yellow-50 border border-yellow-200"
+            }`}>
+              <p className={`text-sm font-medium ${darkMode ? "text-yellow-300" : "text-yellow-800"}`}>
+                <Lock className="w-4 h-4 inline mr-2" />
+                KYC details are locked and cannot be modified
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">
@@ -318,7 +464,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                   KYC Submitted Successfully!
                 </p>
                 <p className={`text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                  Your details are under review by our admin team. You'll be notified once approved.
+                  Your details are under review by our admin team.
                 </p>
               </div>
             </div>
@@ -346,7 +492,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
           transition={{ duration: 0.6 }}
           className="mb-8 flex justify-center"
         >
-          <div className="flex items-center max-w-2xl px-4">
+          <div className="flex items-center max-w-3xl px-4">
             {steps.map((step, index) => {
               const Icon = step.icon
               const isActive = currentStep === step.number
@@ -381,7 +527,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     </span>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`h-0.5 w-16 sm:w-20 md:w-24 mx-4 sm:mx-6 ${
+                    <div className={`h-0.5 w-12 sm:w-16 md:w-20 mx-3 sm:mx-4 ${
                       isCompleted
                         ? "bg-emerald-600"
                         : darkMode ? "bg-zinc-700" : "bg-gray-300"
@@ -465,9 +611,9 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                          Date of Birth <span className="text-red-500">*</span>
+                          Date of Birth <span className="text-gray-400 text-xs">(Optional)</span>
                         </label>
-                        <CustomDatePicker
+                        <ImprovedDatePicker
                           darkMode={darkMode}
                           value={formData.dateOfBirth}
                           onChange={handleInputChange}
@@ -525,24 +671,54 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                         </div>
                       </div>
 
+                      {/* Occupation with Search */}
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
                           Occupation <span className="text-red-500">*</span>
                         </label>
-                        <div className="relative">
-                          <Building className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
-                          <input
-                            type="text"
-                            name="occupation"
-                            value={formData.occupation}
-                            onChange={handleInputChange}
-                            placeholder="Your profession"
-                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
-                          />
+                        <div className="relative" ref={occupationRef}>
+                          <div className="relative">
+                            <Building className={`absolute left-4 top-3.5 w-5 h-5 z-10 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                            <input
+                              type="text"
+                              value={occupationSearch || formData.occupation}
+                              onChange={(e) => {
+                                setOccupationSearch(e.target.value)
+                                setShowOccupationDropdown(true)
+                              }}
+                              onFocus={() => setShowOccupationDropdown(true)}
+                              placeholder="Search occupation..."
+                              className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 outline-none transition-all ${
+                                darkMode
+                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                              }`}
+                            />
+                            <Search className={`absolute right-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                          </div>
+                          
+                          {showOccupationDropdown && filteredOccupations.length > 0 && (
+                            <div className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 ${
+                              darkMode 
+                                ? "bg-zinc-800 border-zinc-700" 
+                                : "bg-white border-gray-200"
+                            }`}>
+                              {filteredOccupations.map((occupation, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => handleOccupationSelect(occupation)}
+                                  className={`w-full px-4 py-3 text-left transition-colors ${
+                                    darkMode 
+                                      ? "hover:bg-zinc-700 text-white" 
+                                      : "hover:bg-gray-50 text-gray-900"
+                                  } ${idx !== 0 ? (darkMode ? "border-t border-zinc-700" : "border-t border-gray-100") : ""}`}
+                                >
+                                  {occupation}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -609,7 +785,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     <div className="space-y-6">
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                          Address <span className="text-red-500">*</span>
+                          Address <span className="text-gray-400 text-xs">(Optional)</span>
                         </label>
                         <div className="relative">
                           <MapPin className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
@@ -790,6 +966,130 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                   </div>
                 </motion.div>
               )}
+
+              {/* Step 3: Preview */}
+              {currentStep === 3 && (
+                <motion.div
+                  key="step3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h3 className={`text-xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                      Review Your KYC Details
+                    </h3>
+                    <p className={`text-sm mb-6 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                      Please review all information carefully before submitting
+                    </p>
+                    
+                    {/* Personal Information Preview */}
+                    <div className={`p-6 rounded-2xl border mb-6 ${
+                      darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+                    }`}>
+                      <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        <User className="w-5 h-5" />
+                        Personal Information
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Full Name</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.fullName || "—"}</p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Date of Birth</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                            {formData.dateOfBirth ? new Date(formData.dateOfBirth + 'T00:00:00').toLocaleDateString('en-IN', { 
+                              day: 'numeric', 
+                              month: 'long', 
+                              year: 'numeric' 
+                            }) : "Not provided"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Gender</p>
+                          <p className={`font-semibold capitalize ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.gender || "—"}</p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Occupation</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.occupation || "—"}</p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Phone Number</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.phoneNumber || "—"}</p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Email Address</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.email || "—"}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Address Preview */}
+                    <div className={`p-6 rounded-2xl border mb-6 ${
+                      darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+                    }`}>
+                      <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        <MapPin className="w-5 h-5" />
+                        Residential Address
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="sm:col-span-2">
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Address</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.addressLine1 || "—"}</p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>City</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.city || "—"}</p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>State</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.state || "—"}</p>
+                        </div>
+                        <div>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Postal Code</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.postalCode || "Not provided"}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* PAN Preview */}
+                    <div className={`p-6 rounded-2xl border ${
+                      darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+                    }`}>
+                      <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        <CreditCard className="w-5 h-5" />
+                        PAN Card Details
+                      </h4>
+                      <div>
+                        <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>PAN Number</p>
+                        <p className={`font-bold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.panNumber || "—"}</p>
+                      </div>
+                    </div>
+
+                    {/* Important Notice */}
+                    <div className={`p-4 rounded-xl border ${
+                      darkMode ? "bg-yellow-900/20 border-yellow-800/50" : "bg-yellow-50 border-yellow-200"
+                    }`}>
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                          darkMode ? "text-yellow-400" : "text-yellow-600"
+                        }`} />
+                        <div>
+                          <p className={`font-semibold mb-1 text-sm ${darkMode ? "text-yellow-300" : "text-yellow-800"}`}>
+                            Important Notice
+                          </p>
+                          <p className={`text-xs ${darkMode ? "text-yellow-400" : "text-yellow-700"}`}>
+                            Once submitted, your KYC details cannot be modified and will be sent for admin approval. 
+                            Please ensure all information is accurate.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </AnimatePresence>
 
             {/* Navigation Buttons */}
@@ -817,7 +1117,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                 </button>
               )}
 
-              {currentStep < 2 ? (
+              {currentStep < 3 ? (
                 <button
                   onClick={() => setCurrentStep(currentStep + 1)}
                   className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold transition-all shadow-lg"

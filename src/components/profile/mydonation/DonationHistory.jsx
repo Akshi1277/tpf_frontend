@@ -156,46 +156,33 @@ export default function DonationHistory({
                 />
               </div>
 
-              {/* Status Filter */}
-              <div className="relative">
-                <Filter className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-                  darkMode ? "text-zinc-500" : "text-gray-400"
-                }`} />
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className={`pl-11 pr-8 py-2.5 rounded-lg border outline-none transition-all appearance-none cursor-pointer ${
-                    darkMode
-                      ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
-                  }`}
-                >
-                  <option value="all">All Status</option>
-                  <option value="completed">Completed</option>
-                  <option value="pending">Pending</option>
-                  <option value="failed">Failed</option>
-                </select>
-              </div>
+              {/* Status Filter - Updated */}
+<div className="relative">
+  <Filter className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
+    darkMode ? "text-zinc-500" : "text-gray-400"
+  }`} />
+
+  <select
+    value={filterStatus}
+    onChange={(e) => setFilterStatus(e.target.value)}
+    className={`pl-11 pr-8 py-2.5 rounded-lg border outline-none transition-all appearance-none cursor-pointer ${
+      darkMode
+        ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
+        : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
+    }`}
+  >
+    <option value="all">All</option>
+    <option value="80G">80G</option>
+    <option value="zakat">Zakaat</option>
+    <option value="all-donations">All Donations</option>
+  </select>
+</div>
+
             </div>
 
             {/* 80G Filter Toggle and Date Range */}
             <div className="flex flex-col sm:flex-row gap-4">
-              {/* 80G Filter */}
-              <button
-                onClick={() => setFilter80G(!filter80G)}
-                className={`px-4 py-2.5 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                  filter80G
-                    ? darkMode
-                      ? "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/50"
-                      : "bg-emerald-500 text-white border-2 border-emerald-600"
-                    : darkMode
-                    ? "bg-zinc-700 text-zinc-400 border-2 border-zinc-600 hover:border-emerald-500/50"
-                    : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-emerald-500/50"
-                }`}
-              >
-                <Shield className="w-5 h-5" />
-                {filter80G ? "Showing 80G Only" : "Show 80G Eligible"}
-              </button>
+          
 
               {/* Date Range Toggle */}
               <button
@@ -214,20 +201,6 @@ export default function DonationHistory({
                 Date Range Filter
               </button>
 
-              {/* Download Invoice Button */}
-              {dateRange.start && dateRange.end && (
-                <button
-                  onClick={handleDownloadInvoice}
-                  className={`px-4 py-2.5 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                    darkMode
-                      ? "bg-purple-500/20 text-purple-400 border-2 border-purple-500/50 hover:bg-purple-500/30"
-                      : "bg-purple-500 text-white border-2 border-purple-600 hover:bg-purple-600"
-                  }`}
-                >
-                  <Download className="w-5 h-5" />
-                  Download Invoice
-                </button>
-              )}
             </div>
 
             {/* Date Range Inputs */}
