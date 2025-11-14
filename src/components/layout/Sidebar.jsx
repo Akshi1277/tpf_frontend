@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   ClipboardList,
   HandHeartIcon,
-  Download
+  Download,
+  IndianRupeeIcon
 } from "lucide-react"
 
 // Menu items defined outside component to prevent recreation on each render
@@ -38,14 +39,19 @@ const menuItems = [
     description: "View your contributions"
   },
   {
+    name: "Offline Donations",
+    path: "/profile/offline-donations",
+    icon: IndianRupeeIcon,
+    gradient: "from-cyan-500 to-blue-600",
+    activeColor: "emerald",
+    description: "Manage Offline Donations"
+  },
+  {
     name: "KYC Details",
     path: "/profile/kyc-details",
     icon: FileCheck,
    gradient: "from-blue-400 via-cyan-500 to-teal-400",
-
-
-
-    activeColor: "purple",
+     activeColor: "purple",
     description: "Verify your identity"
   },
   {
