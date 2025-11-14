@@ -26,29 +26,29 @@ export default function FinancialAidPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
-  const aidOptions = [
-    {
-      id: "myself",
-      title: "Myself",
-      description: "Request financial assistance for personal needs. Funds will be transferred to your verified bank account.",
-      icon: User,
-      route: "/financial-aid/myself"
-    },
-    {
-      id: "relative",
-      title: "Relative/Friend/Other",
-      description: "Raise funds on behalf of a family member, friend, or someone in need. Help those who matter to you.",
-      icon: Users,
-      route: "/financial-aid/relative"
-    },
-    {
-      id: "organization",
-      title: "Organization",
-      description: "Request aid for your registered organization or non-profit. Support your community initiatives and programs.",
-      icon: Building2,
-      route: "/financial-aid/organization"
-    }
-  ]
+ const aidOptions = [
+  {
+    id: "myself",
+    title: "Myself",
+    description: "Request financial assistance for personal needs. Funds will be transferred to your verified bank account.",
+    icon: User,
+    route: "/financial-aid/myself"
+  },
+  {
+    id: "relative",
+    title: "Relative/Friend/Other",
+    description: "Raise funds on behalf of a family member, friend, or someone in need. Help those who matter to you.",
+    icon: Users,
+    route: "/financial-aid/other"
+  },
+  {
+    id: "organization",
+    title: "Organization",
+    description: "Request aid for your registered organization or non-profit. Support your community initiatives and programs.",
+    icon: Building2,
+    route: "/financial-aid/organization"
+  }
+]
 
   const handleOptionSelect = (optionId) => {
     setSelectedOption(optionId)
