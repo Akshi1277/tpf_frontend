@@ -3,23 +3,22 @@
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { 
-  Zap,
+  Clock,
   Heart,
-  Info,
   ChevronRight,
   Check,
   ArrowLeft,
   Sparkles,
   Calendar,
-  Shield
+  Shield,
+  BarChart3
 } from "lucide-react"
 
-export default function DailyImpactPage({ darkModeFromParent }) {
+export default function WeeklySupportPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
   const router = useRouter()
-  const [amount, setAmount] = useState("20")
+  const [amount, setAmount] = useState("50")
   const [customAmount, setCustomAmount] = useState("")
   const [countAsZakat, setCountAsZakat] = useState(false)
   const [launchGoodTip, setLaunchGoodTip] = useState(0)
@@ -31,7 +30,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
-  const presetAmounts = [30, 50, 70]
+  const presetAmounts = [50, 100, 200]
   const tipPercentages = [0, 5, 10, 15]
 
   const calculateTip = () => {
@@ -67,7 +66,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
             <Check className="w-5 h-5" />
           </div>
           <div>
-            <p className="font-semibold">Daily Giving Activated!</p>
+            <p className="font-semibold">Weekly Support Activated!</p>
             <p className="text-sm text-emerald-100">Taking you to dashboard...</p>
           </div>
         </motion.div>
@@ -100,8 +99,8 @@ export default function DailyImpactPage({ darkModeFromParent }) {
         >
           {/* Decorative Background Pattern */}
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-red-500 to-orange-500 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-500 to-blue-500 rounded-full blur-3xl" />
           </div>
 
           {/* Content */}
@@ -109,33 +108,33 @@ export default function DailyImpactPage({ darkModeFromParent }) {
             {/* Icon & Badge */}
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 flex items-center justify-center shadow-lg">
-                  <Zap className="w-8 h-8 text-white" fill="white" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
+                  <Clock className="w-8 h-8 text-white" />
                 </div>
                 <div>
                   <h1 className={`text-3xl sm:text-4xl font-bold ${
                     darkMode ? "text-white" : "text-zinc-900"
                   }`}>
-                    Daily Impact
+                    Weekly Support
                   </h1>
-                  <p className="text-amber-500 font-semibold text-sm sm:text-base">
-                    Every day matters
+                  <p className="text-blue-500 font-semibold text-sm sm:text-base">
+                    Consistent & reliable
                   </p>
                 </div>
               </div>
-              <div className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
-                <span className="text-xs font-bold text-amber-500">MOST ACTIVE</span>
+              <div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+                <span className="text-xs font-bold text-blue-500">MOST POPULAR</span>
               </div>
             </div>
 
             {/* Price */}
             <div className="mb-6">
               <div className="flex items-baseline gap-2">
-                <span className={`text-5xl sm:text-6xl font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent`}>
+                <span className={`text-5xl sm:text-6xl font-bold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent`}>
                   ₹{customAmount || amount}
                 </span>
                 <span className={`text-xl ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>
-                  /day
+                  /week
                 </span>
               </div>
             </div>
@@ -144,13 +143,13 @@ export default function DailyImpactPage({ darkModeFromParent }) {
             <p className={`text-sm sm:text-base leading-relaxed ${
               darkMode ? "text-zinc-400" : "text-zinc-600"
             }`}>
-              Transform lives with consistent daily contributions. Perfect for those who want to make giving a daily habit.
+              Build sustainable impact with weekly contributions. Every Friday, your donation supports ongoing initiatives and creates lasting change.
             </p>
 
             {/* Action Button - Desktop Only */}
             <button
               onClick={() => document.getElementById('amount-section')?.scrollIntoView({ behavior: 'smooth' })}
-              className="hidden sm:flex items-center gap-2 mt-6 text-amber-500 font-semibold hover:gap-3 transition-all group"
+              className="hidden sm:flex items-center gap-2 mt-6 text-blue-500 font-semibold hover:gap-3 transition-all group"
             >
               <span>Click to explore</span>
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -189,8 +188,8 @@ export default function DailyImpactPage({ darkModeFromParent }) {
                 placeholder={amount}
                 className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 outline-none transition-all ${
                   darkMode
-                    ? "bg-zinc-900 border-zinc-700 text-white placeholder-zinc-600 focus:border-amber-500"
-                    : "bg-white border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-100"
+                    ? "bg-zinc-900 border-zinc-700 text-white placeholder-zinc-600 focus:border-blue-500"
+                    : "bg-white border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 }`}
               />
             </div>
@@ -207,7 +206,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
                 }}
                 className={`py-3 px-4 rounded-lg font-semibold transition-all ${
                   (customAmount === "" && amount === preset.toString())
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
                     : darkMode
                     ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                     : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
@@ -256,6 +255,32 @@ export default function DailyImpactPage({ darkModeFromParent }) {
               </p>
             </div>
           </label>
+        </motion.div>
+
+        {/* Donation Schedule Info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
+            darkMode ? "bg-zinc-800" : "bg-white"
+          } shadow-lg`}
+        >
+          <div className="flex items-start gap-3">
+            <Calendar className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className={`text-lg font-bold mb-2 ${
+                darkMode ? "text-white" : "text-zinc-900"
+              }`}>
+                Donation Schedule
+              </h3>
+              <p className={`text-sm leading-relaxed ${
+                darkMode ? "text-zinc-400" : "text-zinc-600"
+              }`}>
+                Your weekly donation will be processed <span className="font-semibold text-blue-500">every Friday at 9:00 AM</span>. You'll receive a confirmation notification after each successful donation.
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Platform Support */}
@@ -343,21 +368,17 @@ export default function DailyImpactPage({ darkModeFromParent }) {
             darkMode ? "text-zinc-400" : "text-zinc-600"
           }`}>
             To select a payment method you will need to create an account or{' '}
-            <Link href="/login" className="text-emerald-600 font-semibold hover:underline">
+            <a href="#" className="text-emerald-600 font-semibold hover:underline">
               log in
-            </Link>
+            </a>
           </p>
-         <Link href="/signup">
-  <button
-    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
-      darkMode
-        ? "bg-zinc-700 text-white hover:bg-zinc-600"
-        : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
-    }`}
-  >
-    Create an account
-  </button>
-</Link>
+          <button className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
+            darkMode
+              ? "bg-zinc-700 text-white hover:bg-zinc-600"
+              : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
+          }`}>
+            Create an account
+          </button>
         </motion.div>
 
         {/* Review & Confirm */}
@@ -372,13 +393,13 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           <h3 className={`text-lg font-bold mb-4 ${
             darkMode ? "text-white" : "text-zinc-900"
           }`}>
-            Review your daily giving
+            Review your weekly giving
           </h3>
 
           <div className="space-y-3 mb-6">
             <div className="flex items-center justify-between py-2">
               <span className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
-                Daily starting today
+                Weekly starting this Friday
               </span>
               <span className={`font-semibold ${darkMode ? "text-white" : "text-zinc-900"}`}>
                 -
@@ -404,7 +425,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
               darkMode ? "border-zinc-700" : "border-zinc-200"
             }`}>
               <span className={`font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
-                Daily total
+                Weekly total
               </span>
               <span className={`text-lg font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
                 ₹{calculateTotal()}
@@ -446,15 +467,15 @@ export default function DailyImpactPage({ darkModeFromParent }) {
 
           <div className="space-y-4">
             {[
-              { icon: Calendar, text: "Automated daily donations at 9:00 AM" },
-              { icon: Sparkles, text: "Flexible amount from ₹20 onwards" },
-              { icon: Shield, text: "Pause or modify anytime" },
-              { icon: Zap, text: "Daily impact notifications" }
+              { icon: Clock, text: "Automated donations every Friday at 9:00 AM" },
+              { icon: Sparkles, text: "Minimum ₹50 per week contribution" },
+              { icon: BarChart3, text: "Comprehensive weekly impact reports" },
+              { icon: Shield, text: "Pause or modify anytime from dashboard" }
             ].map((feature, index) => {
               const Icon = feature.icon
               return (
                 <div key={index} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
                     <Icon className="w-4 h-4 text-white" />
                   </div>
                   <p className={`text-sm ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
