@@ -4,6 +4,7 @@ import Footer from '@/components/layout/Footer'
 import { useState, useEffect } from 'react'
 import PermanentDonorPage from '@/components/permanentdonor/PermanentDonor'
 import DailyImpactPage from '@/components/permanentdonor/dailygiver/DailyGiver'
+import AnnualPatronPage from '@/components/permanentdonor/donateyearly/DonateYearly'
 
 export default function Page() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -39,7 +40,7 @@ export default function Page() {
           <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16 sm:pb-20 ${
             darkMode ? "bg-zinc-950" : "bg-gray-50"
           }`}>
-            <DailyImpactPage darkModeFromParent={darkMode} />
+            <AnnualPatronPage darkModeFromParent={darkMode} />
           </div>
         </main>
       </div>

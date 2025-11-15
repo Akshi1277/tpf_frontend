@@ -79,7 +79,7 @@ const menuItems = [
     description: "Manage your Receipts and Invoices"
   },
   {
-    name: "Contact",
+    name: "Contact Us",
     path: "/profile/contactpage",
     icon: Wrench,
     gradient: "from-rose-500 to-red-600",
