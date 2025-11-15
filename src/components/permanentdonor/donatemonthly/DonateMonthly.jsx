@@ -265,44 +265,7 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
             ))}
           </div>
 
-          {/* Zakat Option */}
-          <label className={`flex items-start gap-3 p-4 rounded-xl cursor-pointer transition-all ${
-            countAsZakat
-              ? darkMode
-                ? "bg-emerald-950/30 border-2 border-emerald-500/30"
-                : "bg-emerald-50 border-2 border-emerald-200"
-              : darkMode
-              ? "bg-zinc-900 border-2 border-zinc-700"
-              : "bg-zinc-50 border-2 border-zinc-200"
-          }`}>
-            <input
-              type="checkbox"
-              checked={countAsZakat}
-              onChange={(e) => setCountAsZakat(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-              countAsZakat
-                ? "bg-emerald-600 border-emerald-600"
-                : darkMode
-                ? "border-zinc-600"
-                : "border-zinc-300"
-            }`}>
-              {countAsZakat && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
-            </div>
-            <div className="flex-1">
-              <p className={`text-sm font-medium ${
-                darkMode ? "text-zinc-200" : "text-zinc-800"
-              }`}>
-                Count as Zakat where applicable
-              </p>
-              <p className={`text-xs mt-1 ${
-                darkMode ? "text-zinc-500" : "text-zinc-500"
-              }`}>
-                Whenever a fundraiser is Zakat-verified, count it as your Zakat.
-              </p>
-            </div>
-          </label>
+        
         </motion.div>
 
         {/* Donation Date Selection */}
