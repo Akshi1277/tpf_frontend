@@ -15,21 +15,22 @@ import {
   Edit3,
   Save,
   X,
-  ChevronLeft,
-  ChevronRight,
   Award,
   Heart,
   Check,
   Briefcase,
   Users,
   Search,
-  ChevronDown
+  TrendingUp,
+  Target,
+  Sparkles
 } from "lucide-react"
 
 export default function ProfilePage({ darkModeFromParent}) {
   const router = useRouter()
   const [darkMode, setDarkMode] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [editingField, setEditingField] = useState(null)
   const [showSuccess, setShowSuccess] = useState(false)
   const [professions, setProfessions] = useState([])
   const [professionSearch, setProfessionSearch] = useState("")
@@ -49,6 +50,8 @@ export default function ProfilePage({ darkModeFromParent}) {
     zakaatAmount: null,
   })
 
+  const [tempData, setTempData] = useState({})
+
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
       setDarkMode(darkModeFromParent)
@@ -57,41 +60,16 @@ export default function ProfilePage({ darkModeFromParent}) {
 
   // Fetch professions from API
   useEffect(() => {
-    const fetchProfessions = async () => {
-      try {
-        // Using a free API that provides occupation data
-        const response = await axios.get('https://api.api-ninjas.com/v1/occupation', {
-          headers: { 'X-Api-Key': 'your_api_key_here' }
-        })
-        
-        // Fallback to common professions if API fails
-        const commonProfessions = [
-          "Software Engineer", "Doctor", "Teacher", "Nurse", "Accountant",
-          "Engineer", "Manager", "Consultant", "Designer", "Architect",
-          "Lawyer", "Pharmacist", "Scientist", "Analyst", "Developer",
-          "Marketing Manager", "Sales Representative", "Business Owner",
-          "Entrepreneur", "Student", "Researcher", "Writer", "Artist",
-          "Musician", "Chef", "Photographer", "Pilot", "Driver",
-          "Electrician", "Plumber", "Mechanic", "Carpenter", "Farmer"
-        ]
-        
-        setProfessions(commonProfessions.sort())
-      } catch (error) {
-        // Fallback professions
-        const commonProfessions = [
-          "Software Engineer", "Doctor", "Teacher", "Nurse", "Accountant",
-          "Engineer", "Manager", "Consultant", "Designer", "Architect",
-          "Lawyer", "Pharmacist", "Scientist", "Analyst", "Developer",
-          "Marketing Manager", "Sales Representative", "Business Owner",
-          "Entrepreneur", "Student", "Researcher", "Writer", "Artist",
-          "Musician", "Chef", "Photographer", "Pilot", "Driver",
-          "Electrician", "Plumber", "Mechanic", "Carpenter", "Farmer"
-        ]
-        setProfessions(commonProfessions.sort())
-      }
-    }
-    
-    fetchProfessions()
+    const commonProfessions = [
+      "Software Engineer", "Doctor", "Teacher", "Nurse", "Accountant",
+      "Engineer", "Manager", "Consultant", "Designer", "Architect",
+      "Lawyer", "Pharmacist", "Scientist", "Analyst", "Developer",
+      "Marketing Manager", "Sales Representative", "Business Owner",
+      "Entrepreneur", "Student", "Researcher", "Writer", "Artist",
+      "Musician", "Chef", "Photographer", "Pilot", "Driver",
+      "Electrician", "Plumber", "Mechanic", "Carpenter", "Farmer"
+    ]
+    setProfessions(commonProfessions.sort())
   }, [])
 
   useEffect(() => {
@@ -104,21 +82,27 @@ export default function ProfilePage({ darkModeFromParent}) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setProfileData(prev => ({ ...prev, [name]: value }))
+  const handleFieldEdit = (field, value) => {
+    setEditingField(field)
+    setTempData({ [field]: value })
+  }
+
+  const handleFieldSave = (field) => {
+    setProfileData(prev => ({ ...prev, [field]: tempData[field] }))
+    setEditingField(null)
+    setShowSuccess(true)
+    setTimeout(() => setShowSuccess(false), 2000)
+  }
+
+  const handleFieldCancel = () => {
+    setEditingField(null)
+    setTempData({})
   }
 
   const handleProfessionSelect = (profession) => {
-    setProfileData(prev => ({ ...prev, profession }))
+    setTempData({ profession })
     setShowProfessionDropdown(false)
     setProfessionSearch("")
-  }
-
-  const handleSave = () => {
-    setIsEditing(false)
-    setShowSuccess(true)
-    setTimeout(() => setShowSuccess(false), 3000)
   }
 
   const calculateAge = (dob) => {
@@ -141,10 +125,6 @@ export default function ProfilePage({ darkModeFromParent}) {
       .slice(0, 2)
   }
 
-  const handleCalculateZakaat = () => {
-    alert("Zakaat calculator will be opened here")
-  }
-
   const userRoles = [
     { value: "donor", label: "Donor", description: "One-time contributor", icon: Heart },
     { value: "permanent_donor", label: "Permanent Donor", description: "Regular monthly supporter", icon: Award },
@@ -156,197 +136,150 @@ export default function ProfilePage({ darkModeFromParent}) {
     prof.toLowerCase().includes(professionSearch.toLowerCase())
   )
 
-  // Improved Date Picker Component with Year and Month Dropdowns
-  const ImprovedDatePicker = ({ darkMode, value, onChange, name }) => {
-    const [showCalendar, setShowCalendar] = useState(false)
-    const [selectedYear, setSelectedYear] = useState(value ? new Date(value + 'T00:00:00').getFullYear() : new Date().getFullYear())
-    const [selectedMonth, setSelectedMonth] = useState(value ? new Date(value + 'T00:00:00').getMonth() : new Date().getMonth())
-    const calendarRef = useRef(null)
-
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-    
-    const currentYear = new Date().getFullYear()
-    const years = Array.from({ length: 100 }, (_, i) => currentYear - i)
-
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-          setShowCalendar(false)
-        }
-      }
-      document.addEventListener("mousedown", handleClickOutside)
-      return () => document.removeEventListener("mousedown", handleClickOutside)
-    }, [])
-
-    const getDaysInMonth = (year, month) => {
-      const firstDay = new Date(year, month, 1)
-      const daysInMonth = new Date(year, month + 1, 0).getDate()
-      const startingDayOfWeek = firstDay.getDay()
-      
-      const days = []
-      const prevMonthLastDay = new Date(year, month, 0).getDate()
-      
-      for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-        days.push({ day: prevMonthLastDay - i, isCurrentMonth: false })
-      }
-      for (let i = 1; i <= daysInMonth; i++) {
-        days.push({ day: i, isCurrentMonth: true })
-      }
-      const remainingDays = 42 - days.length
-      for (let i = 1; i <= remainingDays; i++) {
-        days.push({ day: i, isCurrentMonth: false })
-      }
-      return days
-    }
-
-    const handleDateSelect = (day) => {
-      if (day.isCurrentMonth) {
-        const month = String(selectedMonth + 1).padStart(2, '0')
-        const dayStr = String(day.day).padStart(2, '0')
-        const formattedDate = `${selectedYear}-${month}-${dayStr}`
-        onChange({ target: { name, value: formattedDate } })
-        setShowCalendar(false)
-      }
-    }
-
-    const formatDisplayDate = (dateString) => {
-      if (!dateString) return "Select date"
-      const date = new Date(dateString + 'T00:00:00')
-      return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
-    }
-
-    const selectedDate = value ? new Date(value + 'T00:00:00') : null
-    const isSelectedDate = (day) => {
-      if (!selectedDate || !day.isCurrentMonth) return false
-      return day.day === selectedDate.getDate() && 
-             selectedMonth === selectedDate.getMonth() && 
-             selectedYear === selectedDate.getFullYear()
-    }
+  const EditableTag = ({ icon: Icon, label, value, field, color = "blue", type = "text", options = null }) => {
+    const isEditing = editingField === field
+    const displayValue = isEditing ? tempData[field] : value
 
     return (
-      <div className="relative" ref={calendarRef}>
-        <button
-          type="button"
-          onClick={() => setShowCalendar(!showCalendar)}
-          className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between text-sm sm:text-base ${
-            darkMode
-              ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500"
-              : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500"
-          }`}
-        >
-          <span className={!value ? (darkMode ? "text-zinc-500" : "text-gray-400") : ""}>
-            {formatDisplayDate(value)}
-          </span>
-          <Calendar className={`w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-400" : "text-gray-400"}`} />
-        </button>
-
-        {showCalendar && (
-          <div className={`absolute top-full left-0 mt-2 z-50 rounded-2xl border shadow-2xl overflow-hidden ${
-            darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
-          }`} style={{ width: '320px', maxWidth: '90vw' }}>
-            
-            {/* Year and Month Selectors */}
-            <div className={`p-4 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"}`}>
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className={`px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${
-                    darkMode 
-                      ? "bg-zinc-900 border-zinc-700 text-white" 
-                      : "bg-gray-50 border-gray-200 text-gray-900"
-                  }`}
-                >
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-                <select
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className={`px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${
-                    darkMode 
-                      ? "bg-zinc-900 border-zinc-700 text-white" 
-                      : "bg-gray-50 border-gray-200 text-gray-900"
-                  }`}
-                >
-                  {months.map((month, idx) => (
-                    <option key={idx} value={idx}>{month}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Calendar Days */}
-            <div className="p-4">
-              <div className="grid grid-cols-7 gap-1 mb-2">
-                {days.map((day) => (
-                  <div key={day} className={`text-center text-xs font-semibold py-2 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                    {day}
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 gap-1">
-                {getDaysInMonth(selectedYear, selectedMonth).map((day, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => handleDateSelect(day)}
-                    className={`aspect-square rounded-lg text-sm font-medium transition-all ${
-                      !day.isCurrentMonth
-                        ? darkMode ? "text-zinc-600" : "text-gray-400"
-                        : isSelectedDate(day)
-                        ? "bg-emerald-600 text-white shadow-lg"
-                        : darkMode ? "text-white hover:bg-zinc-700" : "text-gray-900 hover:bg-gray-100"
+      <div className={`group relative px-4 py-2.5 rounded-xl border transition-all ${
+        darkMode 
+          ? `bg-${color}-500/10 border-${color}-500/30 hover:border-${color}-500/50` 
+          : `bg-${color}-50 border-${color}-200 hover:border-${color}-300`
+      }`}>
+        <div className="flex items-center gap-2">
+          <Icon className={`w-4 h-4 flex-shrink-0 text-${color}-600`} />
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs font-medium mb-0.5 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+              {label}
+            </p>
+            {isEditing ? (
+              <div className="flex items-center gap-2">
+                {type === "select" && options ? (
+                  <select
+                    value={displayValue}
+                    onChange={(e) => setTempData({ [field]: e.target.value })}
+                    className={`text-sm font-semibold px-2 py-1 rounded border outline-none ${
+                      darkMode
+                        ? "bg-zinc-800 border-zinc-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
                     }`}
                   >
-                    {day.day}
-                  </button>
-                ))}
+                    {options.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : type === "profession" ? (
+                  <div className="relative w-full" ref={professionRef}>
+                    <input
+                      type="text"
+                      value={professionSearch || displayValue}
+                      onChange={(e) => {
+                        setProfessionSearch(e.target.value)
+                        setTempData({ [field]: e.target.value })
+                        setShowProfessionDropdown(true)
+                      }}
+                      onFocus={() => setShowProfessionDropdown(true)}
+                      className={`text-sm font-semibold px-2 py-1 rounded border outline-none w-full ${
+                        darkMode
+                          ? "bg-zinc-800 border-zinc-600 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                      }`}
+                    />
+                    {showProfessionDropdown && filteredProfessions.length > 0 && (
+                      <div className={`absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-lg border shadow-xl z-50 ${
+                        darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
+                      }`}>
+                        {filteredProfessions.slice(0, 10).map((prof, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              handleProfessionSelect(prof)
+                              setTempData({ [field]: prof })
+                            }}
+                            className={`w-full px-3 py-2 text-left text-sm transition-colors ${
+                              darkMode ? "hover:bg-zinc-700 text-white" : "hover:bg-gray-50 text-gray-900"
+                            }`}
+                          >
+                            {prof}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <input
+                    type={type}
+                    value={displayValue}
+                    onChange={(e) => setTempData({ [field]: e.target.value })}
+                    className={`text-sm font-semibold px-2 py-1 rounded border outline-none w-full ${
+                      darkMode
+                        ? "bg-zinc-800 border-zinc-600 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                  />
+                )}
+                <button
+                  onClick={() => handleFieldSave(field)}
+                  className="p-1 rounded bg-emerald-500 hover:bg-emerald-600 transition-colors"
+                >
+                  <Check className="w-3 h-3 text-white" />
+                </button>
+                <button
+                  onClick={handleFieldCancel}
+                  className={`p-1 rounded transition-colors ${
+                    darkMode ? "bg-zinc-700 hover:bg-zinc-600" : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  <X className="w-3 h-3" />
+                </button>
               </div>
-            </div>
-
-            <div className={`p-4 border-t flex items-center justify-between ${darkMode ? "border-zinc-700" : "border-gray-200"}`}>
-              <button type="button" onClick={() => { onChange({ target: { name, value: "" } }); setShowCalendar(false); }} className="text-sm font-semibold text-emerald-600 hover:text-emerald-700">
-                Clear
-              </button>
-              <button type="button" onClick={() => { const today = new Date().toISOString().split('T')[0]; onChange({ target: { name, value: today } }); setShowCalendar(false); }} className="text-sm font-semibold text-emerald-600 hover:text-emerald-700">
-                Today
-              </button>
-            </div>
+            ) : (
+              <p className={`text-sm font-semibold truncate ${darkMode ? "text-white" : "text-gray-900"}`}>
+                {value}
+              </p>
+            )}
           </div>
-        )}
+          {!isEditing && (
+            <button
+              onClick={() => handleFieldEdit(field, value)}
+              className={`opacity-0 group-hover:opacity-100 p-1 rounded transition-all ${
+                darkMode ? "hover:bg-zinc-700" : "hover:bg-gray-100"
+              }`}
+            >
+              <Edit3 className="w-3 h-3" />
+            </button>
+          )}
+        </div>
       </div>
     )
   }
 
+  const stats = [
+    { label: "Total Donations", value: "₹1,25,000", icon: Heart, color: "emerald", trend: "+12%" },
+    { label: "Campaigns Supported", value: "8", icon: Target, color: "blue", trend: "+3" },
+    { label: "Lives Impacted", value: "150+", icon: Users, color: "purple", trend: "+45" },
+    { label: "Zakat Pending", value: "₹5,000", icon: Award, color: "amber", trend: "20%" }
+  ]
+
   return (
     <div className="mt-5 min-h-screen">
-
       <AnimatePresence>
         {showSuccess && (
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`fixed top-6 right-4 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl flex items-center gap-3 max-w-sm ${
-              darkMode
-                ? "bg-zinc-900 border border-emerald-500/20"
-                : "bg-white border border-emerald-200"
+            className={`fixed top-6 right-4 sm:right-6 z-50 px-4 sm:px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 ${
+              darkMode ? "bg-zinc-900 border border-emerald-500/20" : "bg-white border border-emerald-200"
             }`}
           >
-            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
               <Check className="w-5 h-5 text-white" strokeWidth={3} />
             </div>
-            <div>
-              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-white" : "text-gray-900"}`}>
-                Profile Updated!
-              </p>
-              <p className={`text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                Your changes have been saved
-              </p>
-            </div>
+            <p className={`font-semibold text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>
+              Updated Successfully!
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -360,7 +293,7 @@ export default function ProfilePage({ darkModeFromParent}) {
         }`} />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-8 sm:pb-12">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 lg:pt-20 pb-8 sm:pb-12">
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -368,13 +301,14 @@ export default function ProfilePage({ darkModeFromParent}) {
           transition={{ duration: 0.6 }}
           className="mb-6 sm:mb-8"
         >
+          {/* Main Profile Card */}
           <div className={`rounded-2xl sm:rounded-3xl overflow-hidden ${
             darkMode 
               ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800" 
               : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
           }`}>
-            {/* Gradient Header with Profile Info */}
-            <div className="relative bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-4 sm:px-6 lg:px-10 pt-6 pb-24 sm:pb-28">
+            {/* Header with Gradient */}
+            <div className="relative bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-4 sm:px-6 lg:px-10 pt-8 pb-8 sm:pb-12">
               <div className="absolute inset-0">
                 <div 
                   className="absolute inset-0 opacity-20"
@@ -384,130 +318,115 @@ export default function ProfilePage({ darkModeFromParent}) {
                 />
               </div>
               
-              {/* Edit Button */}
-              <div className="relative z-10 flex justify-end mb-6">
-                {isEditing ? (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleSave}
-                      className="px-3 sm:px-5 py-2 sm:py-2.5 bg-white text-emerald-600 rounded-xl font-semibold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl text-xs sm:text-base"
-                    >
-                      <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>Save</span>
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-xl font-semibold transition-all"
-                    >
-                      <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="px-3 sm:px-5 py-2 sm:py-2.5 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-xl font-semibold transition-all flex items-center gap-2 text-xs sm:text-base"
-                  >
-                    <Edit3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span>Edit Profile</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Profile Picture and Name - Centered on Gradient */}
               <div className="relative z-10 flex flex-col items-center text-center">
-                <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-2xl border-4 overflow-hidden shadow-2xl mb-4 ${
+                {/* Profile Picture */}
+                <div className={`w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-2xl border-4 overflow-hidden shadow-2xl mb-4 ${
                   darkMode ? "border-white/20" : "border-white"
                 }`}>
                   <div className="w-full h-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <span className="text-3xl sm:text-5xl font-bold text-white">
+                    <span className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
                       {getInitials(profileData.fullName)}
                     </span>
                   </div>
                 </div>
                 
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg mb-2">
+                {/* Name */}
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg mb-3">
                   {profileData.fullName}
                 </h1>
                 
-                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+                {/* Role Badge */}
+                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-4">
                   <Shield className="w-4 h-4 text-white" />
                   <span className="font-semibold text-sm text-white">
                     {userRoles.find(r => r.value === profileData.userRole)?.label}
                   </span>
                 </div>
+
+                {/* Editable Tags */}
+                <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+                  <EditableTag 
+                    icon={Droplet} 
+                    label="Blood Group" 
+                    value={profileData.bloodGroup} 
+                    field="bloodGroup"
+                    color="red"
+                    type="select"
+                    options={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
+                  />
+                  <EditableTag 
+                    icon={Users} 
+                    label="Gender" 
+                    value={profileData.gender} 
+                    field="gender"
+                    color="blue"
+                    type="select"
+                    options={["Male", "Female", "Other"]}
+                  />
+                  <EditableTag 
+                    icon={Calendar} 
+                    label="Age" 
+                    value={`${calculateAge(profileData.dob)} years`} 
+                    field="dob"
+                    color="purple"
+                    type="date"
+                  />
+                  <EditableTag 
+                    icon={Briefcase} 
+                    label="Profession" 
+                    value={profileData.profession} 
+                    field="profession"
+                    color="orange"
+                    type="profession"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Quick Stats Bar */}
-            <div className="relative z-20 -mt-16 mx-4 sm:mx-6 lg:mx-10">
-              <div className={`grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl border backdrop-blur-xl shadow-2xl ${
-                darkMode 
-                  ? "bg-zinc-800/95 border-zinc-700/50" 
-                  : "bg-white border-gray-200"
-              }`}>
-                <div className="text-center">
-                  <Droplet className="w-5 h-5 text-red-500 mx-auto mb-1" />
-                  <p className={`text-xs ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Blood</p>
-                  <p className={`text-sm sm:text-base font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {profileData.bloodGroup}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Users className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-                  <p className={`text-xs ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Gender</p>
-                  <p className={`text-sm sm:text-base font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {profileData.gender}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Calendar className="w-5 h-5 text-purple-500 mx-auto mb-1" />
-                  <p className={`text-xs ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Age</p>
-                  <p className={`text-sm sm:text-base font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {calculateAge(profileData.dob)} years
-                  </p>
-                </div>
-                <div className="text-center">
-                  <Briefcase className="w-5 h-5 text-orange-500 mx-auto mb-1" />
-                  <p className={`text-xs ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Work</p>
-                  <p className={`text-sm sm:text-base font-bold truncate px-2 ${darkMode ? "text-white" : "text-gray-900"}`} title={profileData.profession}>
-                    {profileData.profession}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="px-4 sm:px-6 lg:px-10 pt-8 pb-6 sm:pb-8">
-              
-              {/* Contact & Zakaat Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                <div className={`p-4 rounded-xl border transition-all hover:scale-[1.02] hover:-translate-y-1 ${
+            {/* Contact Cards */}
+            <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                {/* Email */}
+                <div className={`group p-4 sm:p-5 rounded-xl border transition-all hover:scale-[1.02] ${
                   darkMode 
-                    ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)]" 
-                    : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
+                    ? "bg-zinc-800/50 border-zinc-700/50 hover:border-blue-500/50" 
+                    : "bg-gray-50 border-gray-200 hover:border-blue-300"
                 }`}>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-start justify-between mb-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                       darkMode ? "bg-blue-500/10" : "bg-blue-50"
                     }`}>
                       <Mail className="w-5 h-5 text-blue-600" />
                     </div>
-                    <span className={`text-xs font-medium ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                      Email
-                    </span>
-                  </div>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={profileData.email}
-                      onChange={handleInputChange}
-                      className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm ${
-                        darkMode
-                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-blue-500"
-                          : "bg-white border-gray-200 text-gray-900 focus:border-blue-500"
+                    <button
+                      onClick={() => handleFieldEdit("email", profileData.email)}
+                      className={`opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-all ${
+                        darkMode ? "hover:bg-zinc-700" : "hover:bg-white"
                       }`}
-                    />
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Email Address
+                  </p>
+                  {editingField === "email" ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="email"
+                        value={tempData.email}
+                        onChange={(e) => setTempData({ email: e.target.value })}
+                        className={`flex-1 text-sm font-medium px-2 py-1 rounded border outline-none ${
+                          darkMode ? "bg-zinc-800 border-zinc-600 text-white" : "bg-white border-gray-300 text-gray-900"
+                        }`}
+                      />
+                      <button onClick={() => handleFieldSave("email")} className="p-1 rounded bg-emerald-500">
+                        <Check className="w-4 h-4 text-white" />
+                      </button>
+                      <button onClick={handleFieldCancel} className={`p-1 rounded ${darkMode ? "bg-zinc-700" : "bg-gray-200"}`}>
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   ) : (
                     <p className={`text-sm font-medium break-all ${darkMode ? "text-white" : "text-gray-900"}`}>
                       {profileData.email}
@@ -515,33 +434,47 @@ export default function ProfilePage({ darkModeFromParent}) {
                   )}
                 </div>
 
-                <div className={`p-4 rounded-xl border transition-all hover:scale-[1.02] hover:-translate-y-1 ${
+                {/* Mobile */}
+                <div className={`group p-4 sm:p-5 rounded-xl border transition-all hover:scale-[1.02] ${
                   darkMode 
-                    ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)]" 
-                    : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
+                    ? "bg-zinc-800/50 border-zinc-700/50 hover:border-green-500/50" 
+                    : "bg-gray-50 border-gray-200 hover:border-green-300"
                 }`}>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-start justify-between mb-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                       darkMode ? "bg-green-500/10" : "bg-green-50"
                     }`}>
                       <Phone className="w-5 h-5 text-green-600" />
                     </div>
-                    <span className={`text-xs font-medium ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                      Mobile
-                    </span>
-                  </div>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      name="mobile"
-                      value={profileData.mobile}
-                      onChange={handleInputChange}
-                      className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm ${
-                        darkMode
-                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-green-500"
-                          : "bg-white border-gray-200 text-gray-900 focus:border-green-500"
+                    <button
+                      onClick={() => handleFieldEdit("mobile", profileData.mobile)}
+                      className={`opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-all ${
+                        darkMode ? "hover:bg-zinc-700" : "hover:bg-white"
                       }`}
-                    />
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Mobile Number
+                  </p>
+                  {editingField === "mobile" ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="tel"
+                        value={tempData.mobile}
+                        onChange={(e) => setTempData({ mobile: e.target.value })}
+                        className={`flex-1 text-sm font-medium px-2 py-1 rounded border outline-none ${
+                          darkMode ? "bg-zinc-800 border-zinc-600 text-white" : "bg-white border-gray-300 text-gray-900"
+                        }`}
+                      />
+                      <button onClick={() => handleFieldSave("mobile")} className="p-1 rounded bg-emerald-500">
+                        <Check className="w-4 h-4 text-white" />
+                      </button>
+                      <button onClick={handleFieldCancel} className={`p-1 rounded ${darkMode ? "bg-zinc-700" : "bg-gray-200"}`}>
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   ) : (
                     <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
                       {profileData.mobile}
@@ -549,249 +482,179 @@ export default function ProfilePage({ darkModeFromParent}) {
                   )}
                 </div>
 
-                <div className={`p-4 rounded-xl border transition-all hover:scale-[1.02] hover:-translate-y-1 ${
+                {/* Zakaat */}
+                <div className={`group p-4 sm:p-5 rounded-xl border transition-all hover:scale-[1.02] sm:col-span-2 lg:col-span-1 ${
                   darkMode 
-                    ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.5)]" 
-                    : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
+                    ? "bg-gradient-to-br from-emerald-900/30 to-emerald-900/10 border-emerald-700/50" 
+                    : "bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200"
                 }`}>
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-start justify-between mb-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      darkMode ? "bg-emerald-500/10" : "bg-emerald-50"
+                      darkMode ? "bg-emerald-500/20" : "bg-emerald-100"
                     }`}>
                       <Award className="w-5 h-5 text-emerald-600" />
                     </div>
-                    <span className={`text-xs font-medium ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                      My Zakaat
-                    </span>
                   </div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-emerald-400" : "text-emerald-700"}`}>
+                    My Zakat
+                  </p>
                   {profileData.zakaatAmount !== null ? (
-                    <p className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    <p className={`text-lg font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
                       ₹{profileData.zakaatAmount.toLocaleString('en-IN')}
                     </p>
                   ) : (
                     <button
-                      onClick={()=>router.push('/zakat-calculator')}
-                      className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                      onClick={() => router.push('/zakat-calculator')}
+                      className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1"
                     >
-                      Calculate your zakaat →
+                      Calculate Now <Sparkles className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Personal Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {/* Date of Birth */}
-                <div>
-                  <label className={`block text-sm font-semibold mb-2 ${
-                    darkMode ? "text-zinc-300" : "text-gray-700"
-                  }`}>
-                    Date of Birth
-                  </label>
-                  {isEditing ? (
-                    <ImprovedDatePicker
-                      darkMode={darkMode}
-                      value={profileData.dob}
-                      onChange={handleInputChange}
-                      name="dob"
-                    />
-                  ) : (
-                    <div className={`p-4 rounded-xl border ${
-                      darkMode 
-                        ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)]" 
-                        : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+              {/* Address */}
+              <div className={`group p-5 sm:p-6 rounded-xl border transition-all hover:scale-[1.01] mb-8 ${
+                darkMode 
+                  ? "bg-zinc-800/50 border-zinc-700/50" 
+                  : "bg-gray-50 border-gray-200"
+              }`}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      darkMode ? "bg-purple-500/10" : "bg-purple-50"
                     }`}>
-                      <p className={`font-medium text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {new Date(profileData.dob + 'T00:00:00').toLocaleDateString('en-IN', { 
-                          day: 'numeric', 
-                          month: 'long', 
-                          year: 'numeric' 
-                        })}
-                      </p>
+                      <MapPin className="w-5 h-5 text-purple-600" />
                     </div>
-                  )}
+                    <p className={`text-sm font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                      Address
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleFieldEdit("address", profileData.address)}
+                    className={`opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-all ${
+                      darkMode ? "hover:bg-zinc-700" : "hover:bg-white"
+                    }`}
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
                 </div>
-
-                {/* Gender */}
-                <div>
-                  <label className={`block text-sm font-semibold mb-2 ${
-                    darkMode ? "text-zinc-300" : "text-gray-700"
-                  }`}>
-                    Gender
-                  </label>
-                  {isEditing ? (
-                    <select
-                      name="gender"
-                      value={profileData.gender}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-base ${
-                        darkMode
-                          ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-blue-500"
-                          : "bg-white border-gray-200 text-gray-900 focus:border-blue-500"
-                      }`}
-                    >
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  ) : (
-                    <div className={`p-4 rounded-xl border ${
-                      darkMode 
-                        ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)]" 
-                        : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                    }`}>
-                      <p className={`font-medium text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {profileData.gender}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Blood Group */}
-                <div>
-                  <label className={`block text-sm font-semibold mb-2 ${
-                    darkMode ? "text-zinc-300" : "text-gray-700"
-                  }`}>
-                    Blood Group
-                  </label>
-                  {isEditing ? (
-                    <select
-                      name="bloodGroup"
-                      value={profileData.bloodGroup}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-base ${
-                        darkMode
-                          ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-red-500"
-                          : "bg-white border-gray-200 text-gray-900 focus:border-red-500"
-                      }`}
-                    >
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
-                    </select>
-                  ) : (
-                    <div className={`p-4 rounded-xl border ${
-                      darkMode 
-                        ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)]" 
-                        : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                    }`}>
-                      <p className={`font-bold text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {profileData.bloodGroup}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Profession with Search */}
-                <div>
-                  <label className={`block text-sm font-semibold mb-2 ${
-                    darkMode ? "text-zinc-300" : "text-gray-700"
-                  }`}>
-                    Profession
-                  </label>
-                  {isEditing ? (
-                    <div className="relative" ref={professionRef}>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={professionSearch || profileData.profession}
-                          onChange={(e) => {
-                            setProfessionSearch(e.target.value)
-                            setShowProfessionDropdown(true)
-                          }}
-                          onFocus={() => setShowProfessionDropdown(true)}
-                          placeholder="Search profession..."
-                          className={`w-full px-4 py-3 pr-10 rounded-xl border-2 outline-none transition-all text-base ${
-                            darkMode
-                              ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-orange-500"
-                              : "bg-white border-gray-200 text-gray-900 focus:border-orange-500"
-                          }`}
-                        />
-                        <Search className={`absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-                          darkMode ? "text-zinc-400" : "text-gray-400"
-                        }`} />
-                      </div>
-                      
-                      {showProfessionDropdown && filteredProfessions.length > 0 && (
-                        <div className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 ${
-                          darkMode 
-                            ? "bg-zinc-800 border-zinc-700" 
-                            : "bg-white border-gray-200"
-                        }`}>
-                          {filteredProfessions.map((profession, idx) => (
-                            <button
-                              key={idx}
-                              type="button"
-                              onClick={() => handleProfessionSelect(profession)}
-                              className={`w-full px-4 py-3 text-left transition-colors ${
-                                darkMode 
-                                  ? "hover:bg-zinc-700 text-white" 
-                                  : "hover:bg-gray-50 text-gray-900"
-                              } ${idx !== 0 ? (darkMode ? "border-t border-zinc-700" : "border-t border-gray-100") : ""}`}
-                            >
-                              {profession}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className={`p-4 rounded-xl border ${
-                      darkMode 
-                        ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)]" 
-                        : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                    }`}>
-                      <p className={`font-medium text-sm ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {profileData.profession}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Address */}
-                <div className="md:col-span-2">
-                  <label className={`block text-sm font-semibold mb-2 ${
-                    darkMode ? "text-zinc-300" : "text-gray-700"
-                  }`}>
-                    Address
-                  </label>
-                  {isEditing ? (
+                {editingField === "address" ? (
+                  <div className="space-y-2">
                     <textarea
-                      name="address"
-                      value={profileData.address}
-                      onChange={handleInputChange}
+                      value={tempData.address}
+                      onChange={(e) => setTempData({ address: e.target.value })}
                       rows="3"
-                      className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all resize-none text-base ${
-                        darkMode
-                          ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
-                          : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
+                      className={`w-full text-sm font-medium px-3 py-2 rounded-lg border outline-none resize-none ${
+                        darkMode ? "bg-zinc-800 border-zinc-600 text-white" : "bg-white border-gray-300 text-gray-900"
                       }`}
                     />
-                  ) : (
-                    <div className={`p-4 rounded-xl border ${
-                      darkMode 
-                        ? "bg-zinc-800/50 border-zinc-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.4)]" 
-                        : "bg-white border-gray-200 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
-                    }`}>
-                      <p className={`font-medium text-sm leading-relaxed ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {profileData.address}
-                      </p>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleFieldSave("address")} className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium">
+                        Save
+                      </button>
+                      <button onClick={handleFieldCancel} className={`px-4 py-2 rounded-lg font-medium ${darkMode ? "bg-zinc-700 text-white" : "bg-gray-200 text-gray-900"}`}>
+                        Cancel
+                      </button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <p className={`text-sm font-medium leading-relaxed ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {profileData.address}
+                  </p>
+                )}
               </div>
 
+              {/* Islamic Quote Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="relative overflow-hidden"
+              >
+                {/* Decorative Islamic Pattern Background */}
+                <div className={`relative rounded-2xl sm:rounded-3xl border overflow-hidden ${
+                  darkMode 
+                    ? "bg-gradient-to-br from-emerald-900/40 via-teal-900/30 to-emerald-900/40 border-emerald-700/30" 
+                    : "bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-50 border-emerald-200"
+                }`}>
+                  {/* Islamic Geometric Pattern Overlay */}
+                  <div 
+                    className="absolute inset-0 opacity-10"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L61.8 38.2L100 50L61.8 61.8L50 100L38.2 61.8L0 50L38.2 38.2z' fill='${darkMode ? '%23059669' : '%23047857'}' fill-opacity='0.4'/%3E%3C/svg%3E")`,
+                      backgroundSize: '50px 50px'
+                    }}
+                  />
+                  
+                  {/* Corner Ornaments */}
+                  <div className={`absolute top-0 left-0 w-32 h-32 ${darkMode ? "opacity-20" : "opacity-30"}`}>
+                    <svg viewBox="0 0 100 100" className={darkMode ? "text-emerald-400" : "text-emerald-600"}>
+                      <path d="M0,0 Q50,50 0,100 Z" fill="currentColor" opacity="0.3"/>
+                    </svg>
+                  </div>
+                  <div className={`absolute bottom-0 right-0 w-32 h-32 rotate-180 ${darkMode ? "opacity-20" : "opacity-30"}`}>
+                    <svg viewBox="0 0 100 100" className={darkMode ? "text-emerald-400" : "text-emerald-600"}>
+                      <path d="M0,0 Q50,50 0,100 Z" fill="currentColor" opacity="0.3"/>
+                    </svg>
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative z-10 px-6 sm:px-10 lg:px-16 py-10 sm:py-14 lg:py-16 text-center">
+                    {/* Decorative Top Element */}
+                    <div className="flex justify-center mb-6">
+                      <div className={`flex items-center gap-3 ${darkMode ? "text-emerald-400" : "text-emerald-700"}`}>
+                        <div className="w-12 h-0.5 bg-current opacity-50"></div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="opacity-70">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                        <div className="w-12 h-0.5 bg-current opacity-50"></div>
+                      </div>
+                    </div>
+
+                    {/* Quote */}
+                    <div className="max-w-3xl mx-auto mb-6">
+                      <p className={`text-xl sm:text-2xl lg:text-3xl font-serif leading-relaxed mb-4 ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`} style={{ fontFamily: "'Merriweather', serif" }}>
+                        "The believer's shade on the Day of Resurrection will be their charity"
+                      </p>
+                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
+                        darkMode 
+                          ? "bg-emerald-500/20 border border-emerald-500/30" 
+                          : "bg-white/80 border border-emerald-300"
+                      }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${darkMode ? "bg-emerald-400" : "bg-emerald-600"}`}></div>
+                        <p className={`text-sm font-medium ${darkMode ? "text-emerald-300" : "text-emerald-800"}`}>
+                          Sahih al-Tirmidhi
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Decorative Bottom Element */}
+                    <div className="flex justify-center mt-6">
+                      <div className={`flex items-center gap-2 ${darkMode ? "text-emerald-400/60" : "text-emerald-600/60"}`}>
+                        <div className="w-8 h-px bg-current"></div>
+                        <div className="w-2 h-2 rounded-full bg-current"></div>
+                        <div className="w-16 h-px bg-current"></div>
+                        <div className="w-2 h-2 rounded-full bg-current"></div>
+                        <div className="w-8 h-px bg-current"></div>
+                      </div>
+                    </div>
+
+                    {/* Additional Wisdom */}
+                    <p className={`mt-6 text-sm sm:text-base italic max-w-2xl mx-auto ${
+                      darkMode ? "text-emerald-300/70" : "text-emerald-800/70"
+                    }`}>
+                      May your generosity be a means of blessing in this life and the hereafter
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </motion.div>
       </div>
-
     </div>
   )
 }

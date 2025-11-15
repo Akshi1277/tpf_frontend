@@ -1,16 +1,15 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { 
   Wallet,
-  Heart,
   Target,
   Users,
-  TrendingUp,
   Trophy,
   Star,
-  Wallet2Icon
+  Calculator,
+  ArrowRight
 } from "lucide-react"
 
 export default function DonationStats({ 
@@ -18,19 +17,24 @@ export default function DonationStats({
   donationStats, 
   currentUser, 
   leaderboardData,
-    monthlyData = [],
+  monthlyData = [],
   yearlyData = [],
   getRankIcon 
 }) {
 
-   const [activeTab, setActiveTab] = useState("weekly")
-    const getActiveData = () => {
+  const [activeTab, setActiveTab] = useState("weekly")
+  const getActiveData = () => {
     if (activeTab === "monthly") return monthlyData
     if (activeTab === "yearly") return yearlyData
     return leaderboardData // weekly default
   }
 
   const activeLeaderboard = getActiveData()
+  
+  // Calculate remaining zakat
+  const calculatedZakat = 25000 // This should come from props ideally
+  const zakatRemaining = Math.max(0, calculatedZakat - donationStats.totalZakat)
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       
@@ -66,11 +70,10 @@ export default function DonationStats({
               }`}>
                 ₹{donationStats.totalAmount.toLocaleString('en-IN')}
               </p>
-             
             </div>
           </motion.div>
 
-          {/* Total Donations */}
+          {/* Total Zakat Donated */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -86,7 +89,7 @@ export default function DonationStats({
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
                 darkMode ? "bg-rose-500/20" : "bg-rose-100"
               }`}>
-                <Wallet2Icon className="w-6 h-6 text-rose-600" />
+                <Wallet className="w-6 h-6 text-rose-600" />
               </div>
               <p className={`text-sm font-medium mb-1 ${
                 darkMode ? "text-zinc-400" : "text-gray-600"
@@ -98,11 +101,42 @@ export default function DonationStats({
               }`}>
                 ₹{donationStats.totalZakat.toLocaleString('en-IN')}
               </p>
-              <p className={`text-xs mt-2 ${
-                darkMode ? "text-zinc-500" : "text-gray-500"
-              }`}>
-                
-              </p>
+              
+              {donationStats.totalZakat === 0 ? (
+                <a
+                  href="/zakat-calculator"
+                  className={`mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                    darkMode
+                      ? "bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 border border-rose-500/50"
+                      : "bg-rose-500 text-white hover:bg-rose-600"
+                  }`}
+                >
+                  <Calculator className="w-4 h-4" />
+                  Calculate Zakat Now
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              ) : (
+                <div className="mt-3">
+                  <p className={`text-xs font-medium mb-1 ${
+                    darkMode ? "text-zinc-400" : "text-gray-600"
+                  }`}>
+                    Calculated Zakat: ₹{calculatedZakat.toLocaleString('en-IN')}
+                  </p>
+                  {zakatRemaining > 0 ? (
+                    <p className={`text-sm font-semibold ${
+                      darkMode ? "text-amber-400" : "text-amber-600"
+                    }`}>
+                      ₹{zakatRemaining.toLocaleString('en-IN')} remaining
+                    </p>
+                  ) : (
+                    <p className={`text-sm font-semibold ${
+                      darkMode ? "text-emerald-400" : "text-emerald-600"
+                    }`}>
+                      ✓ Zakat completed!
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -180,7 +214,7 @@ export default function DonationStats({
         </div>
       </div>
 
- {/* RIGHT COLUMN — LEADERBOARD */}
+      {/* RIGHT COLUMN — LEADERBOARD */}
       <div className="lg:col-span-1">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
