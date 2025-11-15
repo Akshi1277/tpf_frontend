@@ -15,7 +15,8 @@ import {
   Bookmark,
   Eye,
   Calendar,
-  DollarSign
+  DollarSign,
+  IndianRupee
 } from "lucide-react"
 
 export default function MyCampaignsPage({ darkModeFromParent }) {
@@ -328,7 +329,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                   ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
                   : "bg-emerald-500 text-white hover:bg-emerald-600"
               }`}>
-                <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <IndianRupee className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Donate
               </button>
               <button className={`py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg font-semibold transition-all ${
