@@ -38,7 +38,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     postalCode: "",
     phoneNumber: "",
     email: "",
-    occupation: "",
+    profession: "",
     panNumber: "",
     confirmPanNumber: ""
   })
@@ -48,11 +48,11 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const [loadingCities, setLoadingCities] = useState(false)
   const [loadingStates, setLoadingStates] = useState(false)
   
-  // Occupation dropdown states
-  const [occupations, setOccupations] = useState([])
-  const [occupationSearch, setOccupationSearch] = useState("")
-  const [showOccupationDropdown, setShowOccupationDropdown] = useState(false)
-  const occupationRef = useRef(null)
+  // Profession dropdown states
+  const [professions, setProfessions] = useState([])
+  const [professionSearch, setProfessionSearch] = useState("")
+  const [showProfessionDropdown, setShowProfessionDropdown] = useState(false)
+  const professionRef = useRef(null)
 
   // Sync with parent dark mode
   useEffect(() => {
@@ -64,14 +64,14 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   // Fetch Indian states on component mount
   useEffect(() => {
     fetchStates()
-    fetchOccupations()
+    fetchProfessions()
   }, [])
 
-  // Handle click outside for occupation dropdown
+  // Handle click outside for profession dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (occupationRef.current && !occupationRef.current.contains(event.target)) {
-        setShowOccupationDropdown(false)
+      if (professionRef.current && !professionRef.current.contains(event.target)) {
+        setShowProfessionDropdown(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -112,10 +112,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     }
   }
 
-  const fetchOccupations = async () => {
+  const fetchProfessions = async () => {
     try {
-      // Fallback to common occupations
-      const commonOccupations = [
+      // Fallback to common professions
+      const commonProfessions = [
         "Accountant", "Actor/Actress", "Architect", "Artist", "Banker",
         "Business Owner", "Chef", "Civil Engineer", "Consultant", "Data Analyst",
         "Data Scientist", "Designer", "Developer", "Doctor", "Driver",
@@ -125,11 +125,11 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
         "Marketing Manager", "Mechanic", "Musician", "Nurse", "Pharmacist",
         "Photographer", "Pilot", "Plumber", "Professor", "Project Manager",
         "Real Estate Agent", "Researcher", "Sales Representative", "Scientist",
-        "Self Employed", "Software Engineer", "Student", "Teacher", "Writer", "Others"
+        "Self Employed", "Software Engineer", "Student", "Teacher", "Writer", "Other"
       ]
-      setOccupations(commonOccupations.sort())
+      setProfessions(commonProfessions.sort())
     } catch (error) {
-      console.error('Error fetching occupations:', error)
+      console.error('Error fetching professions:', error)
     }
   }
 
@@ -146,10 +146,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     }
   }
 
-  const handleOccupationSelect = (occupation) => {
-    setFormData(prev => ({ ...prev, occupation }))
-    setShowOccupationDropdown(false)
-    setOccupationSearch("")
+  const handleProfessionSelect = (profession) => {
+    setFormData(prev => ({ ...prev, profession }))
+    setShowProfessionDropdown(false)
+    setProfessionSearch("")
   }
 
   const handlePaste = (e) => {
@@ -166,8 +166,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     }, 3000)
   }
 
-  const filteredOccupations = occupations.filter(occ => 
-    occ.toLowerCase().includes(occupationSearch.toLowerCase())
+  const filteredProfessions = professions.filter(occ => 
+    occ.toLowerCase().includes(professionSearch.toLowerCase())
   )
 
   // Improved Date Picker Component
@@ -817,29 +817,29 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                         </div>
                       </div>
 
-                      {/* Occupation with Search */}
+                      {/* Profession with Search */}
                     <div>
   <label
     className={`block text-sm font-semibold mb-2 ${
       darkMode ? "text-zinc-300" : "text-gray-700"
     }`}
   >
-    Occupation <span className="text-red-500">*</span>
+    Profession <span className="text-red-500">*</span>
   </label>
 
   {/* RATHER NOT SAY */}
   <div className="flex items-center gap-2 mb-2">
     <input
       type="checkbox"
-      checked={formData.ratherNotSay || false}
+      checked={formData.ratherNotSayProfession || false}
       onChange={(e) => {
         setFormData((prev) => ({
           ...prev,
-          ratherNotSay: e.target.checked,
-          occupation: e.target.checked ? "" : prev.occupation,
+          ratherNotSayProfession: e.target.checked,
+          profession: e.target.checked ? "" : prev.profession,
         }))
         if (e.target.checked) {
-          setShowOccupationDropdown(false)
+          setShowProfessionDropdown(false)
         }
       }}
     />
@@ -848,7 +848,7 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
     </span>
   </div>
 
-  <div className="relative" ref={occupationRef}>
+  <div className="relative" ref={professionRef}>
     <div className="relative">
       <Building
         className={`absolute left-4 top-3.5 w-5 h-5 z-10 ${
@@ -858,19 +858,19 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
 
       <input
         type="text"
-        disabled={formData.ratherNotSay}
-        value={occupationSearch || formData.occupation}
+        disabled={formData.ratherNotSayProfession}
+        value={professionSearch || formData.profession}
         onChange={(e) => {
-          setOccupationSearch(e.target.value)
-          setShowOccupationDropdown(true)
+          setProfessionSearch(e.target.value)
+          setShowProfessionDropdown(true)
         }}
-        onFocus={() => setShowOccupationDropdown(true)}
-        placeholder="Search occupation..."
+        onFocus={() => setShowProfessionDropdown(true)}
+        placeholder="Search profession..."
         className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 outline-none transition-all ${
           darkMode
             ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
             : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-        } ${formData.ratherNotSay ? "opacity-50 cursor-not-allowed" : ""}`}
+        } ${formData.ratherNotSayProfession ? "opacity-50 cursor-not-allowed" : ""}`}
       />
 
       <Search
@@ -881,36 +881,38 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
     </div>
 
     {/* DROPDOWN */}
-    {showOccupationDropdown && filteredOccupations.length > 0 && !formData.ratherNotSay && (
-      <div
-        className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 scrollbar-hide ${
-          darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
-        }`}
-      >
-        {filteredOccupations.map((occupation, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => handleOccupationSelect(occupation)}
-            className={`w-full px-4 py-3 text-left transition-colors ${
-              darkMode
-                ? "hover:bg-zinc-700 text-white"
-                : "hover:bg-gray-50 text-gray-900"
-            } ${
-              idx !== 0
-                ? darkMode
-                  ? "border-t border-zinc-700"
-                  : "border-t border-gray-100"
-                : ""
-            }`}
-          >
-            {occupation}
-          </button>
-        ))}
+    {showProfessionDropdown &&
+      filteredProfessions.length > 0 &&
+      !formData.ratherNotSayProfession && (
+        <div
+          className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 scrollbar-hide ${
+            darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
+          }`}
+        >
+          {filteredProfessions.map((profession, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleProfessionSelect(profession)}
+              className={`w-full px-4 py-3 text-left transition-colors ${
+                darkMode
+                  ? "hover:bg-zinc-700 text-white"
+                  : "hover:bg-gray-50 text-gray-900"
+              } ${
+                idx !== 0
+                  ? darkMode
+                    ? "border-t border-zinc-700"
+                    : "border-t border-gray-100"
+                  : ""
+              }`}
+            >
+              {profession}
+            </button>
+          ))}
 
-       
-      </div>
-    )}
+        
+        </div>
+      )}
   </div>
 </div>
 
@@ -1181,8 +1183,8 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                           <p className={`font-semibold capitalize ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.gender || "—"}</p>
                         </div>
                         <div>
-                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Occupation</p>
-                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.occupation || "—"}</p>
+                          <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Profession</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.profession || "—"}</p>
                         </div>
                         <div>
                           <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Phone Number</p>
