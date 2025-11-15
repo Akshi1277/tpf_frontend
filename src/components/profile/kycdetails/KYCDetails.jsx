@@ -125,7 +125,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
         "Marketing Manager", "Mechanic", "Musician", "Nurse", "Pharmacist",
         "Photographer", "Pilot", "Plumber", "Professor", "Project Manager",
         "Real Estate Agent", "Researcher", "Sales Representative", "Scientist",
-        "Self Employed", "Software Engineer", "Student", "Teacher", "Writer"
+        "Self Employed", "Software Engineer", "Student", "Teacher", "Writer", "Others"
       ]
       setOccupations(commonOccupations.sort())
     } catch (error) {
@@ -818,55 +818,102 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                       </div>
 
                       {/* Occupation with Search */}
-                      <div>
-                        <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                          Occupation <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative" ref={occupationRef}>
-                          <div className="relative">
-                            <Building className={`absolute left-4 top-3.5 w-5 h-5 z-10 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
-                            <input
-                              type="text"
-                              value={occupationSearch || formData.occupation}
-                              onChange={(e) => {
-                                setOccupationSearch(e.target.value)
-                                setShowOccupationDropdown(true)
-                              }}
-                              onFocus={() => setShowOccupationDropdown(true)}
-                              placeholder="Search occupation..."
-                              className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 outline-none transition-all ${
-                                darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                              }`}
-                            />
-                            <Search className={`absolute right-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
-                          </div>
-                          
-                          {showOccupationDropdown && filteredOccupations.length > 0 && (
-                            <div className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 ${
-                              darkMode 
-                                ? "bg-zinc-800 border-zinc-700" 
-                                : "bg-white border-gray-200"
-                            }`}>
-                              {filteredOccupations.map((occupation, idx) => (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  onClick={() => handleOccupationSelect(occupation)}
-                                  className={`w-full px-4 py-3 text-left transition-colors ${
-                                    darkMode 
-                                      ? "hover:bg-zinc-700 text-white" 
-                                      : "hover:bg-gray-50 text-gray-900"
-                                  } ${idx !== 0 ? (darkMode ? "border-t border-zinc-700" : "border-t border-gray-100") : ""}`}
-                                >
-                                  {occupation}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                    <div>
+  <label
+    className={`block text-sm font-semibold mb-2 ${
+      darkMode ? "text-zinc-300" : "text-gray-700"
+    }`}
+  >
+    Occupation <span className="text-red-500">*</span>
+  </label>
+
+  {/* RATHER NOT SAY */}
+  <div className="flex items-center gap-2 mb-2">
+    <input
+      type="checkbox"
+      checked={formData.ratherNotSay || false}
+      onChange={(e) => {
+        setFormData((prev) => ({
+          ...prev,
+          ratherNotSay: e.target.checked,
+          occupation: e.target.checked ? "" : prev.occupation,
+        }))
+        if (e.target.checked) {
+          setShowOccupationDropdown(false)
+        }
+      }}
+    />
+    <span className={darkMode ? "text-zinc-300" : "text-gray-700"}>
+      Rather not say
+    </span>
+  </div>
+
+  <div className="relative" ref={occupationRef}>
+    <div className="relative">
+      <Building
+        className={`absolute left-4 top-3.5 w-5 h-5 z-10 ${
+          darkMode ? "text-zinc-500" : "text-gray-400"
+        }`}
+      />
+
+      <input
+        type="text"
+        disabled={formData.ratherNotSay}
+        value={occupationSearch || formData.occupation}
+        onChange={(e) => {
+          setOccupationSearch(e.target.value)
+          setShowOccupationDropdown(true)
+        }}
+        onFocus={() => setShowOccupationDropdown(true)}
+        placeholder="Search occupation..."
+        className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 outline-none transition-all ${
+          darkMode
+            ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+        } ${formData.ratherNotSay ? "opacity-50 cursor-not-allowed" : ""}`}
+      />
+
+      <Search
+        className={`absolute right-4 top-3.5 w-5 h-5 ${
+          darkMode ? "text-zinc-500" : "text-gray-400"
+        }`}
+      />
+    </div>
+
+    {/* DROPDOWN */}
+    {showOccupationDropdown && filteredOccupations.length > 0 && !formData.ratherNotSay && (
+      <div
+        className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 scrollbar-hide ${
+          darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
+        }`}
+      >
+        {filteredOccupations.map((occupation, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => handleOccupationSelect(occupation)}
+            className={`w-full px-4 py-3 text-left transition-colors ${
+              darkMode
+                ? "hover:bg-zinc-700 text-white"
+                : "hover:bg-gray-50 text-gray-900"
+            } ${
+              idx !== 0
+                ? darkMode
+                  ? "border-t border-zinc-700"
+                  : "border-t border-gray-100"
+                : ""
+            }`}
+          >
+            {occupation}
+          </button>
+        ))}
+
+       
+      </div>
+    )}
+  </div>
+</div>
+
 
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
