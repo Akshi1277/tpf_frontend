@@ -217,7 +217,6 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
             ))}
           </div>
 
-          {/* Zakat Option */}
           <label className={`flex items-start gap-3 p-4 rounded-xl cursor-pointer transition-all ${
             countAsZakat
               ? darkMode
