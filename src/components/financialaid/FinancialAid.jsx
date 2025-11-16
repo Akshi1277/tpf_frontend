@@ -183,7 +183,7 @@ export default function FinancialAidPage({ darkModeFromParent }) {
                     </div>
 
                     {/* Check Mark */}
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 cursor-pointer">
                       {isSelected ? (
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                           darkMode ? 'bg-emerald-500' : 'bg-emerald-600'

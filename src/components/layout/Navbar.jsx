@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Menu, X, Moon, Sun } from 'lucide-react';
 import { Plus, Heart, Leaf } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   useEffect(() => {
@@ -373,8 +374,8 @@ useEffect(() => {
                     </p>
                     <div className="space-y-1">
                       {/* Start Fundraising */}
-                      <a
-                        href="#"
+                      <Link
+                        href="/financial-aid"
                         className={`group flex items-center justify-between py-2 px-2 rounded-lg transition-all duration-300
              ${darkMode
                             ? "text-zinc-300 hover:bg-zinc-800"
@@ -395,7 +396,7 @@ useEffect(() => {
                         <span className="text-xs text-emerald-600 font-medium">
                           0% platform fee!
                         </span>
-                      </a>
+                      </Link>
 
                       {/* Start Community */}
                       <a
@@ -436,7 +437,7 @@ useEffect(() => {
 
                   {/* Sign up / Log in */}
                   <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
-                    <a
+                    <Link
                       href="/signup"
                       className={`block text-center py-2 px-4 rounded-lg transition-colors
                      ${darkMode
@@ -445,8 +446,9 @@ useEffect(() => {
                         }`}
                     >
                       Sign up
-                    </a>
-                    <a
+                    </Link>
+
+                    <Link
                       href="/login"
                       className={`block text-center py-2 px-4 rounded-lg transition-colors
                      ${darkMode
@@ -455,7 +457,7 @@ useEffect(() => {
                         }`}
                     >
                       Log in
-                    </a>
+                    </Link>
                     
                   </div>
                 </div>

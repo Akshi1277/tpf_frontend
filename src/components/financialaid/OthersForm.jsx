@@ -1,13 +1,20 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { User, Calendar, MapPin, Phone, Mail, CreditCard } from "lucide-react"
 
-export default function OtherForm({ darkMode }) {
+export default function OtherForm({ darkModeFromParent }) {
     const router = useRouter()
 const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+const [darkMode, setDarkMode]= useState(false)
+
+ useEffect(() => {
+    if (darkModeFromParent !== undefined) {
+      setDarkMode(darkModeFromParent)
+    }
+  }, [darkModeFromParent])
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     // Personal Information

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect} from "react"
 import { useRouter } from "next/navigation"
 import { 
   Building2,
@@ -14,9 +14,16 @@ import {
   Upload
 } from "lucide-react"
 
-export default function OrganizationRegistrationPage({ darkMode }) {
+export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const router = useRouter()
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [darkMode, setDarkMode]= useState(false)
+  
+   useEffect(() => {
+      if (darkModeFromParent !== undefined) {
+        setDarkMode(darkModeFromParent)
+      }
+    }, [darkModeFromParent])
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     // Step 1: NGO Registration Form

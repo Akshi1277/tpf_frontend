@@ -102,7 +102,7 @@ export default function SignUpPage({ darkMode }) {
 </AnimatePresence>
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-8">
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-8 ">
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 items-center">
 
