@@ -97,7 +97,7 @@ const handleOtpSubmit = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-     <div className="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-8 pt-24 lg:pt-32">
+     <div className="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-8 pt-24 lg:pt-20">
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 items-center">
 
@@ -120,11 +120,11 @@ const handleOtpSubmit = () => {
     </span>
     <motion.span
       animate={{ 
-        x: ["-100%", "100%"]
+        x: ["-100%", "100%", "-100%"]
       }}
       transition={{
         repeat: Infinity,
-        duration: 2.5,
+        duration: 5.5,
         ease: "linear",
       }}
       className="absolute bottom-2 left-10 w-1/2 h-3 rounded-full blur-sm"
@@ -328,7 +328,7 @@ const handleOtpSubmit = () => {
 
               <button
                 onClick={() => setStep(1)}
-                className={`py-3 px-6 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                className={`py-3 px-6 cursor-pointer rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
                     ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
               >
@@ -338,7 +338,7 @@ const handleOtpSubmit = () => {
             </div>
 
             <p className={`text-center text-xs sm:text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
-              Didn't receive? <button className="font-semibold text-emerald-600 hover:text-emerald-700">Resend code</button>
+              Didn't receive? <button className="font-semibold cursor-pointer text-emerald-600 hover:text-emerald-700">Resend code</button>
             </p>
           </div>
         </motion.div>

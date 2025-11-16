@@ -125,11 +125,11 @@ export default function SignUpPage({ darkMode }) {
                     </span>
         <motion.span
   animate={{ 
-    x: ["-100%", "100%"]
+    x: ["-100%", "100%", "-100%"]
   }}
   transition={{
     repeat: Infinity,
-    duration: 2.5,
+    duration: 5.5,
     ease: "linear",
   }}
   className="absolute bottom-2 left-10 w-1/2 h-3 rounded-full blur-sm"
@@ -275,7 +275,7 @@ export default function SignUpPage({ darkMode }) {
                         <button
                           onClick={handleMobileSubmit}
                           disabled={mobile.length !== 10}
-                          className="w-full group relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full cursor-pointer group relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
                           <div className="relative flex items-center justify-center gap-2 text-white">
@@ -359,7 +359,7 @@ export default function SignUpPage({ darkMode }) {
                         <button
                           onClick={handleOtpSubmit}
                           disabled={otp.length !== 4}
-                          className="w-full group relative overflow-hidden py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full cursor-pointer group relative overflow-hidden py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
                           <div className="relative flex items-center justify-center gap-2 text-white">
@@ -370,7 +370,7 @@ export default function SignUpPage({ darkMode }) {
 
                         <button
                           onClick={() => setStep(1)}
-                          className={`py-3 px-6 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                          className={`py-3 px-6 cursor-pointer rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
                               ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
                               : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                             }`}
