@@ -333,7 +333,7 @@ useEffect(() => {
   {[
     { name: 'My Donations', icon: Plus, isLucide: true, path:'/profile/mydonation'},
     { name: 'My Wishlist', icon: Heart, isLucide: true },
-    { name: 'Daily Givers', icon: Leaf, isLucide: true },
+    { name: 'Daily Givers', icon: Leaf, isLucide: true, path:'/permanent-donor/daily' },
     { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path:'/zakat-calculator' }
   ].map(item => (
     <Link
