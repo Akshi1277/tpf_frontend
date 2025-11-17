@@ -331,10 +331,10 @@ useEffect(() => {
                   {/* Main menu items with icons */}
                  <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
   {[
-    { name: 'My Deeds', icon: Plus, isLucide: true },
+    { name: 'My Donations', icon: Plus, isLucide: true, path:'/profile/mydonation'},
     { name: 'My Wishlist', icon: Heart, isLucide: true },
     { name: 'Daily Givers', icon: Leaf, isLucide: true },
-    { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false }
+    { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path:'/zakat-calculator' }
   ].map(item => (
     <a
       key={item.name}
@@ -398,25 +398,7 @@ useEffect(() => {
                         </span>
                       </Link>
 
-                      {/* Start Community */}
-                      <a
-                        href="#"
-                        className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-all duration-300
-             ${darkMode
-                            ? "text-zinc-300 hover:bg-zinc-800"
-                            : "text-zinc-700 hover:bg-zinc-100"
-                          }`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <Image
-                          src="/community.svg"
-                          alt="Start a community"
-                          width={20}
-                          height={20}
-                          className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
-                        />
-                        <span>Start a community</span>
-                      </a>
+                   
                     </div>
                   </div>
 
