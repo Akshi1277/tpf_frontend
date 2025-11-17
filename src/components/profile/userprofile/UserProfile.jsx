@@ -647,7 +647,7 @@ export default function ProfilePage({ darkModeFromParent }) {
                         field="gender"
                         color="blue"
                         type="select"
-                        options={["Male", "Female", "Other"]}
+                        options={["Male", "Female"]}
                       />
                       <EditableTag 
                         icon={Calendar} 
