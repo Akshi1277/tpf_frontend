@@ -336,9 +336,9 @@ useEffect(() => {
     { name: 'Daily Givers', icon: Leaf, isLucide: true },
     { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path:'/zakat-calculator' }
   ].map(item => (
-    <a
+    <Link
       key={item.name}
-      href="#"
+       href={item.path || '#'}
       className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
         ${darkMode
           ? 'text-zinc-300 hover:bg-zinc-800'
@@ -358,7 +358,7 @@ useEffect(() => {
         />
       )}
       <span>{item.name}</span>
-    </a>
+    </Link>
   ))}
 </div>
 
