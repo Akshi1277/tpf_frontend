@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import HijriDate from "hijri-date";
 import { hijriMonths } from '@/lib/constants';
+import Link from 'next/link';
 
 export default function Footer({ darkMode }) {
   const [hijriFromApi, setHijriFromApi] = useState(null);
@@ -72,25 +73,34 @@ export default function Footer({ darkMode }) {
           </div>
 
           {/* 1️⃣ Ways To Jannah (moved up) */}
-          <div>
-            <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Ways To Jannah</div>
-            <ul className="space-y-1.5 text-sm">
-              {[
-                'Daily Giver',
-                'Donate Weekly (Friday)',
-                'Donate Monthly',
-                'Donate Your Zakat',
-                'Discover Fundraiser',
-                'Donate in Emergency Funds'
-              ].map(item => (
-                <li key={item}>
-                  <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div>
+  <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
+    Ways To Jannah
+  </div>
+
+  <ul className="space-y-1.5 text-sm">
+    {[
+      { name: 'Daily Giver', path: '/permanent-donor/daily' },
+      { name: 'Donate Weekly (Friday)', path: '/permanent-donor/weekly' },
+      { name: 'Donate Monthly', path: '/permanent-donor/monthly' },
+      { name: 'Donate Your Zakat', path: '/zakat-calculator' },
+      { name: 'Discover Fundraiser', path: '/' },
+      { name: 'Donate in Emergency Funds', path: '/' }
+    ].map((item, idx) => (
+      <li key={idx}>
+        <Link
+          href={item.path || '#'}
+          className={`${
+            darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+          } transition-colors`}
+        >
+          {item.name}
+        </Link>
+      </li>
+    ))}
+  </ul>
+</div>
+
 
         {/* 2️⃣ About Us (moved to middle) */}
 <div>
@@ -107,7 +117,7 @@ export default function Footer({ darkMode }) {
       
     ].map(link => (
       <li key={link.name}>
-        <a
+        <Link
           href={link.path}
           className={`${darkMode
             ? 'text-zinc-400 hover:text-white'
@@ -115,7 +125,7 @@ export default function Footer({ darkMode }) {
           } transition-colors`}
         >
           {link.name}
-        </a>
+        </Link>
       </li>
     ))}
   </ul>
