@@ -3,11 +3,11 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect, useRef } from "react"
 import axios from "axios"
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
   Calendar,
   Shield,
   Check,
@@ -39,6 +39,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     phoneNumber: "",
     email: "",
     profession: "",
+    customProfession: "",
     panNumber: "",
     confirmPanNumber: ""
   })
@@ -47,12 +48,13 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const [states, setStates] = useState([])
   const [loadingCities, setLoadingCities] = useState(false)
   const [loadingStates, setLoadingStates] = useState(false)
-  
+
   // Profession dropdown states
   const [professions, setProfessions] = useState([])
   const [professionSearch, setProfessionSearch] = useState("")
   const [showProfessionDropdown, setShowProfessionDropdown] = useState(false)
   const professionRef = useRef(null)
+  const [showCustomProfession, setShowCustomProfession] = useState(false)
 
   // Sync with parent dark mode
   useEffect(() => {
@@ -127,7 +129,9 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
         "Real Estate Agent", "Researcher", "Sales Representative", "Scientist",
         "Self Employed", "Software Engineer", "Student", "Teacher", "Writer", "Other"
       ]
-      setProfessions(commonProfessions.sort())
+      const sorted = commonProfessions.filter(p => p !== "Other").sort()
+      sorted.push("Other")
+      setProfessions(sorted)
     } catch (error) {
       console.error('Error fetching professions:', error)
     }
@@ -147,9 +151,17 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   }
 
   const handleProfessionSelect = (profession) => {
-    setFormData(prev => ({ ...prev, profession }))
-    setShowProfessionDropdown(false)
-    setProfessionSearch("")
+    if (profession === "Other") {
+      setFormData(prev => ({ ...prev, profession: "Other" }))
+      setShowCustomProfession(true)
+      setShowProfessionDropdown(false)
+      setProfessionSearch("")
+    } else {
+      setFormData(prev => ({ ...prev, profession }))
+      setShowCustomProfession(false)
+      setShowProfessionDropdown(false)
+      setProfessionSearch("")
+    }
   }
 
   const handlePaste = (e) => {
@@ -166,7 +178,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     }, 3000)
   }
 
-  const filteredProfessions = professions.filter(occ => 
+  const filteredProfessions = professions.filter(occ =>
     occ.toLowerCase().includes(professionSearch.toLowerCase())
   )
 
@@ -179,7 +191,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-    
+
     const currentYear = new Date().getFullYear()
     const years = Array.from({ length: 100 }, (_, i) => currentYear - i)
 
@@ -197,10 +209,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
       const firstDay = new Date(year, month, 1)
       const daysInMonth = new Date(year, month + 1, 0).getDate()
       const startingDayOfWeek = firstDay.getDay()
-      
+
       const days = []
       const prevMonthLastDay = new Date(year, month, 0).getDate()
-      
+
       for (let i = startingDayOfWeek - 1; i >= 0; i--) {
         days.push({ day: prevMonthLastDay - i, isCurrentMonth: false })
       }
@@ -233,9 +245,9 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     const selectedDate = value ? new Date(value + 'T00:00:00') : null
     const isSelectedDate = (day) => {
       if (!selectedDate || !day.isCurrentMonth) return false
-      return day.day === selectedDate.getDate() && 
-             selectedMonth === selectedDate.getMonth() && 
-             selectedYear === selectedDate.getFullYear()
+      return day.day === selectedDate.getDate() &&
+        selectedMonth === selectedDate.getMonth() &&
+        selectedYear === selectedDate.getFullYear()
     }
 
     return (
@@ -243,11 +255,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
         <button
           type="button"
           onClick={() => setShowCalendar(!showCalendar)}
-          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between ${
-            darkMode
+          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between ${darkMode
               ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500"
               : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500"
-          }`}
+            }`}
         >
           <span className={!value ? (darkMode ? "text-zinc-500" : "text-gray-400") : ""}>
             {formatDisplayDate(value)}
@@ -257,21 +268,20 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
         {showCalendar && (
           <>
-            <div 
+            <div
               className="fixed inset-0 z-[99] sm:hidden bg-black/20"
               onClick={() => setShowCalendar(false)}
             />
-            
-            <div 
-              className={`fixed sm:absolute left-1/2 top-1/2 sm:top-full sm:left-0 -translate-x-1/2 -translate-y-1/2 sm:translate-x-0 sm:translate-y-0 sm:mt-2 z-[100] rounded-2xl border shadow-2xl ${
-                darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
-              }`} 
-              style={{ 
+
+            <div
+              className={`fixed sm:absolute left-1/2 top-1/2 sm:top-full sm:left-0 -translate-x-1/2 -translate-y-1/2 sm:translate-x-0 sm:translate-y-0 sm:mt-2 z-[100] rounded-2xl border shadow-2xl ${darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
+                }`}
+              style={{
                 width: '320px',
                 maxWidth: 'calc(100vw - 2rem)'
               }}
             >
-              
+
               {/* Year and Month Selectors */}
               <div className={`p-4 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"}`}>
                 <div className="grid grid-cols-2 gap-3 mb-3">
@@ -282,11 +292,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     <select
                       value={selectedYear}
                       onChange={(e) => setSelectedYear(Number(e.target.value))}
-                      className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${
-                        darkMode 
-                          ? "bg-zinc-900 border-zinc-700 text-white" 
+                      className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${darkMode
+                          ? "bg-zinc-900 border-zinc-700 text-white"
                           : "bg-gray-50 border-gray-200 text-gray-900"
-                      }`}
+                        }`}
                     >
                       {years.map(year => (
                         <option key={year} value={year}>{year}</option>
@@ -300,11 +309,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     <select
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                      className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${
-                        darkMode 
-                          ? "bg-zinc-900 border-zinc-700 text-white" 
+                      className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${darkMode
+                          ? "bg-zinc-900 border-zinc-700 text-white"
                           : "bg-gray-50 border-gray-200 text-gray-900"
-                      }`}
+                        }`}
                     >
                       {months.map((month, idx) => (
                         <option key={idx} value={idx}>{month.slice(0, 3)}</option>
@@ -329,13 +337,12 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                       key={index}
                       type="button"
                       onClick={() => handleDateSelect(day)}
-                      className={`aspect-square rounded-lg text-sm font-medium transition-all ${
-                        !day.isCurrentMonth
+                      className={`aspect-square rounded-lg text-sm font-medium transition-all ${!day.isCurrentMonth
                           ? darkMode ? "text-zinc-600" : "text-gray-400"
                           : isSelectedDate(day)
-                          ? "bg-emerald-600 text-white shadow-lg"
-                          : darkMode ? "text-white hover:bg-zinc-700" : "text-gray-900 hover:bg-gray-100"
-                      }`}
+                            ? "bg-emerald-600 text-white shadow-lg"
+                            : darkMode ? "text-white hover:bg-zinc-700" : "text-gray-900 hover:bg-gray-100"
+                        }`}
                     >
                       {day.day}
                     </button>
@@ -359,150 +366,142 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   }
 
   // Custom Dropdown Component
-const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder, loading }) => {
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const dropdownRef = useRef(null)
+  const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder, loading }) => {
+    const [showDropdown, setShowDropdown] = useState(false)
+    const [searchQuery, setSearchQuery] = useState("")
+    const dropdownRef = useRef(null)
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false)
-        setSearchQuery("")
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setShowDropdown(false)
+          setSearchQuery("")
+        }
       }
+      document.addEventListener("mousedown", handleClickOutside)
+      return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
+
+    const filteredOptions = options.filter(option =>
+      option.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
+    const handleSelect = (optionName) => {
+      onChange({ target: { name, value: optionName } })
+      setShowDropdown(false)
+      setSearchQuery("")
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
 
-  const filteredOptions = options.filter(option =>
-    option.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <button
+          type="button"
+          onClick={() => setShowDropdown(!showDropdown)}
+          disabled={loading}
+          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between ${darkMode
+              ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500 disabled:opacity-50"
+              : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:opacity-50"
+            }`}
+        >
+          <span className={!value ? (darkMode ? "text-zinc-500" : "text-gray-400") : ""}>
+            {loading ? "Loading..." : value || placeholder}
+          </span>
+          <ChevronRight className={`w-5 h-5 transition-transform ${showDropdown ? 'rotate-90' : ''} ${darkMode ? "text-zinc-400" : "text-gray-400"
+            }`} />
+        </button>
 
-  const handleSelect = (optionName) => {
-    onChange({ target: { name, value: optionName } })
-    setShowDropdown(false)
-    setSearchQuery("")
-  }
+        {showDropdown && !loading && (
+          <>
+            {/* Mobile backdrop */}
+            <div
+              className="fixed inset-0 z-[99] sm:hidden bg-black/20"
+              onClick={() => setShowDropdown(false)}
+            />
 
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setShowDropdown(!showDropdown)}
-        disabled={loading}
-        className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between ${
-          darkMode
-            ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500 disabled:opacity-50"
-            : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:opacity-50"
-        }`}
-      >
-        <span className={!value ? (darkMode ? "text-zinc-500" : "text-gray-400") : ""}>
-          {loading ? "Loading..." : value || placeholder}
-        </span>
-        <ChevronRight className={`w-5 h-5 transition-transform ${showDropdown ? 'rotate-90' : ''} ${
-          darkMode ? "text-zinc-400" : "text-gray-400"
-        }`} />
-      </button>
-
-      {showDropdown && !loading && (
-        <>
-          {/* Mobile backdrop */}
-          <div 
-            className="fixed inset-0 z-[99] sm:hidden bg-black/20"
-            onClick={() => setShowDropdown(false)}
-          />
-          
-          <div 
-            className={`fixed sm:absolute left-1/2 top-1/2 sm:top-full sm:left-0 -translate-x-1/2 sm:translate-x-0 -translate-y-1/2 sm:translate-y-0 sm:mt-2 z-[100] rounded-2xl border shadow-2xl overflow-hidden ${
-              darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
-            }`} 
-            style={{ 
-              width: '320px',
-              maxWidth: 'calc(100vw - 2rem)'
-            }}
-          >
-            {/* Search Input */}
-            <div className={`p-3 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"}`}>
-              <input
-                type="text"
-                placeholder={`Search ${placeholder.toLowerCase()}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm ${
-                  darkMode
-                    ? "bg-zinc-900/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+            <div
+              className={`fixed sm:absolute left-1/2 top-1/2 sm:top-full sm:left-0 -translate-x-1/2 sm:translate-x-0 -translate-y-1/2 sm:translate-y-0 sm:mt-2 z-[100] rounded-2xl border shadow-2xl overflow-hidden ${darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
                 }`}
-                autoFocus
-              />
-            </div>
-
-            {/* Options List with Hidden Scrollbar */}
-            <div 
-              className="max-h-64 overflow-y-auto scrollbar-hide"
               style={{
-                scrollbarWidth: 'none', /* Firefox */
-                msOverflowStyle: 'none' /* IE and Edge */
+                width: '320px',
+                maxWidth: 'calc(100vw - 2rem)'
               }}
             >
-              {/* Placeholder option */}
-              <button
-                type="button"
-                onClick={() => handleSelect("")}
-                className={`w-full px-4 py-3 text-left transition-all border-b ${
-                  !value
-                    ? darkMode
-                      ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
-                      : "bg-emerald-50 text-emerald-600 border-gray-200"
-                    : darkMode
-                    ? "hover:bg-zinc-700 text-zinc-400 border-zinc-700"
-                    : "hover:bg-gray-50 text-gray-500 border-gray-200"
-                }`}
-              >
-                {placeholder}
-              </button>
-
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option) => (
-                  <button
-                    key={option.iso2 || option.id}
-                    type="button"
-                    onClick={() => handleSelect(option.name)}
-                    className={`w-full px-4 py-3 text-left transition-all border-b last:border-b-0 ${
-                      value === option.name
-                        ? darkMode
-                          ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
-                          : "bg-emerald-50 text-emerald-600 border-gray-200"
-                        : darkMode
-                        ? "hover:bg-zinc-700 text-white border-zinc-700"
-                        : "hover:bg-gray-50 text-gray-900 border-gray-200"
+              {/* Search Input */}
+              <div className={`p-3 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"}`}>
+                <input
+                  type="text"
+                  placeholder={`Search ${placeholder.toLowerCase()}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm ${darkMode
+                      ? "bg-zinc-900/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
                     }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{option.name}</span>
-                      {value === option.name && (
-                        <CheckCircle2 className={`w-4 h-4 ${
-                          darkMode ? "text-emerald-400" : "text-emerald-600"
-                        }`} />
-                      )}
-                    </div>
-                  </button>
-                ))
-              ) : (
-                <div className={`px-4 py-8 text-center ${
-                  darkMode ? "text-zinc-500" : "text-gray-500"
-                }`}>
-                  <p className="text-sm">No results found</p>
-                </div>
-              )}
+                  autoFocus
+                />
+              </div>
+
+              {/* Options List with Hidden Scrollbar */}
+              <div
+                className="max-h-64 overflow-y-auto scrollbar-hide"
+                style={{
+                  scrollbarWidth: 'none', /* Firefox */
+                  msOverflowStyle: 'none' /* IE and Edge */
+                }}
+              >
+                {/* Placeholder option */}
+                <button
+                  type="button"
+                  onClick={() => handleSelect("")}
+                  className={`w-full px-4 py-3 text-left transition-all border-b ${!value
+                      ? darkMode
+                        ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
+                        : "bg-emerald-50 text-emerald-600 border-gray-200"
+                      : darkMode
+                        ? "hover:bg-zinc-700 text-zinc-400 border-zinc-700"
+                        : "hover:bg-gray-50 text-gray-500 border-gray-200"
+                    }`}
+                >
+                  {placeholder}
+                </button>
+
+                {filteredOptions.length > 0 ? (
+                  filteredOptions.map((option) => (
+                    <button
+                      key={option.iso2 || option.id}
+                      type="button"
+                      onClick={() => handleSelect(option.name)}
+                      className={`w-full px-4 py-3 text-left transition-all border-b last:border-b-0 ${value === option.name
+                          ? darkMode
+                            ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
+                            : "bg-emerald-50 text-emerald-600 border-gray-200"
+                          : darkMode
+                            ? "hover:bg-zinc-700 text-white border-zinc-700"
+                            : "hover:bg-gray-50 text-gray-900 border-gray-200"
+                        }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{option.name}</span>
+                        {value === option.name && (
+                          <CheckCircle2 className={`w-4 h-4 ${darkMode ? "text-emerald-400" : "text-emerald-600"
+                            }`} />
+                        )}
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className={`px-4 py-8 text-center ${darkMode ? "text-zinc-500" : "text-gray-500"
+                    }`}>
+                    <p className="text-sm">No results found</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
+          </>
+        )}
+      </div>
+    )
+  }
 
   const steps = [
     { number: 1, title: "Personal Info", icon: User },
@@ -515,26 +514,23 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
-            darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
-          }`} />
-          <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
-            darkMode ? "bg-teal-950/20" : "bg-teal-50"
-          }`} />
+          <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+            }`} />
+          <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
+            }`} />
         </div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className={`relative z-10 max-w-2xl w-full rounded-3xl overflow-hidden ${
-            darkMode 
-              ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800" 
+          className={`relative z-10 max-w-2xl w-full rounded-3xl overflow-hidden ${darkMode
+              ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
               : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
-          }`}
+            }`}
         >
           <div className="relative h-32 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
             <div className="absolute inset-0 opacity-20">
-              <div 
+              <div
                 className="absolute inset-0"
                 style={{
                   backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
@@ -553,28 +549,25 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
               KYC Submitted Successfully
             </h2>
 
-            <div className={`p-6 rounded-2xl mb-6 ${
-              darkMode ? "bg-zinc-800/50 border border-zinc-700" : "bg-blue-50 border border-blue-200"
-            }`}>
+            <div className={`p-6 rounded-2xl mb-6 ${darkMode ? "bg-zinc-800/50 border border-zinc-700" : "bg-blue-50 border border-blue-200"
+              }`}>
               <div className="flex items-start gap-3">
-                <AlertCircle className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
-                  darkMode ? "text-blue-400" : "text-blue-600"
-                }`} />
+                <AlertCircle className={`w-6 h-6 flex-shrink-0 mt-0.5 ${darkMode ? "text-blue-400" : "text-blue-600"
+                  }`} />
                 <div className="text-left">
                   <p className={`font-semibold mb-2 ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
                     Your KYC is Under Review
                   </p>
                   <p className={`text-sm ${darkMode ? "text-blue-400" : "text-blue-700"}`}>
-                    Our admin team is reviewing your KYC details. You'll be notified once the verification is complete. 
+                    Our admin team is reviewing your KYC details. You'll be notified once the verification is complete.
                     Your KYC details cannot be changed during the review process.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className={`p-4 rounded-xl ${
-              darkMode ? "bg-yellow-900/20 border border-yellow-800/50" : "bg-yellow-50 border border-yellow-200"
-            }`}>
+            <div className={`p-4 rounded-xl ${darkMode ? "bg-yellow-900/20 border border-yellow-800/50" : "bg-yellow-50 border border-yellow-200"
+              }`}>
               <p className={`text-sm font-medium ${darkMode ? "text-yellow-300" : "text-yellow-800"}`}>
                 <Lock className="w-4 h-4 inline mr-2" />
                 KYC details are locked and cannot be modified
@@ -595,11 +588,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm ${
-              darkMode
+            className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm ${darkMode
                 ? "bg-zinc-900 border border-emerald-500/20"
                 : "bg-white border border-emerald-200"
-            }`}
+              }`}
           >
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -620,17 +612,15 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
 
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
-          darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
-        }`} />
-        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
-          darkMode ? "bg-teal-950/20" : "bg-teal-50"
-        }`} />
+        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+          }`} />
+        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
+          }`} />
       </div>
 
       {/* Main Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-12 pb-8 sm:pb-12">
-        
+
         {/* Progress Steps */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -643,41 +633,37 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
               const Icon = step.icon
               const isActive = currentStep === step.number
               const isCompleted = currentStep > step.number
-              
+
               return (
                 <div key={step.number} className="flex items-center">
                   <div className="flex flex-col items-center">
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all ${
-                      isCompleted
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all ${isCompleted
                         ? "bg-emerald-600 border-emerald-600"
                         : isActive
-                        ? "bg-emerald-600 border-emerald-600"
-                        : darkMode
-                        ? "bg-zinc-800 border-zinc-700"
-                        : "bg-white border-gray-300"
-                    }`}>
+                          ? "bg-emerald-600 border-emerald-600"
+                          : darkMode
+                            ? "bg-zinc-800 border-zinc-700"
+                            : "bg-white border-gray-300"
+                      }`}>
                       {isCompleted ? (
                         <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                       ) : (
-                        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                          isActive ? "text-white" : darkMode ? "text-zinc-400" : "text-gray-400"
-                        }`} />
+                        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? "text-white" : darkMode ? "text-zinc-400" : "text-gray-400"
+                          }`} />
                       )}
                     </div>
-                    <span className={`mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap ${
-                      isActive || isCompleted
+                    <span className={`mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap ${isActive || isCompleted
                         ? darkMode ? "text-emerald-400" : "text-emerald-600"
                         : darkMode ? "text-zinc-500" : "text-gray-500"
-                    }`}>
+                      }`}>
                       {step.title}
                     </span>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`h-0.5 w-12 sm:w-16 md:w-20 mx-3 sm:mx-4 ${
-                      isCompleted
+                    <div className={`h-0.5 w-12 sm:w-16 md:w-20 mx-3 sm:mx-4 ${isCompleted
                         ? "bg-emerald-600"
                         : darkMode ? "bg-zinc-700" : "bg-gray-300"
-                    }`} />
+                      }`} />
                   )}
                 </div>
               )
@@ -690,16 +676,15 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className={`rounded-3xl overflow-visible ${
-            darkMode 
-              ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800" 
+          className={`rounded-3xl overflow-visible ${darkMode
+              ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
               : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
-          }`}
+            }`}
         >
           {/* Gradient Header */}
           <div className="relative h-24 sm:h-32 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
             <div className="absolute inset-0">
-              <div 
+              <div
                 className="absolute inset-0 opacity-20"
                 style={{
                   backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
@@ -732,7 +717,7 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                     <h3 className={`text-lg sm:text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
                       Personal Information
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
@@ -746,11 +731,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                             value={formData.fullName}
                             onChange={handleInputChange}
                             placeholder="As per government ID"
-                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
+                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
                                 ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
                                 : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
+                              }`}
                           />
                         </div>
                       </div>
@@ -776,18 +760,17 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                           <button
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, gender: "male" }))}
-                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                              formData.gender === "male"
+                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.gender === "male"
                                 ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
                                 : darkMode
-                                ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
-                                : "border-gray-200 bg-white hover:border-gray-300"
-                            }`}
+                                  ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+                                  : "border-gray-200 bg-white hover:border-gray-300"
+                              }`}
                           >
                             <svg className={`w-8 h-8 ${formData.gender === "male" ? "text-emerald-600" : darkMode ? "text-zinc-400" : "text-gray-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <circle cx="10" cy="14" r="6"/>
-                              <path d="M14 4 L20 4 L20 10 M14 4 L20 10"/>
-                              <line x1="14" y1="10" x2="19" y2="5"/>
+                              <circle cx="10" cy="14" r="6" />
+                              <path d="M14 4 L20 4 L20 10 M14 4 L20 10" />
+                              <line x1="14" y1="10" x2="19" y2="5" />
                             </svg>
                             <span className={`font-semibold ${formData.gender === "male" ? "text-emerald-600" : darkMode ? "text-white" : "text-gray-900"}`}>
                               Male
@@ -797,18 +780,17 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                           <button
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, gender: "female" }))}
-                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                              formData.gender === "female"
+                            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.gender === "female"
                                 ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
                                 : darkMode
-                                ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
-                                : "border-gray-200 bg-white hover:border-gray-300"
-                            }`}
+                                  ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+                                  : "border-gray-200 bg-white hover:border-gray-300"
+                              }`}
                           >
                             <svg className={`w-8 h-8 ${formData.gender === "female" ? "text-emerald-600" : darkMode ? "text-zinc-400" : "text-gray-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <circle cx="12" cy="8" r="6"/>
-                              <line x1="12" y1="14" x2="12" y2="21"/>
-                              <line x1="9" y1="18" x2="15" y2="18"/>
+                              <circle cx="12" cy="8" r="6" />
+                              <line x1="12" y1="14" x2="12" y2="21" />
+                              <line x1="9" y1="18" x2="15" y2="18" />
                             </svg>
                             <span className={`font-semibold ${formData.gender === "female" ? "text-emerald-600" : darkMode ? "text-white" : "text-gray-900"}`}>
                               Female
@@ -818,103 +800,121 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                       </div>
 
                       {/* Profession with Search */}
-                    <div>
-  <label
-    className={`block text-sm font-semibold mb-2 ${
-      darkMode ? "text-zinc-300" : "text-gray-700"
-    }`}
-  >
-    Profession <span className="text-red-500">*</span>
-  </label>
+                      <div>
+                        <label
+                          className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"
+                            }`}
+                        >
+                          Profession <span className="text-red-500">*</span>
+                        </label>
 
-  {/* RATHER NOT SAY */}
-  <div className="flex items-center gap-2 mb-2">
-    <input
-      type="checkbox"
-      checked={formData.ratherNotSayProfession || false}
-      onChange={(e) => {
-        setFormData((prev) => ({
-          ...prev,
-          ratherNotSayProfession: e.target.checked,
-          profession: e.target.checked ? "" : prev.profession,
-        }))
-        if (e.target.checked) {
-          setShowProfessionDropdown(false)
-        }
-      }}
-    />
-    <span className={darkMode ? "text-zinc-300" : "text-gray-700"}>
-      Rather not say
-    </span>
-  </div>
+                        {/* RATHER NOT SAY */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <input
+                            type="checkbox"
+                            checked={formData.ratherNotSayProfession || false}
+                            onChange={(e) => {
+                              setFormData((prev) => ({
+                                ...prev,
+                                ratherNotSayProfession: e.target.checked,
+                                profession: e.target.checked ? "" : prev.profession,
+                              }))
+                              if (e.target.checked) {
+                                setShowProfessionDropdown(false)
+                              }
+                            }}
+                          />
+                          <span className={darkMode ? "text-zinc-300" : "text-gray-700"}>
+                            Rather not say
+                          </span>
+                        </div>
 
-  <div className="relative" ref={professionRef}>
-    <div className="relative">
-      <Building
-        className={`absolute left-4 top-3.5 w-5 h-5 z-10 ${
-          darkMode ? "text-zinc-500" : "text-gray-400"
-        }`}
-      />
+                        <div className="relative" ref={professionRef}>
+                          <div className="relative">
+                            <Building
+                              className={`absolute left-4 top-3.5 w-5 h-5 z-10 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                                }`}
+                            />
 
-      <input
-        type="text"
-        disabled={formData.ratherNotSayProfession}
-        value={professionSearch || formData.profession}
-        onChange={(e) => {
-          setProfessionSearch(e.target.value)
-          setShowProfessionDropdown(true)
-        }}
-        onFocus={() => setShowProfessionDropdown(true)}
-        placeholder="Search profession..."
-        className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 outline-none transition-all ${
-          darkMode
-            ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-        } ${formData.ratherNotSayProfession ? "opacity-50 cursor-not-allowed" : ""}`}
-      />
+                            <input
+                              type="text"
+                              disabled={formData.ratherNotSayProfession}
+                              value={showProfessionDropdown ? professionSearch : formData.profession}
+                              onChange={(e) => {
+                                const value = e.target.value
+                                setProfessionSearch(value)
+                                setFormData(prev => ({ ...prev, profession: value }))
+                                setShowProfessionDropdown(true)
+                              }}
+                              onFocus={() => {
+                                setProfessionSearch(formData.profession)
+                                setShowProfessionDropdown(true)
+                              }}
+                              placeholder="Search profession..."
+                              className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
+                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                                } ${formData.ratherNotSayProfession ? "opacity-50 cursor-not-allowed" : ""}`}
+                            />
 
-      <Search
-        className={`absolute right-4 top-3.5 w-5 h-5 ${
-          darkMode ? "text-zinc-500" : "text-gray-400"
-        }`}
-      />
-    </div>
+                            <Search
+                              className={`absolute right-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                                }`}
+                            />
+                          </div>
 
-    {/* DROPDOWN */}
-    {showProfessionDropdown &&
-      filteredProfessions.length > 0 &&
-      !formData.ratherNotSayProfession && (
-        <div
-          className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 scrollbar-hide ${
-            darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
-          }`}
-        >
-          {filteredProfessions.map((profession, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handleProfessionSelect(profession)}
-              className={`w-full px-4 py-3 text-left transition-colors ${
-                darkMode
-                  ? "hover:bg-zinc-700 text-white"
-                  : "hover:bg-gray-50 text-gray-900"
-              } ${
-                idx !== 0
-                  ? darkMode
-                    ? "border-t border-zinc-700"
-                    : "border-t border-gray-100"
-                  : ""
-              }`}
-            >
-              {profession}
-            </button>
-          ))}
+                          {/* DROPDOWN */}
+                          {showProfessionDropdown &&
+                            filteredProfessions.length > 0 &&
+                            !formData.ratherNotSayProfession && (
+                              <div
+                                className={`absolute top-full left-0 right-0 mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-xl z-50 scrollbar-hide ${darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-gray-200"
+                                  }`}
+                              >
+                                {filteredProfessions.map((profession, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleProfessionSelect(profession)}
+                                    className={`w-full px-4 py-3 text-left transition-colors ${darkMode
+                                        ? "hover:bg-zinc-700 text-white"
+                                        : "hover:bg-gray-50 text-gray-900"
+                                      } ${idx !== 0
+                                        ? darkMode
+                                          ? "border-t border-zinc-700"
+                                          : "border-t border-gray-100"
+                                        : ""
+                                      }`}
+                                  >
+                                    {profession}
+                                  </button>
+                                ))}
 
-        
-        </div>
-      )}
-  </div>
-</div>
+
+                              </div>
+
+                            )}
+
+                          {/* Custom Profession Input - Shows when "Other" is selected */}
+                          {showCustomProfession && formData.profession === "Other" && (
+                            <div className="mt-3">
+                              <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                Enter Your Profession
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.customProfession || ""}
+                                onChange={(e) => setFormData(prev => ({ ...prev, customProfession: e.target.value }))}
+                                placeholder="Type your profession..."
+                                className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
+                                    ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                                  }`}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
 
                       <div>
@@ -929,11 +929,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                             value={formData.phoneNumber}
                             onChange={handleInputChange}
                             placeholder="+91 98765 43210"
-                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
+                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
                                 ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
                                 : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
+                              }`}
                           />
                         </div>
                       </div>
@@ -950,11 +949,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                             value={formData.email}
                             onChange={handleInputChange}
                             placeholder="your.email@example.com"
-                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
+                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
                                 ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
                                 : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
+                              }`}
                           />
                         </div>
                       </div>
@@ -976,7 +974,7 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                     <h3 className={`text-xl font-bold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
                       Residential Address & PAN Details
                     </h3>
-                    
+
                     <div className="space-y-6">
                       <div>
                         <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
@@ -990,47 +988,46 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                             value={formData.addressLine1}
                             onChange={handleInputChange}
                             placeholder="Please enter your address"
-                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
+                            className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
                                 ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
                                 : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
+                              }`}
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                       {/* State Dropdown */}
-<div>
-  <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-    State <span className="text-red-500">*</span>
-  </label>
-  <CustomDropdown
-    darkMode={darkMode}
-    value={formData.state}
-    onChange={handleStateChange}
-    name="state"
-    options={states}
-    placeholder="Select state"
-    loading={loadingStates}
-  />
-</div>
+                        {/* State Dropdown */}
+                        <div>
+                          <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            State <span className="text-red-500">*</span>
+                          </label>
+                          <CustomDropdown
+                            darkMode={darkMode}
+                            value={formData.state}
+                            onChange={handleStateChange}
+                            name="state"
+                            options={states}
+                            placeholder="Select state"
+                            loading={loadingStates}
+                          />
+                        </div>
 
-{/* City Dropdown */}
-<div>
-  <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-    City <span className="text-red-500">*</span>
-  </label>
-  <CustomDropdown
-    darkMode={darkMode}
-    value={formData.city}
-    onChange={handleInputChange}
-    name="city"
-    options={cities}
-    placeholder="Select city"
-    loading={loadingCities}
-  />
-</div>
+                        {/* City Dropdown */}
+                        <div>
+                          <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            City <span className="text-red-500">*</span>
+                          </label>
+                          <CustomDropdown
+                            darkMode={darkMode}
+                            value={formData.city}
+                            onChange={handleInputChange}
+                            name="city"
+                            options={cities}
+                            placeholder="Select city"
+                            loading={loadingCities}
+                          />
+                        </div>
 
                         <div>
                           <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
@@ -1042,19 +1039,17 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                             value={formData.postalCode}
                             onChange={handleInputChange}
                             placeholder="PIN / ZIP code"
-                            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${
-                              darkMode
+                            className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
                                 ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
                                 : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                            }`}
+                              }`}
                           />
                         </div>
                       </div>
 
                       {/* PAN Details */}
-                      <div className={`p-5 rounded-xl border ${
-                        darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
-                      }`}>
+                      <div className={`p-5 rounded-xl border ${darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+                        }`}>
                         <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
                           <CreditCard className="w-5 h-5" />
                           PAN Card Details
@@ -1072,11 +1067,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                               onPaste={handlePaste}
                               placeholder="ABCDE1234F"
                               maxLength="10"
-                              className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all uppercase ${
-                                darkMode
+                              className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all uppercase ${darkMode
                                   ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
                                   : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                              }`}
+                                }`}
                             />
                           </div>
 
@@ -1092,19 +1086,17 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                               onPaste={handlePaste}
                               placeholder="Re-enter PAN"
                               maxLength="10"
-                              className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all uppercase ${
-                                darkMode
+                              className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all uppercase ${darkMode
                                   ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
                                   : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
-                              }`}
+                                }`}
                             />
                           </div>
                         </div>
-                        
+
                         {formData.panNumber && formData.confirmPanNumber && formData.panNumber !== formData.confirmPanNumber && (
-                          <div className={`mt-3 p-3 rounded-lg flex items-center gap-2 ${
-                            darkMode ? "bg-red-950/30 border border-red-900/50" : "bg-red-50 border border-red-200"
-                          }`}>
+                          <div className={`mt-3 p-3 rounded-lg flex items-center gap-2 ${darkMode ? "bg-red-950/30 border border-red-900/50" : "bg-red-50 border border-red-200"
+                            }`}>
                             <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -1115,9 +1107,8 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                         )}
 
                         {formData.panNumber && formData.confirmPanNumber && formData.panNumber === formData.confirmPanNumber && (
-                          <div className={`mt-3 p-3 rounded-lg flex items-center gap-2 ${
-                            darkMode ? "bg-emerald-950/30 border border-emerald-900/50" : "bg-emerald-50 border border-emerald-200"
-                          }`}>
+                          <div className={`mt-3 p-3 rounded-lg flex items-center gap-2 ${darkMode ? "bg-emerald-950/30 border border-emerald-900/50" : "bg-emerald-50 border border-emerald-200"
+                            }`}>
                             <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                             <span className={`text-sm font-medium ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
                               PAN numbers match
@@ -1125,9 +1116,8 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                           </div>
                         )}
 
-                        <div className={`mt-3 p-3 rounded-lg border ${
-                          darkMode ? "bg-blue-950/20 border-blue-900/30" : "bg-blue-50 border-blue-200"
-                        }`}>
+                        <div className={`mt-3 p-3 rounded-lg border ${darkMode ? "bg-blue-950/20 border-blue-900/30" : "bg-blue-50 border-blue-200"
+                          }`}>
                           <p className={`text-xs ${darkMode ? "text-blue-300" : "text-blue-700"}`}>
                             <strong>Note:</strong> Copy-paste is disabled for security. Please type your PAN number carefully.
                           </p>
@@ -1154,11 +1144,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                     <p className={`text-sm mb-6 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                       Please review all information carefully before submitting
                     </p>
-                    
+
                     {/* Personal Information Preview */}
-                    <div className={`p-6 rounded-2xl border mb-6 ${
-                      darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
-                    }`}>
+                    <div className={`p-6 rounded-2xl border mb-6 ${darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+                      }`}>
                       <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
                         <User className="w-5 h-5" />
                         Personal Information
@@ -1171,10 +1160,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                         <div>
                           <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Date of Birth</p>
                           <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                            {formData.dateOfBirth ? new Date(formData.dateOfBirth + 'T00:00:00').toLocaleDateString('en-IN', { 
-                              day: 'numeric', 
-                              month: 'long', 
-                              year: 'numeric' 
+                            {formData.dateOfBirth ? new Date(formData.dateOfBirth + 'T00:00:00').toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
                             }) : "Not provided"}
                           </p>
                         </div>
@@ -1184,8 +1173,14 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                         </div>
                         <div>
                           <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Profession</p>
-                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.profession || "—"}</p>
+                          <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                            {formData.profession === "Other" && formData.customProfession
+                              ? formData.customProfession
+                              : formData.profession || "—"}
+                          </p>
                         </div>
+
+
                         <div>
                           <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>Phone Number</p>
                           <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>{formData.phoneNumber || "—"}</p>
@@ -1198,9 +1193,8 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                     </div>
 
                     {/* Address Preview */}
-                    <div className={`p-6 rounded-2xl border mb-6 ${
-                      darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
-                    }`}>
+                    <div className={`p-6 rounded-2xl border mb-6 ${darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+                      }`}>
                       <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
                         <MapPin className="w-5 h-5" />
                         Residential Address
@@ -1226,9 +1220,8 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                     </div>
 
                     {/* PAN Preview */}
-                    <div className={`p-6 rounded-2xl border ${
-                      darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
-                    }`}>
+                    <div className={`p-6 rounded-2xl border ${darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+                      }`}>
                       <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
                         <CreditCard className="w-5 h-5" />
                         PAN Card Details
@@ -1240,19 +1233,17 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                     </div>
 
                     {/* Important Notice */}
-                    <div className={`p-4 rounded-xl border ${
-                      darkMode ? "bg-yellow-900/20 border-yellow-800/50" : "bg-yellow-50 border-yellow-200"
-                    }`}>
+                    <div className={`p-4 rounded-xl border ${darkMode ? "bg-yellow-900/20 border-yellow-800/50" : "bg-yellow-50 border-yellow-200"
+                      }`}>
                       <div className="flex items-start gap-3">
-                        <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                          darkMode ? "text-yellow-400" : "text-yellow-600"
-                        }`} />
+                        <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${darkMode ? "text-yellow-400" : "text-yellow-600"
+                          }`} />
                         <div>
                           <p className={`font-semibold mb-1 text-sm ${darkMode ? "text-yellow-300" : "text-yellow-800"}`}>
                             Important Notice
                           </p>
                           <p className={`text-xs ${darkMode ? "text-yellow-400" : "text-yellow-700"}`}>
-                            Once submitted, your KYC details cannot be modified and will be sent for admin approval. 
+                            Once submitted, your KYC details cannot be modified and will be sent for admin approval.
                             Please ensure all information is accurate.
                           </p>
                         </div>
@@ -1268,11 +1259,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
               {currentStep > 1 ? (
                 <button
                   onClick={() => setCurrentStep(currentStep - 1)}
-                  className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
-                    darkMode
+                  className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${darkMode
                       ? "bg-zinc-800 hover:bg-zinc-700 text-white"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                  }`}
+                    }`}
                 >
                   <ChevronLeft className="w-5 h-5" />
                   Back
@@ -1280,9 +1270,8 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
               ) : (
                 <button
                   onClick={onSkip}
-                  className={`text-sm font-medium underline text-center sm:text-left ${
-                    darkMode ? "text-zinc-400 hover:text-zinc-300" : "text-gray-600 hover:text-gray-700"
-                  }`}
+                  className={`text-sm font-medium underline text-center sm:text-left ${darkMode ? "text-zinc-400 hover:text-zinc-300" : "text-gray-600 hover:text-gray-700"
+                    }`}
                 >
                   Skip for now
                 </button>
@@ -1300,11 +1289,10 @@ const CustomDropdown = ({ darkMode, value, onChange, name, options, placeholder,
                 <button
                   onClick={handleSubmit}
                   disabled={formData.panNumber !== formData.confirmPanNumber || !formData.panNumber || !formData.confirmPanNumber}
-                  className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${
-                    formData.panNumber !== formData.confirmPanNumber || !formData.panNumber || !formData.confirmPanNumber
+                  className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${formData.panNumber !== formData.confirmPanNumber || !formData.panNumber || !formData.confirmPanNumber
                       ? "bg-gray-400 cursor-not-allowed text-white"
                       : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
-                  }`}
+                    }`}
                 >
                   <CheckCircle2 className="w-5 h-5" />
                   Submit KYC
