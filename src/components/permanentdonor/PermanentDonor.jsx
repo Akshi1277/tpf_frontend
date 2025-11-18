@@ -20,9 +20,8 @@ import {
 
 export default function PermanentDonorPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
-  const [selectedCard, setSelectedCard] = useState(null)
-  const [hoveredCard, setHoveredCard] = useState(null)
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true)
+  const [selectedPlan, setSelectedPlan] = useState(null)
+  const [hoveredPlan, setHoveredPlan] = useState(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -30,21 +29,16 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       setDarkMode(darkModeFromParent)
     }
   }, [darkModeFromParent])
-  
-  const handleScroll = (e) => {
-  const element = e.target
-  const isAtBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50
-  setShowScrollIndicator(!isAtBottom)
-}
 
   const donationPlans = [
     {
       id: "daily",
-      title: "Daily Impact",
+      title: "Daily Sadaqah",
       subtitle: "Every day matters",
       frequency: "Daily",
-    
-      description: "Transform lives with consistent daily contributions. Perfect for those who want to make giving a daily habit.",
+      islamicQuote: "Give charity without delay",
+      islamicQuoteTranslation: "The best charity is that given regularly",
+      description: "Transform lives with consistent daily contributions. Make giving a daily habit and protect yourself through regular charity.",
       features: [
         "Automated daily donations at 9:00 AM",
         "Flexible amount from ₹10 onwards",
@@ -55,28 +49,29 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       badge: "Most Active",
       color: {
         gradient: darkMode => darkMode 
-          ? "from-amber-500 via-orange-500 to-red-500" 
-          : "from-amber-400 via-orange-400 to-red-400",
-        solid: darkMode => darkMode ? "bg-amber-500" : "bg-amber-500",
-        light: darkMode => darkMode ? "bg-amber-950/20" : "bg-amber-50",
-        border: darkMode => darkMode ? "border-amber-500/30" : "border-amber-300",
-        text: darkMode => darkMode ? "text-amber-400" : "text-amber-600",
+          ? "from-blue-500 via-indigo-500 to-violet-500" 
+          : "from-blue-400 via-indigo-400 to-violet-400",
+        solid: darkMode => darkMode ? "bg-blue-500" : "bg-blue-500",
+        light: darkMode => darkMode ? "bg-blue-950/20" : "bg-blue-50",
+        border: darkMode => darkMode ? "border-blue-500/30" : "border-blue-300",
+        text: darkMode => darkMode ? "text-blue-400" : "text-blue-600",
         glow: darkMode => darkMode 
-          ? "shadow-[0_0_30px_rgba(251,191,36,0.3)]" 
-          : "shadow-[0_0_30px_rgba(251,191,36,0.2)]"
+          ? "shadow-[0_0_40px_rgba(59,130,246,0.4)]" 
+          : "shadow-[0_0_40px_rgba(59,130,246,0.3)]"
       },
       icon: Zap,
       rotation: -18,
-     zIndex: 1,
-    translateX: -80
+      zIndex: 1,
+      translateX: -80
     },
     {
       id: "weekly",
-      title: "Weekly Support",
-      subtitle: "Consistent & reliable",
+      title: "Jumu'ah Giving",
+      subtitle: "Blessed Friday tradition",
       frequency: "Weekly",
-    
-      description: "Build sustainable impact with weekly contributions. Every Friday, your donation supports ongoing initiatives and creates lasting change.",
+      islamicQuote: "Friday - The Best Day",
+      islamicQuoteTranslation: "Give on the most blessed day of the week",
+      description: "Honor the blessed day of Jumu'ah with your weekly sadaqah. Every Friday, create lasting change and earn special blessings.",
       features: [
         "Automated donations every Friday",
         "Minimum ₹50 per week contribution",
@@ -84,31 +79,33 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
         "Priority campaign updates"
       ],
       rules: "Donations are automatically processed every Friday at 9:00 AM. You can modify the amount or pause the subscription anytime through your account settings.",
-      badge: "Most Popular",
+      badge: "Most Blessed",
       color: {
         gradient: darkMode => darkMode 
-          ? "from-blue-500 via-indigo-500 to-purple-500" 
-          : "from-blue-400 via-indigo-400 to-purple-400",
-        solid: darkMode => darkMode ? "bg-blue-500" : "bg-blue-500",
-        light: darkMode => darkMode ? "bg-blue-950/20" : "bg-blue-50",
-        border: darkMode => darkMode ? "border-blue-500/30" : "border-blue-300",
-        text: darkMode => darkMode ? "text-blue-400" : "text-blue-600",
+          ? "from-yellow-500 via-yellow-400 to-amber-400" 
+          : "from-yellow-600 via-yellow-500 to-amber-500",
+        solid: darkMode => darkMode ? "bg-yellow-500" : "bg-yellow-500",
+        light: darkMode => darkMode ? "bg-yellow-900/20" : "bg-yellow-50",
+        border: darkMode => darkMode ? "border-yellow-500/50" : "border-yellow-500",
+        text: darkMode => darkMode ? "text-yellow-400" : "text-yellow-700",
         glow: darkMode => darkMode 
-          ? "shadow-[0_0_30px_rgba(59,130,246,0.3)]" 
-          : "shadow-[0_0_30px_rgba(59,130,246,0.2)]"
+          ? "shadow-[0_0_50px_rgba(234,179,8,0.6)]" 
+          : "shadow-[0_0_50px_rgba(234,179,8,0.5)]"
       },
       icon: Clock,
-    rotation: -6,  // Changed from -4
-    zIndex: 2,
-    translateX: -30 
+      rotation: -6,
+      zIndex: 4,
+      translateX: -30,
+      isSpecial: true
     },
     {
       id: "monthly",
-      title: "Monthly Champion",
+      title: "Monthly Zakat",
       subtitle: "Strategic giving",
       frequency: "Monthly",
-     
-      description: "Join our community of monthly champions. Your sustained support enables long-term planning and greater impact.",
+      islamicQuote: "Consistent Giving",
+      islamicQuoteTranslation: "Regular charity brings abundant blessings",
+      description: "Join our community of monthly champions. Your sustained support enables long-term planning and brings barakah through consistency.",
       features: [
         "Monthly donations on preferred date",
         "Choose date between 1st-30th",
@@ -126,21 +123,22 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
         border: darkMode => darkMode ? "border-purple-500/30" : "border-purple-300",
         text: darkMode => darkMode ? "text-purple-400" : "text-purple-600",
         glow: darkMode => darkMode 
-          ? "shadow-[0_0_30px_rgba(168,85,247,0.3)]" 
-          : "shadow-[0_0_30px_rgba(168,85,247,0.2)]"
+          ? "shadow-[0_0_40px_rgba(168,85,247,0.4)]" 
+          : "shadow-[0_0_40px_rgba(168,85,247,0.3)]"
       },
       icon: BarChart3,
-       rotation: 6,  // Changed from 4
-    zIndex: 2,
-    translateX: 30
+      rotation: 6,
+      zIndex: 2,
+      translateX: 30
     },
     {
       id: "yearly",
-      title: "Annual Patron",
-      subtitle: "Maximum impact",
+      title: "Annual Sadaqah Jariyah",
+      subtitle: "Continuous rewards",
       frequency: "Yearly",
-  
-      description: "Make a significant annual commitment. Ideal for those planning larger contributions with premium recognition and benefits.",
+      islamicQuote: "Ongoing Charity",
+      islamicQuoteTranslation: "Charity that continues to benefit after you",
+      description: "Make a significant annual commitment with continuous rewards. Give once and earn rewards that keep multiplying.",
       features: [
         "Single annual contribution",
         "Choose your donation anniversary",
@@ -158,22 +156,22 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
         border: darkMode => darkMode ? "border-emerald-500/30" : "border-emerald-300",
         text: darkMode => darkMode ? "text-emerald-400" : "text-emerald-600",
         glow: darkMode => darkMode 
-          ? "shadow-[0_0_30px_rgba(16,185,129,0.3)]" 
-          : "shadow-[0_0_30px_rgba(16,185,129,0.2)]"
+          ? "shadow-[0_0_40px_rgba(16,185,129,0.4)]" 
+          : "shadow-[0_0_40px_rgba(16,185,129,0.3)]"
       },
       icon: Award,
-      rotation: 18,  // Changed from 12
-    zIndex: 3,
-    translateX: 80 
+      rotation: 18,
+      zIndex: 3,
+      translateX: 80 
     }
   ]
 
-  const handleCardClick = (plan) => {
-    setSelectedCard(plan)
+  const handlePlanClick = (plan) => {
+    setSelectedPlan(plan)
   }
 
   const handleClose = () => {
-    setSelectedCard(null)
+    setSelectedPlan(null)
   }
 
   const handleProceed = (route) => {
@@ -181,51 +179,47 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
   }
 
   return (
-
-
-    
     <div className="min-h-screen relative overflow-hidden">
       {/* Enhanced Background */}
-      {/* Spotlight Beams */}
-<div className="absolute inset-0 overflow-hidden pointer-events-none">
-  <motion.div
-    animate={{
-      rotate: [0, 360],
-    }}
-    transition={{
-      duration: 25,
-      repeat: Infinity,
-      ease: "linear",
-    }}
-    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]"
-  >
-    <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-      darkMode 
-        ? 'bg-gradient-to-b from-emerald-500/40 via-emerald-500/10 to-transparent' 
-        : 'bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent'
-    }`} style={{ transform: 'rotate(0deg)' }} />
-    <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-      darkMode 
-        ? 'bg-gradient-to-b from-blue-500/40 via-blue-500/10 to-transparent' 
-        : 'bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent'
-    }`} style={{ transform: 'rotate(72deg)' }} />
-    <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-      darkMode 
-        ? 'bg-gradient-to-b from-purple-500/40 via-purple-500/10 to-transparent' 
-        : 'bg-gradient-to-b from-purple-500/50 via-purple-500/20 to-transparent'
-    }`} style={{ transform: 'rotate(144deg)' }} />
-    <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-      darkMode 
-        ? 'bg-gradient-to-b from-teal-500/40 via-teal-500/10 to-transparent' 
-        : 'bg-gradient-to-b from-teal-500/50 via-teal-500/20 to-transparent'
-    }`} style={{ transform: 'rotate(216deg)' }} />
-    <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-      darkMode 
-        ? 'bg-gradient-to-b from-pink-500/40 via-pink-500/10 to-transparent' 
-        : 'bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent'
-    }`} style={{ transform: 'rotate(288deg)' }} />
-  </motion.div>
-</div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            rotate: [0, 360],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]"
+        >
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
+            darkMode 
+              ? 'bg-gradient-to-b from-emerald-500/40 via-emerald-500/10 to-transparent' 
+              : 'bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent'
+          }`} style={{ transform: 'rotate(0deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
+            darkMode 
+              ? 'bg-gradient-to-b from-blue-500/40 via-blue-500/10 to-transparent' 
+              : 'bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent'
+          }`} style={{ transform: 'rotate(72deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
+            darkMode 
+              ? 'bg-gradient-to-b from-purple-500/40 via-purple-500/10 to-transparent' 
+              : 'bg-gradient-to-b from-purple-500/50 via-purple-500/20 to-transparent'
+          }`} style={{ transform: 'rotate(144deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
+            darkMode 
+              ? 'bg-gradient-to-b from-teal-500/40 via-teal-500/10 to-transparent' 
+              : 'bg-gradient-to-b from-teal-500/50 via-teal-500/20 to-transparent'
+          }`} style={{ transform: 'rotate(216deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
+            darkMode 
+              ? 'bg-gradient-to-b from-pink-500/40 via-pink-500/10 to-transparent' 
+              : 'bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent'
+          }`} style={{ transform: 'rotate(288deg)' }} />
+        </motion.div>
+      </div>
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-12">
@@ -234,39 +228,12 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.3 }}
           className="text-center mb-8"
         >
-          <div className="flex items-center justify-center gap-3 mb-6 mt-15 md:mt-0">
-            <motion.div 
-              animate={{ scaleX: [0, 1] }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className={`h-1.5 w-16 rounded-full bg-gradient-to-r ${
-                darkMode ? 'from-emerald-500 to-teal-400' : 'from-emerald-600 to-teal-500'
-              }`} 
-            />
-            <motion.span 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className={`text-sm font-bold tracking-wider uppercase px-4 py-1.5 rounded-full ${
-                darkMode 
-                  ? 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/20' 
-                  : 'text-emerald-700 bg-emerald-100 border border-emerald-200'
-              }`}
-            >
-              Sustainable Giving
-            </motion.span>
-            <motion.div 
-              animate={{ scaleX: [0, 1] }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className={`h-1.5 w-16 rounded-full bg-gradient-to-l ${
-                darkMode ? 'from-emerald-500 to-teal-400' : 'from-emerald-600 to-teal-500'
-              }`} 
-            />
-          </div>
+         
           
-          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold mb-5 ${
+          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold mb-4 ${
             darkMode ? 'text-white' : 'text-gray-900'
           }`}>
             Choose Your{' '}
@@ -279,220 +246,217 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
             </span>
           </h1>
           
-          <p className={`text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed mb-4 ${
-            darkMode ? 'text-zinc-300' : 'text-gray-700'
+          <p className={`text-base max-w-2xl mx-auto mb-2 ${
+            darkMode ? 'text-zinc-400' : 'text-gray-600'
           }`}>
-            Select a card to explore your giving options
+            Select a plan to explore your continuous charity options
           </p>
-          
-          <div className="flex items-center justify-center gap-2 text-sm">
-            <Info className={`w-4 h-4 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`} />
-            <span className={darkMode ? 'text-zinc-500' : 'text-gray-500'}>
-              Click any card to see details
-            </span>
-          </div>
         </motion.div>
 
-<div className="relative mb-16">
-  {/* Desktop Fanned Layout */}
-  <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 lg:gap-6">
-    {donationPlans.map((plan, index) => {
-      const Icon = plan.icon
-      const isSelected = selectedCard?.id === plan.id
-      const isHovered = hoveredCard === plan.id
-      const othersSelected = selectedCard && selectedCard.id !== plan.id
+        <div className="relative mb-16">
+          {/* Desktop Fanned Layout */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 lg:gap-6">
+            {donationPlans.map((plan, index) => {
+              const Icon = plan.icon
+              const isSelected = selectedPlan?.id === plan.id
+              const isHovered = hoveredPlan === plan.id
+              const othersSelected = selectedPlan && selectedPlan.id !== plan.id
 
-      return (
-        <motion.div
-          key={plan.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: othersSelected ? 0.3 : 1,
-            y: 0,
-            scale: isHovered ? 1.02 : 1
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 30,
-            delay: index * 0.1
-          }}
-          onMouseEnter={() => !selectedCard && setHoveredCard(plan.id)}
-          onMouseLeave={() => setHoveredCard(null)}
-          onClick={() => !selectedCard && handleCardClick(plan)}
-          className={`cursor-pointer h-full ${othersSelected ? 'pointer-events-none' : ''}`}
-        >
-          {/* Keep all your existing card JSX here */}
-          <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 h-full flex flex-col ${
-            darkMode 
-              ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
-              : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
-          } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'}`}>
-            
-            <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
+              return (
+                <motion.div
+                  key={plan.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ 
+                    opacity: othersSelected ? 0.3 : 1,
+                    y: 0,
+                    scale: isHovered ? 1.05 : 1,
+                    rotateY: isHovered ? 5 : 0,
+                    z: isHovered ? 50 : 0
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 20,
+                    delay: index * 0.05
+                  }}
+                  onMouseEnter={() => !selectedPlan && setHoveredPlan(plan.id)}
+                  onMouseLeave={() => setHoveredPlan(null)}
+                  onClick={() => !selectedPlan && handlePlanClick(plan)}
+                  className={`cursor-pointer h-full ${othersSelected ? 'pointer-events-none' : ''}`}
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    perspective: '1000px'
+                  }}
+                >
+                  <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-200 h-full flex flex-col ${
+                    darkMode 
+                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
+                      : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
+                  } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'} ${
+                    plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
+                  }`}>
+                    
+                    {/* Shine Effect on Hover */}
+                    {isHovered && (
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                        initial={{ x: '-100%' }}
+                        animate={{ x: '100%' }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
 
-            <div className="absolute top-4 right-4 z-10">
-              <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
-                darkMode
-                  ? "bg-zinc-900/80 text-white"
-                  : "bg-white/80 text-gray-900"
-              }`}>
-                {plan.badge}
-              </div>
-            </div>
+                    <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
 
-            <div className="relative p-8 flex flex-col flex-1">
-              <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)} self-start`}>
-                <Icon className="w-10 h-10 text-white" strokeWidth={2} />
-              </div>
+                    <div className="absolute top-4 right-4 z-10">
+                      <motion.div 
+                        animate={isHovered ? { scale: [1, 1.1, 1] } : {}}
+                        transition={{ repeat: isHovered ? Infinity : 0, duration: 2 }}
+                        className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                          darkMode
+                            ? "bg-zinc-900/80 text-white"
+                            : "bg-white/80 text-gray-900"
+                        }`}
+                      >
+                        {plan.badge}
+                      </motion.div>
+                    </div>
+
+                    <div className="relative p-8 flex flex-col flex-1">
+                      <motion.div 
+                        animate={isHovered ? { rotate: [0, 5, -5, 0] } : {}}
+                        transition={{ duration: 0.25 }}
+                        className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)} self-start`}
+                      >
+                        <Icon className="w-10 h-10 text-white" strokeWidth={2} />
+                      </motion.div>
+                      
+                      <h3 className={`text-2xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        {plan.title}
+                      </h3>
+                      
+                      <p className={`text-sm font-semibold mb-3 ${plan.color.text(darkMode)}`}>
+                        {plan.subtitle}
+                      </p>
+
+                      {/* Islamic Message */}
+                      <div className={`mb-4 p-3 rounded-lg ${plan.color.light(darkMode)}`}>
+                        <p className={`text-sm font-semibold mb-1 ${plan.color.text(darkMode)}`}>
+                          {plan.islamicQuote}
+                        </p>
+                        <p className={`text-xs italic ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                          {plan.islamicQuoteTranslation}
+                        </p>
+                      </div>
+
+                      <p className={`text-sm leading-relaxed flex-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                        {plan.description}
+                      </p>
+
+                      {!isSelected && (
+                        <motion.div
+                          animate={isHovered ? { x: [0, 5, 0] } : {}}
+                          transition={{ repeat: isHovered ? Infinity : 0, duration: 1.5 }}
+                          className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}
+                        >
+                          <span>Click to explore</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+
+          {/* Mobile Stacked Layout */}
+          <div className="block md:hidden space-y-6">
+            {donationPlans.map((plan, index) => {
+              const Icon = plan.icon
               
-              <h3 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                {plan.title}
-              </h3>
-              
-              <p className={`text-sm font-semibold mb-4 ${plan.color.text(darkMode)}`}>
-                {plan.subtitle}
-              </p>
+              return (
+                <motion.div
+                  key={plan.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => handlePlanClick(plan)}
+                  className="cursor-pointer"
+                >
+                  <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
+                    darkMode 
+                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
+                      : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
+                  } shadow-2xl active:scale-[0.98] ${
+                    plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
+                  }`}>
+                    <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
+                    <div className="absolute top-4 right-4 z-10">
+                      <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                        darkMode ? "bg-zinc-900/80 text-white" : "bg-white/80 text-gray-900"
+                      }`}>
+                        {plan.badge}
+                      </div>
+                    </div>
+                    <div className="relative p-8">
+                      <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)}`}>
+                        <Icon className="w-10 h-10 text-white" strokeWidth={2} />
+                      </div>
+                      <h3 className={`text-2xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        {plan.title}
+                      </h3>
+                      <p className={`text-sm font-semibold mb-3 ${plan.color.text(darkMode)}`}>
+                        {plan.subtitle}
+                      </p>
 
-              <div className="flex items-end gap-2 mb-6">
-                <span className={`text-5xl font-bold bg-gradient-to-r ${plan.color.gradient(darkMode)} bg-clip-text text-transparent`}>
-                  {plan.minAmount}
-                </span>
-                <span className={`text-lg font-semibold mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                  {plan.period}
-                </span>
-              </div>
+                      {/* Islamic Message */}
+                      <div className={`mb-4 p-3 rounded-lg ${plan.color.light(darkMode)}`}>
+                        <p className={`text-sm font-semibold mb-1 ${plan.color.text(darkMode)}`}>
+                          {plan.islamicQuote}
+                        </p>
+                        <p className={`text-xs italic ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                          {plan.islamicQuoteTranslation}
+                        </p>
+                      </div>
 
-              <p className={`text-sm leading-relaxed flex-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                {plan.description}
-              </p>
-
-              {!isSelected && (
-                <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                  >
-                    Click to explore
-                  </motion.div>
-                  <ArrowRight className="w-4 h-4" />
-                </div>
-              )}
-            </div>
+                      <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                        {plan.description}
+                      </p>
+                      <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
+                        <span>Tap to explore</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
-        </motion.div>
-      )
-    })}
-  </div>
+        </div>
 
-
-  {/* Mobile Stacked Layout */}
-  <div className="block md:hidden space-y-6">
-    {donationPlans.map((plan, index) => {
-      const Icon = plan.icon
-      
-      return (
-        <motion.div
-          key={plan.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          onClick={() => handleCardClick(plan)}
-          className="cursor-pointer"
-        >
-          <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
-            darkMode 
-              ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
-              : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
-          } shadow-2xl active:scale-[0.98]`}>
-            <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
-            <div className="absolute top-4 right-4 z-10">
-              <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
-                darkMode ? "bg-zinc-900/80 text-white" : "bg-white/80 text-gray-900"
-              }`}>
-                {plan.badge}
-              </div>
-            </div>
-            <div className="relative p-8">
-              <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)}`}>
-                <Icon className="w-10 h-10 text-white" strokeWidth={2} />
-              </div>
-              <h3 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                {plan.title}
-              </h3>
-              <p className={`text-sm font-semibold mb-4 ${plan.color.text(darkMode)}`}>
-                {plan.subtitle}
-              </p>
-              <div className="flex items-end gap-2 mb-6">
-                <span className={`text-5xl font-bold bg-gradient-to-r ${plan.color.gradient(darkMode)} bg-clip-text text-transparent`}>
-                  {plan.minAmount}
-                </span>
-                <span className={`text-lg font-semibold mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                  {plan.period}
-                </span>
-              </div>
-              <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                {plan.description}
-              </p>
-              <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
-                <span>Tap to explore</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )
-    })}
-  </div>
-</div>
-
-        {/* Expanded Card Details Modal */}
+        {/* Expanded Plan Details Modal */}
         <AnimatePresence>
-          {selectedCard && (
-<motion.div
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  exit={{ opacity: 0 }}
-  className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 pt-44 md:pt-20"
-  onClick={handleClose}
->
-<motion.div
-  initial={{ scale: 0.9, opacity: 0, y: 20 }}
-  animate={{ scale: 1, opacity: 1, y: 0 }}
-  exit={{ scale: 0.9, opacity: 0, y: 20 }}
-  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-  onClick={(e) => e.stopPropagation()}
-  onScroll={handleScroll}
-  className={`relative max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl border-2 scrollbar-hide ${
-    darkMode 
-      ? `bg-zinc-900 ${selectedCard.color.border(darkMode)}` 
-      : `bg-white ${selectedCard.color.border(darkMode)}`
-  } ${selectedCard.color.glow(darkMode)}`}
->
-
-  {/* Scroll Indicator */}
-  {showScrollIndicator && (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
-    >
-    <motion.div
-      animate={{ y: [0, 8, 0] }}
-      transition={{ repeat: Infinity, duration: 1.5 }}
-      className={`flex flex-col items-center gap-1 px-4 py-2 rounded-full backdrop-blur-sm ${
-        darkMode ? 'bg-zinc-900/80' : 'bg-white/80'
-      }`}
-    >
-      <span className={`text-xs font-medium ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
-        Scroll for more
-      </span>
-      <ArrowRight className={`w-4 h-4 rotate-90 ${selectedCard.color.text(darkMode)}`} />
-    </motion.div>
-  </motion.div>
-
-  )}
+          {selectedPlan && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 pt-44 md:pt-20"
+              onClick={handleClose}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                onClick={(e) => e.stopPropagation()}
+                className={`relative max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl border-2 scrollbar-hide ${
+                  darkMode 
+                    ? `bg-zinc-900 ${selectedPlan.color.border(darkMode)}` 
+                    : `bg-white ${selectedPlan.color.border(darkMode)}`
+                } ${selectedPlan.color.glow(darkMode)}`}
+              >
                 {/* Close Button */}
                 <button
                   onClick={handleClose}
@@ -508,40 +472,35 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                 <div className="p-8">
                   {/* Header */}
                   <div className="flex items-start gap-4 mb-6">
-                    <div className={`p-4 rounded-2xl bg-gradient-to-br ${selectedCard.color.gradient(darkMode)}`}>
+                    <div className={`p-4 rounded-2xl bg-gradient-to-br ${selectedPlan.color.gradient(darkMode)}`}>
                       {(() => {
-                        const Icon = selectedCard.icon
+                        const Icon = selectedPlan.icon
                         return <Icon className="w-12 h-12 text-white" strokeWidth={2} />
                       })()}
                     </div>
                     <div className="flex-1">
                       <h2 className={`text-4xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {selectedCard.title}
+                        {selectedPlan.title}
                       </h2>
-                      <p className={`text-lg font-semibold ${selectedCard.color.text(darkMode)}`}>
-                        {selectedCard.subtitle}
+                      <p className={`text-lg font-semibold ${selectedPlan.color.text(darkMode)}`}>
+                        {selectedPlan.subtitle}
                       </p>
                     </div>
                   </div>
 
-                  {/* Price */}
-                  <div className={`p-6 rounded-2xl mb-6 ${selectedCard.color.light(darkMode)}`}>
-                    <div className="flex items-end justify-center gap-2">
-                      <span className={`text-6xl font-bold bg-gradient-to-r ${selectedCard.color.gradient(darkMode)} bg-clip-text text-transparent`}>
-                        {selectedCard.minAmount}
-                      </span>
-                      <span className={`text-2xl font-semibold mb-2 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                        {selectedCard.period}
-                      </span>
-                    </div>
-                    <p className={`text-center mt-2 text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-                      {selectedCard.frequency} contribution
+                  {/* Islamic Message */}
+                  <div className={`p-6 rounded-2xl mb-6 ${selectedPlan.color.light(darkMode)} border ${selectedPlan.color.border(darkMode)}`}>
+                    <p className={`text-lg font-semibold mb-2 ${selectedPlan.color.text(darkMode)}`}>
+                      {selectedPlan.islamicQuote}
+                    </p>
+                    <p className={`text-center text-sm italic ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                      {selectedPlan.islamicQuoteTranslation}
                     </p>
                   </div>
 
                   {/* Description */}
                   <p className={`text-base leading-relaxed mb-6 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                    {selectedCard.description}
+                    {selectedPlan.description}
                   </p>
 
                   {/* Features */}
@@ -550,15 +509,15 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                       What's Included
                     </h3>
                     <div className="space-y-3">
-                      {selectedCard.features.map((feature, idx) => (
+                      {selectedPlan.features.map((feature, idx) => (
                         <motion.div 
                           key={idx}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.1 }}
+                          transition={{ delay: idx * 0.05 }}
                           className="flex items-start gap-3"
                         >
-                          <CheckCircle2 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${selectedCard.color.text(darkMode)}`} strokeWidth={2} />
+                          <CheckCircle2 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${selectedPlan.color.text(darkMode)}`} strokeWidth={2} />
                           <span className={`text-sm ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
                             {feature}
                           </span>
@@ -577,7 +536,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                       How it works
                     </h4>
                     <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                      {selectedCard.rules}
+                      {selectedPlan.rules}
                     </p>
                   </div>
 
@@ -594,8 +553,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                       Back to Plans
                     </button>
                     <button
-                      onClick={() => handleProceed(`/permanent-donor/${selectedCard.id}`)}
-                      className={`flex-1 py-4 px-6 rounded-xl font-semibold text-white transition-all shadow-xl hover:shadow-2xl flex items-center justify-center cursor-pointer gap-2 bg-gradient-to-r ${selectedCard.color.gradient(darkMode)}`}
+                      onClick={() => handleProceed(`/permanent-donor/${selectedPlan.id}`)}
+                      className={`flex-1 py-4 px-6 rounded-xl font-semibold text-white transition-all shadow-xl hover:shadow-2xl flex items-center justify-center cursor-pointer gap-2 bg-gradient-to-r ${selectedPlan.color.gradient(darkMode)}`}
                     >
                       Continue
                       <ArrowRight className="w-5 h-5" />
@@ -611,18 +570,22 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.4 }}
           className="mt-16"
         >
           <div className="text-center mb-8">
             <h2 className={`text-2xl sm:text-3xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
-              Why Choose Permanent Giving?
+              Why Choose Continuous Giving?
             </h2>
+            <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+              Charity extinguishes sin as water extinguishes fire
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <motion.div 
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
               className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${
                 darkMode
                   ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-emerald-500/30"
@@ -637,13 +600,17 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               <h3 className={`text-xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
                 Full Flexibility
               </h3>
-              <p className={`text-base leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+              <p className={`text-base leading-relaxed mb-3 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                 Pause, modify, or cancel anytime. No commitments, no questions asked.
+              </p>
+              <p className={`text-xs italic ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                There is no compulsion in religion
               </p>
             </motion.div>
 
             <motion.div 
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
               className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${
                 darkMode
                   ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-teal-500/30"
@@ -658,13 +625,17 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               <h3 className={`text-xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
                 Complete Transparency
               </h3>
-              <p className={`text-base leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+              <p className={`text-base leading-relaxed mb-3 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                 Track every rupee. Detailed reports show exactly how your money helps.
+              </p>
+              <p className={`text-xs italic ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                Allah does not waste the reward of the good-doers
               </p>
             </motion.div>
 
             <motion.div 
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
               className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${
                 darkMode
                   ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-cyan-500/30"
@@ -679,14 +650,16 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               <h3 className={`text-xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
                 Tax Benefits Included
               </h3>
-              <p className={`text-base leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+              <p className={`text-base leading-relaxed mb-3 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                 Automatic 80G receipts for all donations. Maximize your tax savings.
+              </p>
+              <p className={`text-xs italic ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                Whatever you spend of good is for yourselves
               </p>
             </motion.div>
           </div>
         </motion.div>
       </div>
     </div>
-   
   )
 }
