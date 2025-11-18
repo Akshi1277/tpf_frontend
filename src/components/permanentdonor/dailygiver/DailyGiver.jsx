@@ -388,7 +388,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
             }`}>
             By continuing, you agree to our{' '}
             <a href="#" className="underline hover:text-emerald-600">
-              Terms & conditions
+              Policies
             </a>
           </p>
         </motion.div>
