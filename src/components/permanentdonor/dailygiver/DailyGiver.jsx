@@ -33,7 +33,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
   }, [darkModeFromParent])
 
   const presetAmounts = [30, 50, 70]
-  const tipPercentages = [0, 5, 10, 15]
+  const tipAmount = [0, 5, 10, 15]
 
   const calculateTip = () => {
     const baseAmount = parseFloat(customAmount || amount)
@@ -54,10 +54,10 @@ export default function DailyImpactPage({ darkModeFromParent }) {
 
   const calculateTotal = () => {
     const baseAmount = parseFloat(customAmount || amount)
-    if (baseAmount < 10) return "0.00"
-    const tip = parseFloat(calculateTip())
-    return (baseAmount + tip).toFixed(2)
-  }
+    const total = baseAmount + TpfAidTip
+    return total.toFixed(2)
+}
+
 
 
 
@@ -264,24 +264,24 @@ export default function DailyImpactPage({ darkModeFromParent }) {
               </span>
               <span className={`text-lg font-bold ${darkMode ? "text-white" : "text-zinc-900"
                 }`}>
-                ₹{calculateTip()} ({TpfAidTip}%)
+                ₹{TpfAidTip}
               </span>
             </div>
 
-            {/* Tip Percentage Buttons */}
+            {/* Tip amount Buttons */}
             <div className="grid grid-cols-4 gap-2">
-              {tipPercentages.map((percentage) => (
+              {tipAmount.map((amount) => (
                 <button
-                  key={percentage}
-                  onClick={() => setTpfAidTip(percentage)}
-                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${TpfAidTip === percentage
+                  key={amount}
+                  onClick={() => setTpfAidTip(amount)}
+                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${TpfAidTip === amount
                       ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
                       : darkMode
                         ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                         : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
                     }`}
                 >
-                  {percentage}%
+                  {amount}
                 </button>
               ))}
             </div>
@@ -359,7 +359,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
                 Platform support
               </span>
               <span className={`font-semibold ${darkMode ? "text-white" : "text-zinc-900"}`}>
-                ₹{calculateTip()}
+                ₹{TpfAidTip}
               </span>
             </div>
             <div className={`flex items-center justify-between py-3 border-t ${darkMode ? "border-zinc-700" : "border-zinc-200"
