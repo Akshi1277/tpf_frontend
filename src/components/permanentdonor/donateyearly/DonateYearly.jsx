@@ -33,7 +33,7 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
   }, [darkModeFromParent])
 
   const presetAmounts = [2000, 5000, 10000]
-  const tipPercentages = [0, 5, 10, 15]
+  const tipAmount = [0, 5, 10, 15]
 
   const calculateTip = () => {
     const baseAmount = parseFloat(customAmount || amount)
@@ -42,9 +42,10 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
 
   const calculateTotal = () => {
     const baseAmount = parseFloat(customAmount || amount)
-    const tip = parseFloat(calculateTip())
-    return (baseAmount + tip).toFixed(2)
-  }
+    const total = baseAmount + TpfAidTip
+    return total.toFixed(2)
+}
+
 
   const handleConfirm = () => {
     setShowSuccess(true)
@@ -240,28 +241,7 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
             </div>
           </div>
 
-          {/* Preset Amounts */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            {presetAmounts.map((preset) => (
-              <button
-                key={preset}
-                onClick={() => {
-                  setAmount(preset.toString())
-                  setCustomAmount("")
-                }}
-                className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-                  (customAmount === "" && amount === preset.toString())
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg"
-                    : darkMode
-                    ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
-                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-                }`}
-              >
-                {preset.toLocaleString()}
-              </button>
-            ))}
-          </div>
-
+       
        
         </motion.div>
 
@@ -339,25 +319,25 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
               <span className={`text-lg font-bold ${
                 darkMode ? "text-white" : "text-zinc-900"
               }`}>
-                ₹{calculateTip()} ({TpfAidTip}%)
+                ₹{TpfAidTip}
               </span>
             </div>
 
-            {/* Tip Percentage Buttons */}
+            {/* Tip amount Buttons */}
             <div className="grid grid-cols-4 gap-2">
-              {tipPercentages.map((percentage) => (
+              {tipAmount.map((amount) => (
                 <button
-                  key={percentage}
-                  onClick={() => setTpfAidTip(percentage)}
+                  key={amount}
+                  onClick={() => setTpfAidTip(amount)}
                   className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
-                    TpfAidTip === percentage
+                    TpfAidTip === amount
                       ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
                       : darkMode
                       ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
                   }`}
                 >
-                  {percentage}%
+                  {amount}%
                 </button>
               ))}
             </div>
@@ -438,7 +418,7 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
                 Platform support
               </span>
               <span className={`font-semibold ${darkMode ? "text-white" : "text-zinc-900"}`}>
-                ₹{calculateTip()}
+                ₹{TpfAidTip}
               </span>
             </div>
             <div className={`flex items-center justify-between py-3 border-t ${
