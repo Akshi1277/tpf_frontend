@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { 
+import {
   Zap,
   Heart,
   Info,
@@ -19,11 +19,12 @@ import {
 export default function DailyImpactPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
   const router = useRouter()
-  const [amount, setAmount] = useState("20")
+  const [amount, setAmount] = useState("10")
   const [customAmount, setCustomAmount] = useState("")
   const [countAsZakat, setCountAsZakat] = useState(false)
-  const [launchGoodTip, setLaunchGoodTip] = useState(0)
+  const [TpfAidTip, setTpfAidTip] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [amountError, setAmountError] = useState("")
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -36,19 +37,42 @@ export default function DailyImpactPage({ darkModeFromParent }) {
 
   const calculateTip = () => {
     const baseAmount = parseFloat(customAmount || amount)
-    return ((baseAmount * launchGoodTip) / 100).toFixed(2)
+    return ((baseAmount * TpfAidTip) / 100).toFixed(2)
+  }
+
+  const handleCustomAmountChange = (e) => {
+    const value = e.target.value
+    setCustomAmount(value)
+
+    // Validate amount
+    if (value && parseFloat(value) < 10) {
+      setAmountError("Minimum amount is ₹10")
+    } else {
+      setAmountError("")
+    }
   }
 
   const calculateTotal = () => {
     const baseAmount = parseFloat(customAmount || amount)
+    if (baseAmount < 10) return "0.00"
     const tip = parseFloat(calculateTip())
     return (baseAmount + tip).toFixed(2)
   }
 
+
+
   const handleConfirm = () => {
+    const baseAmount = parseFloat(customAmount || amount)
+
+    if (baseAmount < 10) {
+      setAmountError("Minimum amount is ₹10")
+      document.getElementById('amount-section')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+
     setShowSuccess(true)
     setTimeout(() => {
-      router.push('/dashboard')
+      router.push('/')
     }, 2000)
   }
 
@@ -79,11 +103,10 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => router.back()}
-          className={`flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium transition-colors ${
-            darkMode 
-              ? "text-zinc-400 hover:text-white" 
+          className={`flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium transition-colors ${darkMode
+              ? "text-zinc-400 hover:text-white"
               : "text-zinc-600 hover:text-zinc-900"
-          }`}
+            }`}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to plans
@@ -94,9 +117,8 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`relative rounded-3xl overflow-hidden mb-8 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-xl`}
+          className={`relative rounded-3xl overflow-hidden mb-8 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-xl`}
         >
           {/* Decorative Background Pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -113,9 +135,8 @@ export default function DailyImpactPage({ darkModeFromParent }) {
                   <Zap className="w-8 h-8 text-white" fill="white" />
                 </div>
                 <div>
-                  <h1 className={`text-3xl sm:text-4xl font-bold ${
-                    darkMode ? "text-white" : "text-zinc-900"
-                  }`}>
+                  <h1 className={`text-3xl sm:text-4xl font-bold ${darkMode ? "text-white" : "text-zinc-900"
+                    }`}>
                     Daily Impact
                   </h1>
                   <p className="text-amber-500 font-semibold text-sm sm:text-base">
@@ -141,9 +162,8 @@ export default function DailyImpactPage({ darkModeFromParent }) {
             </div>
 
             {/* Description */}
-            <p className={`text-sm sm:text-base leading-relaxed ${
-              darkMode ? "text-zinc-400" : "text-zinc-600"
-            }`}>
+            <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? "text-zinc-400" : "text-zinc-600"
+              }`}>
               Transform lives with consistent daily contributions. Perfect for those who want to make giving a daily habit.
             </p>
 
@@ -164,61 +184,53 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg`}
         >
-          <h3 className={`text-xl font-bold mb-4 ${
-            darkMode ? "text-white" : "text-zinc-900"
-          }`}>
+          <h3 className={`text-xl font-bold mb-4 ${darkMode ? "text-white" : "text-zinc-900"
+            }`}>
             Your giving amount
           </h3>
 
           {/* Custom Amount Input */}
           <div className="mb-4">
             <div className="relative">
-              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold ${
-                darkMode ? "text-zinc-500" : "text-zinc-400"
-              }`}>
+              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold ${darkMode ? "text-zinc-500" : "text-zinc-400"
+                }`}>
                 ₹
               </span>
               <input
                 type="number"
                 value={customAmount}
-                onChange={(e) => setCustomAmount(e.target.value)}
+                onChange={handleCustomAmountChange}
                 placeholder={amount}
-                className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 outline-none transition-all ${
-                  darkMode
-                    ? "bg-zinc-900 border-zinc-700 text-white placeholder-zinc-600 focus:border-amber-500"
-                    : "bg-white border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-100"
-                }`}
+                min="10"
+                className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 outline-none transition-all ${amountError
+                    ? darkMode
+                      ? "bg-zinc-900 border-red-500 text-white placeholder-zinc-600 focus:border-red-500"
+                      : "bg-white border-red-500 text-zinc-900 placeholder-zinc-300 focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                    : darkMode
+                      ? "bg-zinc-900 border-zinc-700 text-white placeholder-zinc-600 focus:border-amber-500"
+                      : "bg-white border-zinc-200 text-zinc-900 placeholder-zinc-300 focus:border-amber-500 focus:ring-4 focus:ring-amber-100"
+                  }`}
               />
             </div>
+            {amountError && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-red-500 text-sm mt-2 flex items-center gap-1"
+              >
+                <Info className="w-4 h-4" />
+                {amountError}
+              </motion.p>
+            )}
           </div>
 
           {/* Preset Amounts */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            {presetAmounts.map((preset) => (
-              <button
-                key={preset}
-                onClick={() => {
-                  setAmount(preset.toString())
-                  setCustomAmount("")
-                }}
-                className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-                  (customAmount === "" && amount === preset.toString())
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
-                    : darkMode
-                    ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
-                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-                }`}
-              >
-                {preset}
-              </button>
-            ))}
-          </div>
 
-         
+
+
         </motion.div>
 
         {/* Platform Support */}
@@ -226,22 +238,19 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg`}
         >
           <div className="flex items-start gap-3 mb-4">
             <Heart className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className={`text-lg font-bold mb-2 ${
-                darkMode ? "text-white" : "text-zinc-900"
-              }`}>
+              <h3 className={`text-lg font-bold mb-2 ${darkMode ? "text-white" : "text-zinc-900"
+                }`}>
                 Help us help the Ummah
               </h3>
-              <p className={`text-sm leading-relaxed mb-4 ${
-                darkMode ? "text-zinc-400" : "text-zinc-600"
-              }`}>
-                Because LaunchGood doesn't charge a platform fee, we rely on the generosity of donors like you to keep more people giving
+              <p className={`text-sm leading-relaxed mb-4 ${darkMode ? "text-zinc-400" : "text-zinc-600"
+                }`}>
+                Because TpfAid doesn't charge a platform fee, we rely on the generosity of donors like you to keep more people giving
               </p>
             </div>
           </div>
@@ -249,15 +258,13 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           {/* Tip Amount Slider */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className={`text-sm font-medium ${
-                darkMode ? "text-zinc-400" : "text-zinc-600"
-              }`}>
+              <span className={`text-sm font-medium ${darkMode ? "text-zinc-400" : "text-zinc-600"
+                }`}>
                 Platform support
               </span>
-              <span className={`text-lg font-bold ${
-                darkMode ? "text-white" : "text-zinc-900"
-              }`}>
-                ₹{calculateTip()} ({launchGoodTip}%)
+              <span className={`text-lg font-bold ${darkMode ? "text-white" : "text-zinc-900"
+                }`}>
+                ₹{calculateTip()} ({TpfAidTip}%)
               </span>
             </div>
 
@@ -266,23 +273,21 @@ export default function DailyImpactPage({ darkModeFromParent }) {
               {tipPercentages.map((percentage) => (
                 <button
                   key={percentage}
-                  onClick={() => setLaunchGoodTip(percentage)}
-                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
-                    launchGoodTip === percentage
+                  onClick={() => setTpfAidTip(percentage)}
+                  className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${TpfAidTip === percentage
                       ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
                       : darkMode
-                      ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
-                      : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-                  }`}
+                        ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                        : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+                    }`}
                 >
                   {percentage}%
                 </button>
               ))}
             </div>
 
-            <a href="#" className={`text-xs underline ${
-              darkMode ? "text-zinc-500 hover:text-zinc-400" : "text-zinc-500 hover:text-zinc-600"
-            }`}>
+            <a href="#" className={`text-xs underline ${darkMode ? "text-zinc-500 hover:text-zinc-400" : "text-zinc-500 hover:text-zinc-600"
+              }`}>
               Custom amount
             </a>
           </div>
@@ -293,34 +298,30 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg`}
         >
-          <h3 className={`text-lg font-bold mb-3 ${
-            darkMode ? "text-white" : "text-zinc-900"
-          }`}>
+          <h3 className={`text-lg font-bold mb-3 ${darkMode ? "text-white" : "text-zinc-900"
+            }`}>
             Payment method
           </h3>
-          <p className={`text-sm mb-4 ${
-            darkMode ? "text-zinc-400" : "text-zinc-600"
-          }`}>
+          <p className={`text-sm mb-4 ${darkMode ? "text-zinc-400" : "text-zinc-600"
+            }`}>
             To select a payment method you will need to create an account or{' '}
             <Link href="/login" className="text-emerald-600 font-semibold hover:underline">
               log in
             </Link>
           </p>
-         <Link href="/signup">
-  <button
-    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
-      darkMode
-        ? "bg-zinc-700 text-white hover:bg-zinc-600"
-        : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
-    }`}
-  >
-    Create an account
-  </button>
-</Link>
+          <Link href="/signup">
+            <button
+              className={`w-full py-3 px-4 rounded-lg font-semibold transition-all cursor-pointer ${darkMode
+                  ? "bg-zinc-700 text-white hover:bg-zinc-600"
+                  : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
+                }`}
+            >
+              Create an account
+            </button>
+          </Link>
         </motion.div>
 
         {/* Review & Confirm */}
@@ -328,13 +329,11 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg`}
         >
-          <h3 className={`text-lg font-bold mb-4 ${
-            darkMode ? "text-white" : "text-zinc-900"
-          }`}>
+          <h3 className={`text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-zinc-900"
+            }`}>
             Review your daily giving
           </h3>
 
@@ -363,9 +362,8 @@ export default function DailyImpactPage({ darkModeFromParent }) {
                 ₹{calculateTip()}
               </span>
             </div>
-            <div className={`flex items-center justify-between py-3 border-t ${
-              darkMode ? "border-zinc-700" : "border-zinc-200"
-            }`}>
+            <div className={`flex items-center justify-between py-3 border-t ${darkMode ? "border-zinc-700" : "border-zinc-200"
+              }`}>
               <span className={`font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
                 Daily total
               </span>
@@ -377,14 +375,17 @@ export default function DailyImpactPage({ darkModeFromParent }) {
 
           <button
             onClick={handleConfirm}
-            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl"
+            disabled={amountError || (customAmount && parseFloat(customAmount) < 10)}
+            className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl ${amountError || (customAmount && parseFloat(customAmount) < 10)
+                ? "bg-zinc-400 text-zinc-200 cursor-not-allowed"
+                : "bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700"
+              }`}
           >
             Confirm
           </button>
 
-          <p className={`text-center text-xs mt-4 ${
-            darkMode ? "text-zinc-500" : "text-zinc-500"
-          }`}>
+          <p className={`text-center text-xs mt-4 ${darkMode ? "text-zinc-500" : "text-zinc-500"
+            }`}>
             By continuing, you agree to our{' '}
             <a href="#" className="underline hover:text-emerald-600">
               Terms & conditions
@@ -397,20 +398,18 @@ export default function DailyImpactPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className={`rounded-2xl p-6 sm:p-8 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg`}
+          className={`rounded-2xl p-6 sm:p-8 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg`}
         >
-          <h3 className={`text-lg font-bold mb-4 ${
-            darkMode ? "text-white" : "text-zinc-900"
-          }`}>
+          <h3 className={`text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-zinc-900"
+            }`}>
             What you get
           </h3>
 
           <div className="space-y-4">
             {[
               { icon: Calendar, text: "Automated daily donations at 9:00 AM" },
-              { icon: Sparkles, text: "Flexible amount from ₹20 onwards" },
+              { icon: Sparkles, text: "Flexible amount from ₹10 onwards" },
               { icon: Shield, text: "Pause or modify anytime" },
               { icon: Zap, text: "Daily impact notifications" }
             ].map((feature, index) => {

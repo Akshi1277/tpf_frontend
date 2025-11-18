@@ -21,7 +21,7 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
   const [amount, setAmount] = useState("50")
   const [customAmount, setCustomAmount] = useState("")
   const [countAsZakat, setCountAsZakat] = useState(false)
-  const [launchGoodTip, setLaunchGoodTip] = useState(0)
+  const [TpfAidTip, setTpfAidTip] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
@@ -31,18 +31,20 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
   }, [darkModeFromParent])
 
   const presetAmounts = [50, 100, 200]
-  const tipPercentages = [0, 5, 10, 15]
+  const tipAmount = [0, 5, 10, 15]
 
   const calculateTip = () => {
     const baseAmount = parseFloat(customAmount || amount)
-    return ((baseAmount * launchGoodTip) / 100).toFixed(2)
+    return ((baseAmount * TpfAidTip) / 100).toFixed(2)
   }
 
   const calculateTotal = () => {
     const baseAmount = parseFloat(customAmount || amount)
-    const tip = parseFloat(calculateTip())
-    return (baseAmount + tip).toFixed(2)
-  }
+    const total = baseAmount + TpfAidTip
+    return total.toFixed(2)
+}
+
+ 
 
   const handleConfirm = () => {
     setShowSuccess(true)
@@ -146,14 +148,7 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
               Build sustainable impact with weekly contributions. Every Friday, your donation supports ongoing initiatives and creates lasting change.
             </p>
 
-            {/* Action Button - Desktop Only */}
-            <button
-              onClick={() => document.getElementById('amount-section')?.scrollIntoView({ behavior: 'smooth' })}
-              className="hidden sm:flex items-center gap-2 mt-6 text-blue-500 font-semibold hover:gap-3 transition-all group"
-            >
-              <span>Click to explore</span>
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
+         
           </div>
         </motion.div>
 
@@ -196,26 +191,7 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
           </div>
 
           {/* Preset Amounts */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            {presetAmounts.map((preset) => (
-              <button
-                key={preset}
-                onClick={() => {
-                  setAmount(preset.toString())
-                  setCustomAmount("")
-                }}
-                className={`py-3 px-4 rounded-lg font-semibold transition-all ${
-                  (customAmount === "" && amount === preset.toString())
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
-                    : darkMode
-                    ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
-                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
-                }`}
-              >
-                {preset}
-              </button>
-            ))}
-          </div>
+        
 
         
         </motion.div>
@@ -266,7 +242,7 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
               <p className={`text-sm leading-relaxed mb-4 ${
                 darkMode ? "text-zinc-400" : "text-zinc-600"
               }`}>
-                Because LaunchGood doesn't charge a platform fee, we rely on the generosity of donors like you to keep more people giving
+                Because TpfAid doesn't charge a platform fee, we rely on the generosity of donors like you to keep more people giving
               </p>
             </div>
           </div>
@@ -282,25 +258,25 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
               <span className={`text-lg font-bold ${
                 darkMode ? "text-white" : "text-zinc-900"
               }`}>
-                ₹{calculateTip()} ({launchGoodTip}%)
+                ₹{TpfAidTip}
               </span>
             </div>
 
-            {/* Tip Percentage Buttons */}
+            {/* Tip amount Buttons */}
             <div className="grid grid-cols-4 gap-2">
-              {tipPercentages.map((percentage) => (
+              {tipAmount.map((amount) => (
                 <button
-                  key={percentage}
-                  onClick={() => setLaunchGoodTip(percentage)}
+                  key={amount}
+                  onClick={() => setTpfAidTip(amount)}
                   className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
-                    launchGoodTip === percentage
+                    TpfAidTip === amount
                       ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
                       : darkMode
                       ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                       : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
                   }`}
                 >
-                  {percentage}%
+                  {amount}
                 </button>
               ))}
             </div>
@@ -381,7 +357,7 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
                 Platform support
               </span>
               <span className={`font-semibold ${darkMode ? "text-white" : "text-zinc-900"}`}>
-                ₹{calculateTip()}
+                ₹{TpfAidTip}
               </span>
             </div>
             <div className={`flex items-center justify-between py-3 border-t ${

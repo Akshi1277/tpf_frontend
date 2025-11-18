@@ -23,7 +23,7 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
   const [customAmount, setCustomAmount] = useState("")
   const [anniversaryDate, setAnniversaryDate] = useState("")
   const [countAsZakat, setCountAsZakat] = useState(false)
-  const [launchGoodTip, setLaunchGoodTip] = useState(0)
+  const [TpfAidTip, setTpfAidTip] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
 
   const calculateTip = () => {
     const baseAmount = parseFloat(customAmount || amount)
-    return ((baseAmount * launchGoodTip) / 100).toFixed(2)
+    return ((baseAmount * TpfAidTip) / 100).toFixed(2)
   }
 
   const calculateTotal = () => {
@@ -323,7 +323,7 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
               <p className={`text-sm leading-relaxed mb-4 ${
                 darkMode ? "text-zinc-400" : "text-zinc-600"
               }`}>
-                Because LaunchGood doesn't charge a platform fee, we rely on the generosity of donors like you to keep more people giving
+                Because TpfAid doesn't charge a platform fee, we rely on the generosity of donors like you to keep more people giving
               </p>
             </div>
           </div>
@@ -339,7 +339,7 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
               <span className={`text-lg font-bold ${
                 darkMode ? "text-white" : "text-zinc-900"
               }`}>
-                ₹{calculateTip()} ({launchGoodTip}%)
+                ₹{calculateTip()} ({TpfAidTip}%)
               </span>
             </div>
 
@@ -348,9 +348,9 @@ export default function AnnualPatronPage({ darkModeFromParent }) {
               {tipPercentages.map((percentage) => (
                 <button
                   key={percentage}
-                  onClick={() => setLaunchGoodTip(percentage)}
+                  onClick={() => setTpfAidTip(percentage)}
                   className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
-                    launchGoodTip === percentage
+                    TpfAidTip === percentage
                       ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
                       : darkMode
                       ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"

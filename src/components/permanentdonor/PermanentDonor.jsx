@@ -43,8 +43,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       title: "Daily Impact",
       subtitle: "Every day matters",
       frequency: "Daily",
-      minAmount: "₹10",
-      period: "/day",
+    
       description: "Transform lives with consistent daily contributions. Perfect for those who want to make giving a daily habit.",
       features: [
         "Automated daily donations at 9:00 AM",
@@ -76,8 +75,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       title: "Weekly Support",
       subtitle: "Consistent & reliable",
       frequency: "Weekly",
-      minAmount: "₹50",
-      period: "/week",
+    
       description: "Build sustainable impact with weekly contributions. Every Friday, your donation supports ongoing initiatives and creates lasting change.",
       features: [
         "Automated donations every Friday",
@@ -109,8 +107,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       title: "Monthly Champion",
       subtitle: "Strategic giving",
       frequency: "Monthly",
-      minAmount: "₹200",
-      period: "/month",
+     
       description: "Join our community of monthly champions. Your sustained support enables long-term planning and greater impact.",
       features: [
         "Monthly donations on preferred date",
@@ -142,8 +139,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       title: "Annual Patron",
       subtitle: "Maximum impact",
       frequency: "Yearly",
-      minAmount: "₹2,000",
-      period: "/year",
+  
       description: "Make a significant annual commitment. Ideal for those planning larger contributions with premium recognition and benefits.",
       features: [
         "Single annual contribution",
@@ -297,114 +293,98 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
           </div>
         </motion.div>
 
-      {/* Card Deck - Fanned Out (Desktop) / Stacked (Mobile) */}
 <div className="relative mb-16">
   {/* Desktop Fanned Layout */}
-  <div className="hidden md:flex md:items-center md:justify-center md:h-[600px]">
-    <div className="relative w-full max-w-5xl h-[500px]">
-      {donationPlans.map((plan, index) => {
-        const Icon = plan.icon
-        const isSelected = selectedCard?.id === plan.id
-        const isHovered = hoveredCard === plan.id
-        const othersSelected = selectedCard && selectedCard.id !== plan.id
+  <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 lg:gap-6">
+    {donationPlans.map((plan, index) => {
+      const Icon = plan.icon
+      const isSelected = selectedCard?.id === plan.id
+      const isHovered = hoveredCard === plan.id
+      const othersSelected = selectedCard && selectedCard.id !== plan.id
 
-        return (
-          <motion.div
-            key={plan.id}
-            initial={{ 
-              x: plan.translateX,
-              y: 0,
-              rotate: plan.rotation,
-              scale: 0.9,
-              opacity: 0
-            }}
-            animate={{
-              x: isSelected ? 0 : othersSelected ? (index < 2 ? -500 : 500) : plan.translateX,
-              y: isSelected ? 0 : othersSelected ? 150 : 0,
-              rotate: isSelected ? 0 : othersSelected ? plan.rotation * 2 : isHovered ? plan.rotation * 0.5 : plan.rotation,
-              scale: isSelected ? 1 : othersSelected ? 0.6 : isHovered ? 0.95 : 0.88,
-              opacity: isSelected ? 1 : othersSelected ? 0.2 : 1,
-              zIndex: isSelected ? 50 : isHovered ? 40 : plan.zIndex
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 30,
-              delay: isSelected ? 0 : index * 0.1
-            }}
-            onMouseEnter={() => !selectedCard && setHoveredCard(plan.id)}
-            onMouseLeave={() => setHoveredCard(null)}
-            onClick={() => !selectedCard && handleCardClick(plan)}
-            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] cursor-pointer ${
-              othersSelected ? 'pointer-events-none blur-sm' : ''
-            }`}
-            style={{
-              transformOrigin: 'center bottom'
-            }}
-          >
-            {/* Keep all your existing card JSX here - don't change anything */}
-            <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
-              darkMode 
-                ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
-                : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
-            } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'}`}>
-              
-              <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
+      return (
+        <motion.div
+          key={plan.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: othersSelected ? 0.3 : 1,
+            y: 0,
+            scale: isHovered ? 1.02 : 1
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+            delay: index * 0.1
+          }}
+          onMouseEnter={() => !selectedCard && setHoveredCard(plan.id)}
+          onMouseLeave={() => setHoveredCard(null)}
+          onClick={() => !selectedCard && handleCardClick(plan)}
+          className={`cursor-pointer h-full ${othersSelected ? 'pointer-events-none' : ''}`}
+        >
+          {/* Keep all your existing card JSX here */}
+          <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 h-full flex flex-col ${
+            darkMode 
+              ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
+              : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
+          } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'}`}>
+            
+            <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
 
-              <div className="absolute top-4 right-4 z-10">
-                <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
-                  darkMode
-                    ? "bg-zinc-900/80 text-white"
-                    : "bg-white/80 text-gray-900"
-                }`}>
-                  {plan.badge}
-                </div>
-              </div>
-
-              <div className="relative p-8">
-                <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)}`}>
-                  <Icon className="w-10 h-10 text-white" strokeWidth={2} />
-                </div>
-                
-                <h3 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                  {plan.title}
-                </h3>
-                
-                <p className={`text-sm font-semibold mb-4 ${plan.color.text(darkMode)}`}>
-                  {plan.subtitle}
-                </p>
-
-                <div className="flex items-end gap-2 mb-6">
-                  <span className={`text-5xl font-bold bg-gradient-to-r ${plan.color.gradient(darkMode)} bg-clip-text text-transparent`}>
-                    {plan.minAmount}
-                  </span>
-                  <span className={`text-lg font-semibold mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                    {plan.period}
-                  </span>
-                </div>
-
-                <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                  {plan.description}
-                </p>
-
-                {!isSelected && (
-                  <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ repeat: Infinity, duration: 2 }}
-                    >
-                      Click to explore
-                    </motion.div>
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                )}
+            <div className="absolute top-4 right-4 z-10">
+              <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
+                darkMode
+                  ? "bg-zinc-900/80 text-white"
+                  : "bg-white/80 text-gray-900"
+              }`}>
+                {plan.badge}
               </div>
             </div>
-          </motion.div>
-        )
-      })}
-    </div>
+
+            <div className="relative p-8 flex flex-col flex-1">
+              <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)} self-start`}>
+                <Icon className="w-10 h-10 text-white" strokeWidth={2} />
+              </div>
+              
+              <h3 className={`text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                {plan.title}
+              </h3>
+              
+              <p className={`text-sm font-semibold mb-4 ${plan.color.text(darkMode)}`}>
+                {plan.subtitle}
+              </p>
+
+              <div className="flex items-end gap-2 mb-6">
+                <span className={`text-5xl font-bold bg-gradient-to-r ${plan.color.gradient(darkMode)} bg-clip-text text-transparent`}>
+                  {plan.minAmount}
+                </span>
+                <span className={`text-lg font-semibold mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                  {plan.period}
+                </span>
+              </div>
+
+              <p className={`text-sm leading-relaxed flex-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                {plan.description}
+              </p>
+
+              {!isSelected && (
+                <div className={`mt-6 flex items-center justify-center gap-2 text-xs font-semibold ${plan.color.text(darkMode)}`}>
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                  >
+                    Click to explore
+                  </motion.div>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )
+    })}
   </div>
+
 
   {/* Mobile Stacked Layout */}
   <div className="block md:hidden space-y-6">
