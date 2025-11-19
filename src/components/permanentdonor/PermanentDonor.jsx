@@ -100,7 +100,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
     },
     {
       id: "monthly",
-      title: "Monthly Zakat",
+      title: "Monthly Champion",
       subtitle: "Strategic giving",
       frequency: "Monthly",
       islamicQuote: "Consistent Giving",
