@@ -680,18 +680,47 @@ export default function ProfilePage({ darkModeFromParent }) {
                         field="gender"
                         color="blue"
                         type="select"
-                        options={[ "Male", "Female"]}
+                        options={[ "Select","Male", "Female"]}
                       />
+                       <EditableTag
+      icon={Calendar}
+      label="Date of Birth"
+      value={
+        tempData.dobDay && tempData.dobMonth && tempData.dobYear
+          ? `${tempData.dobDay}/${tempData.dobMonth}/${tempData.dobYear}`
+          : "Not Selected"
+      }
+      field="dob"
+      color="purple"
+      type="modal"
+      onModalOpen={handleOpenDobModal}
+    />
 
-                      <EditableTag
-                        icon={Calendar}
-                        label="Date of Birth"
-                        value={`${tempData.dobDay}/${tempData.dobMonth}/${tempData.dobYear}`}
-                        field="dob"
-                        color="purple"
-                        type="modal"
-                        onModalOpen={handleOpenDobModal}
-                      />
+    {/* UPDATED — Age display */}
+    <DisplayTag
+      icon={Calendar}
+      label="Age"
+      value={
+        tempData.dobDay && tempData.dobMonth && tempData.dobYear
+          ? `${calculateAge(tempData.dobDay, tempData.dobMonth, tempData.dobYear)} years`
+          : "Not Provided"
+      }
+      color="purple"
+    />
+
+
+                     <DisplayTag
+  icon={Calendar}
+  label="Age"
+  value={
+    profileData.dobDay && profileData.dobMonth && profileData.dobYear
+      ? `${calculateAge(profileData.dobDay, profileData.dobMonth, profileData.dobYear)} years`
+      : "Not provided"
+  }
+  color="purple"
+/>
+
+
                       <EditableTag
                         icon={Briefcase}
                         label="Profession"
