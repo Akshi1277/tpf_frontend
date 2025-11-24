@@ -7,9 +7,11 @@ import { ArrowRight,ArrowLeft, Check } from "lucide-react"
 import { useSendOtpMutation, useVerifyOtpMutation } from "@/utils/slices/authApiSlice"
 import { useDispatch } from "react-redux"
 import { ToastContainer, toast } from "react-toastify"
+import { setCredentials } from "@/utils/slices/authSlice"
 
 export default function LoginPage({ darkMode }) {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [mobile, setMobile] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
 const [step, setStep] = useState(1);
@@ -17,16 +19,22 @@ const [otp, setOtp] = useState('');
 const [sendOtp, {isLoading:sendingOtp}]= useSendOtpMutation()
 const [verifyOtp, {isLoading:verifyingOtp}]= useVerifyOtpMutation()
 
-  const handleLogin = () => {
+  const handleLogin = async() => {
     
     if (mobile.length !== 10) return
        try{
-       sendOtp({mobileNo: mobile}).unwrap()
-       toast.success("Otp Sent Successfully")
+      const res = await sendOtp({ mobileNo: mobile, type:"login" }).unwrap();
+      
+
+      // show OTP only for development
+      if (res.otp) {
+        toast.info(`Your OTP is ${res.otp}`);
+      }
+       
       setStep(2)
      }
    catch(error){
-      toast.error("Something went wrong. Please try again after sometime")
+      toast.error(error?.data?.message || error?.data?.data?.message)
       console.error(error)
    }
   }
@@ -38,9 +46,10 @@ const handleOtpSubmit = async () => {
 
   try {
     const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
+    // Save user in Redux + localStorage
+    dispatch(setCredentials(res.user));
+    
     toast.success("Salam ! from TPF")
-    console.log("OTP verified:", res);
-
     setShowSuccess(true);
     setTimeout(() => router.push('/profile/userprofile'), 2500);
   } catch (err) {
@@ -55,6 +64,7 @@ const handleOtpSubmit = async () => {
         ? "bg-zinc-950"
         : "bg-white"
       }`}>
+        <ToastContainer />
 
       {/* Sophisticated Background Pattern */}
       <div className="absolute inset-0 overflow-hidden">

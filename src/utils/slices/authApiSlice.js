@@ -4,10 +4,10 @@ export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
 
     sendOtp: builder.mutation({
-      query: ({ mobileNo }) => ({
+      query: ({ mobileNo, type }) => ({
         url: "/user/send-otp",
         method: "POST",
-        body: { mobileNo },
+        body: { mobileNo, type },
       }),
     }),
 
@@ -20,13 +20,21 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
     }), // ✅ THIS WAS MISSING
 
-    updateProfile: builder.mutation({
-      query: ({ fullName, email }) => ({
-        url: "/user/update-profile",
-        method: "PUT",
-        body: { fullName, email },
-      }),
-    }),
+   updateProfile: builder.mutation({
+  query: (profileData) => ({
+    url: "/user/update-profile",
+    method: "PUT",
+    body: profileData,   // send everything user wants to update
+  }),
+}),
+
+getUser : builder.query({
+  query:() =>({
+    url: "/user/getUser",
+    method: "GET"
+  })
+})
+
 
 
 
@@ -37,4 +45,5 @@ export const {
   useSendOtpMutation,
   useVerifyOtpMutation,
   useUpdateProfileMutation,
+  useGetUserQuery
 } = authApiSlice;
