@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRight, ArrowLeft, Check } from "lucide-react"
+import { ToastContainer,toast } from "react-toastify"
 
 export default function SignUpPage({ darkMode }) {
   const router = useRouter()
@@ -26,7 +27,12 @@ export default function SignUpPage({ darkMode }) {
   const handleMobileSubmit = async() => {
     try {
     if (mobile.length !== 10) return;
-    await sendOtp({mobileNo : mobile}).unwrap();
+    const res = await sendOtp({ mobileNo: mobile }).unwrap();
+
+// show OTP only for development
+if (res.otp) {
+  toast.info(`Your OTP is ${res.otp}`);
+}
     setStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
   } catch (err) {
@@ -77,7 +83,7 @@ export default function SignUpPage({ darkMode }) {
         ? "bg-zinc-950"
         : "bg-white"
       }`}>
-
+        <ToastContainer />
       {/* Sophisticated Background Pattern */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Grid Pattern */}
