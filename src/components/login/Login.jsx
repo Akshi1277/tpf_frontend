@@ -4,6 +4,9 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRight,ArrowLeft, Check } from "lucide-react"
+import { useSendOtpMutation, useVerifyOtpMutation } from "@/utils/slices/authApiSlice"
+import { useDispatch } from "react-redux"
+import { ToastContainer, toast } from "react-toastify"
 
 export default function LoginPage({ darkMode }) {
   const router = useRouter()
@@ -11,26 +14,41 @@ export default function LoginPage({ darkMode }) {
   const [showSuccess, setShowSuccess] = useState(false)
 const [step, setStep] = useState(1);
 const [otp, setOtp] = useState('');
+const [sendOtp, {isLoading:sendingOtp}]= useSendOtpMutation()
+const [verifyOtp, {isLoading:verifyingOtp}]= useVerifyOtpMutation()
 
   const handleLogin = () => {
-    if (mobile.length === 10) {
-      setShowSuccess(true)
-      setTimeout(() => {
-        router.push('/')
-      }, 2500)
-    }
+    
+    if (mobile.length !== 10) return
+       try{
+       sendOtp({mobileNo: mobile}).unwrap()
+       toast.success("Otp Sent Successfully")
+      setStep(2)
+     }
+   catch(error){
+      toast.error("Something went wrong. Please try again after sometime")
+      console.error(error)
+   }
   }
 
-  const handleMobileSubmit = () => {
-  if (mobile.length === 10) setStep(2);
-};
+ 
 
-const handleOtpSubmit = () => {
-  if (otp.length === 4) {
+const handleOtpSubmit = async () => {
+  if (otp.length !== 4) return;
+
+  try {
+    const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
+    toast.success("Salam ! from TPF")
+    console.log("OTP verified:", res);
+
     setShowSuccess(true);
     setTimeout(() => router.push('/profile/userprofile'), 2500);
+  } catch (err) {
+    console.error("OTP verification failed:", err);
+    alert(err?.data?.message || "Invalid OTP");
   }
 };
+
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${darkMode
@@ -254,7 +272,7 @@ const handleOtpSubmit = () => {
           </div>
 
           <button
-            onClick={handleMobileSubmit}
+            onClick={handleLogin}
             disabled={mobile.length !== 10}
             className="w-full group cursor-pointer relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >

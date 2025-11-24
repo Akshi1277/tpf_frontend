@@ -1,12 +1,21 @@
 "use client"
+import { useSendOtpMutation, useUpdateProfileMutation, useVerifyOtpMutation } from "../../utils/slices/authApiSlice"
+import { useDispatch } from "react-redux"
+import { setCredentials } from "@/utils/slices/authSlice"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { useState } from "react"
+import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRight, ArrowLeft, Check } from "lucide-react"
 
 export default function SignUpPage({ darkMode }) {
   const router = useRouter()
+  const dispatch = useDispatch()
+
+  const [sendOtp, {isLoading:sendingOtp}] = useSendOtpMutation()
+  const [verifyOtp, {isLoading:verifyingOtp}] = useVerifyOtpMutation()
+  const [updateProfile, {isLoading:updatingProfile}] = useUpdateProfileMutation()
+
   const [step, setStep] = useState(1)
   const [mobile, setMobile] = useState('')
   const [otp, setOtp] = useState('')
@@ -14,27 +23,53 @@ export default function SignUpPage({ darkMode }) {
   const [fullName, setFullName] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const handleMobileSubmit = () => {
-    if (mobile.length === 10) {
-      setStep(2)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+  const handleMobileSubmit = async() => {
+    try {
+    if (mobile.length !== 10) return;
+    await sendOtp({mobileNo : mobile}).unwrap();
+    setStep(2);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    alert(err?.data?.message || "Failed to send OTP");
+  }
+}
+
+  const handleOtpSubmit = async() => {
+    try {
+    if (otp.length !== 4) return;
+
+    const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
+
+    // Save user in Redux + localStorage
+    dispatch(setCredentials(res.user));
+
+    // Already logged in via cookie from backend
+
+    // Does user already have profile?
+    if (!res.user.fullName || !res.user.email) {
+      setStep(3); // Go to details
+    } else {
+      router.push("/"); // User already has profile
     }
+  } catch (err) {
+    alert(err?.data?.message || "Invalid OTP");
+  }
   }
 
-  const handleOtpSubmit = () => {
-    if (otp.length === 4) {
-      setStep(3)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
+  const handleFinalSubmit = async() => {
+   try {
+    if (!email || !fullName) return;
 
-  const handleFinalSubmit = () => {
-    if (email && fullName) {
-      setShowSuccess(true)
-      setTimeout(() => {
-        router.push('/')
-      }, 2500)
-    }
+    const res = await updateProfile({ fullName, email }).unwrap();
+    dispatch(setCredentials(res.user));
+    setShowSuccess(true);
+
+    setTimeout(() => {
+      router.push("/profile/userprofile");
+    }, 2000);
+  } catch (err) {
+    alert(err?.data?.message || "Failed to save profile");
+  }
   }
 
   return (

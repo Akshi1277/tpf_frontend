@@ -5,24 +5,50 @@ import { Menu, X, Moon, Sun } from 'lucide-react';
 import { Plus, Heart, Leaf } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
-  useEffect(() => {
-  const savedMode = localStorage.getItem('darkMode')
-  if (savedMode !== null) {
-    setDarkMode(savedMode === 'true')
-  }
-}, [setDarkMode])
-
-useEffect(() => {
-  localStorage.setItem('darkMode', darkMode)
-  window.dispatchEvent(new Event('darkModeChanged'))
-}, [darkMode])
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+useEffect(() => setHasMounted(true), []);
+  const userInfo = useSelector((state) => state.auth.userInfo);
+
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode')
+    if (savedMode !== null) {
+      setDarkMode(savedMode === 'true')
+    }
+  }, [setDarkMode])
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', darkMode)
+    window.dispatchEvent(new Event('darkModeChanged'))
+  }, [darkMode])
+
+  const handleAuthNavigation = (path) => {
+    if (userInfo) {
+      router.push("/profile/userprofile");
+    } else {
+      router.push(path);
+    }
+  };
+
+
+
+
+
 
   const router = useRouter();
-  
+
+  const getInitials = (name) => {
+  if (!name) return "U"; // default (User)
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+};
+
+const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
+
   return (
     <>
 
@@ -113,82 +139,83 @@ useEffect(() => {
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
               {/* Start Fundraising – desktop only */}
               <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer whitespace-nowrap"
-             onClick={() => router.push('/financial-aid')} >
+                onClick={() => router.push('/financial-aid')} >
                 Start fundraising
               </button>
-           <div className="tooltip-container">
-  <button 
-    className={`p-2 rounded-full transition-colors cursor-pointer ${
-      darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'
-    }`}
-    onClick={() => router.push('/zakat-calculator')} 
-  >
-    <Image
-      src="/TPFAid-Icon-Zakat-1.svg"
-      alt="Zakat"
-      width={28}
-      height={28}
-      className="w-7 h-7 scale-110" // increased size
-    />
-  </button>
+              <div className="tooltip-container">
+                <button
+                  className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'
+                    }`}
+                  onClick={() => router.push('/zakat-calculator')}
+                >
+                  <Image
+                    src="/TPFAid-Icon-Zakat-1.svg"
+                    alt="Zakat"
+                    width={28}
+                    height={28}
+                    className="w-7 h-7 scale-110" // increased size
+                  />
+                </button>
 
-  <span
-    className={`tooltip ${
-      darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'
-    }`}
-  >
-    Zakaat
-  </span>
-</div>
+                <span
+                  className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'
+                    }`}
+                >
+                  Zakaat
+                </span>
+              </div>
 
 
-             <div className="tooltip-container">
-  <button
-    onClick={() => setDarkMode(!darkMode)}
-    className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? ' bg-zinc-800 hover:bg-zinc-800' : ' bg-white/80 hover:bg-zinc-100'}`}
-  >
-    {darkMode ? (
-      <Sun className="w-6 h-6 text-white" />
-    ) : (
-      <Moon className="w-6 h-6 text-zinc-900" />
-    )}
-  </button>
-  <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
-    {darkMode ? 'Light Mode' : 'Dark Mode'}
-  </span>
-</div>
+              <div className="tooltip-container">
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? ' bg-zinc-800 hover:bg-zinc-800' : ' bg-white/80 hover:bg-zinc-100'}`}
+                >
+                  {darkMode ? (
+                    <Sun className="w-6 h-6 text-white" />
+                  ) : (
+                    <Moon className="w-6 h-6 text-zinc-900" />
+                  )}
+                </button>
+                <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
+                  {darkMode ? 'Light Mode' : 'Dark Mode'}
+                </span>
+              </div>
 
-
-
-
-              {/* <select
-       value={fontFamily}
-       onChange={e => setFontFamily(e.target.value)}
-       className="p-2 bg-white text-black rounded"
-     >
-       <option value="aref">Aref Ruqaa</option>
-       <option value="markazi">Markazi Text</option>
-       <option value="cairo">Cairo</option>
-       <option value="amiri">Amiri</option>
-     </select> */}
               {/* Hamburger */}
-             <div className="tooltip-container">
-  <button
-    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-    aria-label="Menu"
-    className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
-      ${darkMode
-        ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-        : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-      }`}
-  >
-    {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
-  </button>
-  <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
-    Menu
-  </span>
+            {/* profile initials instead of hamburger when logged in */}
+{hasMounted && userInfo ? (
+<button
+  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+   className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold tracking-wide text-[14px] sm:text-[15px] cursor-pointer transition-all duration-300
+    ring-2 ring-white/70 dark:ring-white/40
+    ${darkMode 
+      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-[1.08]" 
+      : "bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-[1.08]"
+    }`}
+>
+  {initials}
+</button>
 
-</div>
+) : (
+  <div className="tooltip-container">
+    <button
+      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      aria-label="Menu"
+      className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+        ${darkMode
+          ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
+          : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
+        }`}
+    >
+      {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+    </button>
+    <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
+      Menu
+    </span>
+  </div>
+)}
+
             </div>
           </div>
 
@@ -258,14 +285,14 @@ useEffect(() => {
               onClick={() => setMobileMenuOpen(false)}
             >
               {/* Modal popup */}
-  <div
-  className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[90vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl overflow-hidden transition-transform duration-300 ease-in-out flex flex-col
+              <div
+                className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[90vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl overflow-hidden transition-transform duration-300 ease-in-out flex flex-col
     ${darkMode
-      ? 'bg-zinc-900 shadow-[0_0_40px_rgba(0,0,0,0.9)] border border-zinc-800'
-      : 'bg-white shadow-[0_4px_40px_rgba(0,0,0,0.25)] border border-zinc-200'
-    }`}
-  onClick={(e) => e.stopPropagation()}
->
+                    ? 'bg-zinc-900 shadow-[0_0_40px_rgba(0,0,0,0.9)] border border-zinc-800'
+                    : 'bg-white shadow-[0_4px_40px_rgba(0,0,0,0.25)] border border-zinc-200'
+                  }`}
+                onClick={(e) => e.stopPropagation()}
+              >
 
                 {/* Close button - fixed at top on mobile */}
                 <div className={`md:hidden sticky top-0 z-10 flex justify-end px-4 py-3 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
@@ -329,38 +356,38 @@ useEffect(() => {
                   </Link>
 
                   {/* Main menu items with icons */}
-                 <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
-  {[
-    { name: 'My Donations', icon: Plus, isLucide: true, path:'/profile/mydonation'},
-    { name: 'My Wishlist', icon: Heart, isLucide: true, path:'/profile/my-campaign' },
-    { name: 'Daily Givers', icon: Leaf, isLucide: true, path:'/permanent-donor/daily' },
-    { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path:'/zakat-calculator' }
-  ].map(item => (
-    <Link
-      key={item.name}
-       href={item.path || '#'}
-      className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
+                  <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
+                    {[
+                      { name: 'My Donations', icon: Plus, isLucide: true, path: '/profile/mydonation' },
+                      { name: 'My Wishlist', icon: Heart, isLucide: true, path: '/profile/my-campaign' },
+                      { name: 'Daily Givers', icon: Leaf, isLucide: true, path: '/permanent-donor/daily' },
+                      { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' }
+                    ].map(item => (
+                      <Link
+                        key={item.name}
+                        href={item.path || '#'}
+                        className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
         ${darkMode
-          ? 'text-zinc-300 hover:bg-zinc-800'
-          : 'text-zinc-700 hover:bg-zinc-100'
-        }`}
-      onClick={() => setMobileMenuOpen(false)}
-    >
-      {item.isLucide ? (
-        <item.icon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
-      ) : (
-        <Image
-          src={item.icon}
-          alt={item.name}
-          width={20}
-          height={20}
-          className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
-        />
-      )}
-      <span>{item.name}</span>
-    </Link>
-  ))}
-</div>
+                            ? 'text-zinc-300 hover:bg-zinc-800'
+                            : 'text-zinc-700 hover:bg-zinc-100'
+                          }`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.isLucide ? (
+                          <item.icon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
+                        ) : (
+                          <Image
+                            src={item.icon}
+                            alt={item.name}
+                            width={20}
+                            height={20}
+                            className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5"
+                          />
+                        )}
+                        <span>{item.name}</span>
+                      </Link>
+                    ))}
+                  </div>
 
 
 
@@ -398,7 +425,7 @@ useEffect(() => {
                         </span>
                       </Link>
 
-                   
+
                     </div>
                   </div>
 
@@ -419,28 +446,31 @@ useEffect(() => {
 
                   {/* Sign up / Log in */}
                   <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
-                    <Link
-                      href="/signup"
-                      className={`block text-center py-2 px-4 rounded-lg transition-colors
-                     ${darkMode
-                          ? 'text-zinc-300 hover:bg-zinc-800'
-                          : 'text-zinc-700 hover:bg-zinc-100'
-                        }`}
+                    <button
+                      onClick={() => {
+                        handleAuthNavigation("/signup");
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
+    ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}
+  `}
                     >
                       Sign up
-                    </Link>
+                    </button>
 
-                    <Link
-                      href="/login"
-                      className={`block text-center py-2 px-4 rounded-lg transition-colors
-                     ${darkMode
-                          ? 'text-zinc-300 hover:bg-zinc-800'
-                          : 'text-zinc-700 hover:bg-zinc-100'
-                        }`}
+                    <button
+                      onClick={() => {
+                        handleAuthNavigation("/login");
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
+    ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}
+  `}
                     >
                       Log in
-                    </Link>
-                    
+                    </button>
+
+
                   </div>
                 </div>
               </div>
