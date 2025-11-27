@@ -9,6 +9,7 @@ import { User, Calendar, MapPin, Phone, Mail, CreditCard } from "lucide-react"
 export default function MyselfForm({ darkModeFromParent }) {
     const router = useRouter()
 const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+const [showErrorMessage, setShowErrorMessage] = useState(false) 
 const [submitFinancialAid, { isLoading }] = useSubmitFinancialAidMutation()
 const [darkMode, setDarkMode]= useState(false)
 

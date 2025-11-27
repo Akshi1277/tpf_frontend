@@ -9,6 +9,7 @@ import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSli
 export default function OtherForm({ darkModeFromParent }) {
     const router = useRouter()
 const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+const [showErrorMessage, setShowErrorMessage] = useState(false) 
 const [submitFinancialAid, { isLoading }] = useSubmitFinancialAidMutation()
 const [darkMode, setDarkMode]= useState(false)
 
