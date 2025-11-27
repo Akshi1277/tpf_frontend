@@ -1,5 +1,6 @@
 // app/page.jsx
 'use client';
+
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/home/HeroSection';
@@ -14,15 +15,27 @@ import StoriesSection from '@/components/home/StoriesSection';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import StartFundraiserBanner from '@/components/home/FundraiserBanner';
 import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setCMS } from '@/utils/slices/cmsSlice';
+import { useCMS } from './CMSContext';
 
 export default function Page() {
+  const cms = useCMS()
+  const dispatch = useDispatch();
+
+  // store CMS into Redux (global state)
+  useEffect(() => {
+    if (cms?.length) {
+      dispatch(setCMS(cms));
+    }
+  }, [cms, dispatch]);
+
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('darkMode');
         return saved ? JSON.parse(saved) : false;
       } catch (error) {
-        console.error('localStorage not available:', error);
         return false;
       }
     }
@@ -46,78 +59,53 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('darkMode', JSON.stringify(darkMode));
-    } catch (error) {
-      console.error('Failed to save to localStorage:', error);
-    }
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
   return (
     <div className={`min-h-screen font-sans ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-      <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        @keyframes pulse-glow {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-          }
-          50% {
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
-          }
-        }
-        .pulse-glow {
-          animation: pulse-glow 3s ease-in-out infinite;
-        }
-      `}</style>
-
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
-      
-    <section id="hero">
-  <HeroSection darkMode={darkMode} />
-</section>
 
-<section id="impact-stats">
-  <ImpactStatsBar darkMode={darkMode} totalRaised={totalRaised} />
-</section>
+      <section id="hero">
+        <HeroSection darkMode={darkMode}/>
+      </section>
 
-<section id="stories">
-  <StoriesSection darkMode={darkMode} />
-</section>
+      <section id="impact-stats">
+        <ImpactStatsBar darkMode={darkMode} totalRaised={totalRaised} />
+      </section>
 
-<section id="campaigns">
-  <CampaignsSection darkMode={darkMode} />
-</section>
+      <section id="stories">
+        <StoriesSection darkMode={darkMode} />
+      </section>
 
-<section id="curated">
-  <CuratedSection darkMode={darkMode} />
-</section>
+      <section id="campaigns">
+        <CampaignsSection darkMode={darkMode} />
+      </section>
 
-<section id="impact-banner">
-  <ImpactBanner darkMode={darkMode} />
-</section>
+      <section id="curated">
+        <CuratedSection darkMode={darkMode} cms={cms} />
+      </section>
 
-<section id="communities">
-  <CommunitiesSection darkMode={darkMode} />
-</section>
+      <section id="impact-banner">
+        <ImpactBanner darkMode={darkMode} />
+      </section>
 
-<section id="partners">
-  <PartnersSection darkMode={darkMode} />
-</section>
+      <section id="communities">
+        <CommunitiesSection darkMode={darkMode} />
+      </section>
 
-<section id="pulse">
-  <PulseSection darkMode={darkMode} totalRaised={totalRaised} />
-</section>
+      <section id="partners">
+        <PartnersSection darkMode={darkMode} />
+      </section>
 
-<section id="fundraiser-banner">
-  <StartFundraiserBanner darkMode={darkMode} />
-</section>
-      
+      <section id="pulse">
+        <PulseSection darkMode={darkMode} totalRaised={totalRaised} />
+      </section>
+
+      <section id="fundraiser-banner">
+        <StartFundraiserBanner darkMode={darkMode} />
+      </section>
+
       <Footer darkMode={darkMode} />
       <ScrollToTop scrolled={scrolled} />
     </div>
