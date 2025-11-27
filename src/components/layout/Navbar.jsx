@@ -6,8 +6,10 @@ import { Plus, Heart, Leaf } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { logout } from '@/utils/slices/authSlice';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
-
+const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
 useEffect(() => setHasMounted(true), []);
@@ -445,33 +447,59 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
                   </a>
 
                   {/* Sign up / Log in */}
-                  <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
-                    <button
-                      onClick={() => {
-                        handleAuthNavigation("/signup");
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
-    ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}
-  `}
-                    >
-                      Sign up
-                    </button>
+                  {/* Authentication Actions */}
+<div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
+  {userInfo ? (
+    <button
+      onClick={() => {
+        dispatch(logout());
+        setMobileMenuOpen(false);
+      }}
+      className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-colors
+      ${darkMode ? 'text-red-400 hover:bg-zinc-800' : 'text-red-600 hover:bg-zinc-100'}`}
+    >
+      <svg
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </button>
+  ) : (
+    <>
+      <button
+        onClick={() => {
+          handleAuthNavigation("/signup");
+          setMobileMenuOpen(false);
+        }}
+        className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
+        ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
+      >
+        Sign up
+      </button>
 
-                    <button
-                      onClick={() => {
-                        handleAuthNavigation("/login");
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
-    ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}
-  `}
-                    >
-                      Log in
-                    </button>
+      <button
+        onClick={() => {
+          handleAuthNavigation("/login");
+          setMobileMenuOpen(false);
+        }}
+        className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
+        ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
+      >
+        Log in
+      </button>
+    </>
+  )}
+</div>
 
-
-                  </div>
                 </div>
               </div>
             </div>
