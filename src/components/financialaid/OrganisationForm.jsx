@@ -64,7 +64,9 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     crowdfundedBefore: "",
     employeeStrength: "",
     volunteerStrength: "",
-    organizeEvents: ""
+    organizeEvents: "",
+
+    declarationConsent: false,
   })
 
   const handleInputChange = (e) => {
@@ -118,6 +120,7 @@ const handleSubmit = async (e) => {
 
    formDataToSend.append('organizationName', formData.organizationName)
   formDataToSend.append('registrationNumber', formData.registrationNumber)
+  formDataToSend.append('declarationConsent', formData.declarationConsent)
   if (formData.certification80G) {
     formDataToSend.append('certification80G', formData.certification80G)
   }
@@ -481,6 +484,45 @@ const handleSubmit = async (e) => {
                     }`}
                   />
                 </div>
+
+ {/* Declaration & Consent */}
+                  <div className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-lg border ${
+      darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"
+    }`}>
+      <h3 className={`font-bold text-base sm:text-lg mb-3 sm:mb-4 ${darkMode ? "text-white" : "text-zinc-900"}`}>
+        Declaration & Consent
+      </h3>
+      <div className={`text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+        <p>
+          I hereby declare that I am not getting assistance/provision from any other organization or entity in any form and the information provided above is true. Any misrepresentation may lead to disqualification. I authorize True Path Foundation to visit and contact me to verify the provided details. I understand that video verification, its online solicitation/circulation and an appeal are mandatory for funding campaigns. A copy of a document of identity proof and bank details (if available) must be attached. I/We provide free consent for this process and acknowledge full understanding of this form in vernacular.
+        </p>
+      </div>
+      
+      <label className="flex items-start cursor-pointer group">
+        <input
+          type="checkbox"
+          name="declarationConsent"
+          checked={formData.declarationConsent}
+          onChange={(e) => setFormData(prev => ({ ...prev, declarationConsent: e.target.checked }))}
+          className="sr-only peer"
+          required
+        />
+        <div className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${
+          darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+        }`}>
+          <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${
+          formData.declarationConsent 
+            ? 'text-emerald-600' 
+            : darkMode ? "text-zinc-300" : "text-zinc-700"
+        }`}>
+          I agree to the declaration and consent terms stated above <span className="text-red-500">*</span>
+        </span>
+      </label>
+    </div>
 
                 {/* Navigation Button */}
                 <div className="flex justify-end pt-4">
