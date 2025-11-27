@@ -115,18 +115,51 @@ const handleSubmit = async (e) => {
     // Create FormData object for file uploads
     const formDataToSend = new FormData()
 
-    // Add form type (IMPORTANT!)
+    // Add form type
     formDataToSend.append('formType', 'organization')
 
-   formDataToSend.append('organizationName', formData.organizationName)
-  formDataToSend.append('registrationNumber', formData.registrationNumber)
-  formDataToSend.append('declarationConsent', formData.declarationConsent)
-  if (formData.certification80G) {
-    formDataToSend.append('certification80G', formData.certification80G)
-  }
-  if (formData.panCardImage) {
-    formDataToSend.append('panCardImage', formData.panCardImage)
-  }
+    // Step 1: NGO Registration Form
+    formDataToSend.append('fullName', formData.organizationName || '')
+    formDataToSend.append('nonProfit', formData.nonProfit || '')
+    formDataToSend.append('city', formData.city || '')
+    formDataToSend.append('causeSupported', JSON.stringify(formData.causeSupported))
+    formDataToSend.append('founderName', formData.founderName || '')
+    formDataToSend.append('founderEmail', formData.founderEmail || '')
+    formDataToSend.append('founderMobile', formData.founderMobile || '')
+    formDataToSend.append('ngoWebsite', formData.ngoWebsite || '')
+    formDataToSend.append('aboutNGO', formData.aboutNGO || '')
+
+    // Step 2: Contact Details
+    formDataToSend.append('contactName', formData.contactName || '')
+    formDataToSend.append('contactNumber', formData.contactNumber || '')
+    formDataToSend.append('email', formData.contactEmail || '')
+    formDataToSend.append('designation', formData.designation || '')
+
+    // Step 3: Certifications
+    formDataToSend.append('has80G', formData.has80G || '')
+    formDataToSend.append('expiryDate', formData.expiryDate || '')
+    formDataToSend.append('panCard', formData.panCard || '')
+    formDataToSend.append('hasFCRA', formData.hasFCRA || '')
+
+    // Step 4: Organization Profile
+    formDataToSend.append('budget', formData.budget || '')
+    formDataToSend.append('donorDatabase', formData.donorDatabase || '')
+    formDataToSend.append('fullTimeFundraising', formData.fullTimeFundraising || '')
+    formDataToSend.append('crowdfundedBefore', formData.crowdfundedBefore || '')
+    formDataToSend.append('employeeStrength', formData.employeeStrength || '')
+    formDataToSend.append('volunteerStrength', formData.volunteerStrength || '')
+    formDataToSend.append('organizeEvents', formData.organizeEvents || '')
+
+    // Declaration
+    formDataToSend.append('declarationConsent', formData.declarationConsent)
+
+    // File uploads
+    if (formData.certification80G) {
+      formDataToSend.append('certification80G', formData.certification80G)
+    }
+    if (formData.panCardImage) {
+      formDataToSend.append('panCardImage', formData.panCardImage)
+    }
 
     // Submit the form
     const result = await submitFinancialAid(formDataToSend).unwrap()
