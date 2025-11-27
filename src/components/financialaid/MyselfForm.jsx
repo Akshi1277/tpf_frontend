@@ -3,12 +3,13 @@
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSlice"
 import { User, Calendar, MapPin, Phone, Mail, CreditCard } from "lucide-react"
 
 export default function MyselfForm({ darkModeFromParent }) {
     const router = useRouter()
 const [showSuccessMessage, setShowSuccessMessage] = useState(false)
-
+const [submitFinancialAid, { isLoading }] = useSubmitFinancialAidMutation()
 const [darkMode, setDarkMode]= useState(false)
 
  useEffect(() => {
@@ -20,6 +21,8 @@ const [darkMode, setDarkMode]= useState(false)
   const [formData, setFormData] = useState({
     // Personal Information
     fullName: '',
+     relation: '',           
+  relationName: '',
     parentSpouseName: '',
     dateOfBirth: '',
     maritalStatus: '',
@@ -31,7 +34,7 @@ const [darkMode, setDarkMode]= useState(false)
     email: '',
     idType:'',
     govIdNumber: '',
-    govIdDocument:'null',
+    govIdDocument:null,
      // Financial & Employment Details
   occupation: '',
   monthlyIncome: '',
@@ -39,6 +42,7 @@ const [darkMode, setDarkMode]= useState(false)
   accountNumber: '',
   ifscCode: '',
   numberOfDependents: '',
+  bankStatement:null,
 
    // Reason for Aid Request
   aidType: '',
@@ -47,17 +51,24 @@ const [darkMode, setDarkMode]= useState(false)
   declarationConsent: false,
   })
 
- const handleInputChange = (e) => {
+const handleInputChange = (e) => {
   const { name, value } = e.target;
 
-  // If this is a file input
   if (e.target.type === "file") {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: e.target.files[0], // store the file
-    }));
+    if (name === "supportingDocuments") {
+      // Multiple files
+      setFormData((prev) => ({
+        ...prev,
+        [name]: Array.from(e.target.files),
+      }));
+    } else {
+      // Single file
+      setFormData((prev) => ({
+        ...prev,
+        [name]: e.target.files[0],
+      }));
+    }
   } else {
-    // Normal text/select/radio inputs
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -71,21 +82,72 @@ const [darkMode, setDarkMode]= useState(false)
   setCurrentStep(nextStep)
 }
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault()
-  
+
   if (!formData.declarationConsent) {
+    alert('Please accept the declaration and consent')
     return
   }
 
-  console.log('Form submitted:', formData)
-  
-  setShowSuccessMessage(true)
-  
-  // Redirect to home after 3 seconds
-  setTimeout(() => {
-    router.push('/')
-  }, 3000)
+  try {
+    // Create FormData object for file uploads
+    const formDataToSend = new FormData()
+
+    // Add form type (IMPORTANT!)
+    formDataToSend.append('formType', 'myself')  // or 'other' or 'organization'
+
+    // Add all text fields
+    formDataToSend.append('fullName', formData.fullName)
+    formDataToSend.append('relation', formData.relation)
+    formDataToSend.append('relationName', formData.relationName)
+    formDataToSend.append('dateOfBirth', formData.dateOfBirth)
+    formDataToSend.append('maritalStatus', formData.maritalStatus)
+    formDataToSend.append('gender', formData.gender)
+    formDataToSend.append('permanentAddress', formData.permanentAddress)
+    formDataToSend.append('currentAddress', formData.currentAddress)
+    formDataToSend.append('sameAddress', formData.sameAddress)
+    formDataToSend.append('contactNumber', formData.contactNumber)
+    formDataToSend.append('email', formData.email)
+    formDataToSend.append('idType', formData.idType)
+    formDataToSend.append('govIdNumber', formData.govIdNumber)
+    formDataToSend.append('occupation', formData.occupation)
+    formDataToSend.append('monthlyIncome', formData.monthlyIncome)
+    formDataToSend.append('bankNameBranch', formData.bankNameBranch)
+    formDataToSend.append('accountNumber', formData.accountNumber)
+    formDataToSend.append('ifscCode', formData.ifscCode)
+    formDataToSend.append('numberOfDependents', formData.numberOfDependents)
+    formDataToSend.append('aidType', formData.aidType)
+    formDataToSend.append('hardshipDescription', formData.hardshipDescription)
+    formDataToSend.append('declarationConsent', formData.declarationConsent)
+
+    // Add file uploads
+    if (formData.govIdDocument) {
+      formDataToSend.append('govIdDocument', formData.govIdDocument)
+    }
+    if (formData.bankStatement) {
+      formDataToSend.append('bankStatement', formData.bankStatement)
+    }
+    if (formData.supportingDocuments && formData.supportingDocuments.length > 0) {
+      formData.supportingDocuments.forEach((file) => {
+        formDataToSend.append('supportingDocuments', file)
+      })
+    }
+
+    // Submit the form
+    const result = await submitFinancialAid(formDataToSend).unwrap()
+
+    if (result.success) {
+      setShowSuccessMessage(true)
+      setTimeout(() => {
+        router.push('/')
+      }, 3000)
+    }
+  } catch (err) {
+    console.error('Failed to submit application:', err)
+    setShowErrorMessage(true)
+    setTimeout(() => setShowErrorMessage(false), 5000)
+  }
 }
 
 
@@ -110,6 +172,26 @@ const handleSubmit = (e) => {
     </div>
   </motion.div>
   
+)}
+
+{showErrorMessage && (
+  <motion.div
+    initial={{ opacity: 0, y: -50 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+         bg-gradient-to-r from-red-600 to-red-400 text-white px-6 py-4 rounded-lg shadow-2xl 
+         flex items-center gap-3 max-w-md w-[90%] sm:w-auto"
+  >
+    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </div>
+    <div>
+      <p className="font-semibold">Submission Failed!</p>
+      <p className="text-sm text-red-100">Please try again later</p>
+    </div>
+  </motion.div>
 )}
 
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-12 sm:py-20`}>
@@ -1160,16 +1242,16 @@ const handleSubmit = (e) => {
         <span className="hidden sm:inline">Previous</span>
         <span className="sm:hidden">Back</span>
       </button>
-      <button
-        onClick={handleSubmit}
-        disabled={!formData.declarationConsent}
-        className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
-      >
-        Submit
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </button>
+     <button
+  onClick={handleSubmit}
+  disabled={!formData.declarationConsent || isLoading}
+  className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
+>
+  {isLoading ? 'Submitting...' : 'Submit'}
+  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+</button>
     </div>
   </div>
 )}

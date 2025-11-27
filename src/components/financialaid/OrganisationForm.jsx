@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect} from "react"
 import { useRouter } from "next/navigation"
+import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSlice"
 import { 
   Building2,
   Users,
@@ -17,6 +18,7 @@ import {
 export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const router = useRouter()
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+  const [submitFinancialAid, { isLoading }] = useSubmitFinancialAidMutation()
   const [darkMode, setDarkMode]= useState(false)
   
    useEffect(() => {
@@ -28,7 +30,10 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const [formData, setFormData] = useState({
     // Step 1: NGO Registration Form
     nonProfit: "",
-    organizationName: "",
+     organizationName: '',
+  registrationNumber: '',
+  certification80G: null,
+  panCardImage: null,
     city: "",
     causeSupported: [],
     founderName: "",
@@ -95,16 +100,45 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     setCurrentStep(nextStep)
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Form submitted:', formData)
-    
-    setShowSuccessMessage(true)
-    
-    setTimeout(() => {
-      router.push('/')
-    }, 3000)
+const handleSubmit = async (e) => {
+  e.preventDefault()
+
+  if (!formData.declarationConsent) {
+    alert('Please accept the declaration and consent')
+    return
   }
+
+  try {
+    // Create FormData object for file uploads
+    const formDataToSend = new FormData()
+
+    // Add form type (IMPORTANT!)
+    formDataToSend.append('formType', 'organization')
+
+   formDataToSend.append('organizationName', formData.organizationName)
+  formDataToSend.append('registrationNumber', formData.registrationNumber)
+  if (formData.certification80G) {
+    formDataToSend.append('certification80G', formData.certification80G)
+  }
+  if (formData.panCardImage) {
+    formDataToSend.append('panCardImage', formData.panCardImage)
+  }
+
+    // Submit the form
+    const result = await submitFinancialAid(formDataToSend).unwrap()
+
+    if (result.success) {
+      setShowSuccessMessage(true)
+      setTimeout(() => {
+        router.push('/')
+      }, 3000)
+    }
+  } catch (err) {
+    console.error('Failed to submit application:', err)
+    setShowErrorMessage(true)
+    setTimeout(() => setShowErrorMessage(false), 5000)
+  }
+}
 
   const causes = [
     "Animals",
@@ -142,6 +176,26 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
           </div>
         </motion.div>
       )}
+
+      {showErrorMessage && (
+  <motion.div
+    initial={{ opacity: 0, y: -50 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+         bg-gradient-to-r from-red-600 to-red-400 text-white px-6 py-4 rounded-lg shadow-2xl 
+         flex items-center gap-3 max-w-md w-[90%] sm:w-auto"
+  >
+    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </div>
+    <div>
+      <p className="font-semibold">Submission Failed!</p>
+      <p className="text-sm text-red-100">Please try again later</p>
+    </div>
+  </motion.div>
+)}
 
       <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-12 sm:py-20`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-2 pb-12 sm:pb-24">
@@ -221,10 +275,10 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                   </p>
                 </div>
 
-                {/* Question 1: Is your organisation a registered Non-Profit? */}
+                {/* Question 1: Is your organization a registered Non-Profit? */}
                 <div>
                   <label className={`block text-xs sm:text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                    1. Is your organisation a registered Non-Profit? <span className="text-red-500">*</span>
+                    1. Is your organization a registered Non-Profit? <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {[
@@ -260,7 +314,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                      2. Organisation Name <span className="text-red-500">*</span>
+                      2. Organization Name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Building2 className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
@@ -1023,11 +1077,15 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                     Back
                   </button>
                   <button
-                    onClick={handleSubmit}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg text-sm sm:text-base"
-                  >
-                    Submit
-                  </button>
+  onClick={handleSubmit}
+  disabled={!formData.declarationConsent || isLoading}
+  className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
+>
+  {isLoading ? 'Submitting...' : 'Submit'}
+  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+</button>
                 </div>
               </div>
             )}
