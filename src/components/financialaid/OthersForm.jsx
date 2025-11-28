@@ -84,7 +84,9 @@ const handleInputChange = (e) => {
 }
 
 const handleSubmit = async (e) => {
-  e.preventDefault()
+  if (e && e.preventDefault) {
+    e.preventDefault()
+  }
 
   if (!formData.declarationConsent) {
     alert('Please accept the declaration and consent')
@@ -215,7 +217,7 @@ const handleSubmit = async (e) => {
         {/* Progress Indicator */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between sm:justify-center sm:gap-4 md:gap-6 mb-2 overflow-x-auto px-2">
-            {[1, 2, 3, 4].map((step, index) => (
+            {[1, 2, 3, 4, 5].map((step, index) => (
               <div key={step} className="flex items-center flex-shrink-0">
                 {/* Step Circle + Label */}
                 <div className="flex flex-col items-center">
@@ -235,12 +237,12 @@ const handleSubmit = async (e) => {
                       darkMode ? "text-zinc-400" : "text-zinc-600"
                     }`}
                   >
-                    {step === 1 ? "Personal" : step === 2 ? "Contact" : step === 3 ? "Financial" : "Request"}
+    {step === 1 ? "Personal" : step === 2 ? "Contact" : step === 3 ? "Financial" : step === 4 ? "Request" : "Preview"}
                   </span>
                 </div>
 
                 {/* Connecting Line */}
-                {index < 3 && (
+                {index < 4 && (
                   <div
                     className={`w-8 sm:w-12 md:w-16 -mt-5 md:-mt-5 h-1 mx-2 sm:mx-4 rounded transition-all ${
                       currentStep > step
@@ -1228,13 +1230,11 @@ const handleSubmit = async (e) => {
 
    
     {/* Navigation Buttons */}
-    <div className="flex justify-between pt-4 gap-3">
+<div className="flex justify-between pt-4 gap-3">
       <button
         onClick={() => handleNext(3)}
         className={`px-4 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold transition-all border ${
-          darkMode
-            ? "border-zinc-600 text-white hover:bg-zinc-700"
-            : "border-zinc-300 text-zinc-900 hover:bg-zinc-100"
+          darkMode ? "border-zinc-600 text-white hover:bg-zinc-700" : "border-zinc-300 text-zinc-900 hover:bg-zinc-100"
         } flex items-center gap-2`}
       >
         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1243,16 +1243,138 @@ const handleSubmit = async (e) => {
         <span className="hidden sm:inline">Previous</span>
         <span className="sm:hidden">Back</span>
       </button>
+    
      <button
-  onClick={handleSubmit}
-  disabled={!formData.declarationConsent || isLoading}
-  className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
->
-  {isLoading ? 'Submitting...' : 'Submit'}
-  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-</button>
+       onClick={() => handleNext(5)}
+       className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
+     >
+       Preview
+       <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+       </svg>
+     </button>
+    </div>
+  </div>
+)}
+
+{currentStep === 5 && (
+  <div className="space-y-4 sm:space-y-6">
+    <div className="border-l-4 border-emerald-500 pl-3 sm:pl-4 mb-4 sm:mb-6">
+      <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
+        Preview Application
+      </h2>
+      <p className={`text-xs sm:text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+        Review all details before final submission
+      </p>
+    </div>
+
+    <div className={`rounded-2xl p-4 sm:p-6 md:p-8 shadow-inner ${darkMode ? "bg-zinc-800" : "bg-white"}`}>
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Personal</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-xs text-zinc-500">Full Name</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.fullName || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Relation</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.relation || "—"} {formData.relationName ? ` - ${formData.relationName}` : ""}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Date of Birth</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.dateOfBirth || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Gender</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.gender || "—"}</p>
+        </div>
+      </div>
+
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Contact & ID</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-xs text-zinc-500">Current Address</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.currentAddress || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Permanent Address</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.permanentAddress || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Contact Number</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.contactNumber || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Email</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.email || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">ID Type / Number</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.idType ? formData.idType.toUpperCase() : "—"} {formData.govIdNumber ? ` / ${formData.govIdNumber}` : ""}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Gov ID Document</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.govIdDocument ? formData.govIdDocument.name : "No file"}</p>
+        </div>
+      </div>
+
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Financial</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-xs text-zinc-500">Occupation</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.occupation || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Monthly Income</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.monthlyIncome ? `₹ ${formData.monthlyIncome}` : "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Bank</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.bankNameBranch || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Account / IFSC</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.accountNumber ? `${formData.accountNumber} / ${formData.ifscCode}` : "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Bank Statement</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.bankStatement ? formData.bankStatement.name : "No file"}</p>
+        </div>
+      </div>
+
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Aid Request</h3>
+      <div className="mb-4">
+        <p className="text-xs text-zinc-500">Type</p>
+        <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.aidType || "—"}</p>
+        <p className="text-xs text-zinc-500 mt-2">Hardship Description</p>
+        <p className={`font-medium whitespace-pre-wrap ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.hardshipDescription || "—"}</p>
+        <p className="text-xs text-zinc-500 mt-2">Supporting Documents</p>
+        {formData.supportingDocuments && formData.supportingDocuments.length > 0 ? (
+          <ul className={`mt-1 text-sm ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+            {formData.supportingDocuments.map((f, i) => <li key={i}>{f.name}</li>)}
+          </ul>
+        ) : (
+          <p className={`mt-1 text-sm ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>No files</p>
+        )}
+      </div>
+
+      <div className="mt-4 flex justify-between items-center">
+        <button
+          onClick={() => setCurrentStep(4)}
+          className={`px-4 sm:px-8 py-2.5 rounded-lg font-semibold transition-all border ${darkMode ? "border-zinc-600 text-white hover:bg-zinc-700" : "border-zinc-300 text-zinc-900 hover:bg-zinc-100"}`}
+        >
+          Edit
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={!formData.declarationConsent || isLoading}
+          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
+        >
+          {isLoading ? 'Submitting...' : 'Submit'}
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 )}

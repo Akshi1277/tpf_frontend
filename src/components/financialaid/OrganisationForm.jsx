@@ -104,7 +104,10 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   }
 
 const handleSubmit = async (e) => {
-  e.preventDefault()
+  // allow calling handleSubmit from onClick (no event) or from a form submit event
+  if (e && e.preventDefault) {
+    e.preventDefault()
+  }
 
   if (!formData.declarationConsent) {
     alert('Please accept the declaration and consent')
@@ -254,7 +257,7 @@ const handleSubmit = async (e) => {
           {/* Progress Indicator */}
           <div className="mb-6 sm:mb-8">
             <div className="flex items-center justify-between sm:justify-center sm:gap-4 md:gap-6 mb-2 overflow-x-auto px-2">
-              {[1, 2, 3, 4].map((step, index) => (
+              {[1, 2, 3, 4, 5].map((step, index) => (
                 <div key={step} className="flex items-center flex-shrink-0">
                   <div className="flex flex-col items-center">
                     <div
@@ -273,11 +276,11 @@ const handleSubmit = async (e) => {
                         darkMode ? "text-zinc-400" : "text-zinc-600"
                       }`}
                     >
-                      {step === 1 ? "NGO Info" : step === 2 ? "Contact" : step === 3 ? "Certificates" : "Profile"}
+                      {step === 1 ? "NGO Info" : step === 2 ? "Contact" : step === 3 ? "Certificates" : step === 4 ? "Profile":"Preview"}
                     </span>
                   </div>
 
-                  {index < 3 && (
+                  {index < 4 && (
                     <div
                       className={`w-8 sm:w-12 md:w-16 -mt-5 md:-mt-5 h-1 mx-2 sm:mx-4 rounded transition-all ${
                         currentStep > step
@@ -1141,30 +1144,179 @@ const handleSubmit = async (e) => {
                 </div>
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between pt-4">
-                  <button
-                    onClick={() => handleNext(3)}
-                    className={`px-6 sm:px-8 py-2.5 sm:py-3 font-semibold rounded-lg transition-all text-sm sm:text-base ${
-                      darkMode
-                        ? "bg-zinc-700 hover:bg-zinc-600 text-white"
-                        : "bg-zinc-200 hover:bg-zinc-300 text-zinc-900"
-                    }`}
-                  >
-                    Back
-                  </button>
-                  <button
-  onClick={handleSubmit}
-  disabled={!formData.declarationConsent || isLoading}
-  className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
->
-  {isLoading ? 'Submitting...' : 'Submit'}
-  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-</button>
-                </div>
-              </div>
-            )}
+               <div className="flex justify-between pt-4">
+      <button
+        onClick={() => handleNext(3)}
+        className={`px-6 sm:px-8 py-2.5 sm:py-3 font-semibold rounded-lg transition-all text-sm sm:text-base ${
+          darkMode ? "bg-zinc-700 hover:bg-zinc-600 text-white" : "bg-zinc-200 hover:bg-zinc-300 text-zinc-900"
+        }`}
+      >
+        Back
+      </button>
+     
+     <button
+       onClick={() => handleNext(5)}
+       className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg text-sm sm:text-base"
+     >
+       Preview
+     </button>
+    </div>
+  </div>
+)}
+
+{currentStep === 5 && (
+  <div className="space-y-4 sm:space-y-6">
+    <div className="border-l-4 border-emerald-500 pl-3 sm:pl-4 mb-4 sm:mb-6">
+      <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
+        Preview Registration
+      </h2>
+      <p className={`text-xs sm:text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+        Review all details before final submission
+      </p>
+    </div>
+
+    <div className={`rounded-2xl p-4 sm:p-6 md:p-8 shadow-inner ${darkMode ? "bg-zinc-800" : "bg-white"}`}>
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>NGO Information</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-xs text-zinc-500">Organization Name</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.organizationName || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Non-Profit Status</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.nonProfit || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">City</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.city || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Causes Supported</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.causeSupported.join(", ") || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Founder Name</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.founderName || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Founder Email</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.founderEmail || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Founder Mobile</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.founderMobile || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Website</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.ngoWebsite || "—"}</p>
+        </div>
+      </div>
+
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Contact Person</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-xs text-zinc-500">Name</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.contactName || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Contact Number</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.contactNumber || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Email</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.contactEmail || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Designation</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.designation || "—"}</p>
+        </div>
+      </div>
+
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Certifications</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-xs text-zinc-500">80G Certification</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.has80G || "—"}</p>
+        </div>
+        {formData.has80G === "yes" && (
+          <>
+            <div>
+              <p className="text-xs text-zinc-500">Expiry Date</p>
+              <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.expiryDate || "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500">PAN Card</p>
+              <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.panCard || "—"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500">Certification Document</p>
+              <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.certification80G ? formData.certification80G.name : "No file"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500">PAN Card Document</p>
+              <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.panCardImage ? formData.panCardImage.name : "No file"}</p>
+            </div>
+          </>
+        )}
+        <div>
+          <p className="text-xs text-zinc-500">FCRA Certification</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.hasFCRA || "—"}</p>
+        </div>
+      </div>
+
+      <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Organization Profile</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+        <div>
+          <p className="text-xs text-zinc-500">Annual Budget</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.budget || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Donor Database</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.donorDatabase || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Full-time Fundraising Staff</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.fullTimeFundraising || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Crowdfunded Before</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.crowdfundedBefore || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Employee Strength</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.employeeStrength || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Volunteer Strength</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.volunteerStrength || "—"}</p>
+        </div>
+        <div>
+          <p className="text-xs text-zinc-500">Organizes Events</p>
+          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.organizeEvents || "—"}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex justify-between items-center">
+        <button
+          onClick={() => setCurrentStep(4)}
+          className={`px-4 sm:px-8 py-2.5 rounded-lg font-semibold transition-all ${darkMode ? "bg-zinc-700 hover:bg-zinc-600 text-white" : "bg-zinc-200 hover:bg-zinc-300 text-zinc-900"}`}
+        >
+          Edit
+        </button>
+        <button
+          onClick={handleSubmit}
+          disabled={!formData.declarationConsent || isLoading}
+          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
+        >
+          {isLoading ? 'Submitting...' : 'Submit'}
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+)}
           </motion.div>
         </div>
       </div>
