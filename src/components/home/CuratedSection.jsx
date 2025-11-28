@@ -1,13 +1,21 @@
 // components/home/CuratedSection.jsx
 import { useState, useEffect } from 'react';
 import CuratedCard from '@/components/ui/CuratedCard';
-import { curatedItems } from '@/lib/constants';
+import { useCMS } from '@/app/CMSContext';
 
 export default function CuratedSection({ darkMode }) {
   const [curatedScrollIndex, setCuratedScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
 
-  const infiniteCurated = [...curatedItems, ...curatedItems];
+ const cms = useCMS();
+const tailoredItems = cms?.filter((item) => item.type === "tailored") || [];
+const infiniteCurated =
+  tailoredItems.length > 1
+    ? [...tailoredItems, ...tailoredItems]
+    : tailoredItems; // No duplication when only 1 item
+const originalLength = tailoredItems.length;
+const loopLength = infiniteCurated.length;
+
 
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
@@ -37,7 +45,7 @@ export default function CuratedSection({ darkMode }) {
     
     container.scrollTo({ left: scrollTo, behavior: 'smooth' });
 
-    if (curatedScrollIndex >= curatedItems.length) {
+    if (curatedScrollIndex >= loopLength -1) {
       setTimeout(() => {
         container.scrollTo({ left: 0, behavior: 'auto' });
         setCuratedScrollIndex(0);
@@ -80,13 +88,13 @@ export default function CuratedSection({ darkMode }) {
       const scrollLeft = container.scrollLeft;
       const currentIndex = Math.round(scrollLeft / (cardWidth + gap));
 
-      if (currentIndex >= curatedItems.length) {
-        const equivalentIndex = currentIndex - curatedItems.length;
+      if (currentIndex >= tailoredItems.length) {
+        const equivalentIndex = currentIndex - tailoredItems.length;
         container.scrollTo({ left: equivalentIndex * (cardWidth + gap), behavior: 'auto' });
         setCuratedScrollIndex(equivalentIndex);
       } else if (currentIndex < 0) {
-        container.scrollTo({ left: (curatedItems.length + currentIndex) * (cardWidth + gap), behavior: 'auto' });
-        setCuratedScrollIndex(curatedItems.length + currentIndex);
+        container.scrollTo({ left: (tailoredItems.length + currentIndex) * (cardWidth + gap), behavior: 'auto' });
+        setCuratedScrollIndex(tailoredItems.length + currentIndex);
       }
     };
 
@@ -109,7 +117,7 @@ export default function CuratedSection({ darkMode }) {
     const c = document.getElementById('curated-container');
     c?.scrollBy({ left: 300, behavior: 'smooth' });
   };
-
+  
   return (
     <section id="curated" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
