@@ -3,20 +3,24 @@
 import { useState, useEffect } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { campaigns, categories } from '@/lib/constants';
-
+import { useCMS } from '@/app/CMSContext';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+const cms = useCMS();
+const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
+const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
- 
 
-  const filteredCampaigns = selectedCategory === 'all' 
-    ? campaigns 
-    : campaigns.filter(c => c.category === selectedCategory);
+const filteredCampaigns =
+  selectedCategory === "all"
+    ? fundraisers
+    : fundraisers.filter((c) => c.category === selectedCategory);
 
-  const infiniteCampaigns = [...filteredCampaigns, ...filteredCampaigns];
+const infiniteCampaigns = [...filteredCampaigns, ...filteredCampaigns];
+
 
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
@@ -216,14 +220,20 @@ useEffect(() => {
     id="campaigns-container"
     className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
   >
-    {infiniteCampaigns.map((campaign, index) => (
-      <div key={`campaign-${campaign.id}-${index}`} className="flex-shrink-0 w-[280px] sm:w-[285px] snap-start">
-        <CampaignCard 
-          campaign={campaign}
-          darkMode={darkMode}
-        />
-      </div>
-    ))}
+   {infiniteCampaigns.map((campaign, index) => (
+  <div key={campaign._id + "-" + index} className="flex-shrink-0 w-[285px]">
+    <CampaignCard
+      campaign={{
+        ...campaign,
+        image: campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : null,
+        video: campaign.videoUrl ? `${BASE_URL}${campaign.videoUrl}` : null,
+        requiredAmount: Number(campaign.requiredAmount),
+      }}
+      darkMode={darkMode}
+    />
+  </div>
+))}
+
   </div>
 
   {/* RIGHT ARROW - Desktop only */}
