@@ -453,6 +453,7 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
     <button
       onClick={() => {
         dispatch(logout());
+        router.push('/login')
         setMobileMenuOpen(false);
       }}
       className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-colors

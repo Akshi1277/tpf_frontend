@@ -90,6 +90,9 @@ const menuItems = [
 
 const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+
 
   return (
     <div className="flex flex-col h-full overflow-y-auto scrollbar-hide">
@@ -98,11 +101,10 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
         darkMode ? "border-zinc-800" : "border-gray-200"
       }`}>
         <div className="flex items-center justify-between mb-1">
-          <h2 className={`text-lg sm:text-xl font-bold ${
-            darkMode ? "text-white" : "text-gray-900"
-          }`}>
-            My Profile
-          </h2>
+        <h2 className={`text-lg sm:text-xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+  {menuItems.find((i) => i.path === pathname)?.name || "My Profile"}
+</h2>
+
           <button
             onClick={onClose}
             className={`lg:hidden p-2 rounded-lg transition-colors ${
@@ -127,7 +129,8 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
               <span className={`text-xs sm:text-sm font-bold ${
                 darkMode ? "text-zinc-400" : "text-gray-600"
               }`}>
-                {profileCompletion}%
+                {mounted ? `${profileCompletion}%` : "—"}
+
               </span>
             </div>
             <div className={`w-full h-2 rounded-full overflow-hidden ${
@@ -153,7 +156,27 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
             </p>
           </div>
         )}
+       {profileCompletion === 100 && (
+  <div
+    className={`mt-4 px-4 py-3 rounded-xl text-center border backdrop-blur-sm
+      ${darkMode
+        ? "bg-emerald-900/10 border-emerald-800/40"
+        : "bg-emerald-50/70 border-emerald-200"
+      }`}
+  >
+    <p className={`text-[13px] font-semibold ${
+      darkMode ? "text-emerald-300" : "text-emerald-700"
+    }`}>
+      “Every act of kindness is a charity.”
+    </p>
+   
+  </div>
+)}
+
+
       </div>
+
+      
 
       {/* MENU */}
       <nav className="flex-1 p-2 sm:p-3 pb-6">
@@ -251,32 +274,35 @@ function Sidebar({ darkMode }) {
 
   // PHASE 1 — Profile fields 50%
   const calcProfile = () => {
-    let score = 0;
-    if (user?.fullName) score += 10;
-    if (user?.email) score += 10;
-    if (user?.mobileNo) score += 10;
-    if (user?.bloodGroup) score += 10;
-    if (user?.gender) score += 10;
-    if (user?.dob) score += 10;
-    if (user?.profession) score += 10;
+  let score = 0;
+  if (user?.fullName) score += 15;
+  if (user?.email) score += 15;
+  if (user?.mobileNo) score += 15;
+  if (user?.bloodGroup) score += 15;
+  if (user?.gender) score += 15;
+  if (user?.dob) score += 15;
+  if (user?.profession) score += 10;
 
-    const hasAddress =
-      user?.address?.house &&
-      user?.address?.city &&
-      user?.address?.state &&
-      user?.address?.pincode;
+  return score; // 0–100
+};
 
-    if (hasAddress) score += 20;
-
-    return score; // 0-100
-  };
 
   // PHASE 2 — KYC 50%
   const calcKyc = () => {
-    if (user?.kycStatus === "verified") return 100;
-    if (user?.kycDocuments?.length > 0) return 50;
-    return 0;
-  };
+  const k = user?.kycDetails;
+  if (!k) return 0;
+
+  const hasAll =
+    k.fullLegalName &&
+    k.panNumber &&
+    k.address &&
+    k.city &&
+    k.state &&
+    k.pincode;
+
+  return hasAll ? 100 : 0;
+};
+
 
   const profilePhase = calcProfile(); // 0–100
   const kycPhase = calcKyc(); // 0–100

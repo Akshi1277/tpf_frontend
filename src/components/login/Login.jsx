@@ -49,7 +49,7 @@ const handleOtpSubmit = async () => {
     // Save user in Redux + localStorage
     dispatch(setCredentials(res.user));
     
-    toast.success("Salam ! from TPF")
+    toast.success(`Salam ${res.user.fullName} ! from TPF`)
     setShowSuccess(true);
     setTimeout(() => router.push('/profile/userprofile'), 2500);
   } catch (err) {

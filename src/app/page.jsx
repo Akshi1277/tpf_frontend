@@ -16,19 +16,13 @@ import ScrollToTop from '@/components/ui/ScrollToTop';
 import StartFundraiserBanner from '@/components/home/FundraiserBanner';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setCMS } from '@/utils/slices/cmsSlice';
 import { useCMS } from './CMSContext';
 
 export default function Page() {
   const cms = useCMS()
-  const dispatch = useDispatch();
+ 
 
-  // store CMS into Redux (global state)
-  useEffect(() => {
-    if (cms?.length) {
-      dispatch(setCMS(cms));
-    }
-  }, [cms, dispatch]);
+  
 
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {

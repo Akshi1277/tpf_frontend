@@ -1,5 +1,7 @@
 "use client"
-
+import { useSelector, useDispatch } from "react-redux"
+import { setCredentials } from "@/utils/slices/authSlice"
+import { useUpdateProfileMutation } from "@/utils/slices/authApiSlice"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect, useRef } from "react"
 import axios from "axios"
@@ -24,6 +26,9 @@ import {
 } from "lucide-react"
 
 export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
+  const dispatch = useDispatch()
+  const userInfo  = useSelector((state) => state.auth?.userInfo || null);
+  const [updateProfile] = useUpdateProfileMutation()
   const [darkMode, setDarkMode] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
@@ -79,6 +84,34 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+
+  useEffect(() => {
+    if (userInfo) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: userInfo.fullName || "",
+        dateOfBirth: userInfo.dob ? userInfo.dob.split("T")[0] : "",
+           gender: userInfo.gender?.toLowerCase() || "",   // <-- FIX HERE
+        profession: userInfo.profession || "",
+        phoneNumber: userInfo.mobileNo || "",
+        email: userInfo.email || "",
+        addressLine1: userInfo.address?.house || "",
+        city: userInfo.address?.city || "",
+        state: userInfo.address?.state || "",
+        postalCode: userInfo.address?.pincode || "",
+        panNumber: userInfo.kycDetails?.panNumber || "",
+        confirmPanNumber: userInfo.kycDetails?.panNumber || "",
+      }));
+
+      // if KYC already submitted before → lock UI
+     if (userInfo?.kycDetails?.panNumber) {
+  // KYC submitted
+  setIsSubmitted(true);
+}
+
+    }
+  }, [userInfo]);
 
   const fetchStates = async () => {
     setLoadingStates(true)
@@ -169,14 +202,62 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     return false
   }
 
-  const handleSubmit = () => {
-    setIsSubmitted(true)
-    setShowSuccess(true)
+const handleSubmit = async () => {
+  try {
+    const payload = {
+  fullName: formData.fullName,
+  email: formData.email,
+
+  profession:
+    formData.ratherNotSayProfession
+      ? userInfo.profession || "" // do NOT erase existing profession
+      : formData.profession === "Other" && formData.customProfession
+        ? formData.customProfession
+        : formData.profession,
+
+  // KYC block — optional values allowed, but nothing empty overwrites DB
+  kycDetails: {
+    fullLegalName: formData.fullName,
+    ...(formData.addressLine1 && { address: formData.addressLine1 }),
+    ...(formData.city && { city: formData.city }),
+    ...(formData.state && { state: formData.state }),
+    ...(formData.postalCode && { pincode: formData.postalCode }),
+    ...(formData.panNumber && { panNumber: formData.panNumber }),
+    status: "pending",
+    submittedAt: new Date(),
+  },
+};
+
+// ⤵️ Optional dob/gender (only save if DB missing)
+if (!userInfo.gender && formData.gender) {
+  payload.gender = formData.gender;
+}
+if (!userInfo.dob && formData.dateOfBirth) {
+  payload.dob = formData.dateOfBirth;
+}
+
+    const res = await updateProfile(payload).unwrap();
+    dispatch(setCredentials(res.user));
+
+    setShowSuccess(true);
+    setIsSubmitted(true);
+
     setTimeout(() => {
-      setShowSuccess(false)
-      if (onComplete) onComplete(formData)
-    }, 3000)
+      setShowSuccess(false);
+      if (onComplete) onComplete(formData);
+    }, 2000);
+  } catch (error) {
+    alert(error?.data?.message || "Failed to submit KYC");
   }
+};
+
+
+const handleSaveProfileBeforeNext = () => {
+  setCurrentStep(prev => prev + 1);
+};
+
+
+
 
   const filteredProfessions = professions.filter(occ =>
     occ.toLowerCase().includes(professionSearch.toLowerCase())
@@ -250,14 +331,15 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
         selectedYear === selectedDate.getFullYear()
     }
 
+    
     return (
       <div className="relative" ref={calendarRef}>
         <button
           type="button"
           onClick={() => setShowCalendar(!showCalendar)}
           className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between ${darkMode
-              ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500"
-              : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500"
+            ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500"
+            : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500"
             }`}
         >
           <span className={!value ? (darkMode ? "text-zinc-500" : "text-gray-400") : ""}>
@@ -293,8 +375,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                       value={selectedYear}
                       onChange={(e) => setSelectedYear(Number(e.target.value))}
                       className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${darkMode
-                          ? "bg-zinc-900 border-zinc-700 text-white"
-                          : "bg-gray-50 border-gray-200 text-gray-900"
+                        ? "bg-zinc-900 border-zinc-700 text-white"
+                        : "bg-gray-50 border-gray-200 text-gray-900"
                         }`}
                     >
                       {years.map(year => (
@@ -310,8 +392,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(Number(e.target.value))}
                       className={`w-full px-3 py-2 rounded-lg border outline-none text-sm font-semibold ${darkMode
-                          ? "bg-zinc-900 border-zinc-700 text-white"
-                          : "bg-gray-50 border-gray-200 text-gray-900"
+                        ? "bg-zinc-900 border-zinc-700 text-white"
+                        : "bg-gray-50 border-gray-200 text-gray-900"
                         }`}
                     >
                       {months.map((month, idx) => (
@@ -338,10 +420,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                       type="button"
                       onClick={() => handleDateSelect(day)}
                       className={`aspect-square rounded-lg text-sm font-medium transition-all ${!day.isCurrentMonth
-                          ? darkMode ? "text-zinc-600" : "text-gray-400"
-                          : isSelectedDate(day)
-                            ? "bg-emerald-600 text-white shadow-lg"
-                            : darkMode ? "text-white hover:bg-zinc-700" : "text-gray-900 hover:bg-gray-100"
+                        ? darkMode ? "text-zinc-600" : "text-gray-400"
+                        : isSelectedDate(day)
+                          ? "bg-emerald-600 text-white shadow-lg"
+                          : darkMode ? "text-white hover:bg-zinc-700" : "text-gray-900 hover:bg-gray-100"
                         }`}
                     >
                       {day.day}
@@ -399,8 +481,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
           onClick={() => setShowDropdown(!showDropdown)}
           disabled={loading}
           className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all text-left flex items-center justify-between ${darkMode
-              ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500 disabled:opacity-50"
-              : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:opacity-50"
+            ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-emerald-500 disabled:opacity-50"
+            : "bg-white border-gray-200 text-gray-900 hover:border-emerald-500 focus:ring-4 focus:ring-emerald-100 disabled:opacity-50"
             }`}
         >
           <span className={!value ? (darkMode ? "text-zinc-500" : "text-gray-400") : ""}>
@@ -434,8 +516,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={`w-full px-3 py-2 rounded-lg border outline-none transition-all text-sm ${darkMode
-                      ? "bg-zinc-900/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+                    ? "bg-zinc-900/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
                     }`}
                   autoFocus
                 />
@@ -454,12 +536,12 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                   type="button"
                   onClick={() => handleSelect("")}
                   className={`w-full px-4 py-3 text-left transition-all border-b ${!value
-                      ? darkMode
-                        ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
-                        : "bg-emerald-50 text-emerald-600 border-gray-200"
-                      : darkMode
-                        ? "hover:bg-zinc-700 text-zinc-400 border-zinc-700"
-                        : "hover:bg-gray-50 text-gray-500 border-gray-200"
+                    ? darkMode
+                      ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
+                      : "bg-emerald-50 text-emerald-600 border-gray-200"
+                    : darkMode
+                      ? "hover:bg-zinc-700 text-zinc-400 border-zinc-700"
+                      : "hover:bg-gray-50 text-gray-500 border-gray-200"
                     }`}
                 >
                   {placeholder}
@@ -472,12 +554,12 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                       type="button"
                       onClick={() => handleSelect(option.name)}
                       className={`w-full px-4 py-3 text-left transition-all border-b last:border-b-0 ${value === option.name
-                          ? darkMode
-                            ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
-                            : "bg-emerald-50 text-emerald-600 border-gray-200"
-                          : darkMode
-                            ? "hover:bg-zinc-700 text-white border-zinc-700"
-                            : "hover:bg-gray-50 text-gray-900 border-gray-200"
+                        ? darkMode
+                          ? "bg-emerald-950/30 text-emerald-400 border-zinc-700"
+                          : "bg-emerald-50 text-emerald-600 border-gray-200"
+                        : darkMode
+                          ? "hover:bg-zinc-700 text-white border-zinc-700"
+                          : "hover:bg-gray-50 text-gray-900 border-gray-200"
                         }`}
                     >
                       <div className="flex items-center justify-between">
@@ -509,8 +591,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
     { number: 3, title: "Preview", icon: Eye }
   ]
 
-  // If already submitted, show lock message
-  if (isSubmitted) {
+if (isSubmitted) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -524,11 +605,11 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className={`relative z-10 max-w-2xl w-full rounded-3xl overflow-hidden ${darkMode
-              ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
-              : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
+            ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
+            : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
             }`}
         >
-          <div className="relative h-32 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
+          <div className="relative h-40 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
             <div className="absolute inset-0 opacity-20">
               <div
                 className="absolute inset-0"
@@ -540,25 +621,31 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
             </div>
           </div>
 
-          <div className="p-8 text-center -mt-16">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-6">
-              <Lock className="w-12 h-12 text-emerald-600" />
+          <div className="px-8 pb-10 text-center -mt-20">
+            <div className={`inline-flex items-center justify-center w-28 h-28 rounded-full mb-8 shadow-xl ${
+              darkMode ? "bg-emerald-900/50 ring-4 ring-zinc-900/50" : "bg-white ring-8 ring-white shadow-2xl"
+            }`}>
+              
             </div>
 
-            <h2 className={`text-2xl sm:text-3xl font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
+            <h2 className={`text-3xl sm:text-4xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
               KYC Submitted Successfully
             </h2>
 
-            <div className={`p-6 rounded-2xl mb-6 ${darkMode ? "bg-zinc-800/50 border border-zinc-700" : "bg-blue-50 border border-blue-200"
+            <p className={`text-base mb-8 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+              Thank you for submitting your verification documents
+            </p>
+
+            <div className={`p-6 rounded-2xl mb-6 shadow-sm ${darkMode ? "bg-zinc-800/50 border border-zinc-700" : "bg-blue-50/80 border-2 border-blue-200"
               }`}>
-              <div className="flex items-start gap-3">
-                <AlertCircle className={`w-6 h-6 flex-shrink-0 mt-0.5 ${darkMode ? "text-blue-400" : "text-blue-600"
+              <div className="flex items-start gap-4">
+                <AlertCircle className={`w-6 h-6 flex-shrink-0 mt-1 ${darkMode ? "text-blue-400" : "text-blue-600"
                   }`} />
                 <div className="text-left">
-                  <p className={`font-semibold mb-2 ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
+                  <p className={`font-semibold text-base mb-2 ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
                     Your KYC is Under Review
                   </p>
-                  <p className={`text-sm ${darkMode ? "text-blue-400" : "text-blue-700"}`}>
+                  <p className={`text-sm leading-relaxed ${darkMode ? "text-blue-400/90" : "text-blue-700"}`}>
                     Our admin team is reviewing your KYC details. You'll be notified once the verification is complete.
                     Your KYC details cannot be changed during the review process.
                   </p>
@@ -566,10 +653,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
               </div>
             </div>
 
-            <div className={`p-4 rounded-xl ${darkMode ? "bg-yellow-900/20 border border-yellow-800/50" : "bg-yellow-50 border border-yellow-200"
+            <div className={`p-5 rounded-xl shadow-sm ${darkMode ? "bg-yellow-900/20 border border-yellow-800/50" : "bg-yellow-50/90 border-2 border-yellow-300"
               }`}>
-              <p className={`text-sm font-medium ${darkMode ? "text-yellow-300" : "text-yellow-800"}`}>
-                <Lock className="w-4 h-4 inline mr-2" />
+              <p className={`text-sm font-semibold flex items-center justify-center gap-2 ${darkMode ? "text-yellow-300" : "text-yellow-900"}`}>
+                <Lock className="w-4 h-4 flex-shrink-0" />
                 KYC details are locked and cannot be modified
               </p>
             </div>
@@ -589,8 +676,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm ${darkMode
-                ? "bg-zinc-900 border border-emerald-500/20"
-                : "bg-white border border-emerald-200"
+              ? "bg-zinc-900 border border-emerald-500/20"
+              : "bg-white border border-emerald-200"
               }`}
           >
             <div className="flex items-start gap-3">
@@ -598,12 +685,13 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                 <Check className="w-5 h-5 text-white" strokeWidth={3} />
               </div>
               <div className="flex-1">
-                <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                  KYC Submitted Successfully!
-                </p>
-                <p className={`text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                  Your details are under review by our admin team.
-                </p>
+               <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+  KYC Submitted Successfully!
+</p>
+<p className={`text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+  Your form has been sent for admin approval.
+</p>
+
               </div>
             </div>
           </motion.div>
@@ -638,12 +726,12 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                 <div key={step.number} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all ${isCompleted
+                      ? "bg-emerald-600 border-emerald-600"
+                      : isActive
                         ? "bg-emerald-600 border-emerald-600"
-                        : isActive
-                          ? "bg-emerald-600 border-emerald-600"
-                          : darkMode
-                            ? "bg-zinc-800 border-zinc-700"
-                            : "bg-white border-gray-300"
+                        : darkMode
+                          ? "bg-zinc-800 border-zinc-700"
+                          : "bg-white border-gray-300"
                       }`}>
                       {isCompleted ? (
                         <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -653,16 +741,16 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                       )}
                     </div>
                     <span className={`mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap ${isActive || isCompleted
-                        ? darkMode ? "text-emerald-400" : "text-emerald-600"
-                        : darkMode ? "text-zinc-500" : "text-gray-500"
+                      ? darkMode ? "text-emerald-400" : "text-emerald-600"
+                      : darkMode ? "text-zinc-500" : "text-gray-500"
                       }`}>
                       {step.title}
                     </span>
                   </div>
                   {index < steps.length - 1 && (
                     <div className={`h-0.5 w-12 sm:w-16 md:w-20 mx-3 sm:mx-4 ${isCompleted
-                        ? "bg-emerald-600"
-                        : darkMode ? "bg-zinc-700" : "bg-gray-300"
+                      ? "bg-emerald-600"
+                      : darkMode ? "bg-zinc-700" : "bg-gray-300"
                       }`} />
                   )}
                 </div>
@@ -677,8 +765,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className={`rounded-3xl overflow-visible ${darkMode
-              ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
-              : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
+            ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
+            : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
             }`}
         >
           {/* Gradient Header */}
@@ -732,8 +820,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                             onChange={handleInputChange}
                             placeholder="As per government ID"
                             className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                               }`}
                           />
                         </div>
@@ -761,10 +849,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, gender: "male" }))}
                             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.gender === "male"
-                                ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
-                                : darkMode
-                                  ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
-                                  : "border-gray-200 bg-white hover:border-gray-300"
+                              ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
+                              : darkMode
+                                ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+                                : "border-gray-200 bg-white hover:border-gray-300"
                               }`}
                           >
                             <svg className={`w-8 h-8 ${formData.gender === "male" ? "text-emerald-600" : darkMode ? "text-zinc-400" : "text-gray-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -781,10 +869,10 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, gender: "female" }))}
                             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${formData.gender === "female"
-                                ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
-                                : darkMode
-                                  ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
-                                  : "border-gray-200 bg-white hover:border-gray-300"
+                              ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30"
+                              : darkMode
+                                ? "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+                                : "border-gray-200 bg-white hover:border-gray-300"
                               }`}
                           >
                             <svg className={`w-8 h-8 ${formData.gender === "female" ? "text-emerald-600" : darkMode ? "text-zinc-400" : "text-gray-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -852,8 +940,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                               }}
                               placeholder="Search profession..."
                               className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                                 } ${formData.ratherNotSayProfession ? "opacity-50 cursor-not-allowed" : ""}`}
                             />
 
@@ -877,8 +965,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                                     type="button"
                                     onClick={() => handleProfessionSelect(profession)}
                                     className={`w-full px-4 py-3 text-left transition-colors ${darkMode
-                                        ? "hover:bg-zinc-700 text-white"
-                                        : "hover:bg-gray-50 text-gray-900"
+                                      ? "hover:bg-zinc-700 text-white"
+                                      : "hover:bg-gray-50 text-gray-900"
                                       } ${idx !== 0
                                         ? darkMode
                                           ? "border-t border-zinc-700"
@@ -907,8 +995,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                                 onChange={(e) => setFormData(prev => ({ ...prev, customProfession: e.target.value }))}
                                 placeholder="Type your profession..."
                                 className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                    ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                                   }`}
                               />
                             </div>
@@ -930,8 +1018,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                             onChange={handleInputChange}
                             placeholder="+91 98765 43210"
                             className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                               }`}
                           />
                         </div>
@@ -950,8 +1038,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                             onChange={handleInputChange}
                             placeholder="your.email@example.com"
                             className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                               }`}
                           />
                         </div>
@@ -989,8 +1077,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                             onChange={handleInputChange}
                             placeholder="Please enter your address"
                             className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                               }`}
                           />
                         </div>
@@ -1040,8 +1128,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                             onChange={handleInputChange}
                             placeholder="PIN / ZIP code"
                             className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                               }`}
                           />
                         </div>
@@ -1068,8 +1156,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                               placeholder="ABCDE1234F"
                               maxLength="10"
                               className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all uppercase ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                                 }`}
                             />
                           </div>
@@ -1087,8 +1175,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                               placeholder="Re-enter PAN"
                               maxLength="10"
                               className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all uppercase ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
+                                ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
                                 }`}
                             />
                           </div>
@@ -1258,10 +1346,12 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 mt-8 pt-6 border-t border-gray-200 dark:border-zinc-800">
               {currentStep > 1 ? (
                 <button
-                  onClick={() => setCurrentStep(currentStep - 1)}
+                  // back button
+onClick={() => setCurrentStep(prev => prev - 1)}
+
                   className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${darkMode
-                      ? "bg-zinc-800 hover:bg-zinc-700 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                    ? "bg-zinc-800 hover:bg-zinc-700 text-white"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                     }`}
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -1279,7 +1369,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
               {currentStep < 3 ? (
                 <button
-                  onClick={() => setCurrentStep(currentStep + 1)}
+                  onClick={handleSaveProfileBeforeNext}
                   className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold transition-all shadow-lg"
                 >
                   Continue
@@ -1290,8 +1380,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                   onClick={handleSubmit}
                   disabled={formData.panNumber !== formData.confirmPanNumber || !formData.panNumber || !formData.confirmPanNumber}
                   className={`flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${formData.panNumber !== formData.confirmPanNumber || !formData.panNumber || !formData.confirmPanNumber
-                      ? "bg-gray-400 cursor-not-allowed text-white"
-                      : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                    ? "bg-gray-400 cursor-not-allowed text-white"
+                    : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
                     }`}
                 >
                   <CheckCircle2 className="w-5 h-5" />

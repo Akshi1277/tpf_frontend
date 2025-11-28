@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const storedUser =
-  typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
+typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
 
 const initialState = {
   userInfo: storedUser ? JSON.parse(storedUser) : null,
@@ -19,10 +19,12 @@ const authSlice = createSlice({
     },
     
     logout: (state) => {
+     
       state.userInfo = null;
       if (typeof window !== "undefined") {
         localStorage.removeItem("userInfo");
       }
+    
     },
   },
 });
