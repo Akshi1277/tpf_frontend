@@ -14,12 +14,12 @@ export default function CampaignCard({ campaign, darkMode }) {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
- 
+
 
   if (campaign.video) {
     // Video card with full coverage
     return (
-      <div 
+      <div
         className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300 relative
           ${darkMode ? 'bg-zinc-800' : 'bg-white'}
           shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
@@ -50,14 +50,14 @@ export default function CampaignCard({ campaign, darkMode }) {
         <div className="relative z-10">
           {/* Spacer matching aspect-video */}
           <div className="aspect-video"></div>
-          
+
           {/* Content section */}
           <div className="p-4 sm:p-5">
             <h3 className="font-semibold text-sm sm:text-base mb-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] text-white">
               {campaign.title}
             </h3>
             <p className="text-xs sm:text-sm text-zinc-200 mb-3 truncate">{campaign.org}</p>
-            
+
             <div className="mb-3">
               <div className="flex justify-between text-xs sm:text-sm mb-2">
                 <span className="font-medium text-white">
@@ -67,7 +67,7 @@ export default function CampaignCard({ campaign, darkMode }) {
                   of {currency(campaign.goal)}
                 </span>
               </div>
-              
+
               {campaign.validityDate && (
                 <div className="mb-2">
                   <span className="text-[10px] sm:text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
@@ -94,17 +94,17 @@ export default function CampaignCard({ campaign, darkMode }) {
               </span>
             </div>
 
-     <Link href="/campaign" prefetch className="w-full block">
-  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
-    Donate Now
-  </button>
-</Link>
+            <Link href="/campaign" prefetch className="w-full block">
+              <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
+                Donate Now
+              </button>
+            </Link>
 
             <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-zinc-600/50">
               <div className="flex items-center gap-3 sm:gap-4">
                 <button className="flex items-center gap-1 text-zinc-300 hover:text-red-400 transition-colors cursor-pointer">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>
                 <button className="flex items-center gap-1 text-zinc-300 hover:text-emerald-400 transition-colors cursor-pointer">
@@ -130,7 +130,7 @@ export default function CampaignCard({ campaign, darkMode }) {
 
   // Image card - original layout
   return (
-    <div 
+    <div
       className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
         ${darkMode ? 'bg-zinc-800' : 'bg-white'}
         shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
@@ -142,7 +142,7 @@ export default function CampaignCard({ campaign, darkMode }) {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-        
+
         {campaign.urgent && (
           <div className="absolute top-3 left-3 bg-red-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit">
             Urgent
@@ -155,13 +155,13 @@ export default function CampaignCard({ campaign, darkMode }) {
           </div>
         )}
       </div>
-      
+
       <div className="p-4 sm:p-5">
         <h3 className={`font-semibold text-sm sm:text-base mb-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] ${COLORS.neutralHeading}`}>
           {campaign.title}
         </h3>
         <p className={`text-xs sm:text-sm ${COLORS.neutralBody} mb-3 truncate`}>{campaign.org}</p>
-        
+
         <div className="mb-3">
           <div className="flex justify-between text-xs sm:text-sm mb-2">
             <span className={`font-medium ${COLORS.neutralHeading}`}>
@@ -171,7 +171,7 @@ export default function CampaignCard({ campaign, darkMode }) {
               of {currency(campaign.goal)}
             </span>
           </div>
-          
+
           {campaign.validityDate && (
             <div className="mb-2">
               <span className="text-[10px] sm:text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
@@ -197,18 +197,18 @@ export default function CampaignCard({ campaign, darkMode }) {
             {progress}% funded
           </span>
         </div>
-<Link href="/campaign" prefetch className="w-full block">
-  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
-    Donate Now
-  </button>
-</Link>
-         
+        <Link href="/campaign" prefetch className="w-full block">
+          <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
+            Donate Now
+          </button>
+        </Link>
+
 
         <div className={`flex items-center justify-between pt-3 sm:pt-4 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}>
           <div className="flex items-center gap-3 sm:gap-4">
             <button className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-red-400' : 'text-zinc-600 hover:text-red-600'}`}>
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
             </button>
             <button className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'}`}>
@@ -221,10 +221,13 @@ export default function CampaignCard({ campaign, darkMode }) {
               />
             </button>
           </div>
-          <div className={`flex items-center gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full ${darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'}`}>
-            <CheckCircle className="w-3 h-3 text-emerald-600" />
-            <span className={`${darkMode ? 'text-emerald-400' : 'text-emerald-700'} whitespace-nowrap`}>Zakaat Verified</span>
-          </div>
+          {campaign.zakatVerified && (
+
+            <div className={`flex items-center gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full ${darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'}`}>
+              <CheckCircle className="w-3 h-3 text-emerald-600" />
+              <span className={`${darkMode ? 'text-emerald-400' : 'text-emerald-700'} whitespace-nowrap`}>Zakaat Verified</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

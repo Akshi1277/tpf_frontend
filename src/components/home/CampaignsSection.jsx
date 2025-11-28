@@ -13,6 +13,13 @@ const cms = useCMS();
 const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
 const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
+function calcDaysLeft(deadline) {
+  const end = new Date(deadline);
+  const now = new Date();
+  const diff = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+  return diff > 0 ? diff : 0;
+}
+
 
 const filteredCampaigns =
   selectedCategory === "all"
@@ -222,15 +229,23 @@ useEffect(() => {
   >
    {infiniteCampaigns.map((campaign, index) => (
   <div key={campaign._id + "-" + index} className="flex-shrink-0 w-[285px]">
-    <CampaignCard
-      campaign={{
-        ...campaign,
-        image: campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : null,
-        video: campaign.videoUrl ? `${BASE_URL}${campaign.videoUrl}` : null,
-        requiredAmount: Number(campaign.requiredAmount),
-      }}
-      darkMode={darkMode}
-    />
+  <CampaignCard
+  campaign={{
+    ...campaign,
+    image: campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : null,
+    video: campaign.videoUrl ? `${BASE_URL}${campaign.videoUrl}` : null,
+    raised: Number(campaign.raisedAmount || 0),
+    goal: Number(campaign.requiredAmount || campaign.goal || 0),
+    org: campaign.organization || "",    // ← ADD THIS
+    urgent: campaign.isUrgent || false,  // ← fix badge mapping
+    taxBenefit: campaign.taxBenefits || false, // ← fix badge mapping
+    validityDate: campaign.deadline ? calcDaysLeft(campaign.deadline) : null, // optional timer if needed
+     zakatVerified: campaign.zakatVerified || false,
+  }}
+  darkMode={darkMode}
+/>
+
+
   </div>
 ))}
 
