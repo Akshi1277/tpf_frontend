@@ -137,7 +137,7 @@ export default function FinancialAidPage({ darkModeFromParent }) {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 + index * 0.1 }}
-                  onClick={() => handleOptionSelect(option.id)}
+                  onClick={handleNext}
                   className={`w-full text-left p-6 rounded-2xl border-2 transition-all ${
                     isSelected
                       ? darkMode
