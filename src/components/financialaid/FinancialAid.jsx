@@ -1,5 +1,3 @@
-// 
-
 "use client"
 
 import { motion } from "framer-motion"
@@ -9,7 +7,6 @@ import {
   User,
   Users,
   Building2,
-  ArrowRight,
   Heart,
   CheckCircle2
 } from "lucide-react"
@@ -26,52 +23,41 @@ export default function FinancialAidPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
- const aidOptions = [
-  {
-    id: "myself",
-    title: "Myself",
-    description: "Request financial assistance for personal needs. Funds will be transferred to your verified bank account.",
-    icon: User,
-    route: "/financial-aid/myself"
-  },
-  {
-    id: "relative",
-    title: "Relative/Friend/Other",
-    description: "Raise funds on behalf of a family member, friend, or someone in need. Help those who matter to you.",
-    icon: Users,
-    route: "/financial-aid/other"
-  },
-  {
-    id: "organization",
-    title: "Organization",
-    description: "Request aid for your registered organization or non-profit. Support your community initiatives and programs.",
-    icon: Building2,
-    route: "/financial-aid/organization"
-  }
-]
-
-  const handleOptionSelect = (optionId) => {
-    setSelectedOption(optionId)
-  }
-
-  const handleNext = () => {
-    if (selectedOption) {
-      const option = aidOptions.find(opt => opt.id === selectedOption)
-      router.push(option.route)
+  const aidOptions = [
+    {
+      id: "myself",
+      title: "Myself",
+      description: "Request financial assistance for personal needs. Funds will be transferred to your verified bank account.",
+      icon: User,
+      route: "/financial-aid/myself"
+    },
+    {
+      id: "relative",
+      title: "Relative/Friend/Other",
+      description: "Raise funds on behalf of a family member, friend, or someone in need. Help those who matter to you.",
+      icon: Users,
+      route: "/financial-aid/other"
+    },
+    {
+      id: "organization",
+      title: "Organization",
+      description: "Request aid for your registered organization or non-profit. Support your community initiatives and programs.",
+      icon: Building2,
+      route: "/financial-aid/organization"
     }
-  }
+  ]
 
- return (
+  return (
     <div className="min-h-screen pt-10 md:pt-5">
-    {/* Background Effects */}
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
-        darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
-      }`} />
-      <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
-        darkMode ? "bg-teal-950/20" : "bg-teal-50"
-      }`} />
-    </div>
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
+          darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+        }`} />
+        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
+          darkMode ? "bg-teal-950/20" : "bg-teal-50"
+        }`} />
+      </div>
 
       {/* Main Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
@@ -125,7 +111,7 @@ export default function FinancialAidPage({ darkModeFromParent }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="space-y-4 mb-8"
+            className="space-y-4 mb-8 "
           >
             {aidOptions.map((option, index) => {
               const Icon = option.icon
@@ -134,11 +120,15 @@ export default function FinancialAidPage({ darkModeFromParent }) {
               return (
                 <motion.button
                   key={option.id}
+                  type="button"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 + index * 0.1 }}
-                  onClick={handleNext}
-                  className={`w-full text-left p-6 rounded-2xl border-2 transition-all ${
+                  onClick={() => {
+                    setSelectedOption(option.id)
+                    router.push(option.route)
+                  }}
+                  className={`w-full text-left p-6 rounded-2xl border-2 transition-all cursor-pointer ${
                     isSelected
                       ? darkMode
                         ? 'bg-emerald-950/30 border-emerald-600 shadow-lg shadow-emerald-900/20'
@@ -183,7 +173,7 @@ export default function FinancialAidPage({ darkModeFromParent }) {
                     </div>
 
                     {/* Check Mark */}
-                    <div className="flex-shrink-0 cursor-pointer">
+                    {/* <div className="flex-shrink-0 cursor-pointer">
                       {isSelected ? (
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                           darkMode ? 'bg-emerald-500' : 'bg-emerald-600'
@@ -195,39 +185,23 @@ export default function FinancialAidPage({ darkModeFromParent }) {
                           darkMode ? 'border-zinc-700' : 'border-gray-300'
                         }`} />
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 </motion.button>
               )
             })}
           </motion.div>
 
-          {/* Next Button */}
+          {/* Terms (navigation happens immediately on option click) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <button
-              onClick={handleNext}
-              disabled={!selectedOption}
-              className={`w-full py-4 px-6 rounded-xl font-semibold text-white transition-all flex items-center justify-center gap-2 ${
-                selectedOption
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl cursor-pointer'
-                  : darkMode
-                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              Continue
-              <ArrowRight className="w-5 h-5" />
-            </button>
-
-            {/* Terms */}
             <p className={`text-xs text-center mt-4 ${
               darkMode ? 'text-zinc-500' : 'text-gray-500'
             }`}>
-              By clicking continue, you agree to TPF Aid's{' '}
+              By selecting an option you agree to TPF Aid's{' '}
               <a href="/terms" className={`underline ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}>
                 Terms of Service
               </a>
