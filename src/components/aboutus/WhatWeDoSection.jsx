@@ -1,11 +1,14 @@
 // components/home/CuratedSection.jsx
 import { useState, useEffect } from 'react';
 import CuratedCard from '@/components/ui/CuratedCard';
-import { curatedItems } from '@/lib/constants';
+import { useCMS } from '@/app/CMSContext';
 
 export default function WhatWeDoSection({ darkMode }) {
   const [curatedScrollIndex, setCuratedScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+    const cms = useCMS();
+  const curatedItems = cms?.filter((item) => item.type === "tailored") || [];
 
   const infiniteCurated = [...curatedItems, ...curatedItems];
 

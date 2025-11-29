@@ -1,16 +1,21 @@
 // components/home/StartFundraiserBanner.jsx
+import Image from "next/image";
+
 
 export default function StartFundraiserBanner({ darkMode }) {
   return (
     <section className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30"></div>
-          <img
+        <div className="relative overflow-hidden rounded-2xl h-64 md:h-96 ">
+        
+          <Image
             src="https://images.unsplash.com/photo-1576381394626-53b3d2d48145?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=500"
             alt="Start Your Fundraiser"
-            className="h-64 md:h-96 w-full object-cover object-[50%_75%]"
+            fill
+            className="object-cover object-[50%_75%]"
           />
+
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30"></div>
 
           {/* <img
           src="https://images.unsplash.com/photo-1547069545-e88faa5cac9d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fFJlYWNoJTIwbWlsbGlvbnMlMjBvZiUyMGRvbm9ycyUyMHdvcmxkd2lkZS4lMjBUdXJuJTIweW91ciUyMGNhdXNlJTIwaW50byUyMGltcGFjdCUyMHRvZGF5LnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600"
