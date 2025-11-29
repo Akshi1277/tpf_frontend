@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { 
+import { motion } from "framer-motion";
+import {
   Stethoscope,
   HeartPulse,
   Droplet,
@@ -9,55 +9,97 @@ import {
   Heart,
   Users,
   Quote
-} from "lucide-react"
+} from "lucide-react";
 
-export default function RealWorldImpact({ darkMode }) {
-  // Real world impact data
+export default function RealWorldImpact({ darkMode, transactions = [] }) {
+  const hasDonations = transactions && transactions.length > 0;
+
+  const baseCounts = {
+    medical: 0,
+    education: 0,
+    orphans: 0,
+    emergency: 0,
+    water: 0,
+    zakat: 0,
+    food: 0,
+    other: 0,
+  };
+
+  if (hasDonations) {
+    transactions.forEach((txn) => {
+      const raw = (txn.category || txn.cause || "").toString().trim().toLowerCase();
+      let key = "other";
+
+      if (raw.includes("medical") || raw.includes("health")) key = "medical";
+      else if (raw.includes("educat")) key = "education";
+      else if (raw.includes("orphan")) key = "orphans";
+      else if (raw.includes("emerg")) key = "emergency";
+      else if (raw.includes("water")) key = "water";
+      else if (raw.includes("zakat")) key = "zakat";
+      else if (raw.includes("food") || raw.includes("ration")) key = "food";
+
+      baseCounts[key] = (baseCounts[key] || 0) + 1;
+    });
+  }
+
   const realWorldImpact = [
     {
       icon: Stethoscope,
       title: "Medical Aid",
-      value: "150+",
-      description: "People received medical assistance",
-      color: "blue"
+      value: baseCounts.medical,
+      description: hasDonations
+        ? "People received medical assistance"
+        : "Your donations can bring relief to patients",
+      color: "blue",
     },
     {
       icon: HeartPulse,
       title: "Emergency Aid",
-      value: "85",
-      description: "Emergency cases handled",
-      color: "red"
+      value: baseCounts.emergency,
+      description: hasDonations
+        ? "Emergency cases supported"
+        : "Be the first to respond in an emergency",
+      color: "red",
     },
     {
       icon: Droplet,
       title: "Clean Water Supply",
-      value: "200+",
-      description: "Families got clean water access",
-      color: "cyan"
+      value: baseCounts.water,
+      description: hasDonations
+        ? "Families got access to clean water"
+        : "Help families get clean and safe water",
+      color: "cyan",
     },
     {
       icon: GraduationCap,
       title: "Education",
-      value: "45",
-      description: "Students sponsored for education",
-      color: "purple"
+      value: baseCounts.education,
+      description: hasDonations
+        ? "Students supported in education"
+        : "Sponsor education and change a future",
+      color: "purple",
     },
     {
       icon: Heart,
       title: "Orphans",
-      value: "30",
-      description: "Orphans supported with care",
-      color: "pink"
+      value: baseCounts.orphans,
+      description: hasDonations
+        ? "Orphans supported with care"
+        : "Be a source of care for an orphan",
+      color: "pink",
     },
     {
       icon: Users,
       title: "Other Helps",
-      value: "120+",
-      description: "Various support activities",
-      color: "emerald"
-    }
-  ]
+      value: baseCounts.other + baseCounts.zakat + baseCounts.food,
+      description: hasDonations
+        ? "Various acts of kindness"
+        : "Your kindness will create many such stories",
+      color: "emerald",
+    },
+  ];
 
+  const formatImpactValue = (v) => (v > 0 ? `${v}+` : "—");
   return (
     <>
       {/* Real World Impact Section */}
@@ -76,7 +118,9 @@ export default function RealWorldImpact({ darkMode }) {
           <p className={`text-lg ${
             darkMode ? "text-zinc-400" : "text-gray-600"
           }`}>
-            See the lives you've touched through your generosity
+            {hasDonations
+              ? "See the lives you've touched through your generosity"
+              : "Your first donation will start writing this story"}
           </p>
         </div>
 
@@ -148,7 +192,7 @@ export default function RealWorldImpact({ darkMode }) {
                       ? darkMode ? "text-pink-400" : "text-pink-600"
                       : darkMode ? "text-emerald-400" : "text-emerald-600"
                   }`}>
-                    {impact.value}
+                    {formatImpactValue(impact.value)}
                   </p>
                   
                   <p className={`text-sm ${

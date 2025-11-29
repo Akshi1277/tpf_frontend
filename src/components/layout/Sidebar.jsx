@@ -97,84 +97,105 @@ useEffect(() => setMounted(true), []);
   return (
     <div className="flex flex-col h-full overflow-y-auto scrollbar-hide">
       {/* HEADER */}
-      <div className={`px-4 py-4 sm:px-6 sm:py-5 border-b flex-shrink-0 ${
-        darkMode ? "border-zinc-800" : "border-gray-200"
-      }`}>
-        <div className="flex items-center justify-between mb-1">
-        <h2 className={`text-lg sm:text-xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-  {menuItems.find((i) => i.path === pathname)?.name || "My Profile"}
-</h2>
+      {/* HEADER */}
+<div
+  className={`px-4 py-4 sm:px-6 sm:py-5 border-b flex-shrink-0 ${
+    darkMode ? "border-zinc-800" : "border-gray-200"
+  }`}
+>
+  <div className="flex items-center justify-between mb-1">
+    <h2
+      className={`text-lg sm:text-xl font-bold ${
+        darkMode ? "text-white" : "text-gray-900"
+      }`}
+    >
+      {menuItems.find((i) => i.path === pathname)?.name || "My Profile"}
+    </h2>
 
-          <button
-            onClick={onClose}
-            className={`lg:hidden p-2 rounded-lg transition-colors ${
-              darkMode
-                ? "hover:bg-zinc-800 text-zinc-400"
-                : "hover:bg-gray-100 text-gray-600"
+    <button
+      onClick={onClose}
+      className={`lg:hidden p-2 rounded-lg transition-colors ${
+        darkMode
+          ? "hover:bg-zinc-800 text-zinc-400"
+          : "hover:bg-gray-100 text-gray-600"
+      }`}
+    >
+      <X className="w-5 h-5" />
+    </button>
+  </div>
+
+  {/* 🔥 HYDRATION-SAFE PROFILE COMPLETION SECTION */}
+  {mounted && (
+    <>
+      {profileCompletion < 100 && (
+        <div className="mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <span
+              className={`text-xs sm:text-sm font-medium ${
+                darkMode ? "text-zinc-300" : "text-gray-700"
+              }`}
+            >
+              Profile Completion
+            </span>
+            <span
+              className={`text-xs sm:text-sm font-bold ${
+                darkMode ? "text-zinc-400" : "text-gray-600"
+              }`}
+            >
+              {`${profileCompletion}%`}
+            </span>
+          </div>
+
+          <div
+            className={`w-full h-2 rounded-full overflow-hidden ${
+              darkMode ? "bg-zinc-800" : "bg-gray-200"
             }`}
           >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* PROGRESS BAR — ONLY WHEN < 100% */}
-        {profileCompletion < 100 && (
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className={`text-xs sm:text-sm font-medium ${
-                darkMode ? "text-zinc-300" : "text-gray-700"
-              }`}>
-                Profile Completion
-              </span>
-              <span className={`text-xs sm:text-sm font-bold ${
-                darkMode ? "text-zinc-400" : "text-gray-600"
-              }`}>
-                {mounted ? `${profileCompletion}%` : "—"}
-
-              </span>
-            </div>
-            <div className={`w-full h-2 rounded-full overflow-hidden ${
-              darkMode ? "bg-zinc-800" : "bg-gray-200"
-            }`}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${profileCompletion}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className={`h-full rounded-full ${
-                  profileCompletion >= 75
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-500"
-                    : profileCompletion >= 50
-                    ? "bg-gradient-to-r from-orange-500 to-amber-500"
-                    : "bg-gradient-to-r from-red-500 to-rose-500"
-                }`}
-              />
-            </div>
-            <p className={`text-[10px] sm:text-xs mt-1.5 ${
-              darkMode ? "text-zinc-500" : "text-gray-500"
-            }`}>
-              Complete your profile to unlock all features
-            </p>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${profileCompletion}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className={`h-full rounded-full ${
+                profileCompletion >= 75
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-500"
+                  : profileCompletion >= 50
+                  ? "bg-gradient-to-r from-orange-500 to-amber-500"
+                  : "bg-gradient-to-r from-red-500 to-rose-500"
+              }`}
+            />
           </div>
-        )}
-       {profileCompletion === 100 && (
-  <div
-    className={`mt-4 px-4 py-3 rounded-xl text-center border backdrop-blur-sm
-      ${darkMode
-        ? "bg-emerald-900/10 border-emerald-800/40"
-        : "bg-emerald-50/70 border-emerald-200"
-      }`}
-  >
-    <p className={`text-[13px] font-semibold ${
-      darkMode ? "text-emerald-300" : "text-emerald-700"
-    }`}>
-      “Every act of kindness is a charity.”
-    </p>
-   
-  </div>
-)}
 
+          <p
+            className={`text-[10px] sm:text-xs mt-1.5 ${
+              darkMode ? "text-zinc-500" : "text-gray-500"
+            }`}
+          >
+            Complete your profile to unlock all features
+          </p>
+        </div>
+      )}
 
-      </div>
+      {profileCompletion === 100 && (
+        <div
+          className={`mt-4 px-4 py-3 rounded-xl text-center border backdrop-blur-sm ${
+            darkMode
+              ? "bg-emerald-900/10 border-emerald-800/40"
+              : "bg-emerald-50/70 border-emerald-200"
+          }`}
+        >
+          <p
+            className={`text-[13px] font-semibold ${
+              darkMode ? "text-emerald-300" : "text-emerald-700"
+            }`}
+          >
+            “Every act of kindness is a charity.”
+          </p>
+        </div>
+      )}
+    </>
+  )}
+</div>
+
 
       
 
@@ -202,10 +223,9 @@ useEffect(() => setMounted(true), []);
                   }`}
                 >
                   {/* RED ALERT ICON FOR INCOMPLETE SECTIONS */}
-                  {item.incomplete && (
-                   <AlertTriangle className="absolute right-9 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
-
-                  )}
+                {mounted && item.incomplete && (
+  <AlertTriangle className="absolute right-9 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
+)}
 
                   {isActive && (
                     <motion.div

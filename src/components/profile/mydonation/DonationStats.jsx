@@ -1,7 +1,6 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState } from "react"
 import { 
   Wallet,
   Target,
@@ -11,6 +10,7 @@ import {
   Calculator,
   ArrowRight
 } from "lucide-react"
+import { useState, useEffect } from "react"
 
 export default function DonationStats({ 
   darkMode, 
@@ -19,10 +19,14 @@ export default function DonationStats({
   leaderboardData,
   monthlyData = [],
   yearlyData = [],
-  getRankIcon 
+  getRankIcon,
+  peopleHelped = 0
 }) {
 
   const [activeTab, setActiveTab] = useState("weekly")
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
   const getActiveData = () => {
     if (activeTab === "monthly") return monthlyData
     if (activeTab === "yearly") return yearlyData
@@ -31,9 +35,24 @@ export default function DonationStats({
 
   const activeLeaderboard = getActiveData()
   
-  // Calculate remaining zakat
-  const calculatedZakat = 25000 // This should come from props ideally
-  const zakatRemaining = Math.max(0, calculatedZakat - donationStats.totalZakat)
+  // ✅ Use real zakat + totals (still keep fallback logic)
+  const calculatedZakat = 25000 // still from props ideally
+  const zakatRemaining = Math.max(0, calculatedZakat - (donationStats.totalZakat || 0))
+
+  const hasAnyDonations =
+    (donationStats?.totalAmount || 0) > 0 ||
+    (donationStats?.totalZakat || 0) > 0 ||
+    (donationStats?.campaignsSupported || 0) > 0
+
+  const safePeopleHelped = peopleHelped && peopleHelped > 0 ? peopleHelped : 0
+
+  if (!mounted) {
+    return (
+      <div className="animate-pulse text-center py-10 text-gray-400 dark:text-gray-500">
+        Loading donation statistics...
+      </div>
+    )
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -65,11 +84,19 @@ export default function DonationStats({
               }`}>
                 Total Donated
               </p>
-              <p className={`text-2xl md:text-3xl font-bold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                ₹{donationStats.totalAmount.toLocaleString('en-IN')}
-              </p>
+              {hasAnyDonations && donationStats.totalAmount > 0 ? (
+                <p className={`text-2xl md:text-3xl font-bold ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}>
+                  ₹{donationStats.totalAmount.toLocaleString('en-IN')}
+                </p>
+              ) : (
+                <p className={`text-sm md:text-base font-semibold ${
+                  darkMode ? "text-zinc-300" : "text-gray-700"
+                }`}>
+                  Start with your first donation to see your impact here ✨
+                </p>
+              )}
             </div>
           </motion.div>
 
@@ -96,11 +123,19 @@ export default function DonationStats({
               }`}>
                 Total Zakat Donated
               </p>
-              <p className={`text-2xl md:text-3xl font-bold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                ₹{donationStats.totalZakat.toLocaleString('en-IN')}
-              </p>
+              {donationStats.totalZakat > 0 ? (
+                <p className={`text-2xl md:text-3xl font-bold ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}>
+                  ₹{donationStats.totalZakat.toLocaleString('en-IN')}
+                </p>
+              ) : (
+                <p className={`text-sm md:text-base font-semibold ${
+                  darkMode ? "text-zinc-300" : "text-gray-700"
+                }`}>
+                  Calculate and give your Zakat with ease 
+                </p>
+              )}
               
               {donationStats.totalZakat === 0 ? (
                 <a
@@ -163,16 +198,26 @@ export default function DonationStats({
               }`}>
                 Campaigns Supported
               </p>
-              <p className={`text-2xl md:text-3xl font-bold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                {donationStats.campaignsSupported}
-              </p>
-              <p className={`text-xs mt-2 ${
-                darkMode ? "text-zinc-500" : "text-gray-500"
-              }`}>
-                Active causes
-              </p>
+              {donationStats.campaignsSupported > 0 ? (
+                <>
+                  <p className={`text-2xl md:text-3xl font-bold ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}>
+                    {donationStats.campaignsSupported}
+                  </p>
+                  <p className={`text-xs mt-2 ${
+                    darkMode ? "text-zinc-500" : "text-gray-500"
+                  }`}>
+                    Active causes you've supported
+                  </p>
+                </>
+              ) : (
+                <p className={`text-sm md:text-base font-semibold mt-2 ${
+                  darkMode ? "text-zinc-300" : "text-gray-700"
+                }`}>
+                  Support your first campaign to see it here 🌱
+                </p>
+              )}
             </div>
           </motion.div>
 
@@ -199,16 +244,33 @@ export default function DonationStats({
               }`}>
                 People Helped
               </p>
-              <p className={`text-2xl md:text-3xl font-bold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                500+
-              </p>
-              <p className={`text-xs mt-2 ${
-                darkMode ? "text-zinc-500" : "text-gray-500"
-              }`}>
-                Lives impacted
-              </p>
+              {safePeopleHelped > 0 ? (
+                <>
+                  <p className={`text-2xl md:text-3xl font-bold ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}>
+                    {safePeopleHelped}+
+                  </p>
+                  <p className={`text-xs mt-2 ${
+                    darkMode ? "text-zinc-500" : "text-gray-500"
+                  }`}>
+                    Lives impacted through your generosity
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className={`text-2xl md:text-3xl font-bold ${
+                    darkMode ? "text-white/70" : "text-gray-500"
+                  }`}>
+                    —
+                  </p>
+                  <p className={`text-xs mt-2 ${
+                    darkMode ? "text-zinc-500" : "text-gray-500"
+                  }`}>
+                    Your first donation will be someone's first hope 💚
+                  </p>
+                </>
+              )}
             </div>
           </motion.div>
         </div>
@@ -276,16 +338,23 @@ export default function DonationStats({
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className={`font-semibold text-sm truncate ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}>
-                  You ({currentUser.name})
-                </p>
-                <p className={`text-xs ${
-                  darkMode ? "text-zinc-400" : "text-gray-600"
-                }`}>
-                  Your Position
-                </p>
+               {/* HYDRATION SAFE — NAME IN LEADERBOARD */}
+{!mounted && (
+  <p className={`font-semibold text-sm truncate ${
+    darkMode ? "text-white/30" : "text-gray-700/40"
+  }`}>
+    You (—)
+  </p>
+)}
+
+{mounted && (
+  <p className={`font-semibold text-sm truncate ${
+    darkMode ? "text-white" : "text-gray-900"
+  }`}>
+    You ({currentUser.name})
+  </p>
+)}
+
               </div>
 
               <div className="text-right">

@@ -1,5 +1,5 @@
 "use client"
-
+import { useSelector } from "react-redux"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import {
@@ -18,6 +18,7 @@ import DonationHistory from "./DonationHistory"
 import RealWorldImpact from "./RealWorldImpact"
 
 export default function DonationsPage({ darkModeFromParent }) {
+  const userInfo = useSelector((state)=> state.auth.userInfo || [])
   const [darkMode, setDarkMode] = useState(false)
   const [filterStatus, setFilterStatus] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
@@ -25,6 +26,9 @@ export default function DonationsPage({ darkModeFromParent }) {
   const [selectedYear, setSelectedYear] = useState("2024-25")
   const [dateRange, setDateRange] = useState({ start: "", end: "" })
   const [leaderboardPeriod, setLeaderboardPeriod] = useState("weekly")
+  const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+
 
   // Sync with parent dark mode
   useEffect(() => {
@@ -35,9 +39,9 @@ export default function DonationsPage({ darkModeFromParent }) {
 
   // Mock user data
   const currentUser = {
-    name: "Ahmed",
-    rank: 15,
-    weeklyDonation: 8500
+    name: userInfo.fullName,
+    rank: userInfo?.rank || 0,
+    weeklyDonation: userInfo?.weeklyDonation || 0
   }
 
   // Mock leaderboard data
@@ -59,131 +63,15 @@ export default function DonationsPage({ darkModeFromParent }) {
     { id: 15, name: currentUser.name, amount: currentUser.weeklyDonation, rank: 15, isPermanent: false, isCurrentUser: true },
   ]
 
-  // Mock donation stats
   const donationStats = {
-    totalAmount: 125000,
-    totalZakat: 24000,
-    campaignsSupported: 12,
-    bloodDonations: 3,
-    foodDonations: 5,
-    otherDonations: 2
-  }
+    totalAmount: userInfo?.donations?.totalAmount || 0,
+    totalZakat: userInfo?.donations?.totalZakat || 0,
+    campaignsSupported: userInfo?.donations?.campaignsSupported || 0,
+  };
 
   // Transaction history with 80G eligibility
-  const transactions = [
-    {
-      id: "TXN123456789",
-      date: "2024-01-15",
-      time: "14:30",
-      type: "money",
-      amount: 5000,
-      recipient: "Clean Water Initiative",
-      cause: "Water & Sanitation",
-      status: "completed",
-      paymentMethod: "UPI",
-      color: "blue",
-      eligible80G: true,
-      financialYear: "2024-25"
-    },
-    {
-      id: "TXN123456787",
-      date: "2024-01-05",
-      time: "16:45",
-      type: "money",
-      amount: 10000,
-      recipient: "Rural Education Fund",
-      cause: "Education",
-      status: "completed",
-      paymentMethod: "Net Banking",
-      color: "purple",
-      eligible80G: true,
-      financialYear: "2024-25"
-    },
-    {
-      id: "TXN123456785",
-      date: "2023-12-28",
-      time: "11:30",
-      type: "money",
-      amount: 2500,
-      recipient: "Animal Shelter",
-      cause: "Animal Welfare",
-      status: "completed",
-      paymentMethod: "UPI",
-      color: "green",
-      eligible80G: false,
-      financialYear: "2023-24"
-    },
-    {
-      id: "TXN123456784",
-      date: "2023-12-20",
-      time: "15:00",
-      type: "money",
-      amount: 15000,
-      recipient: "Orphanage Support",
-      cause: "Child Welfare",
-      status: "completed",
-      paymentMethod: "Card",
-      color: "pink",
-      eligible80G: true,
-      financialYear: "2023-24"
-    },
-    {
-      id: "TXN123456783",
-      date: "2023-11-15",
-      time: "12:20",
-      type: "money",
-      amount: 7500,
-      recipient: "Medical Emergency Fund",
-      cause: "Healthcare",
-      status: "completed",
-      paymentMethod: "UPI",
-      color: "red",
-      eligible80G: true,
-      financialYear: "2023-24"
-    },
-    {
-      id: "TXN123456782",
-      date: "2023-10-10",
-      time: "09:45",
-      type: "money",
-      amount: 12000,
-      recipient: "Community Kitchen",
-      cause: "Food Security",
-      status: "completed",
-      paymentMethod: "Net Banking",
-      color: "orange",
-      eligible80G: true,
-      financialYear: "2023-24"
-    },
-    {
-      id: "TXN123456781",
-      date: "2023-05-20",
-      time: "14:30",
-      type: "money",
-      amount: 8000,
-      recipient: "Disaster Relief Fund",
-      cause: "Emergency Relief",
-      status: "completed",
-      paymentMethod: "UPI",
-      color: "red",
-      eligible80G: true,
-      financialYear: "2023-24"
-    },
-    {
-      id: "TXN123456780",
-      date: "2022-12-15",
-      time: "10:20",
-      type: "money",
-      amount: 6000,
-      recipient: "School Construction",
-      cause: "Education",
-      status: "completed",
-      paymentMethod: "Card",
-      color: "purple",
-      eligible80G: true,
-      financialYear: "2022-23"
-    }
-  ]
+
+  const transactions = userInfo?.donations?.history || [];
 
   const getRankIcon = (rank) => {
     if (rank === 1) return "🥇"
@@ -237,9 +125,12 @@ export default function DonationsPage({ darkModeFromParent }) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
                 >
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white flex items-center gap-2">
-                    Salam, {currentUser.name}! <span className="text-4xl">🤲</span>
-                  </h1>
+                 {mounted && (
+  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white flex items-center gap-2">
+    Salam, {currentUser.name}! <span className="text-4xl">🤲</span>
+  </h1>
+)}
+
                   <p className="text-sm md:text-base mb-3 text-white/90">
                     Your generosity is making a real difference in people's lives
                   </p>
