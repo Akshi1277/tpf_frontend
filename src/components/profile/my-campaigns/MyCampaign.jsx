@@ -1,5 +1,5 @@
 "use client"
-
+import { useSelector } from "react-redux"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { 
@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 
 export default function MyCampaignsPage({ darkModeFromParent }) {
+  const userInfo = useSelector((state) => state.auth.userInfo)
   const [darkMode, setDarkMode] = useState(false)
   const [activeTab, setActiveTab] = useState("wishlist")
 
@@ -30,127 +31,18 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
+  const myCampaigns = userInfo?.campaigns || [];
+
+  const wishlistedCampaigns = userInfo?.wishlist || [];
   // Mock user data
   const currentUser = {
-    name: "Ahmed",
-    totalCampaigns: 3,
-    totalWishlisted: 5
-  }
+    name: userInfo?.fullName,
+    totalCampaigns: myCampaigns.length,
+    totalWishlisted: wishlistedCampaigns.length,
+  };
 
   // Mock campaigns created by user
-  const myCampaigns = [
-    {
-      id: 1,
-      title: "Help Build Water Wells in Rural Villages",
-      description: "Provide clean drinking water to communities in need. Every contribution helps build sustainable water infrastructure.",
-      image: "https://images.unsplash.com/photo-1541844053589-346841d0b34c?w=800&q=80",
-      goalAmount: 50000,
-      raisedAmount: 32500,
-      donors: 127,
-      daysLeft: 15,
-      category: "Water & Sanitation",
-      status: "active",
-      createdDate: "2024-01-10",
-      views: 1240
-    },
-    {
-      id: 2,
-      title: "Emergency Medical Fund for Cancer Patients",
-      description: "Support cancer patients who cannot afford their treatment. Your donation can save lives.",
-      image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=800&q=80",
-      goalAmount: 100000,
-      raisedAmount: 78000,
-      donors: 234,
-      daysLeft: 8,
-      category: "Healthcare",
-      status: "active",
-      createdDate: "2024-01-05",
-      views: 2340
-    },
-    {
-      id: 3,
-      title: "School Supplies for Underprivileged Children",
-      description: "Ensure every child has the tools they need to learn and succeed in their education.",
-      image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&q=80",
-      goalAmount: 25000,
-      raisedAmount: 25000,
-      donors: 98,
-      daysLeft: 0,
-      category: "Education",
-      status: "completed",
-      createdDate: "2023-12-15",
-      views: 890
-    }
-  ]
 
-  // Mock wishlisted campaigns
-  const wishlistedCampaigns = [
-    {
-      id: 4,
-      title: "Food Distribution for Homeless Shelters",
-      description: "Help provide nutritious meals to homeless individuals and families in our community.",
-      image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80",
-      goalAmount: 40000,
-      raisedAmount: 28000,
-      donors: 156,
-      daysLeft: 20,
-      category: "Food Security",
-      organizer: "Community Kitchen Foundation",
-      wishlistedDate: "2024-01-12"
-    },
-    {
-      id: 5,
-      title: "Animal Rescue and Rehabilitation Center",
-      description: "Support our efforts to rescue, rehabilitate, and rehome abandoned and injured animals.",
-      image: "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=800&q=80",
-      goalAmount: 75000,
-      raisedAmount: 45000,
-      donors: 189,
-      daysLeft: 25,
-      category: "Animal Welfare",
-      organizer: "Paws & Hearts Rescue",
-      wishlistedDate: "2024-01-08"
-    },
-    {
-      id: 6,
-      title: "Rebuild Homes After Natural Disaster",
-      description: "Help families rebuild their lives after devastating floods destroyed their homes.",
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-      goalAmount: 150000,
-      raisedAmount: 95000,
-      donors: 412,
-      daysLeft: 12,
-      category: "Emergency Relief",
-      organizer: "Disaster Response Team",
-      wishlistedDate: "2024-01-06"
-    },
-    {
-      id: 7,
-      title: "Women's Skill Development Program",
-      description: "Empower women with vocational training and resources to become financially independent.",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80",
-      goalAmount: 60000,
-      raisedAmount: 42000,
-      donors: 167,
-      daysLeft: 18,
-      category: "Women Empowerment",
-      organizer: "Women Rising Initiative",
-      wishlistedDate: "2024-01-03"
-    },
-    {
-      id: 8,
-      title: "Plant 10,000 Trees for Climate Action",
-      description: "Join us in our mission to combat climate change by planting trees across urban and rural areas.",
-      image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80",
-      goalAmount: 35000,
-      raisedAmount: 31000,
-      donors: 203,
-      daysLeft: 10,
-      category: "Environment",
-      organizer: "Green Earth Collective",
-      wishlistedDate: "2023-12-28"
-    }
-  ]
 
   const getStatusBadge = (status) => {
     const styles = {
