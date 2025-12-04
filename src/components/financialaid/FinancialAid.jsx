@@ -37,14 +37,8 @@ export default function FinancialAidPage({ darkModeFromParent }) {
       description: "Raise funds on behalf of a family member, friend, or someone in need. Help those who matter to you.",
       icon: Users,
       route: "/financial-aid/other"
-    },
-    {
-      id: "organization",
-      title: "Organization",
-      description: "Request aid for your registered organization or non-profit. Support your community initiatives and programs.",
-      icon: Building2,
-      route: "/financial-aid/organization"
     }
+    
   ]
 
   return (
@@ -201,14 +195,11 @@ export default function FinancialAidPage({ darkModeFromParent }) {
             <p className={`text-xs text-center mt-4 ${
               darkMode ? 'text-zinc-500' : 'text-gray-500'
             }`}>
-              By selecting an option you agree to TPF Aid's{' '}
-              <a href="/terms" className={`underline ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}>
-                Terms of Service
+              Are you an organization?{' '}
+              <a href="/financial-aid/organization" className={`underline ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}>
+                Register here
               </a>
-              {' '}and{' '}
-              <a href="/privacy" className={`underline ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}>
-                Privacy Policy
-              </a>
+              
             </p>
           </motion.div>
 
