@@ -1,5 +1,5 @@
 "use client"
-
+import { useSelector } from "react-redux"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { 
@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 
 export default function MyCommunitiesPage({ darkModeFromParent }) {
+  const userInfo = useSelector((state) => state.auth.userInfo)
   const [darkMode, setDarkMode] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -23,30 +24,12 @@ export default function MyCommunitiesPage({ darkModeFromParent }) {
   }, [darkModeFromParent])
 
   // Mock user data
-  const currentUser = {
-    name: "Ahmed",
-    totalCommunities: 2
+    const currentUser = {
+    name: userInfo?.fullName,
+    totalCommunities: userInfo?.communities?.length || 0,
   }
 
-  // Communities data
-  const communities = [
-    {
-      id: 1,
-      name: "Blood Donors",
-      icon: Droplet,
-      image: "https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=800&q=80",
-      color: "rose",
-      members: 1243
-    },
-    {
-      id: 2,
-      name: "Lawyer",
-      icon: Scale,
-      image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
-      color: "blue",
-      members: 892
-    }
-  ]
+  const communities = userInfo?.communities || [];
 
   const getColorClasses = (color, type = "bg") => {
     const colors = {

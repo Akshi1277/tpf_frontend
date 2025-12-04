@@ -1,18 +1,21 @@
 // components/home/StartFundraiserBanner.jsx
 import Image from "next/image";
-
+import { useCMS } from "@/app/CMSContext";
 
 export default function StartFundraiserBanner({ darkMode }) {
+  const cms = useCMS();
+  const cmsBeforeFooter = cms.filter(item => item.type === "before-footer");
+  const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`
   return (
     <section className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-2xl h-64 md:h-96 ">
         
-          <Image
-            src="https://images.unsplash.com/photo-1576381394626-53b3d2d48145?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=500"
+          <img
+            src={`${BASE_URL}${cmsBeforeFooter[0]?.image}`}
             alt="Start Your Fundraiser"
-            fill
-            className="object-cover object-[50%_75%]"
+            className="w-full h-full object-cover object-[50%_75%]"
+            loading="lazy"
           />
 
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30"></div>
@@ -25,10 +28,10 @@ export default function StartFundraiserBanner({ darkMode }) {
           <div className="absolute inset-0 p-6 md:p-10 flex items-center">
             <div className="max-w-xl text-white">
               <h3 className="text-2xl md:text-3xl font-semibold mb-3">
-                Start your fundraiser in minutes
+                {cmsBeforeFooter[0]?.title}
               </h3>
               <p className="text-sm md:text-base text-white/90 mb-5">
-                No platform fees. Reach millions of generous hearts across the Ummah. Turn your cause into lasting ṣadaqah jāriyah — a reward that continues beyond this world.
+                {cmsBeforeFooter[0]?.description}
               </p>
               <button className="px-6 py-3 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-lg transition-colors">
                 Create Fundraiser Now

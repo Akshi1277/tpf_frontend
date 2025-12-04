@@ -1,11 +1,13 @@
 // components/home/PartnersSection.jsx
-import { partners } from '@/lib/constants';
-
+import { useCMS } from '@/app/CMSContext';
 export default function PartnersSection({ darkMode }) {
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
+  const cms = useCMS();
+  const cmsTrustedBy = cms.filter(item => item.type === "trusted-by");
+  const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`
 
   return (
     <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
@@ -20,9 +22,9 @@ export default function PartnersSection({ darkMode }) {
     </div>
 
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5">
-      {partners.map((partner, index) => (
+      {cmsTrustedBy.map((item) => (
         <div
-          key={index}
+          key={item._id}
           className={`group relative flex flex-col items-center justify-center p-6 rounded-xl overflow-hidden transition-all duration-300 ${
             darkMode ? 'bg-zinc-900' : 'bg-white'
           } border ${darkMode ? 'border-zinc-700 hover:border-zinc-500' : 'border-zinc-200 hover:border-zinc-400'}
@@ -34,8 +36,8 @@ export default function PartnersSection({ darkMode }) {
           
           <div className="relative w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
             <img
-              src={partner.image}
-              alt={partner.name}
+              src={`${BASE_URL}${item.image}`}
+              alt={item.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -43,7 +45,7 @@ export default function PartnersSection({ darkMode }) {
           <span
             className={`relative mt-3 text-xs font-medium ${COLORS.neutralBody} text-center group-hover:text-emerald-600 transition-colors duration-300`}
           >
-            {partner.name}
+            {item.title}
           </span>
         </div>
       ))}

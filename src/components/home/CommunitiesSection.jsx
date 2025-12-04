@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { communities } from '@/lib/constants';
-
+import { useCMS } from "@/app/CMSContext";
 export default function CommunitiesSection({ darkMode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [scrollIndex, setScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
-
-  const infiniteCommunities = [...communities, ...communities];
+  const cms = useCMS();
+  const cmsCommunities = cms.filter(item => item.type === "communities");
+  const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`;
 
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
@@ -156,9 +156,9 @@ export default function CommunitiesSection({ darkMode }) {
             md:grid md:grid-cols-4 md:gap-6 md:overflow-visible md:snap-none md:pb-0
           "
         >
-          {(isMobile ? infiniteCommunities : communities).map((community, index) => (
+          {(isMobile ? [...cmsCommunities, ...cmsCommunities] : cmsCommunities).map((community, index) => (
             <div
-              key={`community-${community.name}-${index}`}
+              key={`community-${community.title}-${index}`}
               className="
                 flex-shrink-0 w-[280px] md:w-auto
                 snap-center rounded-2xl overflow-hidden 
@@ -169,15 +169,15 @@ export default function CommunitiesSection({ darkMode }) {
             >
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={community.image}
-                  alt={community.name}
+                 src={`${BASE_URL}${community.image}`}
+                  alt={community.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
                   <h3 className="font-semibold text-white text-lg mb-2 drop-shadow-md">
-                    {community.name}
+                    {community.title}
                   </h3>
                   <button
                     className="cursor-pointer text-xs flex items-center justify-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-colors duration-200"

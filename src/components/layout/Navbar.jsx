@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Menu, X, Moon, Sun } from 'lucide-react';
+import { Menu, X, Moon, Sun, User2Icon } from 'lucide-react';
 import { Plus, Heart, Leaf } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -360,8 +360,9 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
                   {/* Main menu items with icons */}
                   <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
                     {[
-                      { name: 'My Donations', icon: Plus, isLucide: true, path: '/profile/mydonation' },
-                      { name: 'My Wishlist', icon: Heart, isLucide: true, path: '/profile/my-campaign' },
+                    { name: 'My Profile', icon: User2Icon, isLucide: true, path: '/profile/userprofile' },
+                    { name: 'My Donations', icon: Heart, isLucide: true, path: '/profile/mydonation' },
+                      { name: 'My Wishlist', icon: Plus, isLucide: true, path: '/profile/my-campaign' },
                       { name: 'Daily Givers', icon: Leaf, isLucide: true, path: '/permanent-donor/daily' },
                       { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' }
                     ].map(item => (
