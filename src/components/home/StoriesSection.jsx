@@ -9,7 +9,6 @@ export default function StoriesSection({ darkMode }) {
   const [activeCard, setActiveCard] = useState(null);
   const cms = useCMS();
     const cmsImpactStories = cms.filter(item => item.type === "impact-stories");
-  const infiniteStories = [...cmsImpactStories, ...cmsImpactStories];
 
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
@@ -131,7 +130,7 @@ export default function StoriesSection({ darkMode }) {
           id="stories-container"
           className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 md:overflow-visible md:gap-4"
         >
-         {(isMobile ? infiniteStories : cmsImpactStories).map((story, index) => (
+         {cmsImpactStories.map((story, index) => (
   <div 
     key={`story-${index}-${story.name || story.title || ''}`}
     className="min-w-[280px] md:min-w-0 flex-shrink-0 snap-start"
