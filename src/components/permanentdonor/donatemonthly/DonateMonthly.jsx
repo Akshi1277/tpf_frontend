@@ -1,5 +1,5 @@
 "use client"
-
+import { useCreateSubscriptionMutation } from "@/utils/slices/permanentDonorApiSlice"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -29,6 +29,7 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
   const [TpfAidTip, setTpfAidTip] = useState(30)
   const [showSuccess, setShowSuccess] = useState(false)
   const [tipError, setTipError] = useState("")
+  const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -82,18 +83,38 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
     return total.toFixed(2)
   }
 
-  const handleConfirm = () => {
-    const minTip = calculateMinimumTip()
-    if (TpfAidTip < minTip) {
-      setTipError(`Please add at least ₹${minTip} for platform support`)
-      return
-    }
-    
-    setShowSuccess(true)
-    setTimeout(() => {
-      router.push('/dashboard')
-    }, 2000)
+  const handleConfirm = async () => {
+  const baseAmount = parseFloat(customAmount || amount)
+  const minTip = calculateMinimumTip()
+  
+  if (baseAmount < 10) {
+    setTipError("Minimum amount is ₹10")
+    return
   }
+
+  if (TpfAidTip < minTip) {
+    setTipError(`Please add at least ₹${minTip} for platform support`)
+    return
+  }
+
+  try {
+    const result = await createSubscription({
+      planType: 'monthly',
+      amount: baseAmount,
+      dayOfMonth: parseInt(donationDate),
+    }).unwrap()
+
+    if (result.message || result.subscription) {
+      setShowSuccess(true)
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 2000)
+    }
+  } catch (err) {
+    console.error('Failed to create subscription:', err)
+    setTipError(err.data?.message || 'Failed to create subscription. Please try again.')
+  }
+}
 
   // Generate date options (1-30)
   const dateOptions = Array.from({ length: 30 }, (_, i) => i + 1)
@@ -534,12 +555,17 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
             </div>
           </div>
 
-          <button
-            onClick={handleConfirm}
-            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 text-white font-bold text-lg hover:from-purple-600 hover:via-fuchsia-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl"
-          >
-            Confirm Monthly Giving
-          </button>
+        <button
+  onClick={handleConfirm}
+  disabled={isLoading}
+  className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl ${
+    isLoading
+      ? "bg-zinc-400 text-zinc-200 cursor-not-allowed"
+      : "bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 text-white hover:from-purple-600 hover:via-fuchsia-600 hover:to-pink-600"
+  }`}
+>
+  {isLoading ? "Creating Subscription..." : "Confirm Monthly Giving"}
+</button>
 
           <p className={`text-center text-xs mt-4 ${
             darkMode ? "text-zinc-500" : "text-zinc-500"

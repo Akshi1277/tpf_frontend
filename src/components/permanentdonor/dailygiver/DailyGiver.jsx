@@ -1,5 +1,5 @@
 "use client"
-
+import { useCreateSubscriptionMutation } from "@/utils/slices/permanentDonorApiSlice"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -29,6 +29,7 @@ export default function DailyImpactPage({ darkModeFromParent }) {
   const [showSuccess, setShowSuccess] = useState(false)
   const [amountError, setAmountError] = useState("")
   const [tipError, setTipError] = useState("")
+const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -94,26 +95,38 @@ export default function DailyImpactPage({ darkModeFromParent }) {
     return total.toFixed(2)
   }
 
-  const handleConfirm = () => {
-    const baseAmount = parseFloat(customAmount || amount)
-    const minTip = calculateMinimumTip()
+ const handleConfirm = async () => {
+  const baseAmount = parseFloat(customAmount || amount)
+  const minTip = calculateMinimumTip()
 
-    if (baseAmount < 10) {
-      setAmountError("Minimum amount is ₹10")
-      document.getElementById('amount-section')?.scrollIntoView({ behavior: 'smooth' })
-      return
-    }
-
-    if (TpfAidTip < minTip) {
-      setTipError(`Please add at least ₹${minTip} for platform support`)
-      return
-    }
-
-    setShowSuccess(true)
-    setTimeout(() => {
-      router.push('/dashboard')
-    }, 2000)
+  if (baseAmount < 10) {
+    setAmountError("Minimum amount is ₹10")
+    document.getElementById('amount-section')?.scrollIntoView({ behavior: 'smooth' })
+    return
   }
+
+  if (TpfAidTip < minTip) {
+    setTipError(`Please add at least ₹${minTip} for platform support`)
+    return
+  }
+
+  try {
+    const result = await createSubscription({
+      planType: 'daily',
+      amount: baseAmount,
+    }).unwrap()
+
+    if (result.message || result.subscription) {
+      setShowSuccess(true)
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 2000)
+    }
+  } catch (err) {
+    console.error('Failed to create subscription:', err)
+    setAmountError(err.data?.message || 'Failed to create subscription. Please try again.')
+  }
+}
 
   const recommendedTips = getRecommendedTips()
 
@@ -521,17 +534,17 @@ export default function DailyImpactPage({ darkModeFromParent }) {
             </div>
           </div>
 
-          <button
-            onClick={handleConfirm}
-            disabled={amountError || (customAmount && parseFloat(customAmount) < 10)}
-            className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl ${
-              amountError || (customAmount && parseFloat(customAmount) < 10)
-                ? "bg-zinc-400 text-zinc-200 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 text-white hover:from-blue-600 hover:via-indigo-600 hover:to-violet-600"
-            }`}
-          >
-            Confirm Daily Giving
-          </button>
+       <button
+  onClick={handleConfirm}
+  disabled={isLoading || amountError || (customAmount && parseFloat(customAmount) < 10)}
+  className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl ${
+    isLoading || amountError || (customAmount && parseFloat(customAmount) < 10)
+      ? "bg-zinc-400 text-zinc-200 cursor-not-allowed"
+      : "bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 text-white hover:from-blue-600 hover:via-indigo-600 hover:to-violet-600"
+  }`}
+>
+  {isLoading ? "Creating Subscription..." : "Confirm Daily Giving"}
+</button>
 
           <p className={`text-center text-xs mt-4 ${
             darkMode ? "text-zinc-500" : "text-zinc-500"
