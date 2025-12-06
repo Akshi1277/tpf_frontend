@@ -317,8 +317,7 @@ function Sidebar({ darkMode }) {
     k.panNumber &&
     k.address &&
     k.city &&
-    k.state &&
-    k.pincode;
+    k.state ;
 
   return hasAll ? 100 : 0;
 };
