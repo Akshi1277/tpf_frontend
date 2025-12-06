@@ -69,11 +69,7 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
     
     setTpfAidTip(tipValue)
     
-    if (tipValue < minTip && value !== "") {
-      setTipError(`Minimum platform support is ₹${minTip} (15% of donation)`)
-    } else {
-      setTipError("")
-    }
+  
   }
 
   const calculateTotal = () => {
@@ -92,10 +88,7 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
     return
   }
 
-  if (TpfAidTip < minTip) {
-    setTipError(`Please add at least ₹${minTip} for platform support`)
-    return
-  }
+
 
   try {
     const result = await createSubscription({
@@ -107,7 +100,7 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
     if (result.message || result.subscription) {
       setShowSuccess(true)
       setTimeout(() => {
-        router.push('/dashboard')
+        router.push('/')
       }, 2000)
     }
   } catch (err) {
@@ -434,12 +427,7 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
               </div>
             </div>
 
-            <p className={`text-xs flex items-start gap-1 ${
-              darkMode ? "text-zinc-500" : "text-zinc-500"
-            }`}>
-              <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
-              <span>Minimum platform support is ₹{calculateMinimumTip()} (15% of your donation amount)</span>
-            </p>
+           
           </div>
         </motion.div>
 
