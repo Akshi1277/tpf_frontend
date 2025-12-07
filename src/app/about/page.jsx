@@ -12,7 +12,7 @@ import ValuesSection from '@/components/aboutus/OurTeamSection';
 import NewsletterBanner from '@/components/aboutus/NewsletterBanner';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from '@studio-freight/lenis';
+import Lenis from 'lenis';
 import MissionVisionSection from '@/components/aboutus/MissionVisionSection';
 import OurTeamSection from '@/components/aboutus/OurTeamSection';
 import CuratedSection from '@/components/home/CuratedSection';
