@@ -44,15 +44,27 @@ const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
   }
 
   // Calculate recommended tips
-  const getRecommendedTips = () => {
-    const baseAmount = parseFloat(customAmount || amount)
-    return [
-      Math.ceil((baseAmount * 15) / 100),
-      Math.ceil((baseAmount * 20) / 100),
-      Math.ceil((baseAmount * 25) / 100),
-      Math.ceil((baseAmount * 30) / 100)
-    ]
+// Calculate recommended tips
+const getRecommendedTips = () => {
+  const baseAmount = parseFloat(customAmount || amount)
+  const tips = [
+    Math.ceil((baseAmount * 15) / 100),
+    Math.ceil((baseAmount * 20) / 100),
+    Math.ceil((baseAmount * 25) / 100),
+    Math.ceil((baseAmount * 30) / 100)
+  ]
+  
+  // Remove duplicates and ensure we have 4 unique values
+  const uniqueTips = [...new Set(tips)]
+  
+  // If we have duplicates, add additional values to make 4 options
+  while (uniqueTips.length < 4) {
+    const lastValue = uniqueTips[uniqueTips.length - 1]
+    uniqueTips.push(lastValue + Math.max(1, Math.ceil(baseAmount * 0.05)))
   }
+  
+  return uniqueTips.slice(0, 4)
+}
 
   // Update tip when amount changes
   useEffect(() => {
@@ -67,11 +79,7 @@ const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
     setCustomAmount(value)
 
     // Validate amount
-    if (value && parseFloat(value) < 10) {
-      setAmountError("Minimum amount is ₹10")
-    } else {
-      setAmountError("")
-    }
+  
   }
 
   // Handle tip input change
@@ -95,11 +103,7 @@ const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
   const baseAmount = parseFloat(customAmount || amount)
   const minTip = calculateMinimumTip()
 
-  if (baseAmount < 10) {
-    setAmountError("Minimum amount is ₹10")
-    document.getElementById('amount-section')?.scrollIntoView({ behavior: 'smooth' })
-    return
-  }
+
 
 
 

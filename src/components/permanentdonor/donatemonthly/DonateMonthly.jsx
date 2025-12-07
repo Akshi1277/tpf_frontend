@@ -83,10 +83,7 @@ export default function MonthlyChampionPage({ darkModeFromParent }) {
   const baseAmount = parseFloat(customAmount || amount)
   const minTip = calculateMinimumTip()
   
-  if (baseAmount < 10) {
-    setTipError("Minimum amount is ₹10")
-    return
-  }
+ 
 
 
 

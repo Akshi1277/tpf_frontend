@@ -85,10 +85,7 @@ const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
   const baseAmount = parseFloat(customAmount || amount)
   const minTip = calculateMinimumTip()
   
-  if (baseAmount < 10) {
-    setTipError("Minimum amount is ₹10")
-    return
-  }
+ 
 
   if (!anniversaryDate) {
     setTipError("Please select an anniversary date")
