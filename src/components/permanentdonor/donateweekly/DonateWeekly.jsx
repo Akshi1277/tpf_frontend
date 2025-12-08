@@ -27,6 +27,8 @@ export default function WeeklySupportPage({ darkModeFromParent }) {
   const [countAsZakat, setCountAsZakat] = useState(false)
   const [TpfAidTip, setTpfAidTip] = useState(8)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [showError, setShowError] = useState(false)
+const [errorMessage, setErrorMessage] = useState("")
   const [tipError, setTipError] = useState("")
 const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
 
@@ -43,15 +45,27 @@ const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
   }
 
   // Calculate recommended tips
-  const getRecommendedTips = () => {
-    const baseAmount = parseFloat(customAmount || amount)
-    return [
-      Math.ceil((baseAmount * 15) / 100),
-      Math.ceil((baseAmount * 20) / 100),
-      Math.ceil((baseAmount * 25) / 100),
-      Math.ceil((baseAmount * 30) / 100)
-    ]
+ // Calculate recommended tips
+const getRecommendedTips = () => {
+  const baseAmount = parseFloat(customAmount || amount)
+  const tips = [
+    Math.ceil((baseAmount * 15) / 100),
+    Math.ceil((baseAmount * 20) / 100),
+    Math.ceil((baseAmount * 25) / 100),
+    Math.ceil((baseAmount * 30) / 100)
+  ]
+  
+  // Remove duplicates and ensure we have 4 unique values
+  const uniqueTips = [...new Set(tips)]
+  
+  // If we have duplicates, add additional values to make 4 options
+  while (uniqueTips.length < 4) {
+    const lastValue = uniqueTips[uniqueTips.length - 1]
+    uniqueTips.push(lastValue + Math.max(1, Math.ceil(baseAmount * 0.05)))
   }
+  
+  return uniqueTips.slice(0, 4)
+}
 
   // Update tip when amount changes
   useEffect(() => {
@@ -83,9 +97,6 @@ const handleConfirm = async () => {
   const minTip = calculateMinimumTip()
   
 
-
- 
-
   try {
     const result = await createSubscription({
       planType: 'weekly',
@@ -99,12 +110,16 @@ const handleConfirm = async () => {
         router.push('/')
       }, 2000)
     }
-  } catch (err) {
+  }  catch (err) {
     console.error('Failed to create subscription:', err)
-    setTipError(err.data?.message || 'Failed to create subscription. Please try again.')
+    const errorMsg = err.data?.message || 'Failed to create subscription. Please try again.'
+    setErrorMessage(errorMsg)
+    setShowError(true)
+    setTimeout(() => {
+      setShowError(false)
+    }, 5000)
   }
 }
-
   const recommendedTips = getRecommendedTips()
 
   return (
@@ -127,6 +142,25 @@ const handleConfirm = async () => {
           </div>
         </motion.div>
       )}
+
+      {/* Error Toast */}
+{showError && (
+  <motion.div
+    initial={{ opacity: 0, y: -50 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -50 }}
+    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+               bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-6 py-4 rounded-lg shadow-2xl 
+               flex items-center gap-3 max-w-md w-[90%] sm:w-auto"
+  >
+    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+      <Info className="w-5 h-5" />
+    </div>
+    <div>
+      <p className="text-sm text-red-100">{errorMessage}</p>
+    </div>
+  </motion.div>
+)}
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
         {/* Back Button */}

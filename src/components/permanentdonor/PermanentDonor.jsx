@@ -17,6 +17,7 @@ import {
   X,
   Info
 } from "lucide-react"
+import confetti from "canvas-confetti"
 
 export default function PermanentDonorPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
@@ -166,6 +167,22 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
     }
   ]
 
+const handleMouseEnter = (planId) => {
+  if (!selectedPlan) {
+    setHoveredPlan(planId);
+    
+    if (planId === 'weekly') {
+       confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#FFD700', '#FFA500', '#FF4500'], // Gold/Orange colors
+          disableForReducedMotion: true
+       });
+    }
+  }
+}
+
   const handlePlanClick = (plan) => {
     setSelectedPlan(plan)
   }
@@ -180,19 +197,10 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Enhanced Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            rotate: [0, 360],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]"
-        >
+<div 
+  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] animate-[spin_60s_linear_infinite]"
+>
           <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
             darkMode 
               ? 'bg-gradient-to-b from-emerald-500/40 via-emerald-500/10 to-transparent' 
@@ -218,7 +226,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               ? 'bg-gradient-to-b from-pink-500/40 via-pink-500/10 to-transparent' 
               : 'bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent'
           }`} style={{ transform: 'rotate(288deg)' }} />
-        </motion.div>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -279,7 +287,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                     damping: 20,
                     delay: index * 0.05
                   }}
-                  onMouseEnter={() => !selectedPlan && setHoveredPlan(plan.id)}
+                  onMouseEnter={() => handleMouseEnter(plan.id)}
                   onMouseLeave={() => setHoveredPlan(null)}
                   onClick={() => !selectedPlan && handlePlanClick(plan)}
                   className={`cursor-pointer h-full ${othersSelected ? 'pointer-events-none' : ''}`}
