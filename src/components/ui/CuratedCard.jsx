@@ -1,9 +1,20 @@
 // components/ui/CuratedCard.jsx
+"use client";
 import { ArrowRight } from 'lucide-react';
+import {useRouter} from 'next/navigation';
 export default function CuratedCard({ item, darkMode, }) {
   const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
+  const router=useRouter();
   return (
     <div
+    onClick={() => {
+      console.log("FULL ITEM:", item)
+      // console.log("route from cms",item?.route);
+
+        if (item?.route) {
+          router.push(item.route.trim());
+        }
+      }}
       className={`flex-shrink-0 w-full snap-center rounded-2xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105
         ${darkMode ? 'bg-zinc-800' : 'bg-white'}
         shadow-lg hover:shadow-2xl`}

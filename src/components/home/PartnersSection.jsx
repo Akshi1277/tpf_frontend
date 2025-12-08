@@ -8,7 +8,9 @@ export default function PartnersSection({ darkMode }) {
   const cms = useCMS();
   const cmsTrustedBy = cms.filter(item => item.type === "trusted-by");
   const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`
-
+   if (!cmsTrustedBy || cmsTrustedBy.length === 0) {
+    return null;
+  }
   return (
     <section id="partners" className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'}`}>
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -12,7 +12,9 @@ export default function CampaignsSection({ darkMode }) {
 const cms = useCMS();
 const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
 const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
-
+ if (!fundraisers || fundraisers.length === 0) {
+    return null;
+  }
 function calcDaysLeft(deadline) {
   const end = new Date(deadline);
   const now = new Date();

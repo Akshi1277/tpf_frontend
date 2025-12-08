@@ -5,6 +5,9 @@ export default function ImpactBanner({ darkMode }) {
     const cms = useCMS();
   const cmsStartGiving = cms.filter(item => item.type === "start-giving");
   const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`
+   if (!cmsStartGiving || cmsStartGiving.length === 0) {
+    return null;
+  }
   return (
     <section className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

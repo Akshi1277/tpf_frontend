@@ -7,7 +7,9 @@ export default function CommunitiesSection({ darkMode }) {
   const cms = useCMS();
   const cmsCommunities = cms.filter(item => item.type === "communities");
   const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`;
-
+   if (!cmsCommunities || cmsCommunities.length === 0) {
+    return null;
+  }
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",

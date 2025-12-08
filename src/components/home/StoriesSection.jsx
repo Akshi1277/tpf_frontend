@@ -9,7 +9,9 @@ export default function StoriesSection({ darkMode }) {
   const [activeCard, setActiveCard] = useState(null);
   const cms = useCMS();
     const cmsImpactStories = cms.filter(item => item.type === "impact-stories");
-
+   if (!cmsImpactStories || cmsImpactStories.length === 0) {
+    return null;
+  }
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
