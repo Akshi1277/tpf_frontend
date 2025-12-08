@@ -27,6 +27,8 @@ const filteredCampaigns =
     : fundraisers.filter((c) => c.category === selectedCategory);
 
 const infiniteCampaigns = [...filteredCampaigns, ...filteredCampaigns];
+// const infiniteCampaigns = filteredCampaigns;
+
 
 
   const COLORS = {
