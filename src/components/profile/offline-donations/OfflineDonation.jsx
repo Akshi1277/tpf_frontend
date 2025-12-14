@@ -39,8 +39,14 @@ useEffect(() => {
 }, []);
 
 
-const user = useSelector((state) => state.auth.userInfo);
-const donations = user?.offlineDonations || [];
+const {
+  data,
+  isLoading,
+  isError,
+  error,
+} = useGetOfflineDonationsQuery();
+
+const donations = data?.donations || [];
 
   const [createDonation, { isLoading: creating }] =
     useCreateOfflineDonationMutation();
@@ -94,7 +100,7 @@ const handleSubmit = async () => {
   try {
         const payload = {
       method: formData.method,
-      amount: formData.amount,
+      amount: Number(formData.amount), // ✅ FIX
       remarks: formData.remarks || "",
 
       bankName: formData.bankName,
@@ -277,7 +283,8 @@ if (!isClient) {
 
                     return (
                       <motion.div
-                        key={donation._id}
+                        key={donation._id || `${donation.method}-${donation.submittedOn}-${index}`}
+
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
@@ -323,7 +330,8 @@ if (!isClient) {
                               Amount
                             </p>
                             <p className={`font-bold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>
-                              ₹{donation.amount.toLocaleString("en-IN")}
+                              ₹{Number(donation.amount || 0).toLocaleString("en-IN")}
+
                             </p>
                           </div>
 

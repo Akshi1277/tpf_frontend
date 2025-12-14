@@ -1,185 +1,181 @@
 // components/home/CampaignsSection.jsx
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
-import { campaigns, categories } from '@/lib/constants';
+import { categories } from '@/lib/constants';
 import { useCMS } from '@/app/CMSContext';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
-const cms = useCMS();
-const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
-const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
- if (!fundraisers || fundraisers.length === 0) {
-    return null;
-  }
-function calcDaysLeft(deadline) {
-  const end = new Date(deadline);
-  const now = new Date();
-  const diff = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
-  return diff > 0 ? diff : 0;
-}
 
+  const containerRef = useRef(null);
 
-const filteredCampaigns =
-  selectedCategory === "all"
-    ? fundraisers
-    : fundraisers.filter((c) => c.category === selectedCategory);
+  const cms = useCMS();
+  const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
+  const validFundraisers = fundraisers.filter(
+    (f) => typeof f.campaignSlug === "string" && f.campaignSlug.length > 0
+  );
 
-const infiniteCampaigns = [...filteredCampaigns, ...filteredCampaigns];
-// const infiniteCampaigns = filteredCampaigns;
+  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
+  if (!fundraisers.length) return null;
 
+  const calcDaysLeft = (deadline) => {
+    const end = new Date(deadline);
+    const now = new Date();
+    const diff = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
+  };
+
+  const filteredCampaigns =
+    selectedCategory === "all"
+      ? validFundraisers
+      : validFundraisers.filter((c) => c.category === selectedCategory);
+
+  const MIN_CARDS_FOR_INFINITE = 5;
+  const enableInfiniteScroll = filteredCampaigns.length > MIN_CARDS_FOR_INFINITE;
+
+  const infiniteCampaigns = enableInfiniteScroll
+    ? [...filteredCampaigns, ...filteredCampaigns]
+    : filteredCampaigns;
 
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
 
+  const getScrollAmount = () => {
+    const container = containerRef.current;
+    if (!container) return 0;
+    const cardWidth = container.children[0]?.offsetWidth || 0;
+    const gap = 20;
+    return cardWidth + gap;
+  };
+
   const scrollLeft = () => {
-  const container = document.getElementById('campaigns-container');
-  if (container) {
-    container.scrollBy({ left: -320, behavior: 'smooth' });
-  }
-};
+    const container = containerRef.current;
+    if (container) {
+      container.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+    }
+  };
 
-const scrollRight = () => {
-  const container = document.getElementById('campaigns-container');
-  if (container) {
-    container.scrollBy({ left: 320, behavior: 'smooth' });
-  }
-};
+  const scrollRight = () => {
+    const container = containerRef.current;
+    if (container) {
+      container.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+    }
+  };
 
-useEffect(() => {
-  const handlePause = () => setIsUserScrolling(true);
-  window.addEventListener("pauseCampaignScroll", handlePause);
-  return () => window.removeEventListener("pauseCampaignScroll", handlePause);
-}, []);
-
-useEffect(() => {
-  if (isUserScrolling) return;
-  
-  // Auto-scroll for both mobile and desktop
-  const interval = setInterval(() => {
-    setCampaignScrollIndex(prev => prev + 1);
-  }, 2000); 
-
-  return () => clearInterval(interval);
-}, [isUserScrolling]);
-
-  // Scroll campaigns container
+  // Pause auto-scroll externally
   useEffect(() => {
-    const container = document.getElementById('campaigns-container');
+    const handlePause = () => setIsUserScrolling(true);
+    window.addEventListener("pauseCampaignScroll", handlePause);
+    return () => window.removeEventListener("pauseCampaignScroll", handlePause);
+  }, []);
+
+  // Auto-scroll
+  useEffect(() => {
+    if (!enableInfiniteScroll || isUserScrolling) return;
+
+    const interval = setInterval(() => {
+      setCampaignScrollIndex((prev) => prev + 1);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [enableInfiniteScroll, isUserScrolling]);
+
+  // Apply scroll position
+  useEffect(() => {
+    const container = containerRef.current;
     if (!container) return;
 
-    const cardWidth = container.children[0]?.offsetWidth || 0;
-    const gap = 20; // 1.25rem = 20px
-    const scrollTo = (cardWidth + gap) * campaignScrollIndex;
-    
+    const scrollAmount = getScrollAmount();
     container.scrollTo({
-      left: scrollTo,
-      behavior: 'smooth'
+      left: scrollAmount * campaignScrollIndex,
+      behavior: 'smooth',
     });
 
-    if (campaignScrollIndex >= filteredCampaigns.length) {
+    if (
+      enableInfiniteScroll &&
+      campaignScrollIndex >= filteredCampaigns.length
+    ) {
       setTimeout(() => {
-        container.scrollTo({
-          left: 0,
-          behavior: 'auto'
-        });
+        container.scrollTo({ left: 0, behavior: 'auto' });
         setCampaignScrollIndex(0);
       }, 500);
     }
-  }, [campaignScrollIndex, filteredCampaigns.length]);
+  }, [campaignScrollIndex, filteredCampaigns.length, enableInfiniteScroll]);
 
-  // Handle user scrolling detection
+  // Detect user scroll
   useEffect(() => {
-    const container = document.getElementById('campaigns-container');
+    const container = containerRef.current;
     if (!container) return;
 
     let scrollTimeout;
-    let isScrolling = false;
 
-    const handleScrollStart = () => {
-      if (!isScrolling) {
-        isScrolling = true;
-        setIsUserScrolling(true);
-      }
-      
+    const onScroll = () => {
+      setIsUserScrolling(true);
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
-        isScrolling = false;
         setIsUserScrolling(false);
       }, 2000);
     };
 
-    container.addEventListener('scroll', handleScrollStart, { passive: true });
-
-    return () => {
-      container.removeEventListener('scroll', handleScrollStart);
-    };
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Handle seamless infinite loop for manual scrolling
+  // Seamless infinite correction
   useEffect(() => {
-    const container = document.getElementById('campaigns-container');
+    if (!enableInfiniteScroll) return;
+
+    const container = containerRef.current;
     if (!container) return;
 
-    const handleScrollEnd = () => {
-      const cardWidth = container.children[0]?.offsetWidth || 0;
-      const gap = 20; // 1.25rem = 20px
-      const scrollLeft = container.scrollLeft;
-      const currentIndex = Math.round(scrollLeft / (cardWidth + gap));
+    const scrollAmount = getScrollAmount();
 
-      if (currentIndex >= filteredCampaigns.length) {
-        const equivalentIndex = currentIndex - filteredCampaigns.length;
+    const handleScrollEnd = () => {
+      const index = Math.round(container.scrollLeft / scrollAmount);
+      if (index >= filteredCampaigns.length) {
         container.scrollTo({
-          left: equivalentIndex * (cardWidth + gap),
-          behavior: 'auto'
+          left: (index - filteredCampaigns.length) * scrollAmount,
+          behavior: 'auto',
         });
-        setCampaignScrollIndex(equivalentIndex);
-      } else if (currentIndex < 0) {
-        container.scrollTo({
-          left: (filteredCampaigns.length + currentIndex) * (cardWidth + gap),
-          behavior: 'auto'
-        });
-        setCampaignScrollIndex(filteredCampaigns.length + currentIndex);
+        setCampaignScrollIndex(index - filteredCampaigns.length);
       }
     };
 
-    let scrollTimeout;
+    let timeout;
     const onScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(handleScrollEnd, 150);
+      clearTimeout(timeout);
+      timeout = setTimeout(handleScrollEnd, 150);
     };
 
     container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [enableInfiniteScroll, filteredCampaigns.length]);
 
-    return () => {
-      container.removeEventListener('scroll', onScroll);
-    };
-  }, [filteredCampaigns.length]);
+  // Reset on category change
+  useEffect(() => {
+    const container = containerRef.current;
+    setCampaignScrollIndex(0);
+    if (container) {
+      container.scrollTo({ left: 0, behavior: 'auto' });
+    }
+  }, [selectedCategory]);
 
   return (
     <section id="campaigns" className={`py-10 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+          <h2 className={`text-3xl md:text-4xl font-bold ${COLORS.neutralHeading}`}>
             Fundraising now
           </h2>
-          <button
-            className="
-              whitespace-nowrap
-              text-xs sm:text-sm font-medium
-              bg-emerald-600 px-3 py-1.5 sm:px-4 sm:py-2
-              rounded-full text-white
-              hover:animate-pulse cursor-pointer
-            "
-            
-
-          >
+          <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-4 py-2 rounded-full text-white hover:animate-pulse">
             Discover more
           </button>
         </div>
@@ -189,99 +185,61 @@ useEffect(() => {
             <button
               key={cat.key}
               onClick={() => setSelectedCategory(cat.key)}
-              className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm cursor-pointer transition-colors flex items-center gap-2 ${
+              className={`rounded-full border px-3 py-1.5 text-sm ${
                 selectedCategory === cat.key
                   ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                  : darkMode 
-                    ? "border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                  : darkMode
+                  ? "border-zinc-700 bg-zinc-800 text-zinc-300"
+                  : "border-zinc-200 bg-white text-zinc-700"
               }`}
             >
               {cat.label}
             </button>
           ))}
         </div>
-<div className="relative">
-  {/* LEFT ARROW - Desktop only */}
- <button
-  onClick={scrollLeft}
-  className="absolute left-2 md:-left-10 top-1/2 -translate-y-1/2 z-10
-             hidden md:flex items-center justify-center
-             h-9 w-9 rounded-full
-             border-2 border-emerald-600 dark:border-emerald-500/50
-             bg-gradient-to-br from-emerald-200 via-emerald-50 to-emerald-100
-             dark:bg-gradient-to-br dark:from-emerald-500/20 dark:via-zinc-800/60 dark:to-emerald-600/20
-             backdrop-blur-sm
-             shadow-[0_0_25px_rgba(5,150,105,0.7)]
-             dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]
-             hover:from-emerald-300 hover:via-emerald-100 hover:to-emerald-200
-             hover:shadow-[0_0_30px_rgba(5,150,105,0.9)]
-             dark:hover:from-emerald-500/30 dark:hover:via-zinc-700/80 dark:hover:to-emerald-600/30
-             dark:hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]
-             transition-all duration-300
-             text-emerald-700 dark:text-emerald-300"
->
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-  </svg>
-</button>
 
+        <div className="relative">
+          {enableInfiniteScroll && (
+            <button onClick={scrollLeft} className="hidden md:flex absolute -left-10 top-1/2 -translate-y-1/2 z-10">
+              ◀
+            </button>
+          )}
 
-  <div 
-    id="campaigns-container"
-    className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-  >
-   {infiniteCampaigns.map((campaign, index) => (
-  <div key={campaign._id + "-" + index} className="flex-shrink-0 w-[285px]">
-  <CampaignCard
-  campaign={{
-    ...campaign,
-    image: campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : null,
-    video: campaign.videoUrl ? `${BASE_URL}${campaign.videoUrl}` : null,
-    raised: Number(campaign.raisedAmount || 0),
-    goal: Number(campaign.requiredAmount || campaign.goal || 0),
-    org: campaign.organization || "",    // ← ADD THIS
-    urgent: campaign.isUrgent || false,  // ← fix badge mapping
-    taxBenefit: campaign.taxBenefits || false, // ← fix badge mapping
-    validityDate: campaign.deadline ? calcDaysLeft(campaign.deadline) : null, // optional timer if needed
-     zakatVerified: campaign.zakatVerified || false,
-  }}
-  darkMode={darkMode}
-/>
+          <div
+            ref={containerRef}
+            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+          >
+            {infiniteCampaigns.map((campaign, index) => (
+              <div key={`${campaign._id}-${index}`} className="flex-shrink-0 w-[285px]">
+                <CampaignCard
+                  campaign={{
+                    ...campaign,
+                    image: campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : null,
+                    video: campaign.videoUrl ? `${BASE_URL}${campaign.videoUrl}` : null,
+                    raised: Number(campaign.raisedAmount || 0),
+                    goal: Number(campaign.requiredAmount || campaign.goal || 0),
+                    org: campaign.organization || "",
+                    urgent: campaign.isUrgent || false,
+                    taxBenefit: campaign.taxBenefits || false,
+                    validityDate: campaign.deadline
+                      ? calcDaysLeft(campaign.deadline)
+                      : null,
+                    zakatVerified: campaign.zakatVerified || false,
+                    slug: campaign.campaignSlug,
+                  }}
+                  darkMode={darkMode}
+                />
+              </div>
+            ))}
+          </div>
 
-
-  </div>
-))}
-
-  </div>
-
-  {/* RIGHT ARROW - Desktop only */}
- <button
-  onClick={scrollRight}
-  className="absolute right-2 md:-right-10 top-1/2 -translate-y-1/2 z-10
-             hidden md:flex items-center justify-center
-             h-9 w-9 rounded-full
-             border-2 border-emerald-600 dark:border-emerald-500/50
-             bg-gradient-to-br from-emerald-200 via-emerald-50 to-emerald-100
-             dark:bg-gradient-to-br dark:from-emerald-500/20 dark:via-zinc-800/60 dark:to-emerald-600/20
-             backdrop-blur-sm
-             shadow-[0_0_25px_rgba(5,150,105,0.7)]
-             dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]
-             hover:from-emerald-300 hover:via-emerald-100 hover:to-emerald-200
-             hover:shadow-[0_0_30px_rgba(5,150,105,0.9)]
-             dark:hover:from-emerald-500/30 dark:hover:via-zinc-700/80 dark:hover:to-emerald-600/30
-             dark:hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]
-             transition-all duration-300
-             text-emerald-700 dark:text-emerald-300"
->
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-  </svg>
-</button>
-
-</div>
-</div>
-      
+          {enableInfiniteScroll && (
+            <button onClick={scrollRight} className="hidden md:flex absolute -right-10 top-1/2 -translate-y-1/2 z-10">
+              ▶
+            </button>
+          )}
+        </div>
+      </div>
     </section>
   );
 }
