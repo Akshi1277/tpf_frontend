@@ -1,9 +1,9 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { 
+import {
   Calendar,
   Heart,
   TrendingUp,
@@ -24,6 +24,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [hoveredPlan, setHoveredPlan] = useState(null)
   const router = useRouter()
+  const lastConfettiTime = useRef(0)
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -49,15 +50,15 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       rules: "Your chosen amount will be automatically deducted every day. You maintain full control to pause, adjust, or cancel from your dashboard at any time.",
       badge: "Most Active",
       color: {
-        gradient: darkMode => darkMode 
-          ? "from-blue-500 via-indigo-500 to-violet-500" 
+        gradient: darkMode => darkMode
+          ? "from-blue-500 via-indigo-500 to-violet-500"
           : "from-blue-400 via-indigo-400 to-violet-400",
         solid: darkMode => darkMode ? "bg-blue-500" : "bg-blue-500",
         light: darkMode => darkMode ? "bg-blue-950/20" : "bg-blue-50",
         border: darkMode => darkMode ? "border-blue-500/30" : "border-blue-300",
         text: darkMode => darkMode ? "text-blue-400" : "text-blue-600",
-        glow: darkMode => darkMode 
-          ? "shadow-[0_0_40px_rgba(59,130,246,0.4)]" 
+        glow: darkMode => darkMode
+          ? "shadow-[0_0_40px_rgba(59,130,246,0.4)]"
           : "shadow-[0_0_40px_rgba(59,130,246,0.3)]"
       },
       icon: Zap,
@@ -82,15 +83,15 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       rules: "Donations are automatically processed every Friday at 9:00 AM. You can modify the amount or pause the subscription anytime through your account settings.",
       badge: "Most Blessed",
       color: {
-        gradient: darkMode => darkMode 
-          ? "from-yellow-500 via-yellow-400 to-amber-400" 
+        gradient: darkMode => darkMode
+          ? "from-yellow-500 via-yellow-400 to-amber-400"
           : "from-yellow-600 via-yellow-500 to-amber-500",
         solid: darkMode => darkMode ? "bg-yellow-500" : "bg-yellow-500",
         light: darkMode => darkMode ? "bg-yellow-900/20" : "bg-yellow-50",
         border: darkMode => darkMode ? "border-yellow-500/50" : "border-yellow-500",
         text: darkMode => darkMode ? "text-yellow-400" : "text-yellow-700",
-        glow: darkMode => darkMode 
-          ? "shadow-[0_0_50px_rgba(234,179,8,0.6)]" 
+        glow: darkMode => darkMode
+          ? "shadow-[0_0_50px_rgba(234,179,8,0.6)]"
           : "shadow-[0_0_50px_rgba(234,179,8,0.5)]"
       },
       icon: Clock,
@@ -116,15 +117,15 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       rules: "Your contribution is processed on your chosen date each month. If the date doesn't exist in a given month, it processes on the last available day.",
       badge: "Best Value",
       color: {
-        gradient: darkMode => darkMode 
-          ? "from-purple-500 via-fuchsia-500 to-pink-500" 
+        gradient: darkMode => darkMode
+          ? "from-purple-500 via-fuchsia-500 to-pink-500"
           : "from-purple-400 via-fuchsia-400 to-pink-400",
         solid: darkMode => darkMode ? "bg-purple-500" : "bg-purple-500",
         light: darkMode => darkMode ? "bg-purple-950/20" : "bg-purple-50",
         border: darkMode => darkMode ? "border-purple-500/30" : "border-purple-300",
         text: darkMode => darkMode ? "text-purple-400" : "text-purple-600",
-        glow: darkMode => darkMode 
-          ? "shadow-[0_0_40px_rgba(168,85,247,0.4)]" 
+        glow: darkMode => darkMode
+          ? "shadow-[0_0_40px_rgba(168,85,247,0.4)]"
           : "shadow-[0_0_40px_rgba(168,85,247,0.3)]"
       },
       icon: BarChart3,
@@ -149,39 +150,43 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
       rules: "One annual donation on your selected date. You'll receive advance reminders 15 and 7 days before the scheduled date. Includes all premium donor benefits.",
       badge: "Premium",
       color: {
-        gradient: darkMode => darkMode 
-          ? "from-emerald-500 via-teal-500 to-cyan-500" 
+        gradient: darkMode => darkMode
+          ? "from-emerald-500 via-teal-500 to-cyan-500"
           : "from-emerald-400 via-teal-400 to-cyan-400",
         solid: darkMode => darkMode ? "bg-emerald-500" : "bg-emerald-500",
         light: darkMode => darkMode ? "bg-emerald-950/20" : "bg-emerald-50",
         border: darkMode => darkMode ? "border-emerald-500/30" : "border-emerald-300",
         text: darkMode => darkMode ? "text-emerald-400" : "text-emerald-600",
-        glow: darkMode => darkMode 
-          ? "shadow-[0_0_40px_rgba(16,185,129,0.4)]" 
+        glow: darkMode => darkMode
+          ? "shadow-[0_0_40px_rgba(16,185,129,0.4)]"
           : "shadow-[0_0_40px_rgba(16,185,129,0.3)]"
       },
       icon: Award,
       rotation: 18,
       zIndex: 3,
-      translateX: 80 
+      translateX: 80
     }
   ]
 
-const handleMouseEnter = (planId) => {
-  if (!selectedPlan) {
-    setHoveredPlan(planId);
-    
-    if (planId === 'weekly') {
-       confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#FFD700', '#FFA500', '#FF4500'], // Gold/Orange colors
-          disableForReducedMotion: true
-       });
+  const handleMouseEnter = (planId) => {
+    if (!selectedPlan) {
+      setHoveredPlan(planId);
+
+      if (planId === 'weekly') {
+        const now = Date.now();
+        if (now - lastConfettiTime.current > 2 * 60 * 1000) { // 2 minutes
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#FFD700', '#FFA500', '#FF4500'], // Gold/Orange colors
+            disableForReducedMotion: true
+          });
+          lastConfettiTime.current = now;
+        }
+      }
     }
   }
-}
 
   const handlePlanClick = (plan) => {
     setSelectedPlan(plan)
@@ -198,40 +203,35 @@ const handleMouseEnter = (planId) => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-<div 
-  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] animate-[spin_60s_linear_infinite]"
->
-          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-            darkMode 
-              ? 'bg-gradient-to-b from-emerald-500/40 via-emerald-500/10 to-transparent' 
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] animate-[spin_60s_linear_infinite]"
+        >
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
+              ? 'bg-gradient-to-b from-emerald-500/40 via-emerald-500/10 to-transparent'
               : 'bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent'
-          }`} style={{ transform: 'rotate(0deg)' }} />
-          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-            darkMode 
-              ? 'bg-gradient-to-b from-blue-500/40 via-blue-500/10 to-transparent' 
+            }`} style={{ transform: 'rotate(0deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
+              ? 'bg-gradient-to-b from-blue-500/40 via-blue-500/10 to-transparent'
               : 'bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent'
-          }`} style={{ transform: 'rotate(72deg)' }} />
-          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-            darkMode 
-              ? 'bg-gradient-to-b from-purple-500/40 via-purple-500/10 to-transparent' 
+            }`} style={{ transform: 'rotate(72deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
+              ? 'bg-gradient-to-b from-purple-500/40 via-purple-500/10 to-transparent'
               : 'bg-gradient-to-b from-purple-500/50 via-purple-500/20 to-transparent'
-          }`} style={{ transform: 'rotate(144deg)' }} />
-          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-            darkMode 
-              ? 'bg-gradient-to-b from-teal-500/40 via-teal-500/10 to-transparent' 
+            }`} style={{ transform: 'rotate(144deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
+              ? 'bg-gradient-to-b from-teal-500/40 via-teal-500/10 to-transparent'
               : 'bg-gradient-to-b from-teal-500/50 via-teal-500/20 to-transparent'
-          }`} style={{ transform: 'rotate(216deg)' }} />
-          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${
-            darkMode 
-              ? 'bg-gradient-to-b from-pink-500/40 via-pink-500/10 to-transparent' 
+            }`} style={{ transform: 'rotate(216deg)' }} />
+          <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
+              ? 'bg-gradient-to-b from-pink-500/40 via-pink-500/10 to-transparent'
               : 'bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent'
-          }`} style={{ transform: 'rotate(288deg)' }} />
+            }`} style={{ transform: 'rotate(288deg)' }} />
         </div>
       </div>
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-12">
-        
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -239,24 +239,21 @@ const handleMouseEnter = (planId) => {
           transition={{ duration: 0.3 }}
           className="text-center mb-8"
         >
-         
-          
-          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold mb-4 ${
-            darkMode ? 'text-white' : 'text-gray-900'
-          }`}>
+
+
+          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'
+            }`}>
             Choose Your{' '}
-            <span className={`bg-gradient-to-r ${
-              darkMode 
-                ? 'from-emerald-400 via-teal-400 to-cyan-400' 
+            <span className={`bg-gradient-to-r ${darkMode
+                ? 'from-emerald-400 via-teal-400 to-cyan-400'
                 : 'from-emerald-600 via-teal-600 to-cyan-600'
-            } bg-clip-text text-transparent`}>
+              } bg-clip-text text-transparent`}>
               Giving Plan
             </span>
           </h1>
-          
-          <p className={`text-base max-w-2xl mx-auto mb-2 ${
-            darkMode ? 'text-zinc-400' : 'text-gray-600'
-          }`}>
+
+          <p className={`text-base max-w-2xl mx-auto mb-2 ${darkMode ? 'text-zinc-400' : 'text-gray-600'
+            }`}>
             Select a plan to explore your continuous charity options
           </p>
         </motion.div>
@@ -274,7 +271,7 @@ const handleMouseEnter = (planId) => {
                 <motion.div
                   key={plan.id}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ 
+                  animate={{
                     opacity: othersSelected ? 0.3 : 1,
                     y: 0,
                     scale: isHovered ? 1.05 : 1,
@@ -296,14 +293,12 @@ const handleMouseEnter = (planId) => {
                     perspective: '1000px'
                   }}
                 >
-                  <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-200 h-full flex flex-col ${
-                    darkMode 
-                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
+                  <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-200 h-full flex flex-col ${darkMode
+                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}`
                       : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
-                  } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'} ${
-                    plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
-                  }`}>
-                    
+                    } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'} ${plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
+                    }`}>
+
                     {/* Shine Effect on Hover */}
                     {isHovered && (
                       <motion.div
@@ -317,32 +312,31 @@ const handleMouseEnter = (planId) => {
                     <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
 
                     <div className="absolute top-4 right-4 z-10">
-                      <motion.div 
+                      <motion.div
                         animate={isHovered ? { scale: [1, 1.1, 1] } : {}}
                         transition={{ repeat: isHovered ? Infinity : 0, duration: 2 }}
-                        className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
-                          darkMode
+                        className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${darkMode
                             ? "bg-zinc-900/80 text-white"
                             : "bg-white/80 text-gray-900"
-                        }`}
+                          }`}
                       >
                         {plan.badge}
                       </motion.div>
                     </div>
 
                     <div className="relative p-8 flex flex-col flex-1">
-                      <motion.div 
+                      <motion.div
                         animate={isHovered ? { rotate: [0, 5, -5, 0] } : {}}
                         transition={{ duration: 0.25 }}
                         className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)} self-start`}
                       >
                         <Icon className="w-10 h-10 text-white" strokeWidth={2} />
                       </motion.div>
-                      
+
                       <h3 className={`text-2xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
                         {plan.title}
                       </h3>
-                      
+
                       <p className={`text-sm font-semibold mb-3 ${plan.color.text(darkMode)}`}>
                         {plan.subtitle}
                       </p>
@@ -382,7 +376,7 @@ const handleMouseEnter = (planId) => {
           <div className="block md:hidden space-y-6">
             {donationPlans.map((plan, index) => {
               const Icon = plan.icon
-              
+
               return (
                 <motion.div
                   key={plan.id}
@@ -392,18 +386,15 @@ const handleMouseEnter = (planId) => {
                   onClick={() => handlePlanClick(plan)}
                   className="cursor-pointer"
                 >
-                  <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${
-                    darkMode 
-                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}` 
+                  <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${darkMode
+                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}`
                       : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
-                  } shadow-2xl active:scale-[0.98] ${
-                    plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
-                  }`}>
+                    } shadow-2xl active:scale-[0.98] ${plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
+                    }`}>
                     <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
                     <div className="absolute top-4 right-4 z-10">
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${
-                        darkMode ? "bg-zinc-900/80 text-white" : "bg-white/80 text-gray-900"
-                      }`}>
+                      <div className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${darkMode ? "bg-zinc-900/80 text-white" : "bg-white/80 text-gray-900"
+                        }`}>
                         {plan.badge}
                       </div>
                     </div>
@@ -459,20 +450,18 @@ const handleMouseEnter = (planId) => {
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 onClick={(e) => e.stopPropagation()}
-                className={`relative max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl border-2 scrollbar-hide ${
-                  darkMode 
-                    ? `bg-zinc-900 ${selectedPlan.color.border(darkMode)}` 
+                className={`relative max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl border-2 scrollbar-hide ${darkMode
+                    ? `bg-zinc-900 ${selectedPlan.color.border(darkMode)}`
                     : `bg-white ${selectedPlan.color.border(darkMode)}`
-                } ${selectedPlan.color.glow(darkMode)}`}
+                  } ${selectedPlan.color.glow(darkMode)}`}
               >
                 {/* Close Button */}
                 <button
                   onClick={handleClose}
-                  className={`absolute top-6 right-6 p-2 rounded-full transition-colors z-10 ${
-                    darkMode 
-                      ? "bg-zinc-800 hover:bg-zinc-700 text-white" 
+                  className={`absolute top-6 right-6 p-2 rounded-full transition-colors z-10 ${darkMode
+                      ? "bg-zinc-800 hover:bg-zinc-700 text-white"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-900"
-                  }`}
+                    }`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -518,7 +507,7 @@ const handleMouseEnter = (planId) => {
                     </h3>
                     <div className="space-y-3">
                       {selectedPlan.features.map((feature, idx) => (
-                        <motion.div 
+                        <motion.div
                           key={idx}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -535,11 +524,10 @@ const handleMouseEnter = (planId) => {
                   </div>
 
                   {/* Rules */}
-                  <div className={`p-5 rounded-xl mb-6 border ${
-                    darkMode
+                  <div className={`p-5 rounded-xl mb-6 border ${darkMode
                       ? "bg-zinc-800/40 border-zinc-700"
                       : "bg-gray-50 border-gray-200"
-                  }`}>
+                    }`}>
                     <h4 className={`text-sm font-bold mb-2 uppercase tracking-wide ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                       How it works
                     </h4>
@@ -552,11 +540,10 @@ const handleMouseEnter = (planId) => {
                   <div className="flex gap-4">
                     <button
                       onClick={handleClose}
-                      className={`flex-1 py-4 px-6 rounded-xl font-semibold cursor-pointer transition-all border-2 ${
-                        darkMode
+                      className={`flex-1 py-4 px-6 rounded-xl font-semibold cursor-pointer transition-all border-2 ${darkMode
                           ? "border-zinc-700 text-white hover:bg-zinc-800"
                           : "border-gray-300 text-gray-900 hover:bg-gray-50"
-                      }`}
+                        }`}
                     >
                       Back to Plans
                     </button>
@@ -591,18 +578,16 @@ const handleMouseEnter = (planId) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <motion.div 
+            <motion.div
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
-              className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${
-                darkMode
+              className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${darkMode
                   ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-emerald-500/30"
                   : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-emerald-300 shadow-lg hover:shadow-xl"
-              }`}
+                }`}
             >
-              <div className={`inline-flex p-4 rounded-2xl mb-4 ${
-                darkMode ? "bg-emerald-500/10" : "bg-emerald-100"
-              }`}>
+              <div className={`inline-flex p-4 rounded-2xl mb-4 ${darkMode ? "bg-emerald-500/10" : "bg-emerald-100"
+                }`}>
                 <Heart className={`w-10 h-10 ${darkMode ? "text-emerald-400" : "text-emerald-600"}`} strokeWidth={2} />
               </div>
               <h3 className={`text-xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
@@ -616,18 +601,16 @@ const handleMouseEnter = (planId) => {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
-              className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${
-                darkMode
+              className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${darkMode
                   ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-teal-500/30"
                   : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-teal-300 shadow-lg hover:shadow-xl"
-              }`}
+                }`}
             >
-              <div className={`inline-flex p-4 rounded-2xl mb-4 ${
-                darkMode ? "bg-teal-500/10" : "bg-teal-100"
-              }`}>
+              <div className={`inline-flex p-4 rounded-2xl mb-4 ${darkMode ? "bg-teal-500/10" : "bg-teal-100"
+                }`}>
                 <TrendingUp className={`w-10 h-10 ${darkMode ? "text-teal-400" : "text-teal-600"}`} strokeWidth={2} />
               </div>
               <h3 className={`text-xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
@@ -641,18 +624,16 @@ const handleMouseEnter = (planId) => {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
-              className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${
-                darkMode
+              className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${darkMode
                   ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-cyan-500/30"
                   : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-cyan-300 shadow-lg hover:shadow-xl"
-              }`}
+                }`}
             >
-              <div className={`inline-flex p-4 rounded-2xl mb-4 ${
-                darkMode ? "bg-cyan-500/10" : "bg-cyan-100"
-              }`}>
+              <div className={`inline-flex p-4 rounded-2xl mb-4 ${darkMode ? "bg-cyan-500/10" : "bg-cyan-100"
+                }`}>
                 <Sparkles className={`w-10 h-10 ${darkMode ? "text-cyan-400" : "text-cyan-600"}`} strokeWidth={2} />
               </div>
               <h3 className={`text-xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
