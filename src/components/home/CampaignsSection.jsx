@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { categories } from '@/lib/constants';
 import { useCMS } from '@/app/CMSContext';
+import Link from 'next/link';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -175,9 +176,11 @@ export default function CampaignsSection({ darkMode }) {
           <h2 className={`text-3xl md:text-4xl font-bold ${COLORS.neutralHeading}`}>
             Fundraising now
           </h2>
-          <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-4 py-2 rounded-full text-white hover:animate-pulse">
-            Discover more
-          </button>
+          <Link href="/all-campaigns">
+            <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-4 py-2 rounded-full text-white hover:animate-pulse">
+              Discover more
+            </button>
+          </Link>
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
@@ -185,13 +188,12 @@ export default function CampaignsSection({ darkMode }) {
             <button
               key={cat.key}
               onClick={() => setSelectedCategory(cat.key)}
-              className={`rounded-full border px-3 py-1.5 text-sm ${
-                selectedCategory === cat.key
+              className={`rounded-full border px-3 py-1.5 text-sm ${selectedCategory === cat.key
                   ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                   : darkMode
-                  ? "border-zinc-700 bg-zinc-800 text-zinc-300"
-                  : "border-zinc-200 bg-white text-zinc-700"
-              }`}
+                    ? "border-zinc-700 bg-zinc-800 text-zinc-300"
+                    : "border-zinc-200 bg-white text-zinc-700"
+                }`}
             >
               {cat.label}
             </button>
