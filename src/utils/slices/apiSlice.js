@@ -7,6 +7,6 @@ export const apiSlice = createApi({
         baseUrl: process.env.NEXT_PUBLIC_API_URL,
         credentials: "include",            // 👈 MUST be here
     }),
-    tagTypes: ['CMS'],
+    tagTypes: ['CMS', 'Campaign'],
     endpoints: () => ({})
 })

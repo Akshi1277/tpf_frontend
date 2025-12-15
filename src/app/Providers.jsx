@@ -1,14 +1,17 @@
-"use client";
+'use client';
 
-import { Provider as ReduxProvider } from "react-redux";
-import store from "@/utils/store/store";
-import { CMSContext } from "./CMSContext";
+import { Provider as ReduxProvider } from 'react-redux';
+import store from '@/utils/store/store';
+import { CMSContext } from './CMSContext';
+import { useMemo } from 'react';
 
 export default function Providers({ children, cms }) {
+  // ✅ stable reference across renders
+  const cmsValue = useMemo(() => cms, [cms]);
+
   return (
     <ReduxProvider store={store}>
-      {/* CMS now available instantly to the whole app */}
-      <CMSContext.Provider value={cms}>
+      <CMSContext.Provider value={cmsValue}>
         {children}
       </CMSContext.Provider>
     </ReduxProvider>
