@@ -28,6 +28,7 @@ const [darkMode, setDarkMode]= useState(false)
     dateOfBirth: '',
     maritalStatus: '',
     gender:'',
+    declarationConsent: false,
     permanentAddress: '',
     currentAddress: '',
     sameAddress: false,
@@ -48,40 +49,84 @@ const [darkMode, setDarkMode]= useState(false)
    // Reason for Aid Request
   aidType: '',
   hardshipDescription: '',
-  supportingDocuments: [],
-  declarationConsent: false,
+  supportingDocuments: []
+
   })
 
 const handleInputChange = (e) => {
-  const { name, value } = e.target;
+  const { name, type, value, checked } = e.target;
 
-  if (e.target.type === "file") {
+  if (type === "checkbox") {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+    return;
+  }
+
+  if (type === "file") {
     if (name === "supportingDocuments") {
-      // Multiple files
       setFormData((prev) => ({
         ...prev,
         [name]: Array.from(e.target.files),
       }));
     } else {
-      // Single file
       setFormData((prev) => ({
         ...prev,
         [name]: e.target.files[0],
       }));
     }
-  } else {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    return;
   }
+
+  // text inputs
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
 };
 
 
- const handleNext = (nextStep) => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-  setCurrentStep(nextStep)
-}
+
+const requiredFields = {
+  1: ["fullName", "relation", "relationName", "dateOfBirth", "maritalStatus", "gender","declarationConsent"],
+  2: ["permanentAddress", "currentAddress", "contactNumber", "email", "idType", "govIdNumber", "govIdDocument"],
+  3: ["occupation", "monthlyIncome", "bankNameBranch", "accountNumber", "ifscCode", "numberOfDependents", "bankStatement"],
+  4: ["aidType", "hardshipDescription"],
+};
+
+const validateStep = (step) => {
+  const fields = requiredFields[step];
+
+  for (const field of fields) {
+    const value = formData[field];
+
+    // Checkbox fields should be true
+    if (field === "declarationConsent" && value !== true) {
+      return false;
+    }
+
+    // Normal fields should not be empty/null/undefined
+    if (value === "" || value === null || value === undefined) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+
+
+
+
+const handleNext = (nextStep) => {
+ 
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  setCurrentStep(nextStep);
+};
+
+
 
 const handleSubmit = async (e) => {
   // allow calling handleSubmit from onClick (no event) or from a form submit event
@@ -89,10 +134,7 @@ const handleSubmit = async (e) => {
     e.preventDefault()
   }
 
-  if (!formData.declarationConsent) {
-    alert('Please accept the declaration and consent')
-    return
-  }
+ 
 
   try {
     // Create FormData object for file uploads
@@ -108,6 +150,7 @@ const handleSubmit = async (e) => {
     formDataToSend.append('dateOfBirth', formData.dateOfBirth)
     formDataToSend.append('maritalStatus', formData.maritalStatus)
     formDataToSend.append('gender', formData.gender)
+    formDataToSend.append('declarationConsent', formData.declarationConsent)
     formDataToSend.append('permanentAddress', formData.permanentAddress)
     formDataToSend.append('currentAddress', formData.currentAddress)
     formDataToSend.append('sameAddress', formData.sameAddress)
@@ -123,7 +166,6 @@ const handleSubmit = async (e) => {
     formDataToSend.append('numberOfDependents', formData.numberOfDependents)
     formDataToSend.append('aidType', formData.aidType)
     formDataToSend.append('hardshipDescription', formData.hardshipDescription)
-    formDataToSend.append('declarationConsent', formData.declarationConsent)
 
     // Add file uploads
     if (formData.govIdDocument) {
@@ -486,17 +528,25 @@ const handleSubmit = async (e) => {
     </div>
 
     {/* Next Button */}
-    <div className="flex justify-end pt-4">
-      <button
-        onClick={() => handleNext(2)}
-        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
-      >
-        Next
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
+   <div className="flex justify-end pt-4">
+  <button
+    disabled={!validateStep(currentStep)}
+    onClick={() => handleNext(2)}
+    className={`px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold flex items-center gap-2 transition-all
+      ${
+        !validateStep(currentStep)
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+      }
+    `}
+  >
+    Next
+    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+</div>
+
   </div>
 )}
 
@@ -828,14 +878,21 @@ const handleSubmit = async (e) => {
         <span className="sm:hidden">Back</span>
       </button>
       <button
-        onClick={() => handleNext(3)}
-        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
-      >
-        Next
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
+    disabled={!validateStep(currentStep)}
+    onClick={() => handleNext(3)}
+    className={`px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold flex items-center gap-2 transition-all
+      ${
+        !validateStep(currentStep)
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+      }
+    `}
+  >
+    Next
+    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
     </div>
   </div>
 )}
@@ -1085,15 +1142,22 @@ const handleSubmit = async (e) => {
         <span className="hidden sm:inline">Previous</span>
         <span className="sm:hidden">Back</span>
       </button>
-      <button
-        onClick={() => handleNext(4)}
-        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
-      >
-        Next
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
+     <button
+    disabled={!validateStep(currentStep)}
+    onClick={() => handleNext(4)}
+    className={`px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold flex items-center gap-2 transition-all
+      ${
+        !validateStep(currentStep)
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+      }
+    `}
+  >
+    Next
+    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
     </div>
   </div>
 )}
@@ -1232,20 +1296,22 @@ const handleSubmit = async (e) => {
    
     {/* Navigation Buttons */}
     <div className="flex justify-between pt-4 gap-3">
-      <button
-        onClick={() => handleNext(3)}
-        className={`px-4 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold transition-all border ${
-          darkMode
-            ? "border-zinc-600 text-white hover:bg-zinc-700"
-            : "border-zinc-300 text-zinc-900 hover:bg-zinc-100"
-        } flex items-center gap-2`}
-      >
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        <span className="hidden sm:inline">Previous</span>
-        <span className="sm:hidden">Back</span>
-      </button>
+       <button
+    disabled={!validateStep(currentStep)}
+    onClick={() => handleNext(3)}
+    className={`px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold flex items-center gap-2 transition-all
+      ${
+        !validateStep(currentStep)
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+      }
+    `}
+  >
+    Next
+    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
       <button
         onClick={() => handleNext(5)}
         className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
