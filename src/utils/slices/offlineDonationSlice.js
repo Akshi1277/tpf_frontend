@@ -1,35 +1,52 @@
 import { apiSlice } from "./apiSlice";
+import { setCredentials } from "./authSlice";
 
 export const offlineDonationApiSlice = apiSlice.injectEndpoints({
-    endpoints: (builder) => ({
+  endpoints: (builder) => ({
 
-        // CREATE offline donation
-        createOfflineDonation: builder.mutation({
-            query: (formData) => ({
-                url: '/offline-donations/create',
-                method: 'POST',
-                body: formData,
-            }),
-        }),
+    createOfflineDonation: builder.mutation({
+      query: (formData) => ({
+        url: '/offline-donations/create',
+        method: 'POST',
+        body: formData,
+      }),
 
-        // GET all donations (admin or user list)
-        getOfflineDonations: builder.query({
-            query: () => ({
-                url: '/offline-donations',
-                method: 'GET',
-            }),
-        }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
 
-        // GET one donation by ID
-        getOfflineDonationById: builder.query({
-            query: (id) => `/offline-donations/${id}`,
-        }),
+          dispatch(
+            apiSlice.util.updateQueryData(
+              'getOfflineDonations',
+              undefined,
+              (draft) => {
+                draft.donations.unshift(data.donation);
+              }
+            )
+          );
+
+          dispatch(setCredentials(data.user));
+        } catch (err) {
+          // optional error handling
+        }
+      },
     }),
+
+    getOfflineDonations: builder.query({
+      query: () => ({
+        url: '/offline-donations',
+        method: 'GET',
+      }),
+    }),
+
+    getOfflineDonationById: builder.query({
+      query: (id) => `/offline-donations/${id}`,
+    }),
+  }),
 });
 
-// Export hooks
 export const {
-    useCreateOfflineDonationMutation,
-    useGetOfflineDonationsQuery,
-    useGetOfflineDonationByIdQuery,
+  useCreateOfflineDonationMutation,
+  useGetOfflineDonationsQuery,
+  useGetOfflineDonationByIdQuery,
 } = offlineDonationApiSlice;

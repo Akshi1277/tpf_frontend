@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-
+import { setCredentials } from "./authSlice";
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
 
@@ -11,32 +11,47 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    //useVerifyOtpMutaion
     verifyOtp: builder.mutation({
       query: ({ mobileNo, otp }) => ({
         url: "/user/verify-otp",
         method: "POST",
         body: { mobileNo, otp },
       }),
-    }), // ✅ THIS WAS MISSING
+    }),
 
-   updateProfile: builder.mutation({
-  query: (profileData) => ({
-    url: "/user/update-profile",
-    method: "PUT",
-    body: profileData,   // send everything user wants to update
-  }),
-}),
+    updateProfile: builder.mutation({
+      query: (profileData) => ({
+        url: "/user/update-profile",
+        method: "PUT",
+        body: profileData,
+      }),
 
-getUser : builder.query({
-  query:() =>({
-    url: "/user/getUser",
-    method: "GET"
-  })
-})
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
 
+          // ✅ Update Redux immediately (NO refetch)
+          dispatch(setCredentials(data.user));
 
+        } catch (error) {
+          // optional: console.error(error);
+        }
+      },
 
+      invalidatesTags: ["User"],
+    }),
+
+    getMe: builder.query({
+      query: () => "/user/me",
+      providesTags: ["User"],
+    }),
+
+    logoutUser: builder.mutation({
+      query: () => ({
+        url: "/user/logout",
+        method: "POST",
+      }),
+    }),
 
   }),
 });
@@ -45,5 +60,6 @@ export const {
   useSendOtpMutation,
   useVerifyOtpMutation,
   useUpdateProfileMutation,
-  useGetUserQuery
+  useGetMeQuery,
+  useLogoutUserMutation,
 } = authApiSlice;

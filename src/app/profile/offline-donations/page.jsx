@@ -3,8 +3,6 @@ import Sidebar from '@/components/layout/Sidebar'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { useState, useEffect } from 'react'
-import KYCDetails from '@/components/profile/kycdetails/KYCDetails'
-import MyCampaignsPage from '@/components/profile/my-campaigns/MyCampaign'
 import OfflineDonationsPage from '@/components/profile/offline-donations/OfflineDonation'
 
 export default function Page() {

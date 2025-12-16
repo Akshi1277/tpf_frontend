@@ -1,10 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const storedUser =
-typeof window !== "undefined" ? localStorage.getItem("userInfo") : null;
+// Only SAFE fields are persisted
+const persistedUser =
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : null;
 
 const initialState = {
-  userInfo: storedUser ? JSON.parse(storedUser) : null,
+  userInfo: null,          // AUTH IDENTITY (redux)
+  persistedUser,           // SAFE fallback (localStorage)
 };
 
 const authSlice = createSlice({
@@ -12,19 +16,32 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      state.userInfo = action.payload;
+      const identity = action.payload;
+
+      // 1️⃣ Store identity in redux (used everywhere)
+      state.userInfo = identity;
+
+      // 2️⃣ Persist ONLY minimal safe fields
+      const safePersist = {
+        fullName: identity.fullName ?? null,
+        email: identity.email ?? null,
+        mobileNo: identity.mobileNo ?? null,
+      };
+
+      state.persistedUser = safePersist;
+
       if (typeof window !== "undefined") {
-        localStorage.setItem("userInfo", JSON.stringify(action.payload));
+        localStorage.setItem("userInfo", JSON.stringify(safePersist));
       }
     },
-    
+
     logout: (state) => {
-     
       state.userInfo = null;
+      state.persistedUser = null;
+
       if (typeof window !== "undefined") {
         localStorage.removeItem("userInfo");
       }
-    
     },
   },
 });

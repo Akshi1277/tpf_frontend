@@ -590,6 +590,229 @@ const handleSaveProfileBeforeNext = () => {
     { number: 2, title: "Address & PAN", icon: MapPin },
     { number: 3, title: "Preview", icon: Eye }
   ]
+    const isKycApproved = userInfo?.kycDetails?.panVerified === true && 
+                        userInfo?.kycDetails?.status === "verified";
+
+
+if (isKycApproved) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
+          darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+        }`} />
+        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
+          darkMode ? "bg-teal-950/20" : "bg-teal-50"
+        }`} />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className={`relative z-10 max-w-4xl w-full rounded-3xl overflow-hidden ${
+          darkMode
+            ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
+            : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
+        }`}
+      >
+        {/* Header */}
+        <div className="relative h-32 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
+          <div className="absolute inset-0 opacity-20">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+                backgroundSize: "32px 32px"
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="px-6 sm:px-8 pb-10 -mt-16">
+          {/* Success Badge */}
+          <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full mb-6 shadow-xl ${
+            darkMode ? "bg-emerald-900/50 ring-4 ring-zinc-900/50" : "bg-white ring-8 ring-white shadow-2xl"
+          }`}>
+          </div>
+
+          <h2 className={`text-3xl sm:text-4xl font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
+            KYC Verified Successfully
+          </h2>
+
+          <p className={`text-base mb-8 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+            Your KYC verification is complete and approved
+          </p>
+
+          {/* Status Badge */}
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 ${
+            darkMode ? "bg-emerald-950/30 border border-emerald-800" : "bg-emerald-50 border-2 border-emerald-200"
+          }`}>
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className={`text-sm font-semibold ${darkMode ? "text-emerald-400" : "text-emerald-700"}`}>
+              Verified & Approved
+            </span>
+          </div>
+
+          {/* KYC Details */}
+          <div className="space-y-6">
+            {/* Personal Information */}
+            <div className={`p-6 rounded-2xl border ${
+              darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+            }`}>
+              <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                <User className="w-5 h-5" />
+                Personal Information
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Full Name
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.fullName || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Date of Birth
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.dob ? new Date(userInfo.dob).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    }) : "Not provided"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Gender
+                  </p>
+                  <p className={`font-semibold capitalize ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.gender || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Profession
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.profession || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Phone Number
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.mobileNo || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Email Address
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.email || "—"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Address */}
+            <div className={`p-6 rounded-2xl border ${
+              darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+            }`}>
+              <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                <MapPin className="w-5 h-5" />
+                Residential Address
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Address
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.address?.house || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    City
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.address?.city || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    State
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.address?.state || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Postal Code
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.address?.pincode || "Not provided"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* PAN Details */}
+            <div className={`p-6 rounded-2xl border ${
+              darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+            }`}>
+              <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                <CreditCard className="w-5 h-5" />
+                PAN Card Details
+              </h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    PAN Number
+                  </p>
+                  <p className={`font-bold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.kycDetails?.panNumber || "—"}
+                  </p>
+                </div>
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
+                  darkMode ? "bg-emerald-950/30" : "bg-emerald-50"
+                }`}>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className={`text-sm font-semibold ${darkMode ? "text-emerald-400" : "text-emerald-700"}`}>
+                    Verified
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Info Box */}
+            <div className={`p-5 rounded-xl border ${
+              darkMode ? "bg-blue-950/20 border-blue-800/50" : "bg-blue-50 border-2 border-blue-200"
+            }`}>
+              <div className="flex items-start gap-3">
+                <Lock className={`w-5 h-5 flex-shrink-0 mt-0.5 ${darkMode ? "text-blue-400" : "text-blue-600"}`} />
+                <div>
+                  <p className={`font-semibold text-sm mb-1 ${darkMode ? "text-blue-300" : "text-blue-900"}`}>
+                    KYC Details Locked
+                  </p>
+                  <p className={`text-xs ${darkMode ? "text-blue-400" : "text-blue-700"}`}>
+                    Your KYC has been verified and approved. These details are now locked and cannot be modified.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
 
 if (isSubmitted) {
     return (

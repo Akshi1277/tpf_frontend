@@ -80,7 +80,7 @@ const donations = data?.donations || [];
     { id: "rtgs", name: "RTGS", icon: Building2, description: "Real Time Gross Settlement", color: "emerald" },
     { id: "imps", name: "IMPS", icon: CreditCard, description: "Immediate Payment Service", color: "blue" },
     { id: "neft", name: "NEFT", icon: Landmark, description: "National Electronic Funds Transfer", color: "purple" },
-    { id: "cheque", name: "Cheque", icon: FileText, description: "Bank Cheque Payment", color: "orange" }
+    { id: "cheque", name: "CHEQUE", icon: FileText, description: "Bank Cheque Payment", color: "orange" }
   ]
 
   const handleInputChange = (e) => {
@@ -113,6 +113,8 @@ const handleSubmit = async () => {
       chequeDate: formData.chequeDate,
       branchName: formData.branchName,
     }
+    console.log("Submitting donation:", payload);
+
     const data = await createDonation(payload).unwrap();
 
     // ⭐ Save new user (with new donation) in Redux state

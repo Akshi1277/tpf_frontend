@@ -8,10 +8,13 @@ import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/utils/slices/authSlice';
+import { useLogoutUserMutation } from '@/utils/slices/authApiSlice';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+
+  const [logoutUser] = useLogoutUserMutation();
 useEffect(() => setHasMounted(true), []);
   const userInfo = useSelector((state) => state.auth.userInfo);
 
@@ -35,6 +38,16 @@ useEffect(() => setHasMounted(true), []);
     }
   };
 
+  const handleLogout = async () => {
+  try {
+    await logoutUser().unwrap(); // clears cookie
+  } catch (e) {
+    // ignore
+  } finally {
+    dispatch(logout()); // clears redux + localStorage
+    router.push("/");
+  }
+};
 
 
 
@@ -452,11 +465,7 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
 <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
   {userInfo ? (
     <button
-      onClick={() => {
-        dispatch(logout());
-        router.push('/login')
-        setMobileMenuOpen(false);
-      }}
+      onClick={handleLogout}
       className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-colors
       ${darkMode ? 'text-red-400 hover:bg-zinc-800' : 'text-red-600 hover:bg-zinc-100'}`}
     >
