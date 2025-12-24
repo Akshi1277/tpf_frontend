@@ -183,22 +183,7 @@ export default function CampaignsSection({ darkMode }) {
           </Link>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
-          {categories.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setSelectedCategory(cat.key)}
-              className={`rounded-full border px-3 py-1.5 text-sm ${selectedCategory === cat.key
-                  ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                  : darkMode
-                    ? "border-zinc-700 bg-zinc-800 text-zinc-300"
-                    : "border-zinc-200 bg-white text-zinc-700"
-                }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+      
 
         <div className="relative">
           {enableInfiniteScroll && (
