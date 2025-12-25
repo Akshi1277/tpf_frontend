@@ -161,7 +161,7 @@ const handleSubmit = async (e) => {
   <motion.div
     initial={{ opacity: 0, y: -50 }}
     animate={{ opacity: 1, y: 0 }}
-    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+    className="fixed top-4 left-1/2  -translate-x-1/2 z-50 
                bg-gradient-to-r from-emerald-600 to-emerald-400 text-white px-6 py-4 rounded-lg shadow-2xl 
                flex items-center gap-3 max-w-md w-[90%] sm:w-auto"
   >
@@ -182,7 +182,7 @@ const handleSubmit = async (e) => {
   <motion.div
     initial={{ opacity: 0, y: -50 }}
     animate={{ opacity: 1, y: 0 }}
-    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+    className="fixed top-4 left-1/2  -translate-x-1/2 z-50 
          bg-gradient-to-r from-red-600 to-red-400 text-white px-6 py-4 rounded-lg shadow-2xl 
          flex items-center gap-3 max-w-md w-[90%] sm:w-auto"
   >
@@ -223,7 +223,7 @@ const handleSubmit = async (e) => {
                 {/* Step Circle + Label */}
                 <button
                   onClick={() => handleNext(step)}
-                  className="flex flex-col items-center group cursor-pointer border-none bg-transparent p-0"
+                  className="flex flex-col items-center group cursor-pointer border-none bg-transparent py-2"
                   disabled={step > currentStep}
                 >
                   <div
@@ -289,7 +289,7 @@ const handleSubmit = async (e) => {
         Full Name <span className="text-red-500">*</span>
       </label>
       <div className="relative">
-        <User className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
+        <User className={`absolute left-3 top-1/2  -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
         <input
           type="text"
           name="fullName"
@@ -312,7 +312,7 @@ const handleSubmit = async (e) => {
         Father/Mother/Husband Name <span className="text-red-500">*</span>
       </label>
       <div className="relative">
-        <User className={`absolute left-3 top-6-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
+        <User className={`absolute left-3 top-6  -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
        {/* Relationship Dropdown */}
 <select
   name="relation"
@@ -359,7 +359,7 @@ const handleSubmit = async (e) => {
         Date of Birth <span className="text-red-500">*</span>
       </label>
       <div className="relative">
-        <Calendar className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
+        <Calendar className={`absolute left-3 top-1/2  -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
         <input
           type="date"
           name="dateOfBirth"
@@ -601,7 +601,7 @@ const handleSubmit = async (e) => {
         </span>
       </label>
       <div className="relative">
-        <Phone className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
+        <Phone className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
         <input
           type="tel"
           name="contactNumber"
@@ -627,7 +627,7 @@ const handleSubmit = async (e) => {
         </span>
       </label>
       <div className="relative">
-        <Mail className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
+        <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
         <input
           type="email"
           name="email"
@@ -668,7 +668,7 @@ const handleSubmit = async (e) => {
               <div className="flex items-center gap-2 sm:gap-3">
                 <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${ formData.idType === 'pan' ? 'text-emerald-600':darkMode ? 'text-zinc-400':'text-zinc-500' } `} />
                 <div>
-                  <p className={`font-semibold text-sm sm:text-base ${ darkMode ? "text-white":"text-zinc-900" } `}>PAN Card</p>
+                  <p className={`font-semibold text-sm sm:text-base ${ darkMode ? "text-zinc-900":"text-zinc-900" } `}>PAN Card</p>
                   <p className={`text-[10px] sm:text-xs ${ darkMode ? "text-zinc-500":"text-zinc-500" } `}>10 characters</p>
                 </div>
               </div>
@@ -702,7 +702,7 @@ const handleSubmit = async (e) => {
               <div className="flex items-center gap-2 sm:gap-3">
                 <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${ formData.idType === 'aadhar' ? 'text-emerald-600':darkMode ? 'text-zinc-400':'text-zinc-500' } `} />
                 <div>
-                  <p className={`font-semibold text-sm sm:text-base ${ darkMode ? "text-white":"text-zinc-900" } `}>Aadhar Card</p>
+                  <p className={`font-semibold text-sm sm:text-base ${ darkMode ? "text-zinc-900":"text-zinc-900" } `}>Aadhar Card</p>
                   <p className={`text-[10px] sm:text-xs ${ darkMode ? "text-zinc-500":"text-zinc-500" } `}>12 characters</p>
                 </div>
               </div>
@@ -731,7 +731,7 @@ const handleSubmit = async (e) => {
 </label>
 
       <div className="relative">
-        <CreditCard className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
+        <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
         <input
           type="text"
           name="govIdNumber"
@@ -865,7 +865,7 @@ const handleSubmit = async (e) => {
       Occupation <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-      <svg className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
       <input
@@ -886,7 +886,7 @@ const handleSubmit = async (e) => {
       Monthly Income <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-      <span className={`absolute left-3 top-1/2-translate-y-1/2 font-semibold text-sm sm:text-base ${ darkMode ? "text-zinc-400":"text-zinc-500" } `}>
+      <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-sm sm:text-base ${ darkMode ? "text-zinc-400":"text-zinc-500" } `}>
         ₹
       </span>
       <input
@@ -910,7 +910,7 @@ const handleSubmit = async (e) => {
       Bank Name & Branch <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-      <svg className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
       </svg>
       <input
@@ -931,7 +931,7 @@ const handleSubmit = async (e) => {
       Account Number <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-      <CreditCard className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
+      <CreditCard className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} />
       <input
         type="text"
         name="accountNumber"
@@ -950,7 +950,7 @@ const handleSubmit = async (e) => {
       IFSC Code <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-      <svg className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
       </svg>
       <input
@@ -975,7 +975,7 @@ const handleSubmit = async (e) => {
       Number of Dependents <span className="text-red-500">*</span>
     </label>
     <div className="relative">
-      <svg className={`absolute left-3 top-1/2-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${ darkMode ? "text-zinc-500":"text-zinc-400" } `} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
       </svg>
       <input

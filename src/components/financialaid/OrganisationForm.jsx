@@ -265,7 +265,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                 <div key={step} className="flex items-center flex-shrink-0">
                   <button
                     onClick={() => handleNext(step)}
-                    className="flex flex-col items-center group cursor-pointer border-none bg-transparent p-0"
+                    className="flex flex-col items-center group cursor-pointer border-none bg-transparent py-2"
                     disabled={step > currentStep}
                   >
                     <div

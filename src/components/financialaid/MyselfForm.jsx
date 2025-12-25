@@ -701,7 +701,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                           <div className="flex items-center gap-2 sm:gap-3">
                             <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${formData.idType === 'pan' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
                             <div>
-                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-white" : "text-zinc-900"}`}>PAN Card</p>
+                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-zinc-900" : "text-zinc-900"}`}>PAN Card</p>
                               <p className={`text-[10px] sm:text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>10 characters</p>
                             </div>
                           </div>
@@ -734,7 +734,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                           <div className="flex items-center gap-2 sm:gap-3">
                             <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${formData.idType === 'aadhar' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
                             <div>
-                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-white" : "text-zinc-900"}`}>Aadhar Card</p>
+                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-zinc-900" : "text-zinc-900"}`}>Aadhar Card</p>
                               <p className={`text-[10px] sm:text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>12 characters</p>
                             </div>
                           </div>
