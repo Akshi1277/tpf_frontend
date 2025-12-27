@@ -5,11 +5,18 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSlice"
 import { User, Calendar, MapPin, Phone, Mail, CreditCard } from "lucide-react"
+import LoginModal from "../login/LoginModal"
+import { useSelector } from "react-redux"
+
 
 export default function MyselfForm({ darkModeFromParent }) {
     const router = useRouter()
+    const [showLoginModal, setShowLoginModal] = useState(false)
+    const userInfo  = useSelector((state) => state.auth.userInfo) // Get logged-in user
 const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 const [showErrorMessage, setShowErrorMessage] = useState(false) 
+const [pendingSubmit, setPendingSubmit] = useState(false)
+
 const [submitFinancialAid, { isLoading }] = useSubmitFinancialAidMutation()
 const [darkMode, setDarkMode]= useState(false)
 
@@ -129,19 +136,22 @@ const handleNext = (nextStep) => {
 
 
 const handleSubmit = async (e) => {
-  // allow calling handleSubmit from onClick (no event) or from a form submit event
-  if (e && e.preventDefault) {
-    e.preventDefault()
+  if (e?.preventDefault) e.preventDefault()
+
+  if (!userInfo) {
+    setPendingSubmit(true)
+    setShowLoginModal(true)
+    return
   }
 
- 
+  setPendingSubmit(false)
 
   try {
     // Create FormData object for file uploads
     const formDataToSend = new FormData()
 
     // Add form type (IMPORTANT!)
-    formDataToSend.append('formType', 'myself')  // or 'other' or 'organization'
+    formDataToSend.append('formType', 'myself')
 
     // Add all text fields
     formDataToSend.append('fullName', formData.fullName)
@@ -185,16 +195,25 @@ const handleSubmit = async (e) => {
 
     if (result.success) {
       setShowSuccessMessage(true)
-      setTimeout(() => {
-        router.push('/')
-      }, 3000)
+      setTimeout(() => router.push("/"), 3000)
     }
   } catch (err) {
-    console.error('Failed to submit application:', err)
+    console.error(err)
     setShowErrorMessage(true)
     setTimeout(() => setShowErrorMessage(false), 5000)
   }
 }
+
+const handleLoginSuccess = () => {
+  setShowLoginModal(false)
+}
+
+
+useEffect(() => {
+  if (userInfo && pendingSubmit) {
+    handleSubmit()
+  }
+}, [userInfo, pendingSubmit])
 
 
   return (
@@ -1434,16 +1453,28 @@ const handleSubmit = async (e) => {
           Edit
         </button>
 
-        <button
-          onClick={handleSubmit}
-          disabled={!formData.declarationConsent || isLoading}
-          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
-        >
-          {isLoading ? 'Submitting...' : 'Submit'}
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </button>
+       <button
+  onClick={handleSubmit}
+  disabled={!formData.declarationConsent || isLoading}
+  className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
+>
+  {isLoading ? (
+    <>
+      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Submitting...
+    </>
+  ) : (
+    <>
+      Submit Application
+      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </>
+  )}
+</button>
       </div>
     </div>
   </div>
@@ -1451,6 +1482,14 @@ const handleSubmit = async (e) => {
         </motion.div>
       </div>
     </div>
+
+    {/* Login Modal */}
+<LoginModal
+  isOpen={showLoginModal}
+  onClose={() => setShowLoginModal(false)}
+  darkMode={darkMode}
+  onLoginSuccess={handleLoginSuccess}
+/>
     </>
   )
 }
