@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
-import { categories } from '@/lib/constants';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 
 export default function AllCampaignsPage() {
@@ -21,24 +20,33 @@ export default function AllCampaignsPage() {
         return false;
     });
 
-    const [scrolled, setScrolled] = useState(false);
+    const [scrolled, setScrolled] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('all');
 
     useEffect(() => {
         localStorage.setItem('darkMode', JSON.stringify(darkMode));
     }, [darkMode]);
 
-    useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 0);
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
 
     const cms = useCMS();
-    const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
-    const validFundraisers = fundraisers.filter(
-        (f) => typeof f.campaignSlug === "string" && f.campaignSlug.length > 0
-    );
+
+    const validFundraisers = useMemo(() => {
+        const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
+        return fundraisers.filter(
+            (f) => typeof f.campaignSlug === "string" && f.campaignSlug.length > 0
+        );
+    }, [cms]);
+
+    // Dynamic categories extracted from valid fundraisers
+    const dynamicCategories = useMemo(() => {
+        const cats = Array.from(new Set(validFundraisers.map(f => f.category)))
+            .filter(Boolean)
+            .sort();
+        return [
+            { key: 'all', label: 'All' },
+            ...cats.map(cat => ({ key: cat, label: cat }))
+        ];
+    }, [validFundraisers]);
 
     const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
@@ -75,15 +83,15 @@ export default function AllCampaignsPage() {
 
                 {/* Categories */}
                 <div className="flex flex-wrap justify-center gap-2 mb-10">
-                    {categories.map((cat) => (
+                    {dynamicCategories.map((cat) => (
                         <button
                             key={cat.key}
                             onClick={() => setSelectedCategory(cat.key)}
                             className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${selectedCategory === cat.key
-                                    ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                                    : darkMode
-                                        ? "border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-emerald-500"
-                                        : "border-zinc-200 bg-white text-zinc-700 hover:border-emerald-500"
+                                ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                                : darkMode
+                                    ? "border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-emerald-500"
+                                    : "border-zinc-200 bg-white text-zinc-700 hover:border-emerald-500"
                                 }`}
                         >
                             {cat.label}

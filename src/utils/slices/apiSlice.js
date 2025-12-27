@@ -27,5 +27,20 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithAutoLogout,
   tagTypes: ["CMS", "Campaign", "User"],
-  endpoints: () => ({}),
+  endpoints: (builder) => ({
+    getHijriDate: builder.query({
+      async queryFn(date) {
+        try {
+          const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${date}`);
+          const data = await res.json();
+          return { data };
+        } catch (error) {
+          return { error: { status: 'CUSTOM_ERROR', error: error.message } };
+        }
+      },
+      keepUnusedDataFor: 86400, // Cache for 24 hours
+    }),
+  }),
 });
+
+export const { useGetHijriDateQuery } = apiSlice;

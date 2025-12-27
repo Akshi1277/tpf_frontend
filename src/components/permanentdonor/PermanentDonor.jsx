@@ -17,6 +17,9 @@ import {
   X,
   Info
 } from "lucide-react"
+import { useSelector } from "react-redux"
+import { useGetMeQuery } from "@/utils/slices/authApiSlice"
+import { useGetMySubscriptionQuery } from "@/utils/slices/permanentDonorApiSlice"
 import confetti from "canvas-confetti"
 
 export default function PermanentDonorPage({ darkModeFromParent }) {
@@ -25,6 +28,21 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
   const [hoveredPlan, setHoveredPlan] = useState(null)
   const router = useRouter()
   const lastConfettiTime = useRef(0)
+
+  const { userInfo, persistedUser } = useSelector((state) => state.auth)
+  const { data: userData } = useGetMeQuery(undefined, {
+    skip: !userInfo && !persistedUser
+  })
+
+  // Use the freshest data from getMe query, fallback to userInfo from slice
+  const currentUser = userData?.user || userData?.data || userInfo
+  const isPermanentMember = currentUser?.permanentMember
+
+  const { data: subscriptionData } = useGetMySubscriptionQuery(undefined, {
+    skip: !isPermanentMember
+  })
+
+  const activePlanId = subscriptionData?.subscription?.planType
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -207,24 +225,24 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] animate-[spin_60s_linear_infinite]"
         >
           <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
-              ? 'bg-gradient-to-b from-emerald-500/40 via-emerald-500/10 to-transparent'
-              : 'bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent'
+            ? 'bg-gradient-to-b from-emerald-500/40 via-emerald-500/10 to-transparent'
+            : 'bg-gradient-to-b from-emerald-500/50 via-emerald-500/20 to-transparent'
             }`} style={{ transform: 'rotate(0deg)' }} />
           <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
-              ? 'bg-gradient-to-b from-blue-500/40 via-blue-500/10 to-transparent'
-              : 'bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent'
+            ? 'bg-gradient-to-b from-blue-500/40 via-blue-500/10 to-transparent'
+            : 'bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent'
             }`} style={{ transform: 'rotate(72deg)' }} />
           <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
-              ? 'bg-gradient-to-b from-purple-500/40 via-purple-500/10 to-transparent'
-              : 'bg-gradient-to-b from-purple-500/50 via-purple-500/20 to-transparent'
+            ? 'bg-gradient-to-b from-purple-500/40 via-purple-500/10 to-transparent'
+            : 'bg-gradient-to-b from-purple-500/50 via-purple-500/20 to-transparent'
             }`} style={{ transform: 'rotate(144deg)' }} />
           <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
-              ? 'bg-gradient-to-b from-teal-500/40 via-teal-500/10 to-transparent'
-              : 'bg-gradient-to-b from-teal-500/50 via-teal-500/20 to-transparent'
+            ? 'bg-gradient-to-b from-teal-500/40 via-teal-500/10 to-transparent'
+            : 'bg-gradient-to-b from-teal-500/50 via-teal-500/20 to-transparent'
             }`} style={{ transform: 'rotate(216deg)' }} />
           <div className={`absolute top-0 left-1/2 w-1 h-full origin-top ${darkMode
-              ? 'bg-gradient-to-b from-pink-500/40 via-pink-500/10 to-transparent'
-              : 'bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent'
+            ? 'bg-gradient-to-b from-pink-500/40 via-pink-500/10 to-transparent'
+            : 'bg-gradient-to-b from-pink-500/50 via-pink-500/20 to-transparent'
             }`} style={{ transform: 'rotate(288deg)' }} />
         </div>
       </div>
@@ -245,8 +263,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
             }`}>
             Choose Your{' '}
             <span className={`bg-gradient-to-r ${darkMode
-                ? 'from-emerald-400 via-teal-400 to-cyan-400'
-                : 'from-emerald-600 via-teal-600 to-cyan-600'
+              ? 'from-emerald-400 via-teal-400 to-cyan-400'
+              : 'from-emerald-600 via-teal-600 to-cyan-600'
               } bg-clip-text text-transparent`}>
               Giving Plan
             </span>
@@ -266,6 +284,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               const isSelected = selectedPlan?.id === plan.id
               const isHovered = hoveredPlan === plan.id
               const othersSelected = selectedPlan && selectedPlan.id !== plan.id
+              const isActivePlan = activePlanId === plan.id
 
               return (
                 <motion.div
@@ -294,8 +313,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                   }}
                 >
                   <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-200 h-full flex flex-col ${darkMode
-                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}`
-                      : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
+                    ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}`
+                    : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
                     } ${isHovered || isSelected ? plan.color.glow(darkMode) : 'shadow-2xl'} ${plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
                     }`}>
 
@@ -316,13 +335,27 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                         animate={isHovered ? { scale: [1, 1.1, 1] } : {}}
                         transition={{ repeat: isHovered ? Infinity : 0, duration: 2 }}
                         className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm ${darkMode
-                            ? "bg-zinc-900/80 text-white"
-                            : "bg-white/80 text-gray-900"
+                          ? "bg-zinc-900/80 text-white"
+                          : "bg-white/80 text-gray-900"
                           }`}
                       >
                         {plan.badge}
                       </motion.div>
                     </div>
+
+                    {/* Active Plan Indicator */}
+                    {isActivePlan && (
+                      <div className="absolute bottom-14 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                        <motion.div
+                          initial={{ y: 20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold shadow-xl flex items-center gap-1 border border-white/20 whitespace-nowrap"
+                        >
+                          <CheckCircle2 className="w-3 h-3" />
+                          YOUR ACTIVE PLAN
+                        </motion.div>
+                      </div>
+                    )}
 
                     <div className="relative p-8 flex flex-col flex-1">
                       <motion.div
@@ -376,6 +409,7 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
           <div className="block md:hidden space-y-6">
             {donationPlans.map((plan, index) => {
               const Icon = plan.icon
+              const isActivePlan = activePlanId === plan.id
 
               return (
                 <motion.div
@@ -387,8 +421,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                   className="cursor-pointer"
                 >
                   <div className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-300 ${darkMode
-                      ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}`
-                      : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
+                    ? `bg-gradient-to-br from-zinc-900 via-zinc-900/95 to-zinc-900/90 backdrop-blur-xl ${plan.color.border(darkMode)}`
+                    : `bg-gradient-to-br from-white via-gray-50/50 to-white backdrop-blur-xl ${plan.color.border(darkMode)}`
                     } shadow-2xl active:scale-[0.98] ${plan.isSpecial ? 'ring-4 ring-yellow-400/30 scale-105' : ''
                     }`}>
                     <div className={`absolute inset-0 opacity-10 bg-gradient-to-br ${plan.color.gradient(darkMode)}`} />
@@ -398,6 +432,17 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                         {plan.badge}
                       </div>
                     </div>
+
+                    {/* Active Plan Indicator (Mobile) */}
+                    {isActivePlan && (
+                      <div className="absolute top-8 -right-16 -translate-x-1/2 -translate-y-1/2 z-20">
+                        <div className="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold shadow-xl flex items-center gap-1 border border-white/20 whitespace-nowrap">
+                          <CheckCircle2 className="w-3 h-3" />
+                          YOUR ACTIVE PLAN
+                        </div>
+                      </div>
+                    )}
+
                     <div className="relative p-8">
                       <div className={`inline-flex p-4 rounded-2xl mb-4 bg-gradient-to-br ${plan.color.gradient(darkMode)}`}>
                         <Icon className="w-10 h-10 text-white" strokeWidth={2} />
@@ -451,16 +496,16 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 onClick={(e) => e.stopPropagation()}
                 className={`relative max-w-3xl w-full max-h-[85vh] overflow-y-auto rounded-3xl border-2 scrollbar-hide ${darkMode
-                    ? `bg-zinc-900 ${selectedPlan.color.border(darkMode)}`
-                    : `bg-white ${selectedPlan.color.border(darkMode)}`
+                  ? `bg-zinc-900 ${selectedPlan.color.border(darkMode)}`
+                  : `bg-white ${selectedPlan.color.border(darkMode)}`
                   } ${selectedPlan.color.glow(darkMode)}`}
               >
                 {/* Close Button */}
                 <button
                   onClick={handleClose}
                   className={`absolute top-6 right-6 p-2 rounded-full transition-colors z-10 ${darkMode
-                      ? "bg-zinc-800 hover:bg-zinc-700 text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                    ? "bg-zinc-800 hover:bg-zinc-700 text-white"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-900"
                     }`}
                 >
                   <X className="w-5 h-5" />
@@ -525,8 +570,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
 
                   {/* Rules */}
                   <div className={`p-5 rounded-xl mb-6 border ${darkMode
-                      ? "bg-zinc-800/40 border-zinc-700"
-                      : "bg-gray-50 border-gray-200"
+                    ? "bg-zinc-800/40 border-zinc-700"
+                    : "bg-gray-50 border-gray-200"
                     }`}>
                     <h4 className={`text-sm font-bold mb-2 uppercase tracking-wide ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                       How it works
@@ -541,8 +586,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                     <button
                       onClick={handleClose}
                       className={`flex-1 py-4 px-6 rounded-xl font-semibold cursor-pointer transition-all border-2 ${darkMode
-                          ? "border-zinc-700 text-white hover:bg-zinc-800"
-                          : "border-gray-300 text-gray-900 hover:bg-gray-50"
+                        ? "border-zinc-700 text-white hover:bg-zinc-800"
+                        : "border-gray-300 text-gray-900 hover:bg-gray-50"
                         }`}
                     >
                       Back to Plans
@@ -555,6 +600,16 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
                       <ArrowRight className="w-5 h-5" />
                     </button>
                   </div>
+
+                  {activePlanId === selectedPlan.id && (
+                    <div className={`mt-6 p-4 rounded-xl flex items-center gap-3 border ${darkMode
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                      : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      }`}>
+                      <CheckCircle2 className="w-5 h-5" />
+                      <p className="text-sm font-medium">This is your current active plan</p>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </motion.div>
@@ -582,8 +637,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
               className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${darkMode
-                  ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-emerald-500/30"
-                  : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-emerald-300 shadow-lg hover:shadow-xl"
+                ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-emerald-500/30"
+                : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-emerald-300 shadow-lg hover:shadow-xl"
                 }`}
             >
               <div className={`inline-flex p-4 rounded-2xl mb-4 ${darkMode ? "bg-emerald-500/10" : "bg-emerald-100"
@@ -605,8 +660,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
               className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${darkMode
-                  ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-teal-500/30"
-                  : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-teal-300 shadow-lg hover:shadow-xl"
+                ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-teal-500/30"
+                : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-teal-300 shadow-lg hover:shadow-xl"
                 }`}
             >
               <div className={`inline-flex p-4 rounded-2xl mb-4 ${darkMode ? "bg-teal-500/10" : "bg-teal-100"
@@ -628,8 +683,8 @@ export default function PermanentDonorPage({ darkModeFromParent }) {
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
               className={`p-8 rounded-2xl border-2 text-center transition-all duration-300 ${darkMode
-                  ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-cyan-500/30"
-                  : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-cyan-300 shadow-lg hover:shadow-xl"
+                ? "bg-gradient-to-br from-zinc-900/80 to-zinc-900/50 border-zinc-800 hover:border-cyan-500/30"
+                : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-cyan-300 shadow-lg hover:shadow-xl"
                 }`}
             >
               <div className={`inline-flex p-4 rounded-2xl mb-4 ${darkMode ? "bg-cyan-500/10" : "bg-cyan-100"
