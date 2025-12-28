@@ -62,4 +62,5 @@ export const {
   useUpdateProfileMutation,
   useGetMeQuery,
   useLogoutUserMutation,
+  useLazyGetMeQuery,
 } = authApiSlice;
