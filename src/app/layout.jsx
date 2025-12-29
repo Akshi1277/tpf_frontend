@@ -8,7 +8,8 @@ import {
   Geist_Mono as V0_Font_Geist_Mono,
   Source_Serif_4 as V0_Font_Source_Serif_4
 } from 'next/font/google'
-
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 const _geist = V0_Font_Geist({
   subsets: ['latin'],
   weight: ["100","200","300","400","500","600","700","800","900"],
@@ -49,6 +50,14 @@ export default async function RootLayout({ children }) {
         <Providers cms={cms}>
           {children}
         </Providers>
+         <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnHover
+        />
 
         <Script id="disable-right-click" strategy="afterInteractive">
           {`document.addEventListener('contextmenu', event => event.preventDefault());`}

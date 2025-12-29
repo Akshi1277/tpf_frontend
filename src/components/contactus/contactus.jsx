@@ -1,7 +1,10 @@
 "use client"
 import { motion, useInView } from 'framer-motion';
-import { useState, useRef } from 'react';
-
+import { useState, useRef, useEffect } from 'react';
+import { useCreateTicketMutation } from '@/utils/slices/tickets-queriesApiSlice';
+import { useLazyGetMeQuery } from "@/utils/slices/authApiSlice";
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify"
 // Help Centre Section Component
 function HelpCentreSection({ darkMode, isInView }) {
   const [expandedSection, setExpandedSection] = useState(null);
@@ -96,11 +99,10 @@ function HelpCentreSection({ darkMode, isInView }) {
           {reportableIssues.map((issue, index) => (
             <div
               key={index}
-              className={`flex items-start gap-3 p-4 rounded-lg border ${
-                darkMode 
-                  ? 'bg-zinc-800/50 border-zinc-700/50 hover:border-zinc-600' 
-                  : 'bg-white border-zinc-200 hover:border-zinc-300'
-              } transition-colors duration-200`}
+              className={`flex items-start gap-3 p-4 rounded-lg border ${darkMode
+                ? 'bg-zinc-800/50 border-zinc-700/50 hover:border-zinc-600'
+                : 'bg-white border-zinc-200 hover:border-zinc-300'
+                } transition-colors duration-200`}
             >
               <svg className={`w-5 h-5 flex-shrink-0 mt-0.5 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -126,22 +128,19 @@ function HelpCentreSection({ darkMode, isInView }) {
           {grievanceStages.map((stage, index) => (
             <div
               key={stage.stage}
-              className={`rounded-xl border overflow-hidden ${
-                darkMode 
-                  ? 'bg-zinc-800/50 border-zinc-700/50' 
-                  : 'bg-white border-zinc-200'
-              }`}
+              className={`rounded-xl border overflow-hidden ${darkMode
+                ? 'bg-zinc-800/50 border-zinc-700/50'
+                : 'bg-white border-zinc-200'
+                }`}
             >
               <button
                 onClick={() => setExpandedStage(expandedStage === stage.stage ? null : stage.stage)}
-                className={`w-full p-6 flex items-center justify-between text-left ${
-                  darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-gray-50'
-                } transition-colors duration-200`}
+                className={`w-full p-6 flex items-center justify-between text-left ${darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-gray-50'
+                  } transition-colors duration-200`}
               >
                 <div className="flex items-center gap-4 flex-1">
-                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl flex-shrink-0 ${
-                    darkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-100 text-teal-700'
-                  }`}>
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl flex-shrink-0 ${darkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-100 text-teal-700'
+                    }`}>
                     {stage.stage}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -151,9 +150,8 @@ function HelpCentreSection({ darkMode, isInView }) {
                     <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                       {stage.description}
                     </p>
-                    <div className={`mt-2 inline-flex items-center gap-2 text-xs sm:text-sm font-medium px-3 py-1 rounded-full ${
-                      darkMode ? 'bg-zinc-700 text-zinc-300' : 'bg-gray-100 text-zinc-700'
-                    }`}>
+                    <div className={`mt-2 inline-flex items-center gap-2 text-xs sm:text-sm font-medium px-3 py-1 rounded-full ${darkMode ? 'bg-zinc-700 text-zinc-300' : 'bg-gray-100 text-zinc-700'
+                      }`}>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -162,9 +160,8 @@ function HelpCentreSection({ darkMode, isInView }) {
                   </div>
                 </div>
                 <svg
-                  className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${
-                    expandedStage === stage.stage ? 'rotate-180' : ''
-                  } ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
+                  className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${expandedStage === stage.stage ? 'rotate-180' : ''
+                    } ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -188,9 +185,8 @@ function HelpCentreSection({ darkMode, isInView }) {
                     <div className="space-y-2">
                       {stage.required.map((req, idx) => (
                         <div key={idx} className="flex items-start gap-2">
-                          <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${
-                            darkMode ? 'bg-teal-400' : 'bg-teal-600'
-                          }`}></div>
+                          <div className={`w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 ${darkMode ? 'bg-teal-400' : 'bg-teal-600'
+                            }`}></div>
                           <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                             {req}
                           </p>
@@ -218,7 +214,7 @@ function HelpCentreSection({ darkMode, isInView }) {
           <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
             In rare and serious cases, the matter shall be referred to the Legal Wing of True Path Foundation, whose decision shall be final, binding, and enforceable within the framework of Indian law.
           </p>
-          
+
           <h3 className={`text-lg font-semibold mb-3 ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
             Serious Cases Include:
           </h3>
@@ -226,9 +222,8 @@ function HelpCentreSection({ darkMode, isInView }) {
             {legalMatters.map((matter, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-2 p-3 rounded-lg ${
-                  darkMode ? 'bg-zinc-700/30' : 'bg-white'
-                }`}
+                className={`flex items-center gap-2 p-3 rounded-lg ${darkMode ? 'bg-zinc-700/30' : 'bg-white'
+                  }`}
               >
                 <svg className="w-4 h-4 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -255,9 +250,8 @@ function HelpCentreSection({ darkMode, isInView }) {
           {principles.map((principle, index) => (
             <div
               key={index}
-              className={`p-6 rounded-xl ${
-                darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
-              }`}
+              className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
+                }`}
             >
               <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
                 {principle.title}
@@ -277,25 +271,22 @@ function HelpCentreSection({ darkMode, isInView }) {
       {sections.map((section, index) => (
         <div
           key={section.id}
-          className={`rounded-xl border overflow-hidden ${
-            darkMode 
-              ? 'bg-zinc-800/50 border-zinc-700/50' 
-              : 'bg-white border-zinc-200'
-          }`}
+          className={`rounded-xl border overflow-hidden ${darkMode
+            ? 'bg-zinc-800/50 border-zinc-700/50'
+            : 'bg-white border-zinc-200'
+            }`}
         >
           <button
             onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
-            className={`w-full p-6 flex items-center justify-between text-left ${
-              darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-gray-50'
-            } transition-colors duration-200`}
+            className={`w-full p-6 flex items-center justify-between text-left ${darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-gray-50'
+              } transition-colors duration-200`}
           >
             <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
               {section.title}
             </h2>
             <svg
-              className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${
-                expandedSection === section.id ? 'rotate-180' : ''
-              } ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
+              className={`w-6 h-6 flex-shrink-0 transition-transform duration-300 ${expandedSection === section.id ? 'rotate-180' : ''
+                } ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -335,15 +326,23 @@ export default function ContactPage({ darkMode }) {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [createTicket, { isLoading }] = useCreateTicketMutation();
+  const router = useRouter();
+  const [
+    triggerGetMe,
+    { data: userData, isLoading: authLoading }
+  ] = useLazyGetMeQuery();
+
 
   const queryTypes = [
-    { 
-      value: '', 
+    {
+      value: '',
       label: 'Select a category...',
       icon: null
     },
-    { 
-      value: 'general', 
+    {
+      value: 'general',
       label: 'Raise a Query',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -351,8 +350,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'fraud', 
+    {
+      value: 'fraud',
       label: 'Report a Fraud Campaign',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -360,8 +359,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'feedback', 
+    {
+      value: 'feedback',
       label: 'Feedback',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -369,8 +368,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'complaint', 
+    {
+      value: 'complaint',
       label: 'Raise a Complaint',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -378,8 +377,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'bug', 
+    {
+      value: 'bug',
       label: 'Report a Bug',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -387,8 +386,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'donation', 
+    {
+      value: 'donation',
       label: 'Donation Query',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -396,8 +395,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'fundraiser', 
+    {
+      value: 'fundraiser',
       label: 'Fundraiser Assistance',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -405,8 +404,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'volunteer', 
+    {
+      value: 'volunteer',
       label: 'Volunteer Inquiry',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -414,8 +413,8 @@ export default function ContactPage({ darkMode }) {
         </svg>
       )
     },
-    { 
-      value: 'other', 
+    {
+      value: 'other',
       label: 'Other',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -424,53 +423,88 @@ export default function ContactPage({ darkMode }) {
       )
     }
   ];
+  // useEffect(() => {
+  //   toast.success("Test toast");
+  // }, []);
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
-    
+
     if (!formData.queryType) {
       newErrors.queryType = 'Please select a category';
     }
-    
+
     if (!formData.message.trim()) {
       newErrors.message = 'Message is required';
     } else if (formData.message.trim().length < 10) {
       newErrors.message = 'Message must be at least 10 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      console.log('Form submitted:', formData);
-      setSubmitted(true);
-      
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+
+  console.log("1️⃣ Form validated, checking authentication...");
+
+  try {
+    // ✅ AUTH CHECK
+    const user = await triggerGetMe().unwrap();
+    console.log("2️⃣ User authenticated:", user);
+
+    setIsAuthenticated(true);
+
+    // ✅ CREATE TICKET
+    console.log("3️⃣ Creating ticket...");
+    await createTicket(formData).unwrap();
+
+    console.log("4️⃣ Ticket created successfully");
+    toast.success("✅ Your message has been sent successfully!");
+    setSubmitted(true);
+
+    setTimeout(() => {
+      setFormData({
+        fullName: "",
+        email: "",
+        queryType: "",
+        message: "",
+      });
+      setSubmitted(false);
+      setErrors({});
+    }, 3000);
+
+  } catch (error) {
+    // console.error("🔴 handleSubmit error:", error);
+
+    // 🔐 Check for authentication error
+    // RTK Query errors can be in error.status or error.data.status
+    if (error?.status === 401 || error?.originalStatus === 401) {
+      toast.error("🔒 Please login to send your message.");
       setTimeout(() => {
-        setFormData({
-          fullName: '',
-          email: '',
-          queryType: '',
-          message: ''
-        });
-        setSubmitted(false);
-        setErrors({});
-      }, 3000);
+        router.push("/login");
+      }, 1500); // Give time for toast to show
+      return;
     }
-  };
+
+    // ❗ OTHER ERRORS
+    const errorMessage = error?.data?.message || "⚠️ Something went wrong. Please try again.";
+    toast.error(errorMessage);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -478,7 +512,7 @@ export default function ContactPage({ darkMode }) {
       ...prev,
       [name]: value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -520,9 +554,8 @@ export default function ContactPage({ darkMode }) {
   return (
     <section
       ref={ref}
-      className={`py-16 sm:py-20 md:py-24 ${
-        darkMode ? 'bg-zinc-900' : 'bg-gray-50'
-      } relative overflow-hidden`}
+      className={`py-16 sm:py-20 md:py-24 ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
+        } relative overflow-hidden`}
     >
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -543,14 +576,14 @@ export default function ContactPage({ darkMode }) {
             <div className="w-2 h-2 rounded-full bg-teal-500"></div>
             <div className="h-1 w-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
           </div>
-          
+
           <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
             Get In{' '}
             <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 text-transparent bg-clip-text">
               Touch
             </span>
           </h1>
-          
+
           <p className={`text-base sm:text-lg max-w-2xl mx-auto mb-6 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Have a question or need assistance? We're here to help you every step of the way.
           </p>
@@ -560,11 +593,10 @@ export default function ContactPage({ darkMode }) {
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className={`inline-block p-4 sm:p-5 rounded-2xl border backdrop-blur-sm ${
-              darkMode 
-                ? 'bg-zinc-800/30 border-zinc-700/50' 
-                : 'bg-white/60 border-zinc-200'
-            }`}
+            className={`inline-block p-4 sm:p-5 rounded-2xl border backdrop-blur-sm ${darkMode
+              ? 'bg-zinc-800/30 border-zinc-700/50'
+              : 'bg-white/60 border-zinc-200'
+              }`}
           >
             <p className={`text-sm sm:text-base italic ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
               "And lower your wing in humility to the believers." — Surah Al-Hijr (15:88)
@@ -585,15 +617,13 @@ export default function ContactPage({ darkMode }) {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-              className={`p-5 rounded-xl text-center backdrop-blur-sm ${
-                darkMode 
-                  ? 'bg-zinc-800/30 border border-zinc-700/50' 
-                  : 'bg-white/60 border border-zinc-200'
-              }`}
+              className={`p-5 rounded-xl text-center backdrop-blur-sm ${darkMode
+                ? 'bg-zinc-800/30 border border-zinc-700/50'
+                : 'bg-white/60 border border-zinc-200'
+                }`}
             >
-              <div className={`w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center ${
-                darkMode ? 'text-white' : 'text-white'
-              }`}>
+              <div className={`w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center ${darkMode ? 'text-white' : 'text-white'
+                }`}>
                 {feature.icon}
               </div>
               <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
@@ -614,16 +644,15 @@ export default function ContactPage({ darkMode }) {
           className="max-w-3xl mx-auto mb-12"
         >
           {!submitted ? (
-            <div className={`p-6 sm:p-8 rounded-2xl backdrop-blur-sm border ${
-              darkMode 
-                ? 'bg-zinc-800/30 border-zinc-700/50' 
-                : 'bg-white/80 border-zinc-200'
-            } shadow-2xl`}>
-              <div className="space-y-6">
+            <div className={`p-6 sm:p-8 rounded-2xl backdrop-blur-sm border ${darkMode
+              ? 'bg-zinc-800/30 border-zinc-700/50'
+              : 'bg-white/80 border-zinc-200'
+              } shadow-2xl`}>
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Full Name */}
                 <div>
-                  <label 
-                    htmlFor="fullName" 
+                  <label
+                    htmlFor="fullName"
                     className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -641,21 +670,19 @@ export default function ContactPage({ darkMode }) {
                       onFocus={() => setFocusedField('fullName')}
                       onBlur={() => setFocusedField(null)}
                       placeholder="Enter your full name"
-                      className={`w-full px-4 py-3 rounded-xl text-base transition-all duration-300 ${
-                        darkMode
-                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                      } border-2 ${
-                        errors.fullName 
-                          ? 'border-red-500' 
+                      className={`w-full px-4 py-3 rounded-xl text-base transition-all duration-300 ${darkMode
+                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                        } border-2 ${errors.fullName
+                          ? 'border-red-500'
                           : focusedField === 'fullName'
-                          ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                          : ''
-                      } focus:outline-none`}
+                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                            : ''
+                        } focus:outline-none`}
                     />
                   </div>
                   {errors.fullName && (
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="text-red-500 text-sm mt-2 flex items-center gap-1"
@@ -670,8 +697,8 @@ export default function ContactPage({ darkMode }) {
 
                 {/* Email */}
                 <div>
-                  <label 
-                    htmlFor="email" 
+                  <label
+                    htmlFor="email"
                     className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -689,21 +716,19 @@ export default function ContactPage({ darkMode }) {
                       onFocus={() => setFocusedField('email')}
                       onBlur={() => setFocusedField(null)}
                       placeholder="your.email@example.com"
-                      className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 ${
-                        darkMode
-                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                      } border-2 ${
-                        errors.email 
-                          ? 'border-red-500' 
+                      className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 ${darkMode
+                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                        } border-2 ${errors.email
+                          ? 'border-red-500'
                           : focusedField === 'email'
-                          ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                          : ''
-                      } focus:outline-none`}
+                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                            : ''
+                        } focus:outline-none`}
                     />
                   </div>
                   {errors.email && (
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="text-red-500 text-sm mt-2 flex items-center gap-1"
@@ -718,8 +743,8 @@ export default function ContactPage({ darkMode }) {
 
                 {/* Query Type */}
                 <div>
-                  <label 
-                    htmlFor="queryType" 
+                  <label
+                    htmlFor="queryType"
                     className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -736,21 +761,19 @@ export default function ContactPage({ darkMode }) {
                       onChange={handleChange}
                       onFocus={() => setFocusedField('queryType')}
                       onBlur={() => setFocusedField(null)}
-                      className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 appearance-none cursor-pointer ${
-                        darkMode
-                          ? 'bg-zinc-700/50 text-white border-zinc-600'
-                          : 'bg-white text-zinc-900 border-zinc-300'
-                      } border-2 ${
-                        errors.queryType 
-                          ? 'border-red-500' 
+                      className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 appearance-none cursor-pointer ${darkMode
+                        ? 'bg-zinc-700/50 text-white border-zinc-600'
+                        : 'bg-white text-zinc-900 border-zinc-300'
+                        } border-2 ${errors.queryType
+                          ? 'border-red-500'
                           : focusedField === 'queryType'
-                          ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                          : ''
-                      } focus:outline-none`}
+                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                            : ''
+                        } focus:outline-none`}
                     >
                       {queryTypes.map((type) => (
-                        <option 
-                          key={type.value} 
+                        <option
+                          key={type.value}
                           value={type.value}
                           className={darkMode ? 'bg-zinc-800' : 'bg-white'}
                         >
@@ -765,7 +788,7 @@ export default function ContactPage({ darkMode }) {
                     </div>
                   </div>
                   {errors.queryType && (
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="text-red-500 text-sm mt-2 flex items-center gap-1"
@@ -780,8 +803,8 @@ export default function ContactPage({ darkMode }) {
 
                 {/* Message */}
                 <div>
-                  <label 
-                    htmlFor="message" 
+                  <label
+                    htmlFor="message"
                     className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -799,24 +822,22 @@ export default function ContactPage({ darkMode }) {
                       onBlur={() => setFocusedField(null)}
                       rows="5"
                       placeholder="Please provide details about your query..."
-                      className={`w-full px-5 py-4 rounded-xl text-base resize-none transition-all duration-300 ${
-                        darkMode
-                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                      } border-2 ${
-                        errors.message 
-                          ? 'border-red-500' 
+                      className={`w-full px-5 py-4 rounded-xl text-base resize-none transition-all duration-300 ${darkMode
+                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                        } border-2 ${errors.message
+                          ? 'border-red-500'
                           : focusedField === 'message'
-                          ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                          : ''
-                      } focus:outline-none`}
+                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                            : ''
+                        } focus:outline-none`}
                     />
                     <div className={`absolute bottom-4 right-4 text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                       {formData.message.length} characters
                     </div>
                   </div>
                   {errors.message && (
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="text-red-500 text-sm mt-2 flex items-center gap-1"
@@ -831,28 +852,26 @@ export default function ContactPage({ darkMode }) {
 
                 {/* Submit Button */}
                 <motion.button
-                  onClick={handleSubmit}
+                  type="submit"
+                  disabled={isLoading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-500 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white font-semibold text-base shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 transition-all duration-500 flex items-center justify-center gap-2 group"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-500 text-white font-semibold shadow-lg"
                 >
-                  <span>Send Message</span>
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                  </svg>
+                  {isLoading ? "Sending..." : "Send Message"}
                 </motion.button>
-              </div>
+
+              </form>
             </div>
           ) : (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className={`p-10 sm:p-12 rounded-2xl text-center backdrop-blur-sm border ${
-                darkMode 
-                  ? 'bg-zinc-800/30 border-zinc-700/50' 
-                  : 'bg-white/80 border-zinc-200'
-              } shadow-2xl`}
+              className={`p-10 sm:p-12 rounded-2xl text-center backdrop-blur-sm border ${darkMode
+                ? 'bg-zinc-800/30 border-zinc-700/50'
+                : 'bg-white/80 border-zinc-200'
+                } shadow-2xl`}
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -864,7 +883,7 @@ export default function ContactPage({ darkMode }) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </motion.div>
-              <motion.h3 
+              <motion.h3
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
@@ -872,7 +891,7 @@ export default function ContactPage({ darkMode }) {
               >
                 Message Sent Successfully!
               </motion.h3>
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
@@ -891,14 +910,13 @@ export default function ContactPage({ darkMode }) {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="max-w-5xl mx-auto mt-12"
         >
-          <div className={`text-center mb-8 p-6 sm:p-8 rounded-xl ${
-            darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
-          }`}>
+          <div className={`text-center mb-8 p-6 sm:p-8 rounded-xl ${darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
+            }`}>
             <h2 className={`text-lg sm:text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
               Raise Your Concerns — We're Here to Listen, Solve, and Support
             </h2>
             <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              At TPF Aid, we see every concern as an opportunity to improve — and every question as a responsibility before Allah and humanity. 
+              At TPF Aid, we see every concern as an opportunity to improve — and every question as a responsibility before Allah and humanity.
               <span className="font-semibold"> You will never be ignored. You will never be alone.</span> If something goes wrong — we'll make it right.
             </p>
           </div>
