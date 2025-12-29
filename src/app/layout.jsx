@@ -57,6 +57,7 @@ export default async function RootLayout({ children }) {
           newestOnTop
           closeOnClick
           pauseOnHover
+          style={{ zIndex: 9999 }}
         />
 
         <Script id="disable-right-click" strategy="afterInteractive">

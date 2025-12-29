@@ -15,8 +15,10 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithAutoLogout = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.status === 401) {
-    // Clear redux + localStorage
+  if (
+    result?.error?.status === 401 &&
+    api.endpoint === "getMe" // 👈 adjust if your auth-check endpoint name differs
+  ) {
     api.dispatch(logout());
   }
 

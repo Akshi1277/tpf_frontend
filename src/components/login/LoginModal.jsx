@@ -17,7 +17,8 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     const [step, setStep] = useState(1)
     const [otp, setOtp] = useState(['', '', '', ''])
     const [showSuccess, setShowSuccess] = useState(false)
-    
+    const justOpenedRef = useRef(false)
+
     const otpInputs = useRef([])
     const mobileInputRef = useRef(null)
 
@@ -129,15 +130,18 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     }
 
     useEffect(() => {
-        if (isOpen && step === 1) {
-            setTimeout(() => mobileInputRef.current?.focus(), 300)
-        }
-    }, [isOpen, step])
+    if (isOpen) {
+        justOpenedRef.current = true
+        setTimeout(() => {
+            justOpenedRef.current = false
+        }, 200)
+    }
+}, [isOpen])
 
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!isOpen) return
-            
+             if (justOpenedRef.current) return
             if (e.key === 'Enter') {
                 if (step === 1 && mobile.length === 10) {
                     handleLogin()

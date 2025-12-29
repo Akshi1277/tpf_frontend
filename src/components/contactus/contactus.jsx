@@ -2,9 +2,9 @@
 import { motion, useInView } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { useCreateTicketMutation } from '@/utils/slices/tickets-queriesApiSlice';
-import { useLazyGetMeQuery } from "@/utils/slices/authApiSlice";
-import { useRouter } from "next/navigation";
-import { ToastContainer, toast } from "react-toastify"
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import LoginModal from "@/components/login/LoginModal"
 // Help Centre Section Component
 function HelpCentreSection({ darkMode, isInView }) {
   const [expandedSection, setExpandedSection] = useState(null);
@@ -321,18 +321,45 @@ export default function ContactPage({ darkMode }) {
     fullName: '',
     email: '',
     queryType: '',
+    otherCategory: '',
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const user = useSelector(state => state.auth.user);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [createTicket, { isLoading }] = useCreateTicketMutation();
-  const router = useRouter();
-  const [
-    triggerGetMe,
-    { data: userData, isLoading: authLoading }
-  ] = useLazyGetMeQuery();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+  const submitTicket = async () => {
+    try {
+      // Add await to properly handle the promise
+      const result = await createTicket(formData).unwrap();
+
+      toast.success("Your message has been sent successfully!");
+      setSubmitted(true);
+
+      setTimeout(() => {
+        setFormData({
+          fullName: "",
+          email: "",
+          queryType: "",
+          otherCategory: '',
+          message: "",
+        });
+        setSubmitted(false);
+        setErrors({});
+      }, 3000);
+      setPendingSubmit(false);
+
+
+      return result; // Return the result
+    } catch (error) {
+      // toast.error("Failed to submit ticket. Please try again.");
+      throw error; // Re-throw to handle in the main function
+    }
+  };
 
 
   const queryTypes = [
@@ -423,9 +450,6 @@ export default function ContactPage({ darkMode }) {
       )
     }
   ];
-  // useEffect(() => {
-  //   toast.success("Test toast");
-  // }, []);
 
   const validateForm = () => {
     const newErrors = {};
@@ -443,6 +467,12 @@ export default function ContactPage({ darkMode }) {
     if (!formData.queryType) {
       newErrors.queryType = 'Please select a category';
     }
+    if (
+      formData.queryType === 'other' &&
+      !formData.otherCategory.trim()
+    ) {
+      newErrors.otherCategory = 'Please specify your category';
+    }
 
     if (!formData.message.trim()) {
       newErrors.message = 'Message is required';
@@ -454,72 +484,61 @@ export default function ContactPage({ darkMode }) {
     return Object.keys(newErrors).length === 0;
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  console.log("1️⃣ Form validated, checking authentication...");
-
-  try {
-    // ✅ AUTH CHECK
-    const user = await triggerGetMe().unwrap();
-    console.log("2️⃣ User authenticated:", user);
-
-    setIsAuthenticated(true);
-
-    // ✅ CREATE TICKET
-    console.log("3️⃣ Creating ticket...");
-    await createTicket(formData).unwrap();
-
-    console.log("4️⃣ Ticket created successfully");
-    toast.success("✅ Your message has been sent successfully!");
-    setSubmitted(true);
-
-    setTimeout(() => {
-      setFormData({
-        fullName: "",
-        email: "",
-        queryType: "",
-        message: "",
-      });
-      setSubmitted(false);
-      setErrors({});
-    }, 3000);
-
-  } catch (error) {
-    // console.error("🔴 handleSubmit error:", error);
-
-    // 🔐 Check for authentication error
-    // RTK Query errors can be in error.status or error.data.status
-    if (error?.status === 401 || error?.originalStatus === 401) {
-      toast.error("🔒 Please login to send your message.");
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500); // Give time for toast to show
-      return;
+    // ❌ no API call here
+    try {
+      await submitTicket();
+    } catch (error) {
+      if (error?.status === 401) {
+        toast.error("🔒 Please login to continue.");
+        setPendingSubmit(true);
+        setShowLoginModal(true);
+      }
     }
+  };
 
-    // ❗ OTHER ERRORS
-    const errorMessage = error?.data?.message || "⚠️ Something went wrong. Please try again.";
-    toast.error(errorMessage);
-  }
-};
+
+  useEffect(() => {
+    console.log("showLoginModal =", showLoginModal);
+  }, [showLoginModal]);
+
+  useEffect(() => {
+    console.log("pendingSubmit state changed to:", pendingSubmit);
+  }, [pendingSubmit]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
+      ...(name === 'queryType' && value !== 'other'
+        ? { otherCategory: '' } // 👈 auto-clear
+        : {})
     }));
 
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
+
+
+  const handleLoginSuccess = async () => {
+    setShowLoginModal(false);
+
+    if (pendingSubmit && validateForm()) {
+      setPendingSubmit(false);
+      await submitTicket();
+    }
+  };
+
+
 
   const features = [
     {
@@ -781,6 +800,48 @@ export default function ContactPage({ darkMode }) {
                         </option>
                       ))}
                     </select>
+                    {/* Other Category (Dynamic) */}
+                      {formData.queryType === 'other' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4"
+                        >
+                          <label
+                            htmlFor="otherCategory"
+                            className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'
+                              }`}
+                          >
+                            Please specify <span className="text-red-500">*</span>
+                          </label>
+
+                          <input
+                            type="text"
+                            id="otherCategory"
+                            name="otherCategory"
+                            value={formData.otherCategory}
+                            onChange={handleChange}
+                            placeholder="Describe your issue briefly"
+                            className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 border-2 ${darkMode
+                              ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                              : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                              } ${errors.otherCategory
+                                ? 'border-red-500'
+                                : 'focus:border-teal-500 focus:shadow-lg focus:shadow-teal-500/20'
+                              } focus:outline-none`}
+                          />
+
+                          {errors.otherCategory && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="text-red-500 text-sm mt-2"
+                            >
+                              {errors.otherCategory}
+                            </motion.p>
+                          )}
+                        </motion.div>
+                      )}
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                       <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -923,6 +984,12 @@ export default function ContactPage({ darkMode }) {
 
           <HelpCentreSection darkMode={darkMode} isInView={isInView} />
         </motion.div>
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          darkMode={darkMode}
+          onLoginSuccess={handleLoginSuccess}
+        />
       </div>
     </section>
   );
