@@ -9,6 +9,7 @@ const persistedUser =
 const initialState = {
   userInfo: null,          // AUTH IDENTITY (redux)
   persistedUser,           // SAFE fallback (localStorage)
+  authChecked: false,
 };
 
 const authSlice = createSlice({
@@ -20,7 +21,7 @@ const authSlice = createSlice({
 
       // 1️⃣ Store identity in redux (used everywhere)
       state.userInfo = identity;
-
+      state.authChecked= true;
       // 2️⃣ Persist ONLY minimal safe fields
       const safePersist = {
         fullName: identity.fullName ?? null,
@@ -28,11 +29,17 @@ const authSlice = createSlice({
         mobileNo: identity.mobileNo ?? null,
       };
 
+      
       state.persistedUser = safePersist;
 
       if (typeof window !== "undefined") {
         localStorage.setItem("userInfo", JSON.stringify(safePersist));
       }
+      
+
+    },
+    setAuthChecked: (state) => {
+      state.authChecked = true;
     },
 
     logout: (state) => {
@@ -46,5 +53,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout,setAuthChecked } = authSlice.actions;
 export default authSlice.reducer;

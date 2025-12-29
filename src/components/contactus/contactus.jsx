@@ -327,7 +327,7 @@ export default function ContactPage({ darkMode }) {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState(null);
-  const user = useSelector(state => state.auth.user);
+  const user = useSelector(state => state.auth.userInfo);
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [createTicket, { isLoading }] = useCreateTicketMutation();
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -491,15 +491,15 @@ export default function ContactPage({ darkMode }) {
     if (!validateForm()) return;
 
     // ❌ no API call here
-    try {
-      await submitTicket();
-    } catch (error) {
-      if (error?.status === 401) {
-        toast.error("🔒 Please login to continue.");
-        setPendingSubmit(true);
-        setShowLoginModal(true);
-      }
+    if (!user) {
+      toast.error("🔒 Please login to continue.");
+      setPendingSubmit(true);
+      setShowLoginModal(true);
+      return;
     }
+
+    await submitTicket();
+
   };
 
 
@@ -801,47 +801,47 @@ export default function ContactPage({ darkMode }) {
                       ))}
                     </select>
                     {/* Other Category (Dynamic) */}
-                      {formData.queryType === 'other' && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-4"
+                    {formData.queryType === 'other' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-4"
+                      >
+                        <label
+                          htmlFor="otherCategory"
+                          className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'
+                            }`}
                         >
-                          <label
-                            htmlFor="otherCategory"
-                            className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'
-                              }`}
+                          Please specify <span className="text-red-500">*</span>
+                        </label>
+
+                        <input
+                          type="text"
+                          id="otherCategory"
+                          name="otherCategory"
+                          value={formData.otherCategory}
+                          onChange={handleChange}
+                          placeholder="Describe your issue briefly"
+                          className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 border-2 ${darkMode
+                            ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                            : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                            } ${errors.otherCategory
+                              ? 'border-red-500'
+                              : 'focus:border-teal-500 focus:shadow-lg focus:shadow-teal-500/20'
+                            } focus:outline-none`}
+                        />
+
+                        {errors.otherCategory && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-500 text-sm mt-2"
                           >
-                            Please specify <span className="text-red-500">*</span>
-                          </label>
-
-                          <input
-                            type="text"
-                            id="otherCategory"
-                            name="otherCategory"
-                            value={formData.otherCategory}
-                            onChange={handleChange}
-                            placeholder="Describe your issue briefly"
-                            className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 border-2 ${darkMode
-                              ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                              : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                              } ${errors.otherCategory
-                                ? 'border-red-500'
-                                : 'focus:border-teal-500 focus:shadow-lg focus:shadow-teal-500/20'
-                              } focus:outline-none`}
-                          />
-
-                          {errors.otherCategory && (
-                            <motion.p
-                              initial={{ opacity: 0, y: -6 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="text-red-500 text-sm mt-2"
-                            >
-                              {errors.otherCategory}
-                            </motion.p>
-                          )}
-                        </motion.div>
-                      )}
+                            {errors.otherCategory}
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    )}
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                       <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
