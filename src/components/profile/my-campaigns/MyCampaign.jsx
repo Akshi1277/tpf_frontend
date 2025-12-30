@@ -66,7 +66,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   }
 
   const CampaignCard = ({ campaign, isMyCampaign = false }) => {
-    const progress = calculateProgress(campaign.raisedAmount, campaign.goalAmount)
+    const progress = calculateProgress(campaign.raisedAmount, campaign.targetAmount)
 
     return (
       <motion.div
@@ -120,11 +120,11 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             {campaign.description}
           </p>
 
-          {!isMyCampaign && campaign.organizer && (
+          {!isMyCampaign && campaign.organization && (
             <p className={`text-xs sm:text-sm mb-3 sm:mb-4 ${
               darkMode ? "text-zinc-500" : "text-gray-500"
             }`}>
-              by <span className="font-semibold">{campaign.organizer}</span>
+              by <span className="font-semibold">{campaign.organization}</span>
             </p>
           )}
 
@@ -139,7 +139,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
               <span className={`text-xs ${
                 darkMode ? "text-zinc-500" : "text-gray-500"
               }`}>
-                of ₹{campaign.goalAmount}
+                of ₹{campaign.targetAmount}
               </span>
             </div>
             <div className={`h-1.5 sm:h-2 rounded-full overflow-hidden ${
