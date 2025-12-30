@@ -53,6 +53,40 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    toggleWishlist: builder.mutation({
+      query: (campaignId) => ({
+        url: `/user/wishlist/${campaignId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Wishlist"],
+
+
+      async onQueryStarted(campaignId, { dispatch, queryFulfilled, getState }) {
+        try {
+          const { data } = await queryFulfilled;
+          const user = getState().auth.userInfo;
+
+          dispatch(
+            setCredentials({
+              ...user,               // ✅ keep existing user
+              wishlist: data.wishlist,
+            })
+          );
+        } catch (err) {
+          // console.error(err);
+        }
+      }
+
+
+
+    }),
+
+    // 📥 GET WISHLIST CAMPAIGNS
+    getWishlist: builder.query({
+      query: () => "/user/wishlist",
+      providesTags: ["Wishlist"],
+    }),
+
   }),
 });
 
@@ -63,4 +97,6 @@ export const {
   useGetMeQuery,
   useLogoutUserMutation,
   useLazyGetMeQuery,
+  useToggleWishlistMutation,
+  useGetWishlistQuery,
 } = authApiSlice;

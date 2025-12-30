@@ -1,11 +1,15 @@
 "use client"
 // components/ui/CampaignCard.jsx
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Users, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { currency } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-
+import { Heart } from 'lucide-react';
+import ShareModal from "./ShareModal"
+import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
+import { useSelector } from 'react-redux';
 export default function CampaignCard({ campaign, darkMode }) {
   const progress = Math.min(100, Math.round((campaign.raised / campaign.goal) * 100));
 
@@ -14,8 +18,38 @@ export default function CampaignCard({ campaign, darkMode }) {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
   };
+  const { userInfo } = useSelector((state) => state.auth);
+  const wishlist = userInfo?.wishlist || [];
 
-if (!campaign?.slug) return null;
+  const [toggleWishlist] = useToggleWishlistMutation();
+
+  const saved = wishlist.includes(campaign.campaignId);
+
+  const [openShare, setOpenShare] = useState(false);
+
+  const shareUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/campaign/${campaign.slug}`
+      : "";
+  const handleToggleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!userInfo) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      await toggleWishlist(campaign.campaignId).unwrap();
+    } catch (err) {
+      console.error("Wishlist toggle failed", err);
+    }
+  };
+
+
+
+  if (!campaign?.slug) return null;
 
 
 
@@ -98,21 +132,33 @@ if (!campaign?.slug) return null;
             </div>
 
             <Link href={`/campaign/${campaign.slug}`} prefetch className="w-full block">
-              <button 
-              onClick={console.log("slug",`${campaign.campaignSlug}`)}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
+              <button
+                onClick={console.log("slug", `${campaign.campaignSlug}`)}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
                 Donate Now
               </button>
             </Link>
 
             <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-zinc-600/50">
               <div className="flex items-center gap-3 sm:gap-4">
-                <button className="flex items-center gap-1 text-zinc-300 hover:text-red-400 transition-colors cursor-pointer">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
+                <button
+                  onClick={handleToggleWishlist}
+                  className={`transition-colors cursor-pointer ${saved
+                    ? "text-red-500"
+                    : darkMode
+                      ? "text-zinc-400 hover:text-red-400"
+                      : "text-zinc-600 hover:text-red-600"
+                    }`}
+                >
+                  <Heart
+                    className="w-4 h-4 sm:w-5 sm:h-5"
+                    fill={saved ? "currentColor" : "none"}
+                  />
                 </button>
-                <button className="flex items-center gap-1 text-zinc-300 hover:text-emerald-400 transition-colors cursor-pointer">
+
+                <button
+                  onClick={() => setOpenShare(true)}
+                  className="flex items-center gap-1 text-zinc-300 hover:text-emerald-400 transition-colors cursor-pointer">
                   <Image
                     src="/share.svg"
                     alt="Share"
@@ -211,12 +257,23 @@ if (!campaign?.slug) return null;
 
         <div className={`flex items-center justify-between pt-3 sm:pt-4 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}>
           <div className="flex items-center gap-3 sm:gap-4">
-            <button className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-red-400' : 'text-zinc-600 hover:text-red-600'}`}>
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
+            <button
+              onClick={handleToggleWishlist}
+              className={`transition-colors cursor-pointer ${saved
+                ? "text-red-500"
+                : darkMode
+                  ? "text-zinc-400 hover:text-red-400"
+                  : "text-zinc-600 hover:text-red-600"
+                }`}
+            >
+              <Heart
+                className="w-4 h-4 sm:w-5 sm:h-5"
+                fill={saved ? "currentColor" : "none"}
+              />
             </button>
-            <button className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'}`}>
+            <button
+              onClick={() => setOpenShare(true)}
+              className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'}`}>
               <Image
                 src="/share.svg"
                 alt="Share"
@@ -234,7 +291,15 @@ if (!campaign?.slug) return null;
             </div>
           )}
         </div>
+
       </div>
+      {openShare && (
+        <ShareModal
+          url={shareUrl}
+          title={campaign.title}
+          onClose={() => setOpenShare(false)}
+        />
+      )}
     </div>
   );
 }

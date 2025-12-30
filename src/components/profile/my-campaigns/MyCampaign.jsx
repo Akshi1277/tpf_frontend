@@ -18,11 +18,13 @@ import {
   DollarSign,
   IndianRupee
 } from "lucide-react"
+import { useGetWishlistQuery } from "@/utils/slices/authApiSlice"
 
 export default function MyCampaignsPage({ darkModeFromParent }) {
   const userInfo = useSelector((state) => state.auth.userInfo)
   const [darkMode, setDarkMode] = useState(false)
   const [activeTab, setActiveTab] = useState("wishlist")
+  const { data: wishlistedCampaigns = [], isLoading } = useGetWishlistQuery();
 
   // Sync with parent dark mode
   useEffect(() => {
@@ -31,9 +33,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
-  const myCampaigns = userInfo?.campaigns || [];
-
-  const wishlistedCampaigns = userInfo?.wishlist || [];
+  const myCampaigns = userInfo?.campaigns || [];  
   // Mock user data
   const currentUser = {
     name: userInfo?.fullName,
@@ -139,7 +139,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
               <span className={`text-xs ${
                 darkMode ? "text-zinc-500" : "text-gray-500"
               }`}>
-                of ₹{campaign.goalAmount.toLocaleString()}
+                of ₹{campaign.goalAmount}
               </span>
             </div>
             <div className={`h-1.5 sm:h-2 rounded-full overflow-hidden ${
@@ -357,7 +357,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
             {wishlistedCampaigns.map((campaign) => (
-              <CampaignCard key={campaign.id} campaign={campaign} isMyCampaign={false} />
+              <CampaignCard key={campaign._id} campaign={campaign} isMyCampaign={false} />
             ))}
           </div>
         )}

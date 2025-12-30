@@ -20,11 +20,12 @@ export default function StoryCard({ story, darkMode, isActive, onHover, onLeave 
     <div
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      className={`group flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-3xl overflow-hidden transition-all duration-700 cursor-pointer
-        ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-        ${isActive ? 'shadow-2xl md:scale-105' : 'shadow-lg md:hover:shadow-2xl md:hover:scale-105'}
-        border ${darkMode ? 'border-zinc-700/50' : 'border-zinc-200'}`}
+      className={`group flex flex-col h-full flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-3xl overflow-hidden transition-all duration-700 cursor-pointer
+    ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+    ${isActive ? 'shadow-2xl md:scale-105' : 'shadow-lg md:hover:shadow-2xl md:hover:scale-105'}
+    border ${darkMode ? 'border-zinc-700/50' : 'border-zinc-200'}`}
     >
+
       {/* Image with overlay */}
       <div className="relative overflow-hidden h-48"> {/* reduced from h-64 */}
         <img
@@ -50,7 +51,7 @@ export default function StoryCard({ story, darkMode, isActive, onHover, onLeave 
       </div>
 
       {/* Content */}
-      <div className="p-5"> {/* reduced from p-7 */}
+      <div className="p-5 flex flex-col flex-grow"> {/* reduced from p-7 */}
         <h3 className={`font-bold text-xl ${COLORS.neutralHeading} mb-2 line-clamp-2 group-hover:text-emerald-500 transition-colors duration-300 leading-tight`}>
           {story.title}
         </h3>
@@ -60,7 +61,7 @@ export default function StoryCard({ story, darkMode, isActive, onHover, onLeave 
         </p>
 
         {/* Action bar */}
-        <div className={`pt-3 border-t ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}>
+        <div className={`pt-3 border-t mt-auto ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}>
           <div
             onClick={handleReadMore}
             className={`inline-flex items-center gap-2 text-sm font-bold group/link transition-all duration-300 cursor-pointer ${darkMode ? 'text-emerald-400' : 'text-emerald-600'
