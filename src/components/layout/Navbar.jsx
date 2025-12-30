@@ -21,6 +21,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   const { data: campaignData, isLoading } = useFetchCampaignsQuery();
   const campaigns = campaignData?.campaigns || [];
+  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL || '';
 
   const filteredCampaigns = campaigns.filter(campaign =>
     campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -217,7 +218,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             >
                               <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-200 dark:bg-zinc-800">
                                 <Image
-                                  src={campaign.imageUrl || "/placeholder-campaign.jpg"}
+                                  src={campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : "/placeholder-campaign.jpg"}
                                   alt={campaign.title}
                                   fill
                                   className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -234,7 +235,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                                   </span>
                                   <span className={`flex items-center gap-1 text-[11px] font-medium text-emerald-500`}>
                                     <TrendingUp className="w-3 h-3" />
-                                    {Math.round((campaign.raisedAmount / campaign.targetAmount) * 100)}%
+                                    {campaign.targetAmount > 0 ? Math.round((campaign.raisedAmount / campaign.targetAmount) * 100) : 0}%
                                   </span>
                                 </div>
                               </div>
@@ -449,7 +450,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                           >
                             <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
                               <Image
-                                src={campaign.imageUrl || "/placeholder-campaign.jpg"}
+                                src={campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : "/placeholder-campaign.jpg"}
                                 alt={campaign.title}
                                 fill
                                 className="object-cover"
@@ -567,7 +568,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             >
                               <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                                 <Image
-                                  src={campaign.imageUrl || "/placeholder-campaign.jpg"}
+                                  src={campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : "/placeholder-campaign.jpg"}
                                   alt={campaign.title}
                                   fill
                                   className="object-cover"

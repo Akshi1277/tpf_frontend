@@ -7,7 +7,7 @@ export const campaignApiSlice = apiSlice.injectEndpoints({
     // GET ALL CAMPAIGNS (Landing page)
     // ----------------------------------
     fetchCampaigns: builder.query({
-      query: () => "/campaigns",
+      query: () => "/campaigns/get",
       providesTags: ["Campaign"],
     }),
 
