@@ -82,7 +82,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
       // In the future, this could navigate to a dedicated search page
       // For now, if there's a match, navigate to the first one
       if (filteredCampaigns.length > 0) {
-        router.push(`/campaigns/${filteredCampaigns[0].slug}`);
+        router.push(`/campaign/${filteredCampaigns[0].slug}`);
         setShowDropdown(false);
         setSearchQuery('');
       }
@@ -209,7 +209,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             <div
                               key={campaign._id}
                               onClick={() => {
-                                router.push(`/campaigns/${campaign.slug}`);
+                                router.push(`/campaign/${campaign.slug}`);
                                 setShowDropdown(false);
                                 setSearchQuery('');
                               }}
@@ -441,7 +441,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                           <div
                             key={campaign._id}
                             onClick={() => {
-                              router.push(`/campaigns/${campaign.slug}`);
+                              router.push(`/campaign/${campaign.slug}`);
                               setShowDropdown(false);
                               setSearchQuery('');
                             }}
@@ -559,7 +559,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             <div
                               key={campaign._id}
                               onClick={() => {
-                                router.push(`/campaigns/${campaign.slug}`);
+                                router.push(`/campaign/${campaign.slug}`);
                                 setMobileMenuOpen(false);
                                 setSearchQuery('');
                               }}
