@@ -9,14 +9,39 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/utils/slices/authSlice';
 import { useLogoutUserMutation } from '@/utils/slices/authApiSlice';
+import { useFetchCampaignsQuery } from '@/utils/slices/campaignApiSlice';
+import { Search, MapPin, Building2, TrendingUp } from 'lucide-react';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
-const dispatch = useDispatch()
+  const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const { data: campaignData, isLoading } = useFetchCampaignsQuery();
+  const campaigns = campaignData?.campaigns || [];
+
+  const filteredCampaigns = campaigns.filter(campaign =>
+    campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    campaign.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    campaign.organization?.toLowerCase().includes(searchQuery.toLowerCase())
+  ).slice(0, 5);
 
   const [logoutUser] = useLogoutUserMutation();
-useEffect(() => setHasMounted(true), []);
+  useEffect(() => setHasMounted(true), []);
   const userInfo = useSelector((state) => state.auth.userInfo);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.search-container')) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode')
@@ -39,30 +64,38 @@ useEffect(() => setHasMounted(true), []);
   };
 
   const handleLogout = async () => {
-  try {
-    await logoutUser().unwrap(); // clears cookie
-  } catch (e) {
-    // ignore
-  } finally {
-    dispatch(logout()); // clears redux + localStorage
-    router.push("/");
-  }
-};
-
-
-
-
+    try {
+      await logoutUser().unwrap(); // clears cookie
+    } catch (e) {
+      // ignore
+    } finally {
+      dispatch(logout()); // clears redux + localStorage
+      router.push("/");
+    }
+  };
 
   const router = useRouter();
 
-  const getInitials = (name) => {
-  if (!name) return "U"; // default (User)
-  const parts = name.trim().split(" ");
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[1][0]).toUpperCase();
-};
+  const handleSearchCommit = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      // In the future, this could navigate to a dedicated search page
+      // For now, if there's a match, navigate to the first one
+      if (filteredCampaigns.length > 0) {
+        router.push(`/campaigns/${filteredCampaigns[0].slug}`);
+        setShowDropdown(false);
+        setSearchQuery('');
+      }
+    }
+  };
 
-const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
+  const getInitials = (name) => {
+    if (!name) return "U"; // default (User)
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+
+  const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
 
   return (
     <>
@@ -95,7 +128,7 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
             </div>
 
             {/* CENTER – Search (hidden on mobile) */}
-            <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl md:mx-4 lg:mx-6 xl:mx-8">
+            <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl md:mx-4 lg:mx-6 xl:mx-8 search-container">
               <div className="relative w-full group">
                 {/* Animated background gradient */}
                 <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
@@ -117,7 +150,17 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
 
                 <input
                   type="text"
-                  placeholder="Discover inspiring causes"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowDropdown(true);
+                  }}
+                  onFocus={() => {
+                    setShowDropdown(true);
+                    setIsFocused(true);
+                  }}
+                  onKeyDown={handleSearchCommit}
+                  placeholder="Find causes that matter"
                   className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
              ${darkMode
                       ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
@@ -147,6 +190,88 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
                   <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.3s' }} />
                   <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.6s' }} />
                 </div>
+
+                {/* Search Results Dropdown */}
+                {showDropdown && searchQuery && (
+                  <div className={`absolute top-full left-0 right-0 mt-3 rounded-2xl overflow-hidden shadow-2xl border transition-all duration-300 z-[60]
+                    ${darkMode
+                      ? 'bg-zinc-900/95 border-zinc-800 backdrop-blur-xl'
+                      : 'bg-white/95 border-zinc-100 backdrop-blur-xl'}`}>
+
+                    <div className="p-2">
+                      {filteredCampaigns.length > 0 ? (
+                        <>
+                          <div className={`px-3 py-2 text-[11px] font-bold uppercase tracking-wider ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                            Suggested Causes
+                          </div>
+                          {filteredCampaigns.map((campaign) => (
+                            <div
+                              key={campaign._id}
+                              onClick={() => {
+                                router.push(`/campaigns/${campaign.slug}`);
+                                setShowDropdown(false);
+                                setSearchQuery('');
+                              }}
+                              className={`group flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all duration-200
+                                ${darkMode ? 'hover:bg-zinc-800/80' : 'hover:bg-emerald-50/50'}`}
+                            >
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-200 dark:bg-zinc-800">
+                                <Image
+                                  src={campaign.imageUrl || "/placeholder-campaign.jpg"}
+                                  alt={campaign.title}
+                                  fill
+                                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className={`text-sm font-semibold truncate ${darkMode ? 'text-zinc-200' : 'text-zinc-800'} group-hover:text-emerald-500 transition-colors`}>
+                                  {campaign.title}
+                                </h4>
+                                <div className="flex items-center gap-3 mt-0.5">
+                                  <span className={`flex items-center gap-1 text-[11px] ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                    <Building2 className="w-3 h-3" />
+                                    {campaign.organization}
+                                  </span>
+                                  <span className={`flex items-center gap-1 text-[11px] font-medium text-emerald-500`}>
+                                    <TrendingUp className="w-3 h-3" />
+                                    {Math.round((campaign.raisedAmount / campaign.targetAmount) * 100)}%
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        <div className="p-8 text-center">
+                          <div className={`inline-flex p-3 rounded-full mb-3 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
+                            <Search className={`w-6 h-6 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`} />
+                          </div>
+                          <p className={`text-sm font-medium ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                            No causes found for "{searchQuery}"
+                          </p>
+                          <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                            Try searching for something else
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {filteredCampaigns.length > 0 && (
+                      <div className={`p-2 border-t ${darkMode ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-100 bg-zinc-50/50'}`}>
+                        <button
+                          onClick={() => {
+                            router.push('/#campaigns');
+                            setShowDropdown(false);
+                            setSearchQuery('');
+                          }}
+                          className={`w-full py-2 text-xs font-semibold text-center rounded-lg transition-colors
+                            ${darkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-zinc-500 hover:text-emerald-600 hover:bg-white'}`}>
+                          View all campaigns
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -198,44 +323,44 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
               </div>
 
               {/* Hamburger */}
-            {/* profile initials instead of hamburger when logged in */}
-{hasMounted && userInfo ? (
-<button
-  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-   className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold tracking-wide text-[14px] sm:text-[15px] cursor-pointer transition-all duration-300
+              {/* profile initials instead of hamburger when logged in */}
+              {hasMounted && userInfo ? (
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold tracking-wide text-[14px] sm:text-[15px] cursor-pointer transition-all duration-300
     ring-2 ring-white/70 dark:ring-white/40
-    ${darkMode 
-      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-[1.08]" 
-      : "bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-[1.08]"
-    }`}
->
-  {initials}
-</button>
+    ${darkMode
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-[1.08]"
+                      : "bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-[1.08]"
+                    }`}
+                >
+                  {initials}
+                </button>
 
-) : (
-  <div className="tooltip-container">
-    <button
-      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      aria-label="Menu"
-      className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
+              ) : (
+                <div className="tooltip-container">
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    aria-label="Menu"
+                    className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
         ${darkMode
-          ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
-          : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
-        }`}
-    >
-      {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
-    </button>
-    <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
-      Menu
-    </span>
-  </div>
-)}
+                        ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm'
+                        : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'
+                      }`}
+                  >
+                    {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+                  </button>
+                  <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>
+                    Menu
+                  </span>
+                </div>
+              )}
 
             </div>
           </div>
 
           {/* Mobile search bar */}
-          <div className="md:hidden pb-3">
+          <div className="md:hidden pb-3 search-container">
             <div className="relative w-full group">
               {/* Animated background gradient */}
               <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
@@ -257,7 +382,17 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
 
               <input
                 type="text"
-                placeholder="Discover inspiring causes"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowDropdown(true);
+                }}
+                onFocus={() => {
+                  setShowDropdown(true);
+                  setIsFocused(true);
+                }}
+                onKeyDown={handleSearchCommit}
+                placeholder="Find causes that matter"
                 className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
              ${darkMode
                     ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
@@ -287,6 +422,60 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
                 <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.3s' }} />
                 <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.6s' }} />
               </div>
+
+              {/* Search Results Dropdown (Mobile) */}
+              {showDropdown && searchQuery && (
+                <div className={`absolute top-full left-0 right-0 mt-3 rounded-2xl overflow-hidden shadow-2xl border transition-all duration-300 z-[60]
+                  ${darkMode
+                    ? 'bg-zinc-900 border-zinc-800 backdrop-blur-xl'
+                    : 'bg-white border-zinc-100 backdrop-blur-xl'}`}>
+
+                  <div className="p-2">
+                    {filteredCampaigns.length > 0 ? (
+                      <>
+                        <div className={`px-3 py-2 text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                          Causes
+                        </div>
+                        {filteredCampaigns.map((campaign) => (
+                          <div
+                            key={campaign._id}
+                            onClick={() => {
+                              router.push(`/campaigns/${campaign.slug}`);
+                              setShowDropdown(false);
+                              setSearchQuery('');
+                            }}
+                            className={`group flex items-center gap-3 p-2 rounded-xl cursor-pointer active:bg-emerald-500/10 transition-colors
+                              ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-50'}`}
+                          >
+                            <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
+                              <Image
+                                src={campaign.imageUrl || "/placeholder-campaign.jpg"}
+                                alt={campaign.title}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className={`text-xs font-semibold truncate ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
+                                {campaign.title}
+                              </h4>
+                              <p className={`text-[10px] ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                {campaign.organization}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    ) : (
+                      <div className="p-4 text-center">
+                        <p className={`text-xs font-medium ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                          No causes found
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -332,6 +521,13 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
                   <div className="relative">
                     <input
                       type="text"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setShowDropdown(true);
+                      }}
+                      onFocus={() => setShowDropdown(true)}
+                      onKeyDown={handleSearchCommit}
                       placeholder="I want to support..."
                       className={`w-full px-4 py-3 pl-10 rounded-xl border
                      ${darkMode
@@ -353,6 +549,47 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                       />
                     </svg>
+
+                    {/* Inline results for mobile menu */}
+                    {searchQuery && (
+                      <div className={`mt-2 rounded-xl overflow-hidden ${darkMode ? 'bg-zinc-800/50' : 'bg-zinc-50'}`}>
+                        {filteredCampaigns.length > 0 ? (
+                          filteredCampaigns.map((campaign) => (
+                            <div
+                              key={campaign._id}
+                              onClick={() => {
+                                router.push(`/campaigns/${campaign.slug}`);
+                                setMobileMenuOpen(false);
+                                setSearchQuery('');
+                              }}
+                              className={`flex items-center gap-3 p-3 cursor-pointer border-b last:border-0
+                                ${darkMode ? 'border-zinc-700 hover:bg-zinc-700/50' : 'border-zinc-100 hover:bg-white'}`}
+                            >
+                              <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={campaign.imageUrl || "/placeholder-campaign.jpg"}
+                                  alt={campaign.title}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className={`text-xs font-semibold truncate ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
+                                  {campaign.title}
+                                </h4>
+                                <p className={`text-[10px] ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                  {campaign.organization}
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-4 text-center">
+                            <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>No results found</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Discover link */}
@@ -373,8 +610,8 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
                   {/* Main menu items with icons */}
                   <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
                     {[
-                    { name: 'My Profile', icon: User2Icon, isLucide: true, path: '/profile/userprofile' },
-                    { name: 'My Donations', icon: Heart, isLucide: true, path: '/profile/mydonation' },
+                      { name: 'My Profile', icon: User2Icon, isLucide: true, path: '/profile/userprofile' },
+                      { name: 'My Donations', icon: Heart, isLucide: true, path: '/profile/mydonation' },
                       { name: 'My Wishlist', icon: Plus, isLucide: true, path: '/profile/my-campaign' },
                       { name: 'Daily Givers', icon: Leaf, isLucide: true, path: '/permanent-donor/daily' },
                       { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' }
@@ -462,54 +699,54 @@ const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
 
                   {/* Sign up / Log in */}
                   {/* Authentication Actions */}
-<div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
-  {userInfo ? (
-    <button
-      onClick={handleLogout}
-      className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-colors
+                  <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
+                    {userInfo ? (
+                      <button
+                        onClick={handleLogout}
+                        className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-colors
       ${darkMode ? 'text-red-400 hover:bg-zinc-800' : 'text-red-600 hover:bg-zinc-100'}`}
-    >
-      <svg
-        width="20"
-        height="20"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <polyline points="16 17 21 12 16 7"/>
-        <line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      Logout
-    </button>
-  ) : (
-    <>
-      <button
-        onClick={() => {
-          handleAuthNavigation("/signup");
-          setMobileMenuOpen(false);
-        }}
-        className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                          <polyline points="16 17 21 12 16 7" />
+                          <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Logout
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => {
+                            handleAuthNavigation("/signup");
+                            setMobileMenuOpen(false);
+                          }}
+                          className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
         ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
-      >
-        Sign up
-      </button>
+                        >
+                          Sign up
+                        </button>
 
-      <button
-        onClick={() => {
-          handleAuthNavigation("/login");
-          setMobileMenuOpen(false);
-        }}
-        className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
+                        <button
+                          onClick={() => {
+                            handleAuthNavigation("/login");
+                            setMobileMenuOpen(false);
+                          }}
+                          className={`block w-full text-center py-2 px-4 rounded-lg transition-colors
         ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
-      >
-        Log in
-      </button>
-    </>
-  )}
-</div>
+                        >
+                          Log in
+                        </button>
+                      </>
+                    )}
+                  </div>
 
                 </div>
               </div>
