@@ -19,7 +19,7 @@ import {
   DollarSign,
   IndianRupee
 } from "lucide-react"
-import { useGetWishlistQuery } from "@/utils/slices/authApiSlice"
+import { useToggleWishlistMutation,useGetWishlistQuery } from "@/utils/slices/authApiSlice"
 import ShareModal from "../../ui/ShareModal"
 export default function MyCampaignsPage({ darkModeFromParent }) {
   const userInfo = useSelector((state) => state.auth.userInfo)
@@ -27,8 +27,10 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   const [activeTab, setActiveTab] = useState("wishlist")
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
+  
   const router = useRouter();
   const { data: wishlistedCampaigns = [], isLoading } = useGetWishlistQuery();
+  const [toggleWishlist] = useToggleWishlistMutation();
   // Sync with parent dark mode
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -43,7 +45,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     totalCampaigns: myCampaigns.length,
     totalWishlisted: wishlistedCampaigns.length,
   };
-  
+
   // Mock campaigns created by user
 
 
@@ -70,16 +72,16 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
 
   const CampaignCard = ({ campaign, isMyCampaign = false }) => {
     const progress = calculateProgress(campaign.raisedAmount, campaign.targetAmount)
-   console.log("Campaign inside MyCampaignsPage:", campaign);
+    console.log("Campaign inside MyCampaignsPage:", campaign);
 
-  const handleDonateClick = () => {
-    // Ensure the campaign and slug exist
-    if (campaign?.slug) {
-      router.push(`/campaign/${campaign.slug}`); // Navigate to campaign page
-    } else {
-      console.error("Campaign slug is not available");
-    }
-  };
+    const handleDonateClick = () => {
+      // Ensure the campaign and slug exist
+      if (campaign?.slug) {
+        router.push(`/campaign/${campaign.slug}`); // Navigate to campaign page
+      } else {
+        console.error("Campaign slug is not available");
+      }
+    };
 
     return (
       <motion.div
@@ -102,9 +104,11 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             {isMyCampaign ? (
               getStatusBadge(campaign.status)
             ) : (
-              <button className={`p-1.5 sm:p-2 rounded-full ${darkMode ? "bg-zinc-900/80" : "bg-white/80"
+              <button className={`p-1.5 sm:p-2 cursor-pointer rounded-full ${darkMode ? "bg-zinc-900/80" : "bg-white/80"
                 } backdrop-blur-sm hover:scale-110 transition-transform`}>
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 fill-rose-500" />
+                <Heart 
+                 onClick={() => handleToggleWishlist(campaign._id)}
+                className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 fill-rose-500" />
               </button>
             )}
           </div>
@@ -214,12 +218,12 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             </div>
           ) : (
             <div className="flex gap-2">
-              <button 
-              onClick={handleDonateClick}
-              className={`flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg cursor-pointer font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 ${darkMode
-                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                : "bg-emerald-500 text-white hover:bg-emerald-600"
-                }`}>
+              <button
+                onClick={handleDonateClick}
+                className={`flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg cursor-pointer font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 ${darkMode
+                  ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                  : "bg-emerald-500 text-white hover:bg-emerald-600"
+                  }`}>
                 <IndianRupee className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Donate
               </button>
@@ -248,6 +252,16 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   // Function to handle closing the modal
   const handleCloseModal = () => {
     setIsModalOpen(false); // Close the modal
+  };
+
+  const handleToggleWishlist = async (campaignId) => {
+    try {
+      // Call the existing toggleWishlist function that will either add or remove
+      // the campaign based on its current state in the wishlist
+      await toggleWishlist(campaignId); // Assuming the toggleWishlist function is already available in your API call
+    } catch (err) {
+      console.error("Error toggling wishlist:", err);
+    }
   };
 
   return (
@@ -301,9 +315,11 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                     {currentUser.totalCampaigns} Campaigns
                   </span>
                 </div>
-                <div className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${darkMode ? "bg-white/10" : "bg-white/20"
+                <div className={`flex items-center gap-1.5 cursor-pointer sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${darkMode ? "bg-white/10" : "bg-white/20"
                   } backdrop-blur-sm`}>
-                  <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-300" />
+                  <Heart 
+                   onClick={() => handleToggleWishlist(campaign._id)}
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-300" />
                   <span className="font-semibold text-xs sm:text-sm text-white">
                     {currentUser.totalWishlisted} Wishlisted
                   </span>
@@ -398,10 +414,12 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`text-center py-12 sm:py-16 lg:py-20 rounded-xl sm:rounded-2xl ${darkMode ? "bg-zinc-800/50" : "bg-white shadow-lg"
+            className={`text-center py-12 sm:py-16 lg:py-20 cursor-pointer rounded-xl sm:rounded-2xl ${darkMode ? "bg-zinc-800/50" : "bg-white shadow-lg"
               }`}
           >
-            <Heart className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 ${darkMode ? "text-zinc-600" : "text-gray-400"
+            <Heart 
+             onClick={() => handleToggleWishlist(campaign._id)}
+            className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 ${darkMode ? "text-zinc-600" : "text-gray-400"
               }`} />
             <h3 className={`text-lg sm:text-xl font-bold mb-2 px-4 ${darkMode ? "text-white" : "text-gray-900"
               }`}>
