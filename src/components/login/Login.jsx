@@ -8,12 +8,14 @@ import { useSendOtpMutation, useVerifyOtpMutation } from "@/utils/slices/authApi
 import { useDispatch } from "react-redux"
 import { ToastContainer, toast } from "react-toastify"
 import { setCredentials } from "@/utils/slices/authSlice"
+import { useAppToast } from "@/app/AppToastContext"
 
 export default function LoginPage({ darkMode }) {
   const router = useRouter()
   const dispatch = useDispatch()
   const [mobile, setMobile] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
+  const {showToast} = useAppToast()
 const [step, setStep] = useState(1);
 const [otp, setOtp] = useState('');
 const [sendOtp, {isLoading:sendingOtp}]= useSendOtpMutation()
@@ -28,13 +30,24 @@ const [verifyOtp, {isLoading:verifyingOtp}]= useVerifyOtpMutation()
 
       // show OTP only for development
       if (res.otp) {
-        toast.info(`Your OTP is ${res.otp}`);
+        
+         showToast({
+        type: "success",
+        title: `Your OTP is ${res.otp}`,
+        message: ' ',
+        duration: 2000,
+      });
       }
        
       setStep(2)
      }
    catch(error){
-      toast.error(error?.data?.message || error?.data?.data?.message)
+       showToast({
+        type: "error",
+        title: "Login Failed",
+        message: error?.data?.message || error?.data?.data?.message,
+        duration: 2000,
+      });
       console.error(error)
    }
   }
@@ -48,13 +61,23 @@ const handleOtpSubmit = async () => {
     const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
     // Save user in Redux + localStorage
     dispatch(setCredentials(res.user));
+    showToast({
+        type: "success",
+        title: "Welcome Back!",
+        message: `Salam ${res.user.fullName} ! from TPF`,
+        duration: 2000,
+      });
     
-    toast.success(`Salam ${res.user.fullName} ! from TPF`)
-    setShowSuccess(true);
+    //setShowSuccess(true);
     setTimeout(() => router.push('/profile/userprofile'), 2500);
   } catch (err) {
     console.error("OTP verification failed:", err);
-    alert(err?.data?.message || "Invalid OTP");
+     showToast({
+        type: "error",
+        title: "Invalid Otp",
+        message: 'Please try again!',
+        duration: 2000,
+      });
   }
 };
 
@@ -64,7 +87,6 @@ const handleOtpSubmit = async () => {
         ? "bg-zinc-950"
         : "bg-white"
       }`}>
-        <ToastContainer />
 
       {/* Sophisticated Background Pattern */}
       <div className="absolute inset-0 overflow-hidden">

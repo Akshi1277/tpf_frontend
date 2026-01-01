@@ -10,12 +10,14 @@ import { useSendOtpMutation, useVerifyOtpMutation } from "@/utils/slices/authApi
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
 import { setCredentials } from "@/utils/slices/authSlice"
+import { useAppToast } from "@/app/AppToastContext"
 
 function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     const dispatch = useDispatch()
     const [mobile, setMobile] = useState('')
     const [step, setStep] = useState(1)
     const [otp, setOtp] = useState(['', '', '', ''])
+    const { showToast } = useAppToast()
     const [showSuccess, setShowSuccess] = useState(false)
     const justOpenedRef = useRef(false)
 
@@ -36,7 +38,12 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
             setStep(2)
             setTimeout(() => otpInputs.current[0]?.focus(), 300)
         } catch (error) {
-            toast.error(error?.data?.message || error?.data?.data?.message)
+            showToast({
+                type: "error",
+                title: "Login failed",
+                message: error?.data?.message || error?.data?.data?.message ||'Please try again!',
+                duration: 2000,
+            });
             console.error(error)
         }
     }
@@ -48,8 +55,13 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
         try {
             const res = await verifyOtp({ mobileNo: mobile, otp: otpString }).unwrap()
             dispatch(setCredentials(res.user))
-            
-            toast.success(`Salam ${res.user.fullName}! from TPF`)
+
+            showToast({
+                type: "success",
+                title: "Welcome Back!",
+                message: `Salam ${res.user.fullName} ! from TPF`,
+                duration: 2000,
+            });
             setShowSuccess(true)
 
             setTimeout(() => {
@@ -58,13 +70,18 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
             }, 2000)
         } catch (err) {
             console.error("OTP verification failed:", err)
-            toast.error(err?.data?.message || "Invalid OTP")
+            showToast({
+                type: "error",
+                title: "Invalid Otp",
+                message: 'Please try again!',
+                duration: 2000,
+            });
         }
     }
 
     const handleClose = () => {
         if (showSuccess) return
-        
+
         setMobile("")
         setOtp(['', '', '', ''])
         setStep(1)
@@ -104,7 +121,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
         const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4)
         const newOtp = pastedData.split('').concat(['', '', '', '']).slice(0, 4)
         setOtp(newOtp)
-        
+
         const lastIndex = Math.min(pastedData.length, 3)
         otpInputs.current[lastIndex]?.focus()
     }
@@ -115,11 +132,22 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
             if (res.otp) {
                 toast.info(`Your OTP is ${res.otp}`)
             }
-            toast.success("OTP resent successfully")
+            showToast({
+                type: "success",
+                title: "Otp Resent Successfully!",
+                message: '',
+                duration: 2000,
+            });
             setOtp(['', '', '', ''])
             otpInputs.current[0]?.focus()
         } catch (error) {
-            toast.error(error?.data?.message || "Failed to resend OTP")
+            console.error(error)
+            showToast({
+                type: "error",
+                title: "Failed to Resent Otp",
+                message: 'Please try again!',
+                duration: 2000,
+            });
         }
     }
 
@@ -130,18 +158,18 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     }
 
     useEffect(() => {
-    if (isOpen) {
-        justOpenedRef.current = true
-        setTimeout(() => {
-            justOpenedRef.current = false
-        }, 200)
-    }
-}, [isOpen])
+        if (isOpen) {
+            justOpenedRef.current = true
+            setTimeout(() => {
+                justOpenedRef.current = false
+            }, 200)
+        }
+    }, [isOpen])
 
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!isOpen) return
-             if (justOpenedRef.current) return
+            if (justOpenedRef.current) return
             if (e.key === 'Enter') {
                 if (step === 1 && mobile.length === 10) {
                     handleLogin()
@@ -175,33 +203,29 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             transition={{ duration: 0.2, ease: "easeOut" }}
-                            className={`relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl border-2 shadow-2xl pointer-events-auto ${
-                                darkMode ? "bg-zinc-900 border-emerald-500/30" : "bg-white border-emerald-200"
-                            }`}
+                            className={`relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl border-2 shadow-2xl pointer-events-auto ${darkMode ? "bg-zinc-900 border-emerald-500/30" : "bg-white border-emerald-200"
+                                }`}
                         >
                             <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
                                 <div
-                                    className={`absolute inset-0 ${
-                                        darkMode
-                                            ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
-                                            : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
-                                    }`}
+                                    className={`absolute inset-0 ${darkMode
+                                        ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
+                                        : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
+                                        }`}
                                     style={{ backgroundSize: '48px 48px' }}
                                 />
-                                <div className={`absolute top-0 right-0 w-[400px] h-[400px] rounded-full blur-[100px] ${
-                                    darkMode ? "bg-emerald-950/30" : "bg-emerald-50"
-                                }`} />
+                                <div className={`absolute top-0 right-0 w-[400px] h-[400px] rounded-full blur-[100px] ${darkMode ? "bg-emerald-950/30" : "bg-emerald-50"
+                                    }`} />
                             </div>
 
                             <button
                                 type="button"
                                 onClick={handleClose}
                                 disabled={showSuccess}
-                                className={`absolute top-6 right-6 z-10 p-2 rounded-full transition-all ${
-                                    darkMode
-                                        ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white"
-                                        : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900"
-                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                className={`absolute top-6 right-6 z-10 p-2 rounded-full transition-all ${darkMode
+                                    ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white"
+                                    : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900"
+                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -300,9 +324,8 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                     </label>
                                                     <div className="relative group">
                                                         <div className={`absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition-opacity duration-300`} />
-                                                        <div className={`relative flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${
-                                                            darkMode ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500" : "bg-white border-gray-200 group-focus-within:border-emerald-500"
-                                                        }`}>
+                                                        <div className={`relative flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all ${darkMode ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500" : "bg-white border-gray-200 group-focus-within:border-emerald-500"
+                                                            }`}>
                                                             <div className="flex items-center gap-2">
                                                                 <svg className="w-6 h-4" viewBox="0 0 30 20">
                                                                     <rect width="30" height="6.67" fill="#FF9933" />
@@ -319,9 +342,8 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                                 value={mobile}
                                                                 onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
                                                                 placeholder="10-digit number"
-                                                                className={`flex-1 text-base md:text-lg font-medium outline-none bg-transparent ${
-                                                                    darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"
-                                                                }`}
+                                                                className={`flex-1 text-base md:text-lg font-medium outline-none bg-transparent ${darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"
+                                                                    }`}
                                                             />
                                                         </div>
                                                     </div>
@@ -376,9 +398,8 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                                 onChange={(e) => handleOtpChange(index, e.target.value)}
                                                                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                                                 onPaste={handleOtpPaste}
-                                                                className={`w-14 h-14 sm:w-16 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 outline-none transition-all ${
-                                                                    darkMode ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500" : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
-                                                                } ${digit ? 'border-emerald-500' : ''}`}
+                                                                className={`w-14 h-14 sm:w-16 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 outline-none transition-all ${darkMode ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500" : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
+                                                                    } ${digit ? 'border-emerald-500' : ''}`}
                                                             />
                                                         ))}
                                                     </div>
@@ -401,9 +422,8 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                     <button
                                                         type="button"
                                                         onClick={() => { setStep(1); setOtp(['', '', '', '']) }}
-                                                        className={`py-3 px-6 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${
-                                                            darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                                                        }`}
+                                                        className={`py-3 px-6 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                                            }`}
                                                     >
                                                         <ArrowLeft className="w-4 h-4" />
                                                         Change Number

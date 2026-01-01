@@ -9,7 +9,8 @@ import {
   Source_Serif_4 as V0_Font_Source_Serif_4
 } from 'next/font/google'
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { AppToastProvider } from './AppToastContext'
+import AppToast from '@/components/AppToast'
 const _geist = V0_Font_Geist({
   subsets: ['latin'],
   weight: ["100","200","300","400","500","600","700","800","900"],
@@ -47,18 +48,10 @@ export default async function RootLayout({ children }) {
         className={`font-sans antialiased ${_geist.className} ${_geistMono.variable} ${_sourceSerif_4.variable}`}
       >
         {/* CMS available app-wide without refetching */}
-        <Providers cms={cms}>
-          {children}
-        </Providers>
-         <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          pauseOnHover
-          style={{ zIndex: 9999 }}
-        />
+          <Providers cms={cms}>
+            {children}
+          </Providers>
+
 
         <Script id="disable-right-click" strategy="afterInteractive">
           {`document.addEventListener('contextmenu', event => event.preventDefault());`}

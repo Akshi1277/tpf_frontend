@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useCreateTicketMutation } from '@/utils/slices/tickets-queriesApiSlice';
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import { useAppToast } from '@/app/AppToastContext';
 import LoginModal from "@/components/login/LoginModal"
 // Help Centre Section Component
 function HelpCentreSection({ darkMode, isInView }) {
@@ -332,12 +333,19 @@ export default function ContactPage({ darkMode }) {
   const [createTicket, { isLoading }] = useCreateTicketMutation();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
+  const {showToast} = useAppToast()
+
   const submitTicket = async () => {
     try {
       // Add await to properly handle the promise
       const result = await createTicket(formData).unwrap();
 
-      toast.success("Your message has been sent successfully!");
+       showToast({
+        type: "success",
+        title: "Message Sent",
+        message: 'Our Team will discuss and get back to you soo!',
+        duration: 2000,
+      });
       setSubmitted(true);
 
       setTimeout(() => {
@@ -357,6 +365,13 @@ export default function ContactPage({ darkMode }) {
       return result; // Return the result
     } catch (error) {
       // toast.error("Failed to submit ticket. Please try again.");
+       showToast({
+        type: "error",
+        title: "Failed to submit Ticket",
+        message: 'Please try again!',
+        duration: 2000,
+      });
+
       throw error; // Re-throw to handle in the main function
     }
   };
@@ -492,7 +507,12 @@ export default function ContactPage({ darkMode }) {
 
     // ❌ no API call here
     if (!user) {
-      toast.error("🔒 Please login to continue.");
+       showToast({
+        type: "error",
+        title: "Please login to continue.",
+        message: ' ',
+        duration: 2000,
+      });
       setPendingSubmit(true);
       setShowLoginModal(true);
       return;

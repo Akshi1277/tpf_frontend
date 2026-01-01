@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { logout } from '@/utils/slices/authSlice';
 import { useLogoutUserMutation } from '@/utils/slices/authApiSlice';
 import { useFetchCampaignsQuery } from '@/utils/slices/campaignApiSlice';
 import { Search, MapPin, Building2, TrendingUp } from 'lucide-react';
+import { useAppToast } from '@/app/AppToastContext';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,6 +18,8 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { showToast } = useAppToast();
 
   const { data: campaignData, isLoading } = useFetchCampaignsQuery();
   const campaigns = campaignData?.campaigns || [];
@@ -65,15 +67,35 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   };
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+
     try {
-      await logoutUser().unwrap(); // clears cookie
-    } catch (e) {
-      // ignore
+      await logoutUser().unwrap();
+      showToast({
+        type: "success",
+        title: "Logged out",
+        message: "See you again soon 👋",
+        duration: 2000,
+      });
+    } catch (err) {
+      showToast({
+        type:"error",
+        title:"Logout Failed",
+        message:err,
+        duration:1000
+      })
+      console.log(err)
     } finally {
-      dispatch(logout()); // clears redux + localStorage
-      router.push("/");
+      // Smooth UX delay
+      setTimeout(() => {
+        router.push("/");
+        setIsLoggingOut(false);
+      }, 600);
     }
   };
+
 
   const router = useRouter();
 
@@ -704,24 +726,49 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                     {userInfo ? (
                       <button
                         onClick={handleLogout}
-                        className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-colors
-      ${darkMode ? 'text-red-400 hover:bg-zinc-800' : 'text-red-600 hover:bg-zinc-100'}`}
+                        disabled={isLoggingOut}
+                        className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-all duration-300
+    ${isLoggingOut
+                            ? 'text-zinc-400 cursor-not-allowed'
+                            : darkMode
+                              ? 'text-red-400 hover:bg-zinc-800'
+                              : 'text-red-600 hover:bg-zinc-100'
+                          }`}
                       >
-                        <svg
-                          width="20"
-                          height="20"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                          <polyline points="16 17 21 12 16 7" />
-                          <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                        Logout
+                        {isLoggingOut ? (
+                          <>
+                            <svg
+                              className="animate-spin w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle cx="12" cy="12" r="10" opacity="0.25" />
+                              <path d="M22 12a10 10 0 0 1-10 10" />
+                            </svg>
+                            Logging out…
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              width="20"
+                              height="20"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                              <polyline points="16 17 21 12 16 7" />
+                              <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Logout
+                          </>
+                        )}
                       </button>
+
                     ) : (
                       <>
                         <button

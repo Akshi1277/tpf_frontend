@@ -16,6 +16,7 @@ import {
   Upload
 } from "lucide-react"
 import FilePreview from "./FilePreview"
+import { useAppToast } from "@/app/AppToastContext"
 
 export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const router = useRouter()
@@ -23,6 +24,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const [showErrorMessage, setShowErrorMessage] = useState(false)
   const [submitFinancialAid, { isLoading }] = useSubmitFinancialAidMutation()
   const [darkMode, setDarkMode] = useState(false)
+  const {showToast} =useAppToast()
 
 
   useEffect(() => {
@@ -114,7 +116,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     }
 
     if (!formData.declarationConsent) {
-      alert('Please accept the declaration and consent')
+       showToast({
+        type: "error",
+        title: "Please accept the declaration and consent",
+        message: ' ',
+        duration: 2000,
+      });
       return
     }
 

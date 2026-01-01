@@ -7,8 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowRight, ArrowLeft, Check } from "lucide-react"
-import { ToastContainer, toast } from "react-toastify"
-
+import { useAppToast } from "@/app/AppToastContext"
 export default function SignUpPage({ darkMode }) {
   const router = useRouter()
   const dispatch = useDispatch()
@@ -16,6 +15,7 @@ export default function SignUpPage({ darkMode }) {
   const [sendOtp, { isLoading: sendingOtp }] = useSendOtpMutation()
   const [verifyOtp, { isLoading: verifyingOtp }] = useVerifyOtpMutation()
   const [updateProfile, { isLoading: updatingProfile }] = useUpdateProfileMutation()
+  const { showToast } = useAppToast()
 
   const [step, setStep] = useState(1)
   const [mobile, setMobile] = useState('')
@@ -27,16 +27,27 @@ export default function SignUpPage({ darkMode }) {
   const handleMobileSubmit = async () => {
     try {
       if (mobile.length !== 10) return;
-      const res = await sendOtp({ mobileNo: mobile, type:"signup" }).unwrap();
+      const res = await sendOtp({ mobileNo: mobile, type: "signup" }).unwrap();
 
       // show OTP only for development
       if (res.otp) {
-        toast.info(`Your OTP is ${res.otp}`);
+        showToast({
+          type: "success",
+          title: `Your OTP is ${res.otp}`,
+          message: ' ',
+          duration: 2000,
+        });
       }
       setStep(2);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      alert(err?.data?.message || "Failed to send OTP");
+      showToast({
+        type: "error",
+        title: err?.data?.message || "Failed to send OTP",
+        message: ' ',
+        duration: 2000,
+      });
+
     }
   }
 
@@ -58,15 +69,20 @@ export default function SignUpPage({ darkMode }) {
         router.push("/"); // User already has profile
       }
     } catch (err) {
-      alert(err?.data?.message || "Invalid OTP");
+      showToast({
+        type: "error",
+        title: err?.data?.message || "Invalid OTP",
+        message: ' ',
+        duration: 2000,
+      });
     }
   }
 
   const handleFinalSubmit = async () => {
     try {
       if (!email || !fullName) return;
-    
-      const profileData = {fullName, email}
+
+      const profileData = { fullName, email }
       const res = await updateProfile(profileData).unwrap();
       dispatch(setCredentials(res.user));
       setShowSuccess(true);
@@ -75,7 +91,12 @@ export default function SignUpPage({ darkMode }) {
         router.push("/profile/userprofile");
       }, 2000);
     } catch (err) {
-      alert(err?.data?.message || "Failed to save profile");
+      showToast({
+        type: "error",
+        title: err?.data?.message || "Failed to save profile",
+        message: ' ',
+        duration: 2000,
+      });
     }
   }
 
@@ -84,7 +105,6 @@ export default function SignUpPage({ darkMode }) {
       ? "bg-zinc-950"
       : "bg-white"
       }`}>
-      <ToastContainer />
       {/* Sophisticated Background Pattern */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Grid Pattern */}
@@ -123,8 +143,8 @@ export default function SignUpPage({ darkMode }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             className={`fixed top-4 sm:top-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3 ${darkMode
-                ? "bg-zinc-900 border border-emerald-500/20"
-                : "bg-white border border-emerald-200"
+              ? "bg-zinc-900 border border-emerald-500/20"
+              : "bg-white border border-emerald-200"
               }`}
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -467,8 +487,8 @@ export default function SignUpPage({ darkMode }) {
                               onChange={(e) => setFullName(e.target.value)}
                               placeholder="John Doe"
                               className={`w-full px-4 sm:px-5 py-3 sm:py-4 text-base sm:text-lg md:text-xl rounded-xl sm:rounded-2xl border-2 outline-none transition-all ${darkMode
-                                  ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
+                                ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
+                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
                                 }`}
                               autoFocus
                             />
@@ -485,8 +505,8 @@ export default function SignUpPage({ darkMode }) {
                               onChange={(e) => setEmail(e.target.value)}
                               placeholder="john@example.com"
                               className={`w-full px-4 sm:px-5 py-3 sm:py-4 text-base sm:text-lg md:text-xl rounded-xl sm:rounded-2xl border-2 outline-none transition-all ${darkMode
-                                  ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
+                                ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
+                                : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
                                 }`}
                             />
                           </div>
@@ -508,8 +528,8 @@ export default function SignUpPage({ darkMode }) {
                           <button
                             onClick={() => setStep(2)}
                             className={`py-3 px-6 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
-                                ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
-                                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                              ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+                              : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                               }`}
                           >
                             <ArrowLeft className="w-4 h-4" />

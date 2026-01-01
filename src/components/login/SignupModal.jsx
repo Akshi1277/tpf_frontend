@@ -10,6 +10,7 @@ import { useSendOtpMutation, useVerifyOtpMutation, useUpdateProfileMutation } fr
 import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
 import { setCredentials } from "@/utils/slices/authSlice"
+import { useAppToast } from "@/app/AppToastContext"
 
 function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
     const dispatch = useDispatch()
@@ -19,6 +20,7 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState('')
     const [showSuccess, setShowSuccess] = useState(false)
+    const { showToast } = useAppToast()
 
     const otpInputs = useRef([])
     const mobileInputRef = useRef(null)
@@ -39,7 +41,12 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
             setStep(2)
             setTimeout(() => otpInputs.current[0]?.focus(), 300)
         } catch (error) {
-            toast.error(error?.data?.message || error?.data?.data?.message || "Failed to send OTP")
+            showToast({
+                type: "error",
+                title: "Failed to send otp",
+                message: error?.data?.message || error?.data?.data?.message || "Failed to send OTP",
+                duration: 2000,
+            });
             console.error(error)
         }
     }
@@ -65,7 +72,12 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
             }
         } catch (err) {
             console.error("OTP verification failed:", err)
-            toast.error(err?.data?.message || "Invalid OTP")
+            showToast({
+                type: "error",
+                title: "OTP verification failed",
+                message: err?.data?.message || "Invalid OTP",
+                duration: 2000,
+            });
         }
     }
 
@@ -86,7 +98,12 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
             }, 2000)
         } catch (err) {
             console.error("Profile update failed:", err)
-            toast.error(err?.data?.message || "Failed to save profile")
+            showToast({
+                type: "error",
+                title: "Failed to save Details",
+                message: err?.data?.message || 'Please try again!',
+                duration: 2000,
+            });
         }
     }
 
@@ -149,7 +166,12 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
             setOtp(['', '', '', ''])
             otpInputs.current[0]?.focus()
         } catch (error) {
-            toast.error(error?.data?.message || "Failed to resend OTP")
+            showToast({
+                type: "error",
+                title: "Failed to resend OTP",
+                message: error?.data?.message || 'Please try again!',
+                duration: 2000,
+            });
         }
     }
 
@@ -210,8 +232,8 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
                             <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
                                 <div
                                     className={`absolute inset-0 ${darkMode
-                                            ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
-                                            : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
+                                        ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
+                                        : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
                                         }`}
                                     style={{ backgroundSize: '48px 48px' }}
                                 />
@@ -224,8 +246,8 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
                                 onClick={handleClose}
                                 disabled={showSuccess}
                                 className={`absolute top-6 right-6 z-10 p-2 rounded-full transition-all ${darkMode
-                                        ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white"
-                                        : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900"
+                                    ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white"
+                                    : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900"
                                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 <X className="w-5 h-5" />

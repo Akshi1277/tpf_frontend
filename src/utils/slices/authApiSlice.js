@@ -1,5 +1,5 @@
 import { apiSlice } from "./apiSlice";
-import { setCredentials } from "./authSlice";
+import { logout, setCredentials } from "./authSlice";
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
 
@@ -50,7 +50,16 @@ export const authApiSlice = apiSlice.injectEndpoints({
       query: () => ({
         url: "/user/logout",
         method: "POST",
+        credentials: "include", // 🔥 REQUIRED for cookies
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } finally {
+          dispatch(logout()); // clear auth slice
+          dispatch(authApiSlice.util.resetApiState()); // 🔥 REQUIRED
+        }
+      },
     }),
 
     toggleWishlist: builder.mutation({
