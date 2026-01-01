@@ -3,6 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import LoginModal from "../login/LoginModal"
+import { useCreateTicketMutation } from '@/utils/slices/tickets-queriesApiSlice';
 // Interactive Search Component
 function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,6 +14,7 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
   const user = useSelector(state => state.auth.userInfo);
+  const [createTicket, { isLoading }] = useCreateTicketMutation();
 
   const searchFAQs = (query) => {
     if (!query.trim()) return null;
@@ -69,21 +71,30 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   };
 
   const submitQuestion = async () => {
-    setSubmitted(true);
+    try {
+      setSubmitted(true);
 
-    // 🔜 future API call goes here
-    // await createFaqQuestion({ question: userQuestion });
+      await createTicket({
+        fullName: user.fullName || "Authenticated User",
+        email: user.email,
+        queryType: "faqs",          // ✅ IMPORTANT
+        message: userQuestion,      // ✅ FAQ question
+      }).unwrap();
 
-    setTimeout(() => {
-      setStage('initial');
-      setSearchQuery('');
-      setSearchResult(null);
-      setUserQuestion('');
+      setTimeout(() => {
+        setStage("initial");
+        setSearchQuery("");
+        setSearchResult(null);
+        setUserQuestion("");
+        setSubmitted(false);
+        setPendingSubmit(false);
+      }, 2000);
+
+    } catch (error) {
+      console.error("FAQ submit failed", error);
       setSubmitted(false);
-      setPendingSubmit(false);
-    }, 2500);
+    }
   };
-
 
   const handleQuestionSubmit = (e) => {
     e.preventDefault();
