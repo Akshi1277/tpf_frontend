@@ -37,6 +37,8 @@ export default async function RootLayout({ children }) {
     next: { revalidate: 300 }, // 5 minutes
   })
 
+  console.log("CMS ALL FETCHED")
+
   const data = await res.json()
 
   // ✅ FIX: freeze reference to avoid context re-triggering

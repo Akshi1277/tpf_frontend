@@ -1,15 +1,36 @@
 import { useState } from 'react';
 import { Heart, Lock } from 'lucide-react';
+import PayUForm from '../payments/PayUForm';
 
-export default function DonationCard({ darkMode }) {
+export default function DonationCard({ darkMode, campaignId }) {
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
+  const [payuData, setPayuData] = useState(null);
+
 
   const presetAmounts = [500, 1000, 2500, 5000, 10000];
 
-  const handleDonate = () => {
+  const handleDonate = async () => {
     const amount = selectedAmount || parseInt(customAmount);
-    console.log('Donate amount:', amount);
+    if (!amount) return;
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/donations/initiate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ 
+          amount,
+          campaignId
+         }),
+      }
+    );
+
+    const data = await res.json();
+    setPayuData(data.payu);
   };
 
   return (
@@ -40,15 +61,14 @@ export default function DonationCard({ darkMode }) {
                 setSelectedAmount(amount);
                 setCustomAmount('');
               }}
-              className={`p-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 ${
-                selectedAmount === amount
+              className={`p-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 ${selectedAmount === amount
                   ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30'
                   : darkMode
-                  ? 'bg-zinc-700 text-white hover:bg-zinc-600'
-                  : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-              }`}
+                    ? 'bg-zinc-700 text-white hover:bg-zinc-600'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                }`}
             >
-              ₹{(amount/1000).toFixed(1)}K
+              ₹{(amount / 1000).toFixed(1)}K
             </button>
           ))}
         </div>
@@ -59,9 +79,8 @@ export default function DonationCard({ darkMode }) {
           Or Enter Custom Amount
         </label>
         <div className="relative">
-          <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold ${
-            darkMode ? 'text-gray-400' : 'text-gray-500'
-          }`}>
+          <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>
             ₹
           </span>
           <input
@@ -72,13 +91,12 @@ export default function DonationCard({ darkMode }) {
               setCustomAmount(e.target.value);
               setSelectedAmount(null);
             }}
-            className={`w-full h-14 pl-10 pr-4 text-lg rounded-xl border-2 transition-all focus:outline-none focus:ring-2 ${
-              customAmount
+            className={`w-full h-14 pl-10 pr-4 text-lg rounded-xl border-2 transition-all focus:outline-none focus:ring-2 ${customAmount
                 ? 'border-emerald-500 focus:ring-emerald-200'
                 : darkMode
-                ? 'text-white placeholder-zinc-500 focus:border-emerald-500'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
-            }`}
+                  ? 'text-white placeholder-zinc-500 focus:border-emerald-500'
+                  : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
+              }`}
           />
         </div>
       </div>
@@ -86,34 +104,39 @@ export default function DonationCard({ darkMode }) {
       <button
         onClick={handleDonate}
         disabled={!selectedAmount && !customAmount}
-        className={`w-full h-14 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
-          selectedAmount || customAmount
+        className={`w-full h-14 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${selectedAmount || customAmount
             ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40'
             : darkMode
-            ? 'bg-zinc-700 text-gray-400'
-            : 'bg-gray-200 text-gray-400'
-        }`}
+              ? 'bg-zinc-700 text-gray-400'
+              : 'bg-gray-200 text-gray-400'
+          }`}
       >
         Donate {selectedAmount ? `₹${selectedAmount.toLocaleString()}` : customAmount ? `₹${parseInt(customAmount).toLocaleString()}` : 'Now'}
       </button>
 
-      <div className={`flex items-center justify-center gap-2 text-sm mt-4 p-3 rounded-lg ${
-        darkMode ? 'bg-zinc-900' : 'bg-gray-50'
-      }`}>
+      <div className={`flex items-center justify-center gap-2 text-sm mt-4 p-3 rounded-lg ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
+        }`}>
         <Lock className="w-4 h-4 text-emerald-500" />
         <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
           100% secure payment • SSL encrypted
         </span>
       </div>
 
-      <div className={`mt-6 p-4 rounded-xl border ${
-        darkMode ? 'border-zinc-700 bg-zinc-900/50' : 'border-gray-200 bg-gray-50'
-      }`}>
+      <div className={`mt-6 p-4 rounded-xl border ${darkMode ? 'border-zinc-700 bg-zinc-900/50' : 'border-gray-200 bg-gray-50'
+        }`}>
         <p className={`text-xs text-center leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-          By donating, you agree to our terms. Your donation is tax-deductible. 
+          By donating, you agree to our terms. Your donation is tax-deductible.
           You'll receive a receipt via email.
         </p>
       </div>
+
+      {payuData && (
+        <PayUForm
+          action={payuData.action}
+          payload={payuData.payload}
+        />
+      )}
     </div>
+
   );
 }

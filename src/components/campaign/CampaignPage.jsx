@@ -41,7 +41,7 @@ export default function CampaignPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <DonationCard darkMode={darkMode} />
+            <DonationCard darkMode={darkMode} campaign = {campaignData} />
           </div>
         </div>
 
