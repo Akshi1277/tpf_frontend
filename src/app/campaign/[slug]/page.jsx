@@ -35,6 +35,7 @@ export default function CampaignPage() {
   }
 
   const campaign = data.campaign;
+  console.log(campaign)
 
 
   return (

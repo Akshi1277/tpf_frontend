@@ -11,7 +11,15 @@ import ShareModal from "./ShareModal"
 import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
 import { useSelector } from 'react-redux';
 export default function CampaignCard({ campaign, darkMode }) {
-  const progress = Math.min(100, Math.round((campaign.raised / campaign.goal) * 100));
+
+  const progress = campaign.requiredAmount
+    ? Math.min(
+      100,
+      Math.round(
+        (campaign.receivedAmount / campaign.requiredAmount) * 100
+      )
+    )
+    : 0;
 
   const router = useRouter();
   const COLORS = {
@@ -23,7 +31,8 @@ export default function CampaignCard({ campaign, darkMode }) {
 
   const [toggleWishlist] = useToggleWishlistMutation();
 
-  const saved = wishlist.includes(campaign.campaignId);
+  const campaignId = campaign.campaignId || campaign._id;
+  const saved = wishlist.includes(campaignId);
 
   const [openShare, setOpenShare] = useState(false);
 
@@ -31,6 +40,8 @@ export default function CampaignCard({ campaign, darkMode }) {
     typeof window !== "undefined"
       ? `${window.location.origin}/campaign/${campaign.slug}`
       : "";
+
+
   const handleToggleWishlist = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -41,7 +52,7 @@ export default function CampaignCard({ campaign, darkMode }) {
     }
 
     try {
-      await toggleWishlist(campaign.campaignId).unwrap();
+      await toggleWishlist(campaignId).unwrap();
     } catch (err) {
       console.error("Wishlist toggle failed", err);
     }
@@ -98,10 +109,11 @@ export default function CampaignCard({ campaign, darkMode }) {
             <div className="mb-3">
               <div className="flex justify-between text-xs sm:text-sm mb-2">
                 <span className="font-medium text-white">
-                  {currency(campaign.raised)}
+                  {currency(campaign.receivedAmount)
+                  }
                 </span>
                 <span className="text-zinc-200">
-                  of {currency(campaign.goal)}
+                  of {currency(campaign.requiredAmount)}
                 </span>
               </div>
 
@@ -124,7 +136,7 @@ export default function CampaignCard({ campaign, darkMode }) {
             <div className="flex items-center justify-between mb-3 text-xs sm:text-sm">
               <span className="text-zinc-200">
                 <Users className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-                {campaign.donors} donors
+                {campaign.donorCount} donors
               </span>
               <span className="font-medium text-emerald-400">
                 {progress}% funded
@@ -216,10 +228,10 @@ export default function CampaignCard({ campaign, darkMode }) {
         <div className="mb-3">
           <div className="flex justify-between text-xs sm:text-sm mb-2">
             <span className={`font-medium ${COLORS.neutralHeading}`}>
-              {currency(campaign.raised)}
+              {currency(campaign.receivedAmount)}
             </span>
             <span className={COLORS.neutralBody}>
-              of {currency(campaign.goal)}
+              of {currency(campaign.requiredAmount)}
             </span>
           </div>
 
@@ -242,7 +254,7 @@ export default function CampaignCard({ campaign, darkMode }) {
         <div className="flex items-center justify-between mb-3 text-xs sm:text-sm">
           <span className={COLORS.neutralBody}>
             <Users className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-            {campaign.donors} donors
+            {campaign.donorCount} donors
           </span>
           <span className="font-medium text-emerald-600">
             {progress}% funded

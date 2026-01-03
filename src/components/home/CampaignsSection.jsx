@@ -1,9 +1,8 @@
 // components/home/CampaignsSection.jsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
-import { categories } from '@/lib/constants';
 import { useCMS } from '@/app/CMSContext';
 import Link from 'next/link';
 
@@ -13,87 +12,130 @@ export default function CampaignsSection({ darkMode }) {
   const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   const containerRef = useRef(null);
-
   const cms = useCMS();
-  const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
-  const validFundraisers = fundraisers.filter(
-    (f) => typeof f.campaignSlug === "string" && f.campaignSlug.length > 0
-  );
 
   const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
-  if (!fundraisers.length) return null;
-
+  /* --------------------------------
+     Helpers
+  --------------------------------- */
   const calcDaysLeft = (deadline) => {
     const end = new Date(deadline);
     const now = new Date();
-    const diff = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
-    return diff > 0 ? diff : 0;
+    return Math.max(
+      0,
+      Math.ceil((end - now) / (1000 * 60 * 60 * 24))
+    );
   };
 
-  const filteredCampaigns =
-    selectedCategory === "all"
-      ? validFundraisers
-      : validFundraisers.filter((c) => c.category === selectedCategory);
+  /* --------------------------------
+     🔒 ACTIVE CAMPAIGNS (HARD GATE)
+  --------------------------------- */
+  const activeCampaigns = useMemo(() => {
+    if (!Array.isArray(cms)) return [];
 
+    return cms
+      .filter(
+        (item) =>
+          item.type === 'fundraiser' &&
+          item.campaignStatus === 'ACTIVE' &&
+          typeof item.campaignSlug === 'string' &&
+          item.campaignSlug.trim().length > 0
+      )
+      .map((campaign) => ({
+        ...campaign,
+        image: campaign.imageUrl
+          ? `${BASE_URL}${campaign.imageUrl}`
+          : null,
+        video: campaign.videoUrl
+          ? `${BASE_URL}${campaign.videoUrl}`
+          : null,
+        raised: Number(campaign.raisedAmount || 0),
+        goal: Number(campaign.requiredAmount || campaign.goal || 0),
+        org: campaign.organization || '',
+        urgent: Boolean(campaign.isUrgent),
+        taxBenefit: Boolean(campaign.taxBenefits),
+        validityDate: campaign.deadline
+          ? calcDaysLeft(campaign.deadline)
+          : null,
+        zakatVerified: Boolean(campaign.zakatVerified),
+        slug: campaign.campaignSlug,
+      }));
+  }, [cms]);
+
+  /* --------------------------------
+     Category Filter (ACTIVE ONLY)
+  --------------------------------- */
+  const filteredCampaigns = useMemo(() => {
+    if (selectedCategory === 'all') return activeCampaigns;
+    return activeCampaigns.filter(
+      (c) => c.category === selectedCategory
+    );
+  }, [activeCampaigns, selectedCategory]);
+
+  /* --------------------------------
+     🚫 HARD STOP — NO ACTIVE CAMPAIGNS
+  --------------------------------- */
+  if (!filteredCampaigns.length) {
+    return null;
+  }
+
+  /* --------------------------------
+     Infinite Scroll Setup
+  --------------------------------- */
   const MIN_CARDS_FOR_INFINITE = 5;
-  const enableInfiniteScroll = filteredCampaigns.length > MIN_CARDS_FOR_INFINITE;
+  const enableInfiniteScroll =
+    filteredCampaigns.length > MIN_CARDS_FOR_INFINITE;
 
-  const infiniteCampaigns = enableInfiniteScroll
-    ? [...filteredCampaigns, ...filteredCampaigns]
-    : filteredCampaigns;
+  const infiniteCampaigns = useMemo(() => {
+    return enableInfiniteScroll
+      ? [...filteredCampaigns, ...filteredCampaigns]
+      : filteredCampaigns;
+  }, [filteredCampaigns, enableInfiniteScroll]);
 
-  const COLORS = {
-    neutralHeading: darkMode ? "text-white" : "text-zinc-900",
-    neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
-  };
-
+  /* --------------------------------
+     Scroll Helpers
+  --------------------------------- */
   const getScrollAmount = () => {
     const container = containerRef.current;
     if (!container) return 0;
     const cardWidth = container.children[0]?.offsetWidth || 0;
-    const gap = 20;
-    return cardWidth + gap;
+    return cardWidth + 20;
   };
 
   const scrollLeft = () => {
-    const container = containerRef.current;
-    if (container) {
-      container.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
-    }
+    containerRef.current?.scrollBy({
+      left: -getScrollAmount(),
+      behavior: 'smooth',
+    });
   };
 
   const scrollRight = () => {
-    const container = containerRef.current;
-    if (container) {
-      container.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
-    }
+    containerRef.current?.scrollBy({
+      left: getScrollAmount(),
+      behavior: 'smooth',
+    });
   };
 
-  // Pause auto-scroll externally
-  useEffect(() => {
-    const handlePause = () => setIsUserScrolling(true);
-    window.addEventListener("pauseCampaignScroll", handlePause);
-    return () => window.removeEventListener("pauseCampaignScroll", handlePause);
-  }, []);
-
-  // Auto-scroll
+  /* --------------------------------
+     Auto Scroll
+  --------------------------------- */
   useEffect(() => {
     if (!enableInfiniteScroll || isUserScrolling) return;
 
     const interval = setInterval(() => {
-      setCampaignScrollIndex((prev) => prev + 1);
+      setCampaignScrollIndex((i) => i + 1);
     }, 2000);
 
     return () => clearInterval(interval);
   }, [enableInfiniteScroll, isUserScrolling]);
 
-  // Apply scroll position
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const scrollAmount = getScrollAmount();
+
     container.scrollTo({
       left: scrollAmount * campaignScrollIndex,
       behavior: 'smooth',
@@ -106,76 +148,66 @@ export default function CampaignsSection({ darkMode }) {
       setTimeout(() => {
         container.scrollTo({ left: 0, behavior: 'auto' });
         setCampaignScrollIndex(0);
-      }, 500);
+      }, 400);
     }
   }, [campaignScrollIndex, filteredCampaigns.length, enableInfiniteScroll]);
 
-  // Detect user scroll
+  /* --------------------------------
+     User Scroll Detection
+  --------------------------------- */
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    let scrollTimeout;
+    let timeout;
 
     const onScroll = () => {
       setIsUserScrolling(true);
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        setIsUserScrolling(false);
-      }, 2000);
+      clearTimeout(timeout);
+      timeout = setTimeout(
+        () => setIsUserScrolling(false),
+        2000
+      );
     };
 
-    container.addEventListener('scroll', onScroll, { passive: true });
-    return () => container.removeEventListener('scroll', onScroll);
+    container.addEventListener('scroll', onScroll, {
+      passive: true,
+    });
+    return () =>
+      container.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Seamless infinite correction
+  /* --------------------------------
+     Reset on Category Change
+  --------------------------------- */
   useEffect(() => {
-    if (!enableInfiniteScroll) return;
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    const scrollAmount = getScrollAmount();
-
-    const handleScrollEnd = () => {
-      const index = Math.round(container.scrollLeft / scrollAmount);
-      if (index >= filteredCampaigns.length) {
-        container.scrollTo({
-          left: (index - filteredCampaigns.length) * scrollAmount,
-          behavior: 'auto',
-        });
-        setCampaignScrollIndex(index - filteredCampaigns.length);
-      }
-    };
-
-    let timeout;
-    const onScroll = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(handleScrollEnd, 150);
-    };
-
-    container.addEventListener('scroll', onScroll, { passive: true });
-    return () => container.removeEventListener('scroll', onScroll);
-  }, [enableInfiniteScroll, filteredCampaigns.length]);
-
-  // Reset on category change
-  useEffect(() => {
-    const container = containerRef.current;
     setCampaignScrollIndex(0);
-    if (container) {
-      container.scrollTo({ left: 0, behavior: 'auto' });
-    }
+    containerRef.current?.scrollTo({
+      left: 0,
+      behavior: 'auto',
+    });
   }, [selectedCategory]);
 
+  /* --------------------------------
+     Render
+  --------------------------------- */
   return (
-    <section id="campaigns" className={`py-10 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
+    <section
+      id="campaigns"
+      className={`py-10 ${
+        darkMode ? 'bg-zinc-800' : 'bg-white'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-3xl md:text-4xl font-bold ${COLORS.neutralHeading}`}>
+          <h2
+            className={`text-3xl md:text-4xl font-bold ${
+              darkMode ? 'text-white' : 'text-zinc-900'
+            }`}
+          >
             Fundraising now
           </h2>
+
           <Link href="/all-campaigns">
             <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-4 py-2 rounded-full text-white hover:animate-pulse">
               Discover more
@@ -183,37 +215,27 @@ export default function CampaignsSection({ darkMode }) {
           </Link>
         </div>
 
-      
-
         <div className="relative">
           {enableInfiniteScroll && (
-            <button onClick={scrollLeft} className="hidden md:flex absolute -left-10 top-1/2 -translate-y-1/2 z-10">
+            <button
+              onClick={scrollLeft}
+              className="hidden md:flex absolute -left-10 top-1/2 -translate-y-1/2 z-10"
+            >
               ◀
             </button>
           )}
 
           <div
             ref={containerRef}
-            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+            className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide"
           >
             {infiniteCampaigns.map((campaign, index) => (
-              <div key={`${campaign._id}-${index}`} className="flex-shrink-0 w-[285px]">
+              <div
+                key={`${campaign._id}-${index}`}
+                className="flex-shrink-0 w-[285px]"
+              >
                 <CampaignCard
-                  campaign={{
-                    ...campaign,
-                    image: campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : null,
-                    video: campaign.videoUrl ? `${BASE_URL}${campaign.videoUrl}` : null,
-                    raised: Number(campaign.raisedAmount || 0),
-                    goal: Number(campaign.requiredAmount || campaign.goal || 0),
-                    org: campaign.organization || "",
-                    urgent: campaign.isUrgent || false,
-                    taxBenefit: campaign.taxBenefits || false,
-                    validityDate: campaign.deadline
-                      ? calcDaysLeft(campaign.deadline)
-                      : null,
-                    zakatVerified: campaign.zakatVerified || false,
-                    slug: campaign.campaignSlug,
-                  }}
+                  campaign={campaign}
                   darkMode={darkMode}
                 />
               </div>
@@ -221,7 +243,10 @@ export default function CampaignsSection({ darkMode }) {
           </div>
 
           {enableInfiniteScroll && (
-            <button onClick={scrollRight} className="hidden md:flex absolute -right-10 top-1/2 -translate-y-1/2 z-10">
+            <button
+              onClick={scrollRight}
+              className="hidden md:flex absolute -right-10 top-1/2 -translate-y-1/2 z-10"
+            >
               ▶
             </button>
           )}
