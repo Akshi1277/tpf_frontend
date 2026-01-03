@@ -1,7 +1,9 @@
 "use client"
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useState, useRef } from 'react';
-
+import { useSelector } from 'react-redux';
+import LoginModal from "../login/LoginModal"
+import { useCreateTicketMutation } from '@/utils/slices/tickets-queriesApiSlice';
 // Interactive Search Component
 function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -9,10 +11,14 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   const [stage, setStage] = useState('initial'); // initial, result, feedback, question
   const [userQuestion, setUserQuestion] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+  const user = useSelector(state => state.auth.userInfo);
+  const [createTicket, { isLoading }] = useCreateTicketMutation();
 
   const searchFAQs = (query) => {
     if (!query.trim()) return null;
-    
+
     const lowerQuery = query.toLowerCase();
     let bestMatch = null;
     let highestScore = 0;
@@ -21,11 +27,11 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
       faqData[category].forEach(faq => {
         const qLower = faq.q.toLowerCase();
         const aLower = faq.a.toLowerCase();
-        
+
         let score = 0;
         if (qLower.includes(lowerQuery)) score += 3;
         if (aLower.includes(lowerQuery)) score += 1;
-        
+
         const queryWords = lowerQuery.split(' ');
         queryWords.forEach(word => {
           if (word.length > 2) {
@@ -64,17 +70,55 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
     }
   };
 
+  const submitQuestion = async () => {
+    try {
+      setSubmitted(true);
+
+      await createTicket({
+        fullName: user.fullName || "Authenticated User",
+        email: user.email,
+        queryType: "faqs",          // ✅ IMPORTANT
+        message: userQuestion,      // ✅ FAQ question
+      }).unwrap();
+
+      setTimeout(() => {
+        setStage("initial");
+        setSearchQuery("");
+        setSearchResult(null);
+        setUserQuestion("");
+        setSubmitted(false);
+        setPendingSubmit(false);
+      }, 2000);
+
+    } catch (error) {
+      console.error("FAQ submit failed", error);
+      setSubmitted(false);
+    }
+  };
+
   const handleQuestionSubmit = (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setStage('initial');
-      setSearchQuery('');
-      setSearchResult(null);
-      setUserQuestion('');
-      setSubmitted(false);
-    }, 2500);
+
+    // ❌ Not logged in → block + open modal
+    if (!user) {
+      setPendingSubmit(true);
+      setShowLoginModal(true);
+      return;
+    }
+
+    // ✅ Logged in → proceed
+    submitQuestion();
   };
+
+  const handleLoginSuccess = async () => {
+    setShowLoginModal(false);
+
+    if (pendingSubmit) {
+      setPendingSubmit(false);
+      submitQuestion();
+    }
+  };
+
 
   const handleReset = () => {
     setStage('initial');
@@ -89,14 +133,13 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: 0.6 }}
-      className={`mt-12 sm:mt-16 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 ${
-        darkMode
-          ? 'bg-gradient-to-br from-zinc-800 to-zinc-800/50 border-zinc-700/50'
-          : 'bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-100'
-      } border relative overflow-hidden`}
+      className={`mt-12 sm:mt-16 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 ${darkMode
+        ? 'bg-gradient-to-br from-zinc-800 to-zinc-800/50 border-zinc-700/50'
+        : 'bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-100'
+        } border relative overflow-hidden`}
     >
       <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 rounded-full blur-3xl"></div>
-      
+
       <div className="relative z-10">
         <AnimatePresence mode="wait">
           {/* Initial Search Stage */}
@@ -115,7 +158,7 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
               <p className={`text-base sm:text-lg mb-8 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
                 Search for answers or ask us directly
               </p>
-              
+
               <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
                 <div className="relative">
                   <input
@@ -123,11 +166,10 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Type your question here..."
-                    className={`w-full px-6 py-4 pr-14 rounded-xl text-base ${
-                      darkMode
-                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                    } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
+                    className={`w-full px-6 py-4 pr-14 rounded-xl text-base ${darkMode
+                      ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                      : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                      } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
                   />
                   <button
                     type="submit"
@@ -143,9 +185,8 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
               <div className="mt-8">
                 <a
                   href="https://tpf-aid.vercel.app/contactus"
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${
-                    darkMode ? 'bg-zinc-700/30 hover:bg-zinc-700/50 text-zinc-300' : 'bg-white/60 hover:bg-white text-zinc-700'
-                  } transition-all duration-300 group`}
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${darkMode ? 'bg-zinc-700/30 hover:bg-zinc-700/50 text-zinc-300' : 'bg-white/60 hover:bg-white text-zinc-700'
+                    } transition-all duration-300 group`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
@@ -173,9 +214,8 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
                     </h3>
                     <button
                       onClick={handleReset}
-                      className={`p-2 rounded-lg ${
-                        darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
-                      } transition-all duration-300`}
+                      className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
+                        } transition-all duration-300`}
                     >
                       <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -183,9 +223,8 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
                     </button>
                   </div>
 
-                  <div className={`p-6 rounded-xl ${
-                    darkMode ? 'bg-zinc-700/30' : 'bg-white/60'
-                  } mb-8`}>
+                  <div className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-700/30' : 'bg-white/60'
+                    } mb-8`}>
                     <h4 className={`text-lg font-semibold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
                       {searchResult.q}
                     </h4>
@@ -207,11 +246,10 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
                       </button>
                       <button
                         onClick={() => handleFeedback(false)}
-                        className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 ${
-                          darkMode
-                            ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
-                            : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
-                        }`}
+                        className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
+                          ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
+                          : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
+                          }`}
                       >
                         No, I need more help
                       </button>
@@ -234,11 +272,10 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
                       onClick={handleReset}
-                      className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                        darkMode
-                          ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
-                          : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
-                      }`}
+                      className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
+                        ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
+                        : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
+                        }`}
                     >
                       Try Another Search
                     </button>
@@ -293,9 +330,8 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
                     </h3>
                     <button
                       onClick={handleReset}
-                      className={`p-2 rounded-lg ${
-                        darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
-                      } transition-all duration-300`}
+                      className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
+                        } transition-all duration-300`}
                     >
                       <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -314,11 +350,10 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
                       placeholder="Type your question here..."
                       rows="6"
                       required
-                      className={`w-full px-6 py-4 rounded-xl text-base resize-none ${
-                        darkMode
-                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                      } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
+                      className={`w-full px-6 py-4 rounded-xl text-base resize-none ${darkMode
+                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                        } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
                     />
                     <button
                       type="submit"
@@ -346,6 +381,16 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
             </motion.div>
           )}
         </AnimatePresence>
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => {
+            setShowLoginModal(false);
+            setPendingSubmit(false);
+          }}
+          darkMode={darkMode}
+          onLoginSuccess={handleLoginSuccess}
+        />
+
       </div>
     </motion.div>
   );
@@ -358,41 +403,55 @@ export default function FAQSection({ darkMode }) {
   const [openQuestion, setOpenQuestion] = useState(null);
 
   const categories = [
-    { id: 'general', label: 'General', icon: (
-      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )},
-    { id: 'donors', label: 'For Donors', icon: (
-      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )},
-    { id: 'beneficiaries', label: 'For Beneficiaries', icon: (
-      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-      </svg>
-    )},
-    { id: 'volunteers', label: 'For Volunteers', icon: (
-      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-      </svg>
-    )},
-    { id: 'issues', label: 'Issues & Support', icon: (
-      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-      </svg>
-    )},
-    { id: 'legal', label: 'Legal', icon: (
-      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-      </svg>
-    )},
-    { id: 'other', label: 'Other', icon: (
-      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-      </svg>
-    )}
+    {
+      id: 'general', label: 'General', icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    {
+      id: 'donors', label: 'For Donors', icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    {
+      id: 'beneficiaries', label: 'For Beneficiaries', icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      )
+    },
+    {
+      id: 'volunteers', label: 'For Volunteers', icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+        </svg>
+      )
+    },
+    {
+      id: 'issues', label: 'Issues & Support', icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      )
+    },
+    {
+      id: 'legal', label: 'Legal', icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+        </svg>
+      )
+    },
+    {
+      id: 'other', label: 'Other', icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+      )
+    }
   ];
 
   const faqData = {
@@ -551,9 +610,8 @@ export default function FAQSection({ darkMode }) {
   return (
     <section
       ref={ref}
-      className={`py-36 sm:py-20 md:py-30 ${
-        darkMode ? 'bg-zinc-900' : 'bg-white'
-      } relative overflow-hidden`}
+      className={`py-36 sm:py-20 md:py-30 ${darkMode ? 'bg-zinc-900' : 'bg-white'
+        } relative overflow-hidden`}
     >
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -601,13 +659,12 @@ export default function FAQSection({ darkMode }) {
                 setOpenCategory(cat.id);
                 setOpenQuestion(null);
               }}
-              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 inline-flex items-center gap-2 ${
-                openCategory === cat.id
-                  ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg scale-105'
-                  : darkMode
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 inline-flex items-center gap-2 ${openCategory === cat.id
+                ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg scale-105'
+                : darkMode
                   ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
                   : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
-              }`}
+                }`}
             >
               <span className="flex items-center">{cat.icon}</span>
               <span className="whitespace-nowrap">{cat.label}</span>
@@ -629,38 +686,34 @@ export default function FAQSection({ darkMode }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                className={`rounded-xl sm:rounded-2xl overflow-hidden border ${
-                  darkMode
-                    ? 'bg-zinc-800/50 border-zinc-700/50 backdrop-blur-sm'
-                    : 'bg-white border-zinc-200'
-                } shadow-sm hover:shadow-md transition-all duration-300`}
+                className={`rounded-xl sm:rounded-2xl overflow-hidden border ${darkMode
+                  ? 'bg-zinc-800/50 border-zinc-700/50 backdrop-blur-sm'
+                  : 'bg-white border-zinc-200'
+                  } shadow-sm hover:shadow-md transition-all duration-300`}
               >
                 <button
                   onClick={() => toggleQuestion(index)}
-                  className={`w-full px-5 sm:px-6 py-4 sm:py-5 flex items-start justify-between gap-4 text-left transition-colors duration-200 ${
-                    darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-zinc-50'
-                  }`}
+                  className={`w-full px-5 sm:px-6 py-4 sm:py-5 flex items-start justify-between gap-4 text-left transition-colors duration-200 ${darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-zinc-50'
+                    }`}
                 >
                   <div className="flex-1">
-                    <h3 className={`text-base sm:text-lg font-semibold ${
-                      darkMode ? 'text-white' : 'text-zinc-900'
-                    }`}>
+                    <h3 className={`text-base sm:text-lg font-semibold ${darkMode ? 'text-white' : 'text-zinc-900'
+                      }`}>
                       {faq.q}
                     </h3>
                   </div>
-                  <div className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    openQuestion === index
-                      ? 'bg-gradient-to-r from-teal-500 to-emerald-500 rotate-180'
-                      : darkMode
+                  <div className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300 ${openQuestion === index
+                    ? 'bg-gradient-to-r from-teal-500 to-emerald-500 rotate-180'
+                    : darkMode
                       ? 'bg-zinc-700'
                       : 'bg-zinc-100'
-                  }`}>
+                    }`}>
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </button>
-                
+
                 <motion.div
                   initial={false}
                   animate={{
@@ -670,12 +723,10 @@ export default function FAQSection({ darkMode }) {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="overflow-hidden"
                 >
-                  <div className={`px-5 sm:px-6 pb-4 sm:pb-5 pt-2 ${
-                    darkMode ? 'text-zinc-300' : 'text-zinc-600'
-                  }`}>
-                    <div className={`pl-4 border-l-2 ${
-                      darkMode ? 'border-teal-500/50' : 'border-emerald-500/50'
+                  <div className={`px-5 sm:px-6 pb-4 sm:pb-5 pt-2 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'
                     }`}>
+                    <div className={`pl-4 border-l-2 ${darkMode ? 'border-teal-500/50' : 'border-emerald-500/50'
+                      }`}>
                       <p className="text-sm sm:text-base leading-relaxed">{faq.a}</p>
                     </div>
                   </div>
