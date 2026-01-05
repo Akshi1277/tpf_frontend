@@ -29,8 +29,6 @@ export default function MyselfForm({ darkModeFromParent }) {
   const [formData, setFormData] = useState({
     // Personal Information
     fullName: '',
-    relation: '',
-    relationName: '',
     parentSpouseName: '',
     dateOfBirth: '',
     maritalStatus: '',
@@ -96,7 +94,7 @@ export default function MyselfForm({ darkModeFromParent }) {
 
 
   const requiredFields = {
-    1: ["fullName", "relation", "relationName", "dateOfBirth", "maritalStatus", "gender", "declarationConsent"],
+    1: ["fullName", "dateOfBirth", "maritalStatus", "gender", "declarationConsent"],
     2: ["permanentAddress", "currentAddress", "contactNumber", "email", "idType", "govIdNumber", "govIdDocument"],
     3: ["occupation", "monthlyIncome", "bankNameBranch", "accountNumber", "ifscCode", "numberOfDependents", "bankStatement"],
     4: ["aidType", "hardshipDescription"],
@@ -155,8 +153,6 @@ export default function MyselfForm({ darkModeFromParent }) {
 
       // Add all text fields
       formDataToSend.append('fullName', formData.fullName)
-      formDataToSend.append('relation', formData.relation)
-      formDataToSend.append('relationName', formData.relationName)
       formDataToSend.append('dateOfBirth', formData.dateOfBirth)
       formDataToSend.append('maritalStatus', formData.maritalStatus)
       formDataToSend.append('gender', formData.gender)
@@ -359,50 +355,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                   </div>
                 </div>
 
-                {/* Father/Mother/Husband Name */}
-                <div>
-                  <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                    Father/Mother/Husband Name <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <User className={`absolute left-3 top-6 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
-                    {/* Relationship Dropdown */}
-                    <select
-                      name="relation"
-                      value={formData.relation}
-                      onChange={handleInputChange}
-                      className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode
-                        ? "bg-zinc-700 border-zinc-600 text-white"
-                        : "bg-white border-zinc-300 text-zinc-900"
-                        }`}
-                      required
-                    >
-                      <option value="" disabled>Select Relation</option>
-                      <option value="Father">Father</option>
-                      <option value="Mother">Mother</option>
-                      <option value="Wife">Wife</option>
-                      <option value="Husband">Husband</option>
-                      <option value="Sibling">Sibling</option>
-                      <option value="Other">Other</option>
-                    </select>
 
-                    {/* Name Input Field Under Dropdown */}
-                    <input
-                      type="text"
-                      name="relationName"
-                      value={formData.relationName}
-                      onChange={handleInputChange}
-                      placeholder="Enter the name"
-                      className={`mt-3 w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode
-                        ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-                        : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-                        }`}
-                      required
-                    />
-
-
-                  </div>
-                </div>
 
                 {/* Date of Birth */}
                 <div>
