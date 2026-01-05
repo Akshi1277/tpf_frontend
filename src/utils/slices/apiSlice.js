@@ -28,7 +28,7 @@ const baseQueryWithAutoLogout = async (args, api, extraOptions) => {
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithAutoLogout,
-  tagTypes: ["CMS", "Campaign", "User","Wishlist"],
+  tagTypes: ["CMS", "Campaign", "User","Wishlist", "RecentTransactions","PeopleHelped", "Leaderboard"],
   endpoints: (builder) => ({
     getHijriDate: builder.query({
       async queryFn(date) {

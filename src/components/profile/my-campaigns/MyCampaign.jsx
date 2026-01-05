@@ -19,15 +19,17 @@ import {
   DollarSign,
   IndianRupee
 } from "lucide-react"
-import { useToggleWishlistMutation,useGetWishlistQuery } from "@/utils/slices/authApiSlice"
+import { useToggleWishlistMutation, useGetWishlistQuery } from "@/utils/slices/authApiSlice"
 import ShareModal from "../../ui/ShareModal"
+
+
 export default function MyCampaignsPage({ darkModeFromParent }) {
   const userInfo = useSelector((state) => state.auth.userInfo)
   const [darkMode, setDarkMode] = useState(false)
   const [activeTab, setActiveTab] = useState("wishlist")
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
-  
+
   const router = useRouter();
   const { data: wishlistedCampaigns = [], isLoading } = useGetWishlistQuery();
   const [toggleWishlist] = useToggleWishlistMutation();
@@ -73,6 +75,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   const CampaignCard = ({ campaign, isMyCampaign = false }) => {
     const progress = calculateProgress(campaign.raisedAmount, campaign.targetAmount)
     console.log("Campaign inside MyCampaignsPage:", campaign);
+   
 
     const handleDonateClick = () => {
       // Ensure the campaign and slug exist
@@ -82,6 +85,23 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         console.error("Campaign slug is not available");
       }
     };
+
+    const getDaysLeft = (deadline) => {
+  const today = new Date();
+  const endDate = new Date(deadline);
+
+  // Normalize times to avoid partial-day issues
+  today.setHours(0, 0, 0, 0);
+  endDate.setHours(0, 0, 0, 0);
+
+  const diffTime = endDate - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
+};
+
+const daysLeft = getDaysLeft(campaign.deadline);
+
 
     return (
       <motion.div
@@ -96,7 +116,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         {/* Image */}
         <div className="relative h-40 sm:h-48 overflow-hidden">
           <img
-            src={campaign.image}
+            src={`${process.env.NEXT_PUBLIC_UPLOAD_URL}${campaign.imageUrl}`}    
             alt={campaign.title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
@@ -106,9 +126,9 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             ) : (
               <button className={`p-1.5 sm:p-2 cursor-pointer rounded-full ${darkMode ? "bg-zinc-900/80" : "bg-white/80"
                 } backdrop-blur-sm hover:scale-110 transition-transform`}>
-                <Heart 
-                 onClick={() => handleToggleWishlist(campaign._id)}
-                className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 fill-rose-500" />
+                <Heart
+                  onClick={() => handleToggleWishlist(campaign._id)}
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 fill-rose-500" />
               </button>
             )}
           </div>
@@ -167,17 +187,32 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                 }`} />
               <span className={`text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
                 }`}>
-                {campaign.donors}
+                {campaign.totalDonors}
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <Clock className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${campaign.daysLeft <= 5 ? "text-rose-500" : darkMode ? "text-zinc-400" : "text-gray-600"
-                }`} />
-              <span className={`text-xs sm:text-sm ${campaign.daysLeft <= 5 ? "text-rose-500 font-semibold" : darkMode ? "text-zinc-400" : "text-gray-600"
-                }`}>
-                {campaign.daysLeft > 0 ? `${campaign.daysLeft}d` : "Ended"}
-              </span>
-            </div>
+  <Clock
+    className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
+      daysLeft <= 5 && daysLeft > 0
+        ? "text-rose-500"
+        : darkMode
+        ? "text-zinc-400"
+        : "text-gray-600"
+    }`}
+  />
+  <span
+    className={`text-xs sm:text-sm ${
+      daysLeft <= 5 && daysLeft > 0
+        ? "text-rose-500 font-semibold"
+        : darkMode
+        ? "text-zinc-400"
+        : "text-gray-600"
+    }`}
+  >
+    {daysLeft > 0 ? `${daysLeft}d` : "Ended"}
+  </span>
+</div>
+
             {isMyCampaign && (
               <div className="flex items-center gap-1">
                 <Eye className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${darkMode ? "text-zinc-400" : "text-gray-600"
@@ -317,9 +352,9 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                 </div>
                 <div className={`flex items-center gap-1.5 cursor-pointer sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${darkMode ? "bg-white/10" : "bg-white/20"
                   } backdrop-blur-sm`}>
-                  <Heart 
-                   onClick={() => handleToggleWishlist(campaign._id)}
-                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-300" />
+                  <Heart
+                    onClick={() => handleToggleWishlist(campaign._id)}
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-300" />
                   <span className="font-semibold text-xs sm:text-sm text-white">
                     {currentUser.totalWishlisted} Wishlisted
                   </span>
@@ -417,10 +452,10 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             className={`text-center py-12 sm:py-16 lg:py-20 cursor-pointer rounded-xl sm:rounded-2xl ${darkMode ? "bg-zinc-800/50" : "bg-white shadow-lg"
               }`}
           >
-            <Heart 
-             onClick={() => handleToggleWishlist(campaign._id)}
-            className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 ${darkMode ? "text-zinc-600" : "text-gray-400"
-              }`} />
+            <Heart
+              onClick={() => handleToggleWishlist(campaign._id)}
+              className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 ${darkMode ? "text-zinc-600" : "text-gray-400"
+                }`} />
             <h3 className={`text-lg sm:text-xl font-bold mb-2 px-4 ${darkMode ? "text-white" : "text-gray-900"
               }`}>
               No wishlisted campaigns

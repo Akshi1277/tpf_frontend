@@ -96,6 +96,18 @@ export const authApiSlice = apiSlice.injectEndpoints({
       providesTags: ["Wishlist"],
     }),
 
+    getRecentTransactions: builder.query({
+      query: () => "/user/recent-transactions",
+      providesTags: ["RecentTransactions"],
+    }),
+
+    getPeopleHelpedStats: builder.query({
+      query: () => "/user/people-helped",
+      providesTags: ["PeopleHelped"],
+    }),
+
+
+
   }),
 });
 
@@ -108,4 +120,7 @@ export const {
   useLazyGetMeQuery,
   useToggleWishlistMutation,
   useGetWishlistQuery,
+  useGetRecentTransactionsQuery,
+  useGetPeopleHelpedStatsQuery,
+
 } = authApiSlice;

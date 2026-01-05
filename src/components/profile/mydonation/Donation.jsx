@@ -16,18 +16,19 @@ import {
 import DonationStats from "./DonationStats"
 import DonationHistory from "./DonationHistory"
 import RealWorldImpact from "./RealWorldImpact"
+import { useGetLeaderboardStatsQuery } from "@/utils/slices/leaderboardApiSlice"
+import { useGetRecentTransactionsQuery, useGetPeopleHelpedStatsQuery } from "@/utils/slices/authApiSlice"
 
 export default function DonationsPage({ darkModeFromParent }) {
-  const userInfo = useSelector((state)=> state.auth.userInfo || [])
+  const userInfo = useSelector((state) => state.auth.userInfo || [])
   const [darkMode, setDarkMode] = useState(false)
   const [filterStatus, setFilterStatus] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [filter80G, setFilter80G] = useState(false)
-  const [selectedYear, setSelectedYear] = useState("2024-25")
   const [dateRange, setDateRange] = useState({ start: "", end: "" })
-  const [leaderboardPeriod, setLeaderboardPeriod] = useState("weekly")
   const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
+  const { data: peopleHelpedRes } = useGetPeopleHelpedStatsQuery();
+  useEffect(() => setMounted(true), []);
 
 
   // Sync with parent dark mode
@@ -37,41 +38,43 @@ useEffect(() => setMounted(true), []);
     }
   }, [darkModeFromParent])
 
-  // Mock user data
+
+  const peopleHelped = peopleHelpedRes?.data?.totalPeopleHelped || 0;
+  const categoryBreakdown = peopleHelpedRes?.data?.categoryBreakdown || {};
+
+  const {
+    data: leaderboardStats,
+    isLoading: leaderboardLoading,
+    isError: leaderboardError,
+  } = useGetLeaderboardStatsQuery()
+
+
+  const currentUserFromLeaderboard =leaderboardStats?.weekly?.find(u => u.isCurrentUser) || null;
+
   const currentUser = {
     name: userInfo.fullName,
-    rank: userInfo?.rank || 0,
-    weeklyDonation: userInfo?.weeklyDonation || 0
-  }
+    rank: currentUserFromLeaderboard?.rank ?? "—",
+    weeklyDonation: currentUserFromLeaderboard?.amount ?? 0,
+  };
 
-  // Mock leaderboard data
-  const leaderboardData = [
-    { id: 1, name: "Fatima Khan", amount: 45000, rank: 1, isPermanent: true },
-    { id: 2, name: "Rahul Sharma", amount: 38000, rank: 2, isPermanent: true },
-    { id: 3, name: "Ayesha Patel", amount: 32000, rank: 3, isPermanent: false },
-    { id: 4, name: "Mohammed Ali", amount: 28500, rank: 4, isPermanent: true },
-    { id: 5, name: "Priya Reddy", amount: 25000, rank: 5, isPermanent: false },
-    { id: 6, name: "Kabir Singh", amount: 22000, rank: 6, isPermanent: false },
-    { id: 7, name: "Zainab Ahmed", amount: 20000, rank: 7, isPermanent: true },
-    { id: 8, name: "Arjun Verma", amount: 18500, rank: 8, isPermanent: false },
-    { id: 9, name: "Sana Malik", amount: 17000, rank: 9, isPermanent: false },
-    { id: 10, name: "Rohan Das", amount: 15500, rank: 10, isPermanent: false },
-    { id: 11, name: "Noor Fatima", amount: 14000, rank: 11, isPermanent: true },
-    { id: 12, name: "Vikram Joshi", amount: 12500, rank: 12, isPermanent: false },
-    { id: 13, name: "Amina Syed", amount: 11000, rank: 13, isPermanent: false },
-    { id: 14, name: "Karan Mehta", amount: 9500, rank: 14, isPermanent: false },
-    { id: 15, name: currentUser.name, amount: currentUser.weeklyDonation, rank: 15, isPermanent: false, isCurrentUser: true },
-  ]
 
   const donationStats = {
-    totalAmount: userInfo?.donations?.totalAmount || 0,
-    totalZakat: userInfo?.donations?.totalZakat || 0,
-    campaignsSupported: userInfo?.donations?.campaignsSupported || 0,
+    totalAmount: userInfo?.donationStats?.totalAmount || 0,
+    totalZakat: userInfo?.donationStats?.totalZakat || 0,
+    campaignsSupported: userInfo?.donationStats?.campaignsSupported || 0,
   };
 
   // Transaction history with 80G eligibility
 
-  const transactions = userInfo?.donations?.history || [];
+  const {
+    data: recentTxnResponse,
+    isLoading: isTransactionsLoading,
+    isError,
+  } = useGetRecentTransactionsQuery();
+
+  const transactions = recentTxnResponse?.data || [];
+
+
 
   const getRankIcon = (rank) => {
     if (rank === 1) return "🥇"
@@ -85,6 +88,24 @@ useEffect(() => setMounted(true), []);
     // Implement invoice download logic
   }
 
+
+  if (leaderboardLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading leaderboard...
+      </div>
+    )
+  }
+
+  if (leaderboardError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        No LeaderBoard Data
+      </div>
+    )
+  }
+
+
   return (
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-gradient-to-br from-emerald-50 via-white to-teal-50"}`}>
 
@@ -92,8 +113,8 @@ useEffect(() => setMounted(true), []);
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className={`absolute inset-0 ${darkMode
-              ? "bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.02)_1px,transparent_1px)]"
-              : "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
+            ? "bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.02)_1px,transparent_1px)]"
+            : "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
             }`}
           style={{ backgroundSize: '48px 48px' }}
         />
@@ -110,8 +131,8 @@ useEffect(() => setMounted(true), []);
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className={`mb-6 rounded-2xl overflow-hidden relative ${darkMode
-              ? "bg-gradient-to-br from-emerald-900/40 to-teal-900/40 border border-emerald-700/30"
-              : "bg-gradient-to-br from-emerald-600 to-teal-600 shadow-xl"
+            ? "bg-gradient-to-br from-emerald-900/40 to-teal-900/40 border border-emerald-700/30"
+            : "bg-gradient-to-br from-emerald-600 to-teal-600 shadow-xl"
             }`}
         >
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -mr-24 -mt-24 blur-2xl" />
@@ -125,11 +146,11 @@ useEffect(() => setMounted(true), []);
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
                 >
-                 {mounted && (
-  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white flex items-center gap-2">
-    Salam, {currentUser.name}! <span className="text-4xl">🤲</span>
-  </h1>
-)}
+                  {mounted && (
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-white flex items-center gap-2">
+                      Salam, {currentUser.name}! <span className="text-4xl">🤲</span>
+                    </h1>
+                  )}
 
                   <p className="text-sm md:text-base mb-3 text-white/90">
                     Your generosity is making a real difference in people's lives
@@ -162,13 +183,13 @@ useEffect(() => setMounted(true), []);
           darkMode={darkMode}
           donationStats={donationStats}
           currentUser={currentUser}
-          leaderboardData={leaderboardData}
-          monthlyData={leaderboardData}
-          yearlyData={leaderboardData}
+          leaderboardData={leaderboardStats?.weekly || []}
+          monthlyData={leaderboardStats?.monthly || []}
+          yearlyData={leaderboardStats?.yearly || []}
           getRankIcon={getRankIcon}
-          leaderboardPeriod={leaderboardPeriod}
-          setLeaderboardPeriod={setLeaderboardPeriod}
+          peopleHelped={peopleHelped}
         />
+
 
         {/* Donation History */}
         <DonationHistory
@@ -186,7 +207,10 @@ useEffect(() => setMounted(true), []);
         />
 
         {/* Real World Impact */}
-        <RealWorldImpact darkMode={darkMode} />
+        <RealWorldImpact
+          darkMode={darkMode}
+          categoryBreakdown={categoryBreakdown}
+        />
 
       </div>
 

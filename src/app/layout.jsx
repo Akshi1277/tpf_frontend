@@ -13,17 +13,17 @@ import { AppToastProvider } from './AppToastContext'
 import AppToast from '@/components/AppToast'
 const _geist = V0_Font_Geist({
   subsets: ['latin'],
-  weight: ["100","200","300","400","500","600","700","800","900"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 })
 
 const _geistMono = V0_Font_Geist_Mono({
   subsets: ['latin'],
-  weight: ["100","200","300","400","500","600","700","800","900"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 })
 
 const _sourceSerif_4 = V0_Font_Source_Serif_4({
   subsets: ['latin'],
-  weight: ["200","300","400","500","600","700","800","900"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
 })
 
 export const metadata = {
@@ -34,8 +34,9 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   // ✅ FIX: cached + revalidated CMS fetch
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cms/all`, {
-    next: { revalidate: 300 }, // 5 minutes
+    cache: "no-store",
   })
+
 
   console.log("CMS ALL FETCHED")
 
@@ -50,9 +51,9 @@ export default async function RootLayout({ children }) {
         className={`font-sans antialiased ${_geist.className} ${_geistMono.variable} ${_sourceSerif_4.variable}`}
       >
         {/* CMS available app-wide without refetching */}
-          <Providers cms={cms}>
-            {children}
-          </Providers>
+        <Providers cms={cms}>
+          {children}
+        </Providers>
 
 
         <Script id="disable-right-click" strategy="afterInteractive">

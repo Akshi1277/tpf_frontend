@@ -11,9 +11,28 @@ import {
   Quote
 } from "lucide-react";
 
-export default function RealWorldImpact({ darkMode, transactions = [] }) {
-  const hasDonations = transactions && transactions.length > 0;
+export default function RealWorldImpact({ darkMode, categoryBreakdown = {} }) {
 
+  /* --------------------------------------------
+     1. Normalize campaign categories → UI buckets
+  --------------------------------------------- */
+  const normalizeCategory = (category = "") => {
+    const raw = category.toLowerCase();
+
+    if (raw.includes("medical") || raw.includes("health")) return "medical";
+    if (raw.includes("educat")) return "education";
+    if (raw.includes("orphan")) return "orphans";
+    if (raw.includes("emerg")) return "emergency";
+    if (raw.includes("water")) return "water";
+    if (raw.includes("zakat")) return "zakat";
+    if (raw.includes("food") || raw.includes("ration")) return "food";
+
+    return "other";
+  };
+
+  /* --------------------------------------------
+     2. Base counters (people, not transactions)
+  --------------------------------------------- */
   const baseCounts = {
     medical: 0,
     education: 0,
@@ -25,29 +44,26 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
     other: 0,
   };
 
-  if (hasDonations) {
-    transactions.forEach((txn) => {
-      const raw = (txn.category || txn.cause || "").toString().trim().toLowerCase();
-      let key = "other";
+  /* --------------------------------------------
+     3. Apply backend-calculated values
+        (ONE campaign = counted ONCE)
+  --------------------------------------------- */
+  Object.entries(categoryBreakdown).forEach(([category, count]) => {
+    const key = normalizeCategory(category);
+    baseCounts[key] += Number(count || 0);
+  });
 
-      if (raw.includes("medical") || raw.includes("health")) key = "medical";
-      else if (raw.includes("educat")) key = "education";
-      else if (raw.includes("orphan")) key = "orphans";
-      else if (raw.includes("emerg")) key = "emergency";
-      else if (raw.includes("water")) key = "water";
-      else if (raw.includes("zakat")) key = "zakat";
-      else if (raw.includes("food") || raw.includes("ration")) key = "food";
+  const hasImpact = Object.values(baseCounts).some(v => v > 0);
 
-      baseCounts[key] = (baseCounts[key] || 0) + 1;
-    });
-  }
-
+  /* --------------------------------------------
+     4. UI cards (UNCHANGED)
+  --------------------------------------------- */
   const realWorldImpact = [
     {
       icon: Stethoscope,
       title: "Medical Aid",
       value: baseCounts.medical,
-      description: hasDonations
+      description: hasImpact
         ? "People received medical assistance"
         : "Your donations can bring relief to patients",
       color: "blue",
@@ -56,8 +72,8 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
       icon: HeartPulse,
       title: "Emergency Aid",
       value: baseCounts.emergency,
-      description: hasDonations
-        ? "Emergency cases supported"
+      description: hasImpact
+        ? "Families supported during emergencies"
         : "Be the first to respond in an emergency",
       color: "red",
     },
@@ -65,7 +81,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
       icon: Droplet,
       title: "Clean Water Supply",
       value: baseCounts.water,
-      description: hasDonations
+      description: hasImpact
         ? "Families got access to clean water"
         : "Help families get clean and safe water",
       color: "cyan",
@@ -74,7 +90,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
       icon: GraduationCap,
       title: "Education",
       value: baseCounts.education,
-      description: hasDonations
+      description: hasImpact
         ? "Students supported in education"
         : "Sponsor education and change a future",
       color: "purple",
@@ -83,7 +99,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
       icon: Heart,
       title: "Orphans",
       value: baseCounts.orphans,
-      description: hasDonations
+      description: hasImpact
         ? "Orphans supported with care"
         : "Be a source of care for an orphan",
       color: "pink",
@@ -92,7 +108,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
       icon: Users,
       title: "Other Helps",
       value: baseCounts.other + baseCounts.zakat + baseCounts.food,
-      description: hasDonations
+      description: hasImpact
         ? "Various acts of kindness"
         : "Your kindness will create many such stories",
       color: "emerald",
@@ -100,6 +116,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
   ];
 
   const formatImpactValue = (v) => (v > 0 ? `${v}+` : "—");
+
   return (
     <>
       {/* Real World Impact Section */}
@@ -118,7 +135,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
           <p className={`text-lg ${
             darkMode ? "text-zinc-400" : "text-gray-600"
           }`}>
-            {hasDonations
+            {hasImpact
               ? "See the lives you've touched through your generosity"
               : "Your first donation will start writing this story"}
           </p>
@@ -126,7 +143,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {realWorldImpact.map((impact, index) => {
-            const Icon = impact.icon
+            const Icon = impact.icon;
             return (
               <motion.div
                 key={index}
@@ -139,7 +156,6 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
                     : "bg-white border-gray-200 shadow-lg"
                 }`}
               >
-                {/* Background pattern */}
                 <div className={`absolute inset-0 opacity-5 ${
                   impact.color === "blue" ? "bg-blue-500" :
                   impact.color === "red" ? "bg-red-500" :
@@ -148,7 +164,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
                   impact.color === "pink" ? "bg-pink-500" :
                   "bg-emerald-500"
                 }`} />
-                
+
                 <div className="relative">
                   <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${
                     impact.color === "blue" 
@@ -172,13 +188,13 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
                       "text-emerald-600"
                     }`} />
                   </div>
-                  
+
                   <h3 className={`font-semibold mb-2 ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}>
                     {impact.title}
                   </h3>
-                  
+
                   <p className={`text-3xl font-bold mb-2 ${
                     impact.color === "blue" 
                       ? darkMode ? "text-blue-400" : "text-blue-600"
@@ -194,7 +210,7 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
                   }`}>
                     {formatImpactValue(impact.value)}
                   </p>
-                  
+
                   <p className={`text-sm ${
                     darkMode ? "text-zinc-400" : "text-gray-600"
                   }`}>
@@ -202,12 +218,12 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
                   </p>
                 </div>
               </motion.div>
-            )
+            );
           })}
         </div>
       </motion.div>
 
-      {/* Inspirational Quote Section */}
+      {/* Inspirational Quote Section (UNCHANGED) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -218,10 +234,9 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
             : "bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 shadow-lg"
         }`}
       >
-        {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/10 rounded-full -ml-32 -mt-32 blur-3xl" />
         <div className="absolute bottom-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full -mr-24 -mb-24 blur-3xl" />
-        
+
         <div className="relative p-8 md:p-12 text-center">
           <motion.div
             animate={{ rotate: [0, 5, 0, -5, 0] }}
@@ -232,19 +247,19 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
               darkMode ? "text-amber-400" : "text-amber-600"
             }`} />
           </motion.div>
-          
+
           <blockquote className={`text-2xl md:text-3xl lg:text-4xl font-bold mb-4 ${
             darkMode ? "text-white" : "text-gray-900"
           }`}>
             "Charity does not decrease wealth"
           </blockquote>
-          
+
           <p className={`text-lg md:text-xl mb-2 ${
             darkMode ? "text-amber-200" : "text-amber-800"
           }`}>
             — Prophet Muhammad (ﷺ)
           </p>
-          
+
           <p className={`text-base md:text-lg max-w-3xl mx-auto ${
             darkMode ? "text-zinc-300" : "text-gray-700"
           }`}>
@@ -253,5 +268,5 @@ export default function RealWorldImpact({ darkMode, transactions = [] }) {
         </div>
       </motion.div>
     </>
-  )
+  );
 }
