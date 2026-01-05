@@ -49,7 +49,7 @@ export default function DonationsPage({ darkModeFromParent }) {
   } = useGetLeaderboardStatsQuery()
 
 
-  const currentUserFromLeaderboard =leaderboardStats?.weekly?.find(u => u.isCurrentUser) || null;
+  const currentUserFromLeaderboard = leaderboardStats?.weekly?.find(u => u.isCurrentUser) || null;
 
   const currentUser = {
     name: userInfo.fullName,
@@ -89,21 +89,6 @@ export default function DonationsPage({ darkModeFromParent }) {
   }
 
 
-  if (leaderboardLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading leaderboard...
-      </div>
-    )
-  }
-
-  if (leaderboardError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        No LeaderBoard Data
-      </div>
-    )
-  }
 
 
   return (
@@ -186,9 +171,12 @@ export default function DonationsPage({ darkModeFromParent }) {
           leaderboardData={leaderboardStats?.weekly || []}
           monthlyData={leaderboardStats?.monthly || []}
           yearlyData={leaderboardStats?.yearly || []}
+          leaderboardLoading={leaderboardLoading}
+          leaderboardError={leaderboardError}
           getRankIcon={getRankIcon}
           peopleHelped={peopleHelped}
         />
+
 
 
         {/* Donation History */}

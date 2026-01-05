@@ -90,7 +90,6 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
     } finally {
       // Smooth UX delay
       setTimeout(() => {
-        router.push("/");
         setIsLoggingOut(false);
       }, 600);
     }
