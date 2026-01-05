@@ -314,7 +314,7 @@ export default function OtherForm({ darkModeFromParent }) {
                 {/* Full Name */}
                 <div>
                   <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"} `}>
-                    Full Name <span className="text-red-500">*</span>
+                    Campaigner Name <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <User className={`absolute left-3 top-1/2  -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"} `} />
@@ -323,7 +323,7 @@ export default function OtherForm({ darkModeFromParent }) {
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleInputChange}
-                      placeholder="Enter your full name"
+                      placeholder="Enter campaigner's full name"
                       className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode
                         ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
                         : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
@@ -336,7 +336,7 @@ export default function OtherForm({ darkModeFromParent }) {
                 {/* Father/Mother/Husband Name */}
                 <div>
                   <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"} `}>
-                    Father/Mother/Husband Name <span className="text-red-500">*</span>
+                    Relationship with Beneficiary <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <User className={`absolute left-3 top-6  -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"} `} />
@@ -366,7 +366,7 @@ export default function OtherForm({ darkModeFromParent }) {
                       name="relationName"
                       value={formData.relationName}
                       onChange={handleInputChange}
-                      placeholder="Enter the name"
+                      placeholder="Enter beneficiary's full name"
                       className={`mt-3 w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode
                         ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
                         : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"

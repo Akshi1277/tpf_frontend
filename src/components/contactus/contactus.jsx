@@ -11,6 +11,7 @@ function HelpCentreSection({ darkMode, isInView }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const [expandedStage, setExpandedStage] = useState(null);
 
+  
   const reportableIssues = [
     'Delay or non-receipt of aid or donation receipt',
     'Fraudulent campaigns or suspected misuse',

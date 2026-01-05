@@ -51,7 +51,7 @@ export default function CampaignPage() {
         <CampaignHero campaign={campaign} darkMode={darkMode} />
 
         {/* PROGRESS */}
-       <CampaignProgress darkMode={darkMode} campaign={campaign} />
+        <CampaignProgress darkMode={darkMode} campaign={campaign} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* TABS */}
@@ -64,6 +64,7 @@ export default function CampaignPage() {
             <DonationCard
               campaignId={campaign._id}
               targetAmount={campaign.targetAmount}
+              zakatVerified={campaign.zakatVerified}
               darkMode={darkMode}
             />
           </div>
