@@ -1,5 +1,5 @@
 import { getMediaUrl } from '@/utils/media';
-
+import { useRouter } from 'next/navigation';
 export default function CuratedCard({ item, darkMode, }) {
   const router = useRouter();
   return (

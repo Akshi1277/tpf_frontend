@@ -258,7 +258,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                         </div>
 
                         <a
-                          href={`${BASE_URL}${doc.fileUrl}`}
+                          href={getMediaUrl(doc.fileUrl)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
