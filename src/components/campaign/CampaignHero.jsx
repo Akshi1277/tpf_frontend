@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
+import { getMediaUrl } from "@/utils/media";
 
 export default function CampaignHero({ campaign, darkMode }) {
   if (!campaign) return null;
-
-  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
   return (
     <motion.div
@@ -15,7 +14,7 @@ export default function CampaignHero({ campaign, darkMode }) {
       <img
         src={
           campaign.imageUrl
-            ? `${BASE_URL}${campaign.imageUrl}`
+            ? getMediaUrl(campaign.imageUrl)
             : "https://via.placeholder.com/1200x400?text=Campaign"
         }
         alt={campaign.title}

@@ -30,6 +30,7 @@ import {
 } from '@/utils/slices/commentApiSlice';
 import { useSendOtpMutation, useVerifyOtpMutation } from '@/utils/slices/authApiSlice';
 import { setCredentials } from '@/utils/slices/authSlice';
+import { getMediaUrl } from '@/utils/media';
 
 export default function CampaignTabs({ darkMode, campaign }) {
   const [activeTab, setActiveTab] = useState('about');
@@ -49,7 +50,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
   const [newComment, setNewComment] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
 
-  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
+
 
   /* ---------------- API HOOKS ---------------- */
   // Comments
@@ -249,7 +250,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                     </div>
 
                     <a
-                      href={`${BASE_URL}${doc.fileUrl}`}
+                      href={getMediaUrl(doc.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

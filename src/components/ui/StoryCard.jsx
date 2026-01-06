@@ -1,6 +1,7 @@
-// components/ui/StoryCard.jsx
 import { ArrowRight, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getMediaUrl } from '@/utils/media';
+
 export default function StoryCard({ story, darkMode, isActive, onHover, onLeave }) {
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
@@ -29,7 +30,7 @@ export default function StoryCard({ story, darkMode, isActive, onHover, onLeave 
       {/* Image with overlay */}
       <div className="relative overflow-hidden h-48"> {/* reduced from h-64 */}
         <img
-          src={`${process.env.NEXT_PUBLIC_UPLOAD_URL}${story.image}`}
+          src={getMediaUrl(story.image)}
           alt={story.title}
           className="h-full w-full object-cover transition-all duration-1000 group-hover:scale-125 group-hover:rotate-2"
           loading='lazy'
