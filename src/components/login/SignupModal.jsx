@@ -57,7 +57,6 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
 
         try {
             const res = await verifyOtp({ mobileNo: mobile, otp: otpString }).unwrap()
-            dispatch(setCredentials(res.user))
 
             if (!res.user.fullName || !res.user.email) {
                 setStep(3)
@@ -89,7 +88,8 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
             const res = await updateProfile(profileData).unwrap()
             dispatch(setCredentials(res.user))
 
-            toast.success(`Welcome ${fullName}! from TPF`)
+
+
             setShowSuccess(true)
 
             setTimeout(() => {

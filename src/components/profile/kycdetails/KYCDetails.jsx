@@ -741,7 +741,7 @@ if (isKycApproved) {
                     City
                   </p>
                   <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {userInfo.address?.city || "—"}
+                    {userInfo.kycDetails?.city || "—"}
                   </p>
                 </div>
                 <div>
@@ -749,7 +749,7 @@ if (isKycApproved) {
                     State
                   </p>
                   <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {userInfo.address?.state || "—"}
+                    {userInfo.kycDetails?.state || "—"}
                   </p>
                 </div>
                 <div>

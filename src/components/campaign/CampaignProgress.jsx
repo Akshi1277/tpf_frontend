@@ -6,6 +6,7 @@ import {
   DollarSign,
   Shield,
   CheckCircle,
+  Target,
 } from "lucide-react";
 
 /**
@@ -49,8 +50,8 @@ export default function CampaignProgress({ darkMode, campaign }) {
   const avgDonation =
     totalDonors > 0 ? Math.round(raisedAmount / totalDonors) : 0;
 
-  // INR helpers
-  const formatLakhs = (amount) => (amount / 100000).toFixed(2);
+  // Format numbers with commas
+  const formatNumber = (num) => num.toLocaleString('en-IN');
 
   return (
     <motion.div
@@ -64,114 +65,158 @@ export default function CampaignProgress({ darkMode, campaign }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* ===================== LEFT: PROGRESS ===================== */}
         <div className="lg:col-span-2">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-emerald-500" />
-            <h3
-              className={`text-lg font-semibold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Campaign Progress
-            </h3>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
+                <TrendingUp className="w-5 h-5 text-emerald-500" />
+              </div>
+              <h3
+                className={`text-lg font-semibold ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Campaign Progress
+              </h3>
+            </div>
+            <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+              darkMode 
+                ? 'bg-emerald-500/10 text-emerald-400' 
+                : 'bg-emerald-100 text-emerald-700'
+            }`}>
+              {percentage}% Complete
+            </div>
           </div>
 
           {/* Amount */}
           <div className="mb-6">
-            <div className="flex items-end gap-3 mb-3">
-              <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                ₹{formatLakhs(raisedAmount)}L
+            <div className="flex items-end gap-3 mb-4">
+              <div className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                ₹{formatNumber(raisedAmount)}
               </div>
-              <div
-                className={`text-lg pb-1 ${
-                  darkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                raised of ₹{formatLakhs(targetAmount)}L
+              <div className={`text-lg pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                of ₹{formatNumber(targetAmount)}
               </div>
             </div>
 
             {/* Progress bar */}
-            <div
-              className={`relative w-full h-4 rounded-full overflow-hidden ${
-                darkMode ? "bg-zinc-700" : "bg-gray-200"
-              }`}
-            >
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${percentage}%` }}
-                transition={{ duration: 1, delay: 0.4 }}
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 relative"
+            <div className="relative">
+              <div
+                className={`relative w-full h-3 rounded-full overflow-hidden ${
+                  darkMode ? "bg-zinc-700" : "bg-gray-200"
+                }`}
               >
-                <div className="absolute inset-0 bg-white/20 animate-pulse" />
-              </motion.div>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percentage}%` }}
+                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  className="h-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-500 relative overflow-hidden"
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    animate={{ x: ["-100%", "200%"] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  />
+                </motion.div>
+              </div>
+              {percentage > 0 && (
+                <div 
+                  className="absolute top-0 h-3 w-1 bg-white rounded-full shadow-lg"
+                  style={{ left: `${Math.min(percentage, 98)}%` }}
+                />
+              )}
             </div>
-
-            <p
-              className={`text-sm mt-2 font-medium ${
-                darkMode ? "text-emerald-400" : "text-emerald-600"
-              }`}
-            >
-              {percentage}% funded
-            </p>
+            
+            {/* Motivational message */}
+            {percentage < 100 && (
+              <motion.div
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className={`mt-4 px-4 py-3 rounded-lg border-l-4 border-emerald-500 ${
+                  darkMode 
+                    ? "bg-gradient-to-r from-emerald-500/10 to-transparent text-gray-200" 
+                    : "bg-gradient-to-r from-emerald-50 to-transparent text-gray-800"
+                }`}
+              >
+                <p className="text-sm font-medium">
+                  Every contribution brings hope to those in need
+                </p>
+              </motion.div>
+            )}
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <StatCard
               darkMode={darkMode}
-              icon={<Users className="w-4 h-4 text-emerald-500" />}
-              value={totalDonors}
+              icon={<Users className="w-5 h-5" />}
+              value={formatNumber(totalDonors)}
               label="Donors"
+              color="emerald"
             />
             <StatCard
               darkMode={darkMode}
-              icon={<Calendar className="w-4 h-4 text-blue-500" />}
-              value={daysLeft}
-              label="Days left"
+              icon={<Calendar className="w-5 h-5" />}
+              value={formatNumber(daysLeft)}
+              label="Days Left"
+              color="blue"
             />
             <StatCard
               darkMode={darkMode}
-              icon={<DollarSign className="w-4 h-4 text-purple-500" />}
-              value={`₹${(avgDonation / 1000).toFixed(1)}K`}
-              label="Avg. donation"
+              icon={<DollarSign className="w-5 h-5" />}
+              value={`₹${formatNumber(avgDonation)}`}
+              label="Avg. Donation"
+              color="purple"
             />
           </div>
         </div>
 
         {/* ===================== RIGHT: TRUST ===================== */}
-        <div
-          className={`p-6 rounded-xl ${
-            darkMode
-              ? "bg-gradient-to-br from-emerald-900/30 to-teal-900/30 border border-emerald-800/30"
-              : "bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100"
-          }`}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <Shield className="w-5 h-5 text-emerald-600" />
-            <h4
-              className={`font-semibold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Trust & Safety
-            </h4>
+        <div className="relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 opacity-5">
+            <div className={`absolute top-0 right-0 w-32 h-32 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-600'} blur-3xl`} />
+            <div className={`absolute bottom-0 left-0 w-32 h-32 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-600'} blur-3xl`} />
           </div>
+          
+          <div
+            className={`relative p-6 rounded-xl h-full ${
+              darkMode
+                ? "bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700"
+                : "bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-2 border-emerald-100"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-100'}`}>
+                <Shield className="w-5 h-5 text-emerald-600" />
+              </div>
+              <h4
+                className={`font-semibold ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Trust & Safety
+              </h4>
+            </div>
 
-          <TrustItem
-            darkMode={darkMode}
-            title="Verified Campaign"
-            subtitle="Reviewed by platform team"
-          />
-          <TrustItem
-            darkMode={darkMode}
-            title="100% Transparent"
-            subtitle="Documents & updates available"
-          />
-          <TrustItem
-            darkMode={darkMode}
-            title="Secure Payments"
-            subtitle="Bank-grade encryption"
-          />
+            <div className="space-y-4">
+              <TrustItem
+                darkMode={darkMode}
+                title="Verified Campaign"
+                subtitle="Reviewed by platform team"
+              />
+              <TrustItem
+                darkMode={darkMode}
+                title="100% Transparent"
+                subtitle="Documents & updates available"
+              />
+              <TrustItem
+                darkMode={darkMode}
+                title="Secure Payments"
+                subtitle="Bank-grade encryption"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -180,41 +225,62 @@ export default function CampaignProgress({ darkMode, campaign }) {
 
 /* ===================== SUB COMPONENTS ===================== */
 
-function StatCard({ darkMode, icon, value, label }) {
+function StatCard({ darkMode, icon, value, label, color }) {
+  const colorClasses = {
+    emerald: darkMode ? 'text-emerald-400' : 'text-emerald-600',
+    blue: darkMode ? 'text-blue-400' : 'text-blue-600',
+    purple: darkMode ? 'text-purple-400' : 'text-purple-600'
+  };
+
+  const bgClasses = {
+    emerald: darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50',
+    blue: darkMode ? 'bg-blue-500/10' : 'bg-blue-50',
+    purple: darkMode ? 'bg-purple-500/10' : 'bg-purple-50'
+  };
+
   return (
-    <div
-      className={`p-4 rounded-xl ${
-        darkMode ? "bg-zinc-700/50" : "bg-gray-50"
+    <motion.div
+      whileHover={{ y: -2 }}
+      className={`p-4 rounded-xl border transition-all ${
+        darkMode ? "bg-zinc-900/50 border-zinc-700 hover:border-zinc-600" : "bg-white border-gray-200 hover:border-gray-300 shadow-sm"
       }`}
     >
-      <div className="flex items-center gap-2 mb-1">
-        {icon}
-        <span
-          className={`text-2xl font-bold ${
-            darkMode ? "text-white" : "text-gray-900"
-          }`}
-        >
-          {value}
-        </span>
+      <div className={`w-10 h-10 rounded-lg ${bgClasses[color]} flex items-center justify-center mb-3`}>
+        <div className={colorClasses[color]}>
+          {icon}
+        </div>
+      </div>
+      <div
+        className={`text-xl font-bold mb-1 ${
+          darkMode ? "text-white" : "text-gray-900"
+        }`}
+      >
+        {value}
       </div>
       <p
-        className={`text-xs ${
+        className={`text-xs font-medium ${
           darkMode ? "text-gray-400" : "text-gray-600"
         }`}
       >
         {label}
       </p>
-    </div>
+    </motion.div>
   );
 }
 
 function TrustItem({ darkMode, title, subtitle }) {
   return (
-    <div className="flex items-start gap-3 mb-3">
-      <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5" />
+    <motion.div 
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="flex items-start gap-3"
+    >
+      <div className={`mt-0.5 ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-100'} p-1 rounded`}>
+        <CheckCircle className="w-4 h-4 text-emerald-500" />
+      </div>
       <div>
         <p
-          className={`text-sm font-medium ${
+          className={`text-sm font-semibold mb-0.5 ${
             darkMode ? "text-gray-200" : "text-gray-900"
           }`}
         >
@@ -228,6 +294,6 @@ function TrustItem({ darkMode, title, subtitle }) {
           {subtitle}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }
