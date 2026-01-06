@@ -12,6 +12,7 @@ import RelatedCampaigns from "@/components/campaign/RelatedCampaigns";
 import FooterCTA from "@/components/campaign/FooterCTA";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import GlobalLoader from "@/components/GlobalLoader";
 
 export default function CampaignPage() {
   const { slug } = useParams();
@@ -23,7 +24,7 @@ export default function CampaignPage() {
   });
 
   if (isLoading) {
-    return <div className="py-24 text-center">Loading campaign…</div>;
+    return <GlobalLoader />
   }
 
   if (error || !data?.campaign) {
@@ -73,9 +74,10 @@ export default function CampaignPage() {
         {/* RELATED */}
         <RelatedCampaigns
           category={campaign.category}
-          currentCampaignId={campaign._id}
+          currentSlug={campaign.slug}
           darkMode={darkMode}
         />
+
 
         <FooterCTA darkMode={darkMode} />
       </div>

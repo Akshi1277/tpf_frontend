@@ -1,12 +1,18 @@
-'use client';
+"use client";
 
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetMeQuery } from "@/utils/slices/authApiSlice";
-import { setCredentials, logout } from "@/utils/slices/authSlice";
+import {
+  setCredentials,
+  logout,
+  setAuthChecked,
+} from "@/utils/slices/authSlice";
+import GlobalLoader from "@/components/GlobalLoader";
 
 export default function UserAuthProvider({ children }) {
   const dispatch = useDispatch();
+  const authChecked = useSelector((state) => state.auth.authChecked);
 
   const { data, error, isFetching } = useGetMeQuery();
 
@@ -18,9 +24,16 @@ export default function UserAuthProvider({ children }) {
     if (error?.status === 401) {
       dispatch(logout());
     }
-  }, [data, error, dispatch]);
 
-  if (isFetching) return null;
+    if (!isFetching) {
+      dispatch(setAuthChecked());
+    }
+  }, [data, error, isFetching, dispatch]);
+
+  // 🔒 BLOCK ENTIRE APP UNTIL AUTH IS RESOLVED
+  if (!authChecked) {
+    return <GlobalLoader />;
+  }
 
   return children;
 }

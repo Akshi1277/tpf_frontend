@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import LoginModal from '../login/LoginModal';
 import {
   Info,
   MessageCircle,
@@ -10,40 +11,30 @@ import {
   Lock,
   Award,
   ChevronRight,
-  X,
-  Smartphone,
   Heart,
-  User,
+  Inbox,
+  MessageSquare,
   Send,
   Loader2,
-  MoreVertical,
-  Edit2,
   Trash2,
   Check,
-  XCircle,
 } from 'lucide-react';
 import {
   useGetCommentsQuery,
   useAddCommentMutation,
-  useUpdateCommentMutation,
   useDeleteCommentMutation,
 } from '@/utils/slices/commentApiSlice';
-import { useSendOtpMutation, useVerifyOtpMutation } from '@/utils/slices/authApiSlice';
-import { setCredentials } from '@/utils/slices/authSlice';
 import { getMediaUrl } from '@/utils/media';
 
 export default function CampaignTabs({ darkMode, campaign }) {
-  const [activeTab, setActiveTab] = useState('about');
-  const [showLogin, setShowLogin] = useState(false);
-
-  // Login State
-  const [mobile, setMobile] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState('mobile');
-
-  // Redux Auth
+  const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.auth);
+
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingDocsAccess, setPendingDocsAccess] = useState(false);
+  const [pendingCommentsAccess, setPendingCommentsAccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('about');
+  const isAuthenticated = !!userInfo;
 
   // Comments State
   const [commentPage, setCommentPage] = useState(1);
@@ -53,7 +44,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
 
 
   /* ---------------- API HOOKS ---------------- */
-  // Comments
   const { data: commentsData, isLoading: commentsLoading, isFetching: commentsFetching } = useGetCommentsQuery({
     campaignId: campaign?._id,
     page: commentPage
@@ -62,39 +52,41 @@ export default function CampaignTabs({ darkMode, campaign }) {
   });
 
   const [addComment, { isLoading: isAdding }] = useAddCommentMutation();
-  const [updateComment, { isLoading: isUpdating }] = useUpdateCommentMutation();
   const [deleteComment, { isLoading: isDeleting }] = useDeleteCommentMutation();
 
-  // Auth Mutations
-  const [sendOtp, { isLoading: sendingOtp }] = useSendOtpMutation();
-  const [verifyOtp, { isLoading: verifyingOtp }] = useVerifyOtpMutation();
+  /* ---------------- SAFE DATA ---------------- */
+  const impactGoals = campaign?.impactGoals ?? [];
+  const documents = campaign?.documents ?? [];
 
-  /* ---------------- HANDLERS ---------------- */
-  const handleSendOtp = async () => {
-    if (mobile.length !== 10) return;
-    try {
-      await sendOtp({ mobileNo: mobile, type: 'login' }).unwrap();
-      setStep('otp');
-    } catch (err) {
-      alert(err?.data?.message || "Failed to send OTP");
+  const handleDocumentsLogin = () => {
+    if (!userInfo) {
+      setPendingDocsAccess(true);
+      setPendingCommentsAccess(false);
+      setShowLoginModal(true);
     }
   };
 
-  const handleVerifyOtp = async () => {
-    if (otp.length !== 4) return;
-    try {
-      const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
-      dispatch(setCredentials(res.user));
-      setShowLogin(false);
-      setStep('mobile');
-      setMobile('');
-      setOtp('');
-    } catch (err) {
-      alert(err?.data?.message || "Invalid OTP");
+  const handleCommentsLogin = () => {
+    if (!userInfo) {
+      setPendingCommentsAccess(true);
+      setPendingDocsAccess(false);
+      setShowLoginModal(true);
     }
   };
+
+  useEffect(() => {
+    if (userInfo && (pendingDocsAccess || pendingCommentsAccess)) {
+      setPendingDocsAccess(false);
+      setPendingCommentsAccess(false);
+      setShowLoginModal(false);
+    }
+  }, [userInfo, pendingDocsAccess, pendingCommentsAccess]);
 
   const handlePostComment = async () => {
+    if (!userInfo) {
+      handleCommentsLogin();
+      return;
+    }
     if (!newComment.trim()) return;
     try {
       await addComment({
@@ -104,10 +96,9 @@ export default function CampaignTabs({ darkMode, campaign }) {
       }).unwrap();
       setNewComment('');
       setIsAnonymous(false);
-      setCommentPage(1); // Reset to first page to see new comment
+      setCommentPage(1);
     } catch (err) {
       console.error("Failed to post comment:", err);
-      if (err?.status === 401) setShowLogin(true);
     }
   };
 
@@ -125,10 +116,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
       console.error("Failed to delete", err);
     }
   };
-
-  /* ---------------- SAFE DATA ---------------- */
-  const impactGoals = campaign?.impactGoals ?? [];
-  const documents = campaign?.documents ?? [];
 
   return (
     <div className={`${darkMode ? 'bg-zinc-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden`}>
@@ -175,11 +162,12 @@ export default function CampaignTabs({ darkMode, campaign }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
-          className="p-6 md:p-8"
+          className={`p-6 md:p-8 ${(activeTab === 'documents' || activeTab === 'comments') ? 'min-h-[400px]' : ''}`}
         >
           {/* ================= ABOUT TAB ================= */}
           {activeTab === 'about' && (
             <div className="space-y-8">
+              {/* About */}
               <div>
                 <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   About This Campaign
@@ -189,6 +177,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 </p>
               </div>
 
+              {/* Beneficiary */}
               {campaign?.beneficiaryName && (
                 <div className={`p-5 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gray-50 border border-gray-200'}`}>
                   <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -200,6 +189,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 </div>
               )}
 
+              {/* Impact Goals */}
               {impactGoals.length > 0 && (
                 <div className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100'}`}>
                   <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -221,55 +211,91 @@ export default function CampaignTabs({ darkMode, campaign }) {
 
           {/* ================= DOCUMENTS TAB ================= */}
           {activeTab === 'documents' && (
-            <div className="relative">
-              <div className={`space-y-3 ${!userInfo ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
-                {documents.length === 0 && (
-                  <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
-                    No documents available.
-                  </p>
-                )}
-
-                {documents.map((doc, i) => (
-                  <div
-                    key={i}
-                    className={`flex items-center justify-between p-4 rounded-lg border
-                      ${darkMode ? 'border-zinc-700' : 'border-gray-200'}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {doc.name}
-                        </p>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                          {doc.fileType?.toUpperCase()}
-                        </p>
-                      </div>
-                    </div>
-
-                    <a
-                      href={getMediaUrl(doc.fileUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
+            <div className="relative min-h-[350px] flex flex-col">
+              <div className={`flex-1 ${!isAuthenticated ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
+                {documents.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 px-4">
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${
+                        darkMode ? 'bg-zinc-900' : 'bg-gray-100'
+                      }`}
                     >
-                      View Document
-                    </a>
+                      <Inbox className={`w-10 h-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                    </motion.div>
+                    <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      No Documents Yet
+                    </h4>
+                    <p className={`text-center max-w-md ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                      Supporting documents will be uploaded here as they become available.
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  <div className="space-y-3">
+                    {documents.map((doc, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className={`flex items-center justify-between p-4 rounded-lg border transition-all hover:shadow-md
+                          ${darkMode ? 'border-zinc-700 hover:border-emerald-500/50' : 'border-gray-200 hover:border-emerald-400'}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                            <FileText className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                              {doc.name}
+                            </p>
+                            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                              {doc.fileType?.toUpperCase()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <a
+                          href={`${BASE_URL}${doc.fileUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                            darkMode 
+                              ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' 
+                              : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                          }`}
+                        >
+                          View Document
+                        </a>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {!userInfo && (
+              {!isAuthenticated && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-md bg-black/40 rounded-xl">
-                  <Lock className="w-10 h-10 text-white mb-3" />
-                  <p className="text-white font-semibold mb-1">Documents Locked</p>
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg font-semibold"
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-center"
                   >
-                    Login to View
-                  </button>
+                    <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 mx-auto">
+                      <Lock className="w-8 h-8 text-white" />
+                    </div>
+                    <p className="text-white font-semibold text-lg mb-2">Documents Locked</p>
+                    <p className="text-white/80 text-sm mb-4 max-w-xs">
+                      Sign in to access campaign documents and transparency reports
+                    </p>
+                    <button
+                      onClick={handleDocumentsLogin}
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105"
+                    >
+                      Sign In to View
+                    </button>
+                  </motion.div>
                 </div>
               )}
             </div>
@@ -277,209 +303,180 @@ export default function CampaignTabs({ darkMode, campaign }) {
 
           {/* ================= COMMENTS TAB ================= */}
           {activeTab === 'comments' && (
-            <div className="space-y-8">
-              {/* --- Post Comment Section --- */}
-              {userInfo ? (
-                <div className={`p-4 rounded-xl border ${darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-gray-50 border-gray-100'}`}>
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
-                      {userInfo.fullName?.charAt(0) || 'U'}
-                    </div>
-                    <div className="flex-1">
-                      <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Write a comment..."
-                        className={`w-full bg-transparent border-0 focus:ring-0 outline-none p-0 text-base resize-none min-h-[60px] ${darkMode ? 'text-white placeholder-zinc-500' : 'text-gray-900 placeholder-gray-400'}`}
-                        maxLength={1000}
-                      />
-                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-dashed border-gray-200/20">
-                        <label className={`flex items-center gap-2 text-sm cursor-pointer select-none ${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isAnonymous ? 'bg-emerald-500 border-emerald-500' : 'border-gray-400'}`}>
-                            {isAnonymous && <Check className="w-3 h-3 text-white" />}
-                          </div>
-                          <input type="checkbox" checked={isAnonymous} onChange={e => setIsAnonymous(e.target.checked)} className="hidden" />
-                          Comment as Anonymous
-                        </label>
-                        <button
-                          onClick={handlePostComment}
-                          disabled={!newComment.trim() || isAdding}
-                          className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all
-                              ${!newComment.trim() ? 'opacity-50 cursor-not-allowed bg-gray-200 text-gray-400' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
-                        >
-                          {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                          Post
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className={`text-center p-8 rounded-xl border border-dashed ${darkMode ? 'border-zinc-700 bg-zinc-800/50' : 'border-gray-200 bg-gray-50'}`}>
-                  <MessageCircle className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-zinc-600' : 'text-gray-300'}`} />
-                  <p className={`mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Join the conversation by logging in.</p>
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
-                  >
-                    Login to Comment
-                  </button>
-                </div>
-              )}
-
-              {/* --- Comment List --- */}
-              <div className="space-y-4">
-                {commentsLoading && commentPage === 1 ? (
-                  <div className="text-center py-10">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" />
-                  </div>
-                ) : commentsData?.data?.length === 0 ? (
-                  <p className={`text-center py-10 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>No comments yet. Be the first to share your thoughts!</p>
-                ) : (
-                  <>
-                    {commentsData?.data?.map((comment) => (
-                      <motion.div
-                        key={comment._id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`p-5 rounded-xl border-l-4 border-emerald-500
-                          ${darkMode ? 'bg-zinc-900 shadow-xl' : 'bg-white shadow-md'}`}
-                      >
-                        <div className="flex gap-4">
-                          <div className={`w-12 h-12 rounded-full font-semibold flex items-center justify-center shrink-0
-                             ${comment.isAnonymous ? 'bg-gray-500' : 'bg-emerald-600'} text-white`}>
-                            {comment.user?.fullName ? comment.user.fullName.charAt(0) : 'A'}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start mb-1">
-                              <div>
-                                <span className={`font-semibold mr-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                  {comment.user?.fullName || 'Anonymous'}
-                                  {comment.isOwner && comment.isAnonymous && <span className="opacity-50 ml-1">(You)</span>}
-                                </span>
-                                <span className="text-xs text-gray-500 whitespace-nowrap">
-                                  {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                </span>
+            <div className="relative min-h-[350px] flex flex-col">
+              <div className={`flex-1 ${!isAuthenticated ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
+                <div className="space-y-8">
+                  {/* --- Post Comment Section --- */}
+                  {isAuthenticated && (
+                    <div className={`p-4 rounded-xl border ${darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-gray-50 border-gray-100'}`}>
+                      <div className="flex gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-bold">
+                          {userInfo?.fullName?.charAt(0) || 'U'}
+                        </div>
+                        <div className="flex-1">
+                          <textarea
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="Write a comment..."
+                            className={`w-full bg-transparent border-0 focus:ring-0 outline-none p-0 text-base resize-none min-h-[60px] ${darkMode ? 'text-white placeholder-zinc-500' : 'text-gray-900 placeholder-gray-400'}`}
+                            maxLength={1000}
+                          />
+                          <div className="flex items-center justify-between mt-2 pt-2 border-t border-dashed border-gray-200/20">
+                            <label className={`flex items-center gap-2 text-sm cursor-pointer select-none ${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>
+                              <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isAnonymous ? 'bg-emerald-500 border-emerald-500' : 'border-gray-400'}`}>
+                                {isAnonymous && <Check className="w-3 h-3 text-white" />}
                               </div>
-
-                              {/* Delete Action */}
-                              {comment.isOwner && (
-                                <div className="flex items-center">
-                                  <button
-                                    onClick={() => handleDelete(comment._id)}
-                                    disabled={isDeleting}
-                                    className={`p-2 rounded-xl transition-all duration-200 hover:scale-105
-                                      ${darkMode
-                                        ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
-                                        : 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200'}`}
-                                    title="Delete Comment"
-                                  >
-                                    {isDeleting ? (
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                      <Trash2 className="w-4 h-4" />
-                                    )}
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-
-                            <p className={`whitespace-pre-wrap break-words ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                              {comment.content}
-                            </p>
+                              <input type="checkbox" checked={isAnonymous} onChange={e => setIsAnonymous(e.target.checked)} className="hidden" />
+                              Comment as Anonymous
+                            </label>
+                            <button
+                              onClick={handlePostComment}
+                              disabled={!newComment.trim() || isAdding}
+                              className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all
+                                  ${!newComment.trim() ? 'opacity-50 cursor-not-allowed bg-gray-200 text-gray-400' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
+                            >
+                              {isAdding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                              Post
+                            </button>
                           </div>
                         </div>
-                      </motion.div>
-                    ))}
-
-                    {/* Load More */}
-                    {commentsData?.hasMore && (
-                      <div className="text-center pt-2">
-                        <button
-                          onClick={() => setCommentPage(prev => prev + 1)}
-                          disabled={commentsFetching}
-                          className={`text-sm font-semibold hover:underline ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
-                        >
-                          {commentsFetching ? 'Loading...' : 'Load More Comments'}
-                        </button>
                       </div>
+                    </div>
+                  )}
+
+                  {/* --- Comment List --- */}
+                  <div className="space-y-4">
+                    {commentsLoading && commentPage === 1 ? (
+                      <div className="text-center py-10">
+                        <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" />
+                      </div>
+                    ) : commentsData?.data?.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-16 px-4">
+                        <motion.div
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                          className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${
+                            darkMode ? 'bg-zinc-900' : 'bg-gray-100'
+                          }`}
+                        >
+                          <MessageSquare className={`w-10 h-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                        </motion.div>
+                        <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          No Comments Yet
+                        </h4>
+                        <p className={`text-center max-w-md ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                          Be the first to share words of encouragement and support for this cause.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        {commentsData?.data?.map((comment) => (
+                          <motion.div
+                            key={comment._id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`p-5 rounded-xl border-l-4 border-emerald-500 transition-all hover:shadow-md
+                              ${darkMode ? 'bg-zinc-900 hover:bg-zinc-900/80' : 'bg-gray-50 hover:bg-gray-100/80'}`}
+                          >
+                            <div className="flex gap-4">
+                              <div className={`w-12 h-12 rounded-full font-semibold flex items-center justify-center shrink-0
+                                 ${comment.isAnonymous ? 'bg-gray-500' : 'bg-gradient-to-br from-emerald-500 to-teal-600'} text-white`}>
+                                {comment.user?.fullName ? comment.user.fullName.charAt(0) : 'A'}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start mb-1">
+                                  <div>
+                                    <span className={`font-semibold mr-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                      {comment.user?.fullName || 'Anonymous'}
+                                      {comment.isOwner && comment.isAnonymous && <span className="opacity-50 ml-1">(You)</span>}
+                                    </span>
+                                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                                      {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </span>
+                                  </div>
+
+                                  {/* Delete Action */}
+                                  {comment.isOwner && (
+                                    <button
+                                      onClick={() => handleDelete(comment._id)}
+                                      disabled={isDeleting}
+                                      className={`p-2 rounded-xl transition-all duration-200 hover:scale-105
+                                        ${darkMode
+                                          ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
+                                          : 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200'}`}
+                                      title="Delete Comment"
+                                    >
+                                      {isDeleting ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                      )}
+                                    </button>
+                                  )}
+                                </div>
+
+                                <p className={`whitespace-pre-wrap break-words ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                  {comment.content}
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+
+                        {/* Load More */}
+                        {commentsData?.hasMore && (
+                          <div className="text-center pt-2">
+                            <button
+                              onClick={() => setCommentPage(prev => prev + 1)}
+                              disabled={commentsFetching}
+                              className={`text-sm font-semibold hover:underline ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
+                            >
+                              {commentsFetching ? 'Loading...' : 'Load More Comments'}
+                            </button>
+                          </div>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
+                  </div>
+                </div>
               </div>
+
+              {!isAuthenticated && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-md bg-black/40 rounded-xl">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-center"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 mx-auto">
+                      <Lock className="w-8 h-8 text-white" />
+                    </div>
+                    <p className="text-white font-semibold text-lg mb-2">Comments Locked</p>
+                    <p className="text-white/80 text-sm mb-4 max-w-xs">
+                      Sign in to read and post comments for this campaign
+                    </p>
+                    <button
+                      onClick={handleCommentsLogin}
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105"
+                    >
+                      Sign In to Comment
+                    </button>
+                  </motion.div>
+                </div>
+              )}
             </div>
           )}
         </motion.div>
       </AnimatePresence>
 
-      {/* ================= LOGIN MODAL ================= */}
-      <AnimatePresence>
-        {showLogin && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowLogin(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 w-full max-w-md relative"
-            >
-              <button onClick={() => setShowLogin(false)} className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full">
-                <X className="w-5 h-5" />
-              </button>
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        darkMode={darkMode}
+        onLoginSuccess={() => setShowLoginModal(false)}
+      />
 
-              <h2 className="text-xl font-bold mb-4 text-gray-900">Login Required</h2>
-              <p className="text-gray-600 mb-6">Please log in to view documents or post comments.</p>
-
-              <div className="flex flex-col gap-3">
-                {step === 'mobile' && (
-                  <>
-                    <input
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                      placeholder="Enter mobile number"
-                      className="w-full border border-gray-300 p-3 rounded-xl mb-2 text-gray-900 focus:ring-2 focus:ring-emerald-500 outline-none"
-                      maxLength={10}
-                    />
-                    <button
-                      onClick={handleSendOtp}
-                      disabled={mobile.length < 10 || sendingOtp}
-                      className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 disabled:opacity-50 flex justify-center items-center"
-                    >
-                      {sendingOtp ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send OTP"}
-                    </button>
-                  </>
-                )}
-
-                {step === 'otp' && (
-                  <>
-                    <input
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                      placeholder="Enter 4-digit OTP"
-                      className="w-full border border-gray-300 p-3 rounded-xl mb-2 text-gray-900 focus:ring-2 focus:ring-emerald-500 outline-none text-center tracking-widest text-lg"
-                      maxLength={4}
-                    />
-                    <button
-                      onClick={handleVerifyOtp}
-                      disabled={otp.length < 4 || verifyingOtp}
-                      className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 disabled:opacity-50 flex justify-center items-center"
-                    >
-                      {verifyingOtp ? <Loader2 className="w-5 h-5 animate-spin" /> : "Verify & Login"}
-                    </button>
-                  </>
-                )}
-              </div>
-
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       {/* ================= DELETE CONFIRMATION MODAL ================= */}
       <AnimatePresence>
         {deleteConfirm.show && (

@@ -1,20 +1,15 @@
 "use client";
 
 import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 export default function ProfileLayout({ children }) {
   const { userInfo } = useSelector((state) => state.auth);
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!userInfo) {
-      router.replace("/login");
-    }
-  }, [userInfo]);
-
-  if (!userInfo) return null;
+  // Auth is GUARANTEED resolved by UserAuthProvider
+  if (!userInfo) {
+    redirect("/login");
+  }
 
   return children;
 }
