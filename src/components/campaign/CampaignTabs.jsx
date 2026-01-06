@@ -48,8 +48,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
   const [commentPage, setCommentPage] = useState(1);
   const [newComment, setNewComment] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [editContent, setEditContent] = useState('');
 
   const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
@@ -112,32 +110,18 @@ export default function CampaignTabs({ darkMode, campaign }) {
     }
   };
 
-  const handleEdit = (comment) => {
-    setEditingId(comment._id);
-    setEditContent(comment.content);
+  const [deleteConfirm, setDeleteConfirm] = useState({ show: false, id: null });
+
+  const handleDelete = (id) => {
+    setDeleteConfirm({ show: true, id });
   };
 
-  const handleSaveEdit = async () => {
-    if (!editContent.trim()) return;
+  const handleConfirmDelete = async () => {
     try {
-      await updateComment({
-        id: editingId,
-        content: editContent
-      }).unwrap();
-      setEditingId(null);
-      setEditContent('');
+      await deleteComment(deleteConfirm.id).unwrap();
+      setDeleteConfirm({ show: false, id: null });
     } catch (err) {
-      console.error("Failed to update comment:", err);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete your comment?")) {
-      try {
-        await deleteComment(id).unwrap();
-      } catch (err) {
-        console.error("Failed to delete", err);
-      }
+      console.error("Failed to delete", err);
     }
   };
 
@@ -305,7 +289,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder="Write a comment..."
-                        className={`w-full bg-transparent border-0 focus:ring-0 p-0 text-base resize-none min-h-[60px] ${darkMode ? 'text-white placeholder-zinc-500' : 'text-gray-900 placeholder-gray-400'}`}
+                        className={`w-full bg-transparent border-0 focus:ring-0 outline-none p-0 text-base resize-none min-h-[60px] ${darkMode ? 'text-white placeholder-zinc-500' : 'text-gray-900 placeholder-gray-400'}`}
                         maxLength={1000}
                       />
                       <div className="flex items-center justify-between mt-2 pt-2 border-t border-dashed border-gray-200/20">
@@ -357,80 +341,53 @@ export default function CampaignTabs({ darkMode, campaign }) {
                         key={comment._id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`p-5 rounded-xl border-l-4 
-                          ${editingId === comment._id ? 'border-amber-500' : 'border-emerald-500'}
-                          ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'}`}
+                        className={`p-5 rounded-xl border-l-4 border-emerald-500
+                          ${darkMode ? 'bg-zinc-900 shadow-xl' : 'bg-white shadow-md'}`}
                       >
-                        {editingId === comment._id ? (
-                          // Edit Mode
-                          <div>
-                            <textarea
-                              value={editContent}
-                              onChange={(e) => setEditContent(e.target.value)}
-                              className={`w-full p-3 rounded-lg border focus:ring-2 focus:ring-amber-500 outline-none resize-none min-h-[80px] mb-3 ${darkMode ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}
-                            />
-                            <div className="flex justify-end gap-2">
-                              <button
-                                onClick={() => setEditingId(null)}
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium ${darkMode ? 'text-gray-400 hover:bg-zinc-800' : 'text-gray-600 hover:bg-gray-200'}`}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={handleSaveEdit}
-                                disabled={isUpdating || !editContent.trim()}
-                                className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 disabled:opacity-50"
-                              >
-                                {isUpdating ? 'Saving...' : 'Save Changes'}
-                              </button>
-                            </div>
+                        <div className="flex gap-4">
+                          <div className={`w-12 h-12 rounded-full font-semibold flex items-center justify-center shrink-0
+                             ${comment.isAnonymous ? 'bg-gray-500' : 'bg-emerald-600'} text-white`}>
+                            {comment.user?.fullName ? comment.user.fullName.charAt(0) : 'A'}
                           </div>
-                        ) : (
-                          // Display Mode
-                          <div className="flex gap-4">
-                            <div className={`w-12 h-12 rounded-full font-semibold flex items-center justify-center shrink-0
-                               ${comment.isAnonymous ? 'bg-gray-500' : 'bg-emerald-600'} text-white`}>
-                              {comment.user?.fullName ? comment.user.fullName.charAt(0) : 'A'}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-start mb-1">
-                                <div>
-                                  <span className={`font-semibold mr-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    {comment.user?.fullName || 'Anonymous'}
-                                    {comment.isOwner && comment.isAnonymous && <span className="opacity-50 ml-1">(You)</span>}
-                                  </span>
-                                  <span className="text-xs text-gray-500 whitespace-nowrap">
-                                    {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                  </span>
-                                </div>
-
-                                {/* Edit/Delete Actions */}
-                                {comment.isOwner && (
-                                  <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                      onClick={() => handleEdit(comment)}
-                                      className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-500 hover:text-blue-500`}
-                                      title="Edit"
-                                    >
-                                      <Edit2 className="w-3.5 h-3.5" />
-                                    </button>
-                                    <button
-                                      onClick={() => handleDelete(comment._id)}
-                                      className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-500 hover:text-red-500`}
-                                      title="Delete"
-                                    >
-                                      {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                                    </button>
-                                  </div>
-                                )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start mb-1">
+                              <div>
+                                <span className={`font-semibold mr-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                  {comment.user?.fullName || 'Anonymous'}
+                                  {comment.isOwner && comment.isAnonymous && <span className="opacity-50 ml-1">(You)</span>}
+                                </span>
+                                <span className="text-xs text-gray-500 whitespace-nowrap">
+                                  {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </span>
                               </div>
 
-                              <p className={`whitespace-pre-wrap break-words ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                {comment.content}
-                              </p>
+                              {/* Delete Action */}
+                              {comment.isOwner && (
+                                <div className="flex items-center">
+                                  <button
+                                    onClick={() => handleDelete(comment._id)}
+                                    disabled={isDeleting}
+                                    className={`p-2 rounded-xl transition-all duration-200 hover:scale-105
+                                      ${darkMode
+                                        ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
+                                        : 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200'}`}
+                                    title="Delete Comment"
+                                  >
+                                    {isDeleting ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <Trash2 className="w-4 h-4" />
+                                    )}
+                                  </button>
+                                </div>
+                              )}
                             </div>
+
+                            <p className={`whitespace-pre-wrap break-words ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              {comment.content}
+                            </p>
                           </div>
-                        )}
+                        </div>
                       </motion.div>
                     ))}
 
@@ -518,6 +475,58 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 )}
               </div>
 
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* ================= DELETE CONFIRMATION MODAL ================= */}
+      <AnimatePresence>
+        {deleteConfirm.show && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4"
+            onClick={() => setDeleteConfirm({ show: false, id: null })}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`rounded-2xl p-6 w-full max-w-sm relative ${darkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white'}`}
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className={`p-4 rounded-full mb-4 ${darkMode ? 'bg-red-500/10' : 'bg-red-50'}`}>
+                  <Trash2 className="w-8 h-8 text-red-500" />
+                </div>
+
+                <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Delete Comment?
+                </h3>
+                <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  This action cannot be undone. Are you sure you want to remove your comment?
+                </p>
+
+                <div className="flex w-full gap-3">
+                  <button
+                    onClick={() => setDeleteConfirm({ show: false, id: null })}
+                    className={`flex-1 py-3 rounded-xl font-semibold transition-colors
+                      ${darkMode
+                        ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmDelete}
+                    disabled={isDeleting}
+                    className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold flex justify-center items-center transition-opacity disabled:opacity-50"
+                  >
+                    {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Delete"}
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
