@@ -1,5 +1,5 @@
 "use client"
-import { useCreateSubscriptionMutation } from "@/utils/slices/permanentDonorApiSlice"
+import { useInitiatePayUMandateMutation } from "@/utils/slices/permanentDonorApiSlice"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -30,8 +30,12 @@ export default function DailyImpactPage({ darkModeFromParent }) {
   const [amountError, setAmountError] = useState("")
   const [tipError, setTipError] = useState("")
   const [showError, setShowError] = useState(false)
-const [errorMessage, setErrorMessage] = useState("")
-const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
+  const [errorMessage, setErrorMessage] = useState("")
+  const [vpa, setVpa] = useState("")
+  const [vpaError, setVpaError] = useState("")
+
+  const [initiatePayUMandate, { isLoading }] = useInitiatePayUMandateMutation()
+
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -46,27 +50,27 @@ const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
   }
 
   // Calculate recommended tips
-// Calculate recommended tips
-const getRecommendedTips = () => {
-  const baseAmount = parseFloat(customAmount || amount)
-  const tips = [
-    Math.ceil((baseAmount * 15) / 100),
-    Math.ceil((baseAmount * 20) / 100),
-    Math.ceil((baseAmount * 25) / 100),
-    Math.ceil((baseAmount * 30) / 100)
-  ]
-  
-  // Remove duplicates and ensure we have 4 unique values
-  const uniqueTips = [...new Set(tips)]
-  
-  // If we have duplicates, add additional values to make 4 options
-  while (uniqueTips.length < 4) {
-    const lastValue = uniqueTips[uniqueTips.length - 1]
-    uniqueTips.push(lastValue + Math.max(1, Math.ceil(baseAmount * 0.05)))
+  // Calculate recommended tips
+  const getRecommendedTips = () => {
+    const baseAmount = parseFloat(customAmount || amount)
+    const tips = [
+      Math.ceil((baseAmount * 15) / 100),
+      Math.ceil((baseAmount * 20) / 100),
+      Math.ceil((baseAmount * 25) / 100),
+      Math.ceil((baseAmount * 30) / 100)
+    ]
+
+    // Remove duplicates and ensure we have 4 unique values
+    const uniqueTips = [...new Set(tips)]
+
+    // If we have duplicates, add additional values to make 4 options
+    while (uniqueTips.length < 4) {
+      const lastValue = uniqueTips[uniqueTips.length - 1]
+      uniqueTips.push(lastValue + Math.max(1, Math.ceil(baseAmount * 0.05)))
+    }
+
+    return uniqueTips.slice(0, 4)
   }
-  
-  return uniqueTips.slice(0, 4)
-}
 
   // Update tip when amount changes
   useEffect(() => {
@@ -81,17 +85,17 @@ const getRecommendedTips = () => {
     setCustomAmount(value)
 
     // Validate amount
-  
+
   }
 
   // Handle tip input change
   const handleTipChange = (value) => {
     const tipValue = parseFloat(value) || 0
     const minTip = calculateMinimumTip()
-    
+
     setTpfAidTip(tipValue)
-    
-   
+
+
   }
 
   const calculateTotal = () => {
@@ -101,32 +105,58 @@ const getRecommendedTips = () => {
     return total.toFixed(2)
   }
 
-const handleConfirm = async () => {
-  const baseAmount = parseFloat(customAmount || amount)
-  const minTip = calculateMinimumTip()
+  const isValidVPA = (vpa) => {
+  if (!vpa) return false
 
-  try {
-    const result = await createSubscription({
-      planType: 'daily',
-      amount: baseAmount,
-    }).unwrap()
-
-    if (result.message || result.subscription) {
-      setShowSuccess(true)
-      setTimeout(() => {
-        router.push('/')
-      }, 2000)
-    }
-  } catch (err) {
-    console.error('Failed to create subscription:', err)
-    const errorMsg = err.data?.message || 'Failed to create subscription. Please try again.'
-    setErrorMessage(errorMsg)
-    setShowError(true)
-    setTimeout(() => {
-      setShowError(false)
-    }, 5000)
-  }
+  // Basic but safe UPI ID validation
+  // Examples: name@okhdfcbank, mobile@ybl
+  const vpaRegex = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{3,}$/
+  return vpaRegex.test(vpa)
 }
+
+
+  const handleConfirm = async () => {
+    const baseAmount = parseFloat(customAmount || amount)
+
+    try {
+
+      if (!isValidVPA(vpa)) {
+        setVpaError("Please enter a valid UPI ID")
+        return
+      }
+
+
+      const res = await initiatePayUMandate({
+        planType: "daily",
+        amount: baseAmount,
+        vpa, // REAL USER VPA
+      }).unwrap()
+
+      // Build and submit PayU form
+      const form = document.createElement("form")
+      form.method = "POST"
+      form.action = res.action
+
+      Object.entries(res.payload).forEach(([key, value]) => {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = key
+        input.value =
+          typeof value === "object" ? JSON.stringify(value) : value
+        form.appendChild(input)
+      })
+
+      document.body.appendChild(form)
+      form.submit()
+
+    } catch (err) {
+      console.error("Failed to initiate PayU mandate:", err)
+      const errorMsg =
+        err?.data?.message || "Failed to start autopay. Please try again."
+      setErrorMessage(errorMsg)
+      setShowError(true)
+    }
+  }
 
   const recommendedTips = getRecommendedTips()
 
@@ -152,23 +182,23 @@ const handleConfirm = async () => {
       )}
 
       {/* Error Toast */}
-{showError && (
-  <motion.div
-    initial={{ opacity: 0, y: -50 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -50 }}
-    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+      {showError && (
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -50 }}
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
                bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-6 py-4 rounded-lg shadow-2xl 
                flex items-center gap-3 max-w-md w-[90%] sm:w-auto"
-  >
-    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-      <Info className="w-5 h-5" />
-    </div>
-    <div>
-      <p className="text-sm text-red-100">{errorMessage}</p>
-    </div>
-  </motion.div>
-)}
+        >
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <Info className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-sm text-red-100">{errorMessage}</p>
+          </div>
+        </motion.div>
+      )}
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
         {/* Back Button */}
@@ -176,11 +206,10 @@ const handleConfirm = async () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => router.back()}
-          className={`flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium transition-colors ${
-            darkMode 
-              ? "text-zinc-400 hover:text-white" 
-              : "text-blue-700 hover:text-blue-900"
-          }`}
+          className={`flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium transition-colors ${darkMode
+            ? "text-zinc-400 hover:text-white"
+            : "text-blue-700 hover:text-blue-900"
+            }`}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to plans
@@ -191,9 +220,8 @@ const handleConfirm = async () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`relative rounded-3xl overflow-hidden mb-8 ${
-            darkMode ? "bg-zinc-800" : "bg-gradient-to-br from-white via-blue-50/30 to-white"
-          } shadow-xl border ${darkMode ? "border-zinc-700" : "border-blue-200/50"}`}
+          className={`relative rounded-3xl overflow-hidden mb-8 ${darkMode ? "bg-zinc-800" : "bg-gradient-to-br from-white via-blue-50/30 to-white"
+            } shadow-xl border ${darkMode ? "border-zinc-700" : "border-blue-200/50"}`}
         >
           {/* Decorative Background Pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -210,9 +238,8 @@ const handleConfirm = async () => {
                   <Zap className="w-8 h-8 text-white" fill="white" />
                 </div>
                 <div>
-                  <h1 className={`text-3xl sm:text-4xl font-bold ${
-                    darkMode ? "text-white" : "text-zinc-900"
-                  }`}>
+                  <h1 className={`text-3xl sm:text-4xl font-bold ${darkMode ? "text-white" : "text-zinc-900"
+                    }`}>
                     Daily Impact
                   </h1>
                   <p className="text-blue-600 font-semibold text-sm sm:text-base">
@@ -238,9 +265,8 @@ const handleConfirm = async () => {
             </div>
 
             {/* Description */}
-            <p className={`text-sm sm:text-base leading-relaxed ${
-              darkMode ? "text-zinc-400" : "text-zinc-600"
-            }`}>
+            <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? "text-zinc-400" : "text-zinc-600"
+              }`}>
               Transform lives with consistent daily contributions. Perfect for those who want to make giving a daily habit in the Ummah.
             </p>
           </div>
@@ -252,22 +278,19 @@ const handleConfirm = async () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
         >
-          <h3 className={`text-xl font-bold mb-4 ${
-            darkMode ? "text-white" : "text-zinc-900"
-          }`}>
+          <h3 className={`text-xl font-bold mb-4 ${darkMode ? "text-white" : "text-zinc-900"
+            }`}>
             Your giving amount
           </h3>
 
           {/* Custom Amount Input */}
           <div className="mb-4">
             <div className="relative">
-              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold ${
-                darkMode ? "text-zinc-500" : "text-blue-600"
-              }`}>
+              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold ${darkMode ? "text-zinc-500" : "text-blue-600"
+                }`}>
                 ₹
               </span>
               <input
@@ -276,15 +299,14 @@ const handleConfirm = async () => {
                 onChange={handleCustomAmountChange}
                 placeholder={amount}
                 min="10"
-                className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 outline-none transition-all ${
-                  amountError
-                    ? darkMode
-                      ? "bg-zinc-900 border-red-500 text-white placeholder-zinc-600 focus:border-red-500"
-                      : "bg-white border-red-500 text-zinc-900 placeholder-zinc-300 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-                    : darkMode
-                      ? "bg-zinc-900 border-zinc-700 text-white placeholder-zinc-600 focus:border-blue-500"
-                      : "bg-blue-50/30 border-blue-200 text-zinc-900 placeholder-zinc-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                }`}
+                className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 outline-none transition-all ${amountError
+                  ? darkMode
+                    ? "bg-zinc-900 border-red-500 text-white placeholder-zinc-600 focus:border-red-500"
+                    : "bg-white border-red-500 text-zinc-900 placeholder-zinc-300 focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                  : darkMode
+                    ? "bg-zinc-900 border-zinc-700 text-white placeholder-zinc-600 focus:border-blue-500"
+                    : "bg-blue-50/30 border-blue-200 text-zinc-900 placeholder-zinc-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  }`}
               />
             </div>
             {amountError && (
@@ -300,15 +322,14 @@ const handleConfirm = async () => {
           </div>
 
           {/* Zakat Checkbox */}
-          <div className={`mt-4 p-4 rounded-xl border-2 ${
-            countAsZakat 
-              ? darkMode 
-                ? "bg-blue-900/20 border-blue-500/50" 
-                : "bg-blue-50 border-blue-300"
-              : darkMode
+          <div className={`mt-4 p-4 rounded-xl border-2 ${countAsZakat
+            ? darkMode
+              ? "bg-blue-900/20 border-blue-500/50"
+              : "bg-blue-50 border-blue-300"
+            : darkMode
               ? "bg-zinc-900 border-zinc-700"
               : "bg-gray-50 border-gray-200"
-          } transition-all`}>
+            } transition-all`}>
             <label className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -318,16 +339,14 @@ const handleConfirm = async () => {
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`font-semibold ${
-                    darkMode ? "text-white" : "text-zinc-900"
-                  }`}>
+                  <span className={`font-semibold ${darkMode ? "text-white" : "text-zinc-900"
+                    }`}>
                     Count this as Zakat
                   </span>
                   <Sparkles className={`w-4 h-4 ${countAsZakat ? "text-blue-500" : "text-zinc-400"}`} />
                 </div>
-                <p className={`text-xs leading-relaxed ${
-                  darkMode ? "text-zinc-400" : "text-zinc-600"
-                }`}>
+                <p className={`text-xs leading-relaxed ${darkMode ? "text-zinc-400" : "text-zinc-600"
+                  }`}>
                   Your contribution will be allocated to Zakat-eligible campaigns and beneficiaries only
                 </p>
               </div>
@@ -340,21 +359,18 @@ const handleConfirm = async () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
         >
           <div className="flex items-start gap-3 mb-4">
             <Heart className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className={`text-lg font-bold mb-2 ${
-                darkMode ? "text-white" : "text-zinc-900"
-              }`}>
+              <h3 className={`text-lg font-bold mb-2 ${darkMode ? "text-white" : "text-zinc-900"
+                }`}>
                 Help us help the Ummah
               </h3>
-              <p className={`text-sm leading-relaxed mb-4 ${
-                darkMode ? "text-zinc-400" : "text-zinc-600"
-              }`}>
+              <p className={`text-sm leading-relaxed mb-4 ${darkMode ? "text-zinc-400" : "text-zinc-600"
+                }`}>
                 Because TpfAid doesn't charge a platform fee, we rely on the generosity of donors like you to keep more people giving
               </p>
             </div>
@@ -363,31 +379,28 @@ const handleConfirm = async () => {
           {/* Platform Support Input */}
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-2">
-              <span className={`text-sm font-medium ${
-                darkMode ? "text-zinc-400" : "text-zinc-600"
-              }`}>
+              <span className={`text-sm font-medium ${darkMode ? "text-zinc-400" : "text-zinc-600"
+                }`}>
                 Platform support amount
               </span>
             </div>
 
             {/* Custom Tip Input */}
             <div className="relative">
-              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold ${
-                darkMode ? "text-zinc-500" : "text-blue-600"
-              }`}>
+              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold ${darkMode ? "text-zinc-500" : "text-blue-600"
+                }`}>
                 ₹
               </span>
               <input
                 type="number"
                 value={TpfAidTip}
                 onChange={(e) => handleTipChange(e.target.value)}
-                className={`w-full pl-12 pr-4 py-3 text-xl font-bold rounded-xl border-2 outline-none transition-all ${
-                  tipError
-                    ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
-                    : darkMode
+                className={`w-full pl-12 pr-4 py-3 text-xl font-bold rounded-xl border-2 outline-none transition-all ${tipError
+                  ? "border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                  : darkMode
                     ? "bg-zinc-900 border-zinc-700 text-white focus:border-blue-500"
                     : "bg-blue-50/30 border-blue-200 text-zinc-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-                }`}
+                  }`}
               />
             </div>
 
@@ -405,9 +418,8 @@ const handleConfirm = async () => {
 
             {/* Recommended Amounts */}
             <div>
-              <p className={`text-xs mb-2 ${
-                darkMode ? "text-zinc-500" : "text-zinc-600"
-              }`}>
+              <p className={`text-xs mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-600"
+                }`}>
                 Recommended amounts:
               </p>
               <div className="grid grid-cols-4 gap-2">
@@ -418,13 +430,12 @@ const handleConfirm = async () => {
                       setTpfAidTip(tipAmount)
                       setTipError("")
                     }}
-                    className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${
-                      TpfAidTip === tipAmount
-                        ? "bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500 text-white shadow-lg"
-                        : darkMode
+                    className={`py-2 px-3 rounded-lg text-sm font-semibold transition-all ${TpfAidTip === tipAmount
+                      ? "bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500 text-white shadow-lg"
+                      : darkMode
                         ? "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
                         : "bg-blue-50 text-blue-900 hover:bg-blue-100 border border-blue-200"
-                    }`}
+                      }`}
                   >
                     ₹{tipAmount}
                   </button>
@@ -432,7 +443,7 @@ const handleConfirm = async () => {
               </div>
             </div>
 
-           
+
           </div>
         </motion.div>
 
@@ -441,23 +452,20 @@ const handleConfirm = async () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-gradient-to-br from-zinc-800 to-zinc-800/50" : "bg-gradient-to-br from-blue-50 to-white"
-          } shadow-lg border-2 ${darkMode ? "border-blue-500/20" : "border-blue-300/50"}`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-gradient-to-br from-zinc-800 to-zinc-800/50" : "bg-gradient-to-br from-blue-50 to-white"
+            } shadow-lg border-2 ${darkMode ? "border-blue-500/20" : "border-blue-300/50"}`}
         >
           <div className="flex items-start gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
               <Wallet className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className={`text-lg font-bold mb-2 ${
-                darkMode ? "text-white" : "text-zinc-900"
-              }`}>
+              <h3 className={`text-lg font-bold mb-2 ${darkMode ? "text-white" : "text-zinc-900"
+                }`}>
                 TPF's Baitul Maal
               </h3>
-              <p className={`text-sm leading-relaxed mb-4 ${
-                darkMode ? "text-zinc-400" : "text-zinc-600"
-              }`}>
+              <p className={`text-sm leading-relaxed mb-4 ${darkMode ? "text-zinc-400" : "text-zinc-600"
+                }`}>
                 Your platform support contribution will be added to TPF's Baitul Maal and utilized transparently for:
               </p>
             </div>
@@ -484,13 +492,12 @@ const handleConfirm = async () => {
             })}
           </div>
 
-          <div className={`mt-4 p-3 rounded-lg ${
-            darkMode ? "bg-blue-900/20" : "bg-blue-100/50"
-          } border ${darkMode ? "border-blue-500/30" : "border-blue-200"}`}>
+          <div className={`mt-4 p-3 rounded-lg ${darkMode ? "bg-blue-900/20" : "bg-blue-100/50"
+            } border ${darkMode ? "border-blue-500/30" : "border-blue-200"}`}>
             <p className={`text-xs ${darkMode ? "text-blue-300" : "text-blue-800"}`}>
               <Info className="w-3 h-3 inline mr-1" />
-              {countAsZakat 
-                ? "As this is marked as Zakat, your contribution will be used exclusively for Zakat-eligible beneficiaries and campaigns." 
+              {countAsZakat
+                ? "As this is marked as Zakat, your contribution will be used exclusively for Zakat-eligible beneficiaries and campaigns."
                 : "All funds are managed with complete transparency and accountability."}
             </p>
           </div>
@@ -501,13 +508,11 @@ const handleConfirm = async () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
-          className={`rounded-2xl p-6 sm:p-8 mb-6 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
+          className={`rounded-2xl p-6 sm:p-8 mb-6 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
         >
-          <h3 className={`text-lg font-bold mb-4 ${
-            darkMode ? "text-white" : "text-zinc-900"
-          }`}>
+          <h3 className={`text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-zinc-900"
+            }`}>
             Review your daily giving
           </h3>
 
@@ -536,9 +541,8 @@ const handleConfirm = async () => {
                 ₹{TpfAidTip}
               </span>
             </div>
-            <div className={`flex items-center justify-between py-3 border-t ${
-              darkMode ? "border-zinc-700" : "border-blue-200"
-            }`}>
+            <div className={`flex items-center justify-between py-3 border-t ${darkMode ? "border-zinc-700" : "border-blue-200"
+              }`}>
               <span className={`font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
                 Daily total
               </span>
@@ -548,21 +552,38 @@ const handleConfirm = async () => {
             </div>
           </div>
 
-       <button
-  onClick={handleConfirm}
-  disabled={isLoading || amountError || (customAmount && parseFloat(customAmount) < 10)}
-  className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl ${
-    isLoading || amountError || (customAmount && parseFloat(customAmount) < 10)
-      ? "bg-zinc-400 text-zinc-200 cursor-not-allowed"
-      : "bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 text-white hover:from-blue-600 hover:via-indigo-600 hover:to-violet-600"
-  }`}
->
-  {isLoading ? "Creating Subscription..." : "Confirm Daily Giving"}
-</button>
+          <div className="mb-6">
+            <label className="block text-sm font-semibold mb-2">
+              Your UPI ID
+            </label>
+            <input
+              type="text"
+              value={vpa}
+              onChange={(e) => {
+                setVpa(e.target.value.trim())
+                setVpaError("")
+              }}
+              placeholder="yourname@okhdfcbank"
+              className="w-full px-4 py-3 border rounded-lg"
+            />
+            {vpaError && (
+              <p className="text-red-500 text-sm mt-1">{vpaError}</p>
+            )}
+          </div>
 
-          <p className={`text-center text-xs mt-4 ${
-            darkMode ? "text-zinc-500" : "text-zinc-500"
-          }`}>
+          <button
+            onClick={handleConfirm}
+            disabled={isLoading || amountError || (customAmount && parseFloat(customAmount) < 10)}
+            className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl ${isLoading || amountError || (customAmount && parseFloat(customAmount) < 10)
+              ? "bg-zinc-400 text-zinc-200 cursor-not-allowed"
+              : "bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 text-white hover:from-blue-600 hover:via-indigo-600 hover:to-violet-600"
+              }`}
+          >
+            {isLoading ? "Creating Subscription..." : "Confirm Daily Giving"}
+          </button>
+
+          <p className={`text-center text-xs mt-4 ${darkMode ? "text-zinc-500" : "text-zinc-500"
+            }`}>
             By continuing, you agree to our{' '}
             <a href="#" className="underline hover:text-blue-600">
               Policies
@@ -575,13 +596,11 @@ const handleConfirm = async () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className={`rounded-2xl p-6 sm:p-8 ${
-            darkMode ? "bg-zinc-800" : "bg-white"
-          } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
+          className={`rounded-2xl p-6 sm:p-8 ${darkMode ? "bg-zinc-800" : "bg-white"
+            } shadow-lg border ${darkMode ? "border-zinc-700" : "border-blue-100"}`}
         >
-          <h3 className={`text-lg font-bold mb-4 ${
-            darkMode ? "text-white" : "text-zinc-900"
-          }`}>
+          <h3 className={`text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-zinc-900"
+            }`}>
             What you get
           </h3>
 

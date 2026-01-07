@@ -11,6 +11,15 @@ export const permanentDonorApiSlice = apiSlice.injectEndpoints({
             }),
         }),
 
+        initiatePayUMandate: builder.mutation({
+            query: (data) => ({
+                url: '/permanent-donor/initiate-payu',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+
+
         // Get my subscription
         getMySubscription: builder.query({
             query: () => '/permanent-donor/my-subscription',
@@ -75,4 +84,5 @@ export const {
     useResumeSubscriptionMutation,
     useCancelSubscriptionMutation,
     useGetSubscriptionHistoryQuery,
+    useInitiatePayUMandateMutation
 } = permanentDonorApiSlice;
