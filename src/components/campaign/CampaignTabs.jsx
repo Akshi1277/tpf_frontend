@@ -40,6 +40,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
   const [commentPage, setCommentPage] = useState(1);
   const [newComment, setNewComment] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
 
 
@@ -219,9 +220,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.3 }}
-                      className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${
-                        darkMode ? 'bg-zinc-900' : 'bg-gray-100'
-                      }`}
+                      className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${darkMode ? 'bg-zinc-900' : 'bg-gray-100'
+                        }`}
                     >
                       <Inbox className={`w-10 h-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                     </motion.div>
@@ -261,11 +261,10 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           href={getMediaUrl(doc.fileUrl)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            darkMode 
-                              ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' 
+                          className={`px-4 py-2 rounded-lg font-medium transition-colors ${darkMode
+                              ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
                               : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
-                          }`}
+                            }`}
                         >
                           View Document
                         </a>
@@ -307,7 +306,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
               <div className={`flex-1 ${!isAuthenticated ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
                 <div className="space-y-8">
                   {/* --- Post Comment Section --- */}
-                  {isAuthenticated && (
+                  {isAuthenticated && !commentsData?.userHasCommented && (
                     <div className={`p-4 rounded-xl border ${darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-gray-50 border-gray-100'}`}>
                       <div className="flex gap-4">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-bold">
@@ -344,6 +343,12 @@ export default function CampaignTabs({ darkMode, campaign }) {
                     </div>
                   )}
 
+                  {isAuthenticated && commentsData?.userHasCommented && (
+                    <div className={`p-4 rounded-xl border border-dashed text-center ${darkMode ? 'bg-zinc-900/30 border-zinc-700 text-zinc-400' : 'bg-gray-50/50 border-gray-200 text-gray-500'}`}>
+                      <p className="text-sm">You have already shared your thoughts on this campaign. Thank you for your support!</p>
+                    </div>
+                  )}
+
                   {/* --- Comment List --- */}
                   <div className="space-y-4">
                     {commentsLoading && commentPage === 1 ? (
@@ -356,9 +361,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           initial={{ scale: 0.9, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ duration: 0.3 }}
-                          className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${
-                            darkMode ? 'bg-zinc-900' : 'bg-gray-100'
-                          }`}
+                          className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${darkMode ? 'bg-zinc-900' : 'bg-gray-100'
+                            }`}
                         >
                           <MessageSquare className={`w-10 h-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                         </motion.div>
@@ -371,7 +375,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                       </div>
                     ) : (
                       <>
-                        {commentsData?.data?.map((comment) => (
+                        {(isExpanded ? commentsData?.data : commentsData?.data?.slice(0, 5)).map((comment) => (
                           <motion.div
                             key={comment._id}
                             initial={{ opacity: 0, y: 10 }}
@@ -424,18 +428,28 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           </motion.div>
                         ))}
 
-                        {/* Load More */}
-                        {commentsData?.hasMore && (
-                          <div className="text-center pt-2">
+                        {/* Show More / Less / Load More */}
+                        <div className="flex flex-col items-center gap-3 pt-2">
+                          {(commentsData?.totalCount > 5 || commentsData?.data?.length > 5) && (
+                            <button
+                              onClick={() => setIsExpanded(!isExpanded)}
+                              className={`text-sm font-semibold hover:underline ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
+                            >
+                              {isExpanded ? 'Show Less Comments' : 'Show More Comments'}
+                            </button>
+                          )}
+
+                          {isExpanded && commentsData?.hasMore && (
                             <button
                               onClick={() => setCommentPage(prev => prev + 1)}
                               disabled={commentsFetching}
-                              className={`text-sm font-semibold hover:underline ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
+                              className={`text-xs opacity-60 hover:opacity-100 flex items-center gap-1 ${darkMode ? 'text-white' : 'text-zinc-600'}`}
                             >
-                              {commentsFetching ? 'Loading...' : 'Load More Comments'}
+                              {commentsFetching ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                              Load Older Comments
                             </button>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </>
                     )}
                   </div>
