@@ -68,7 +68,8 @@ export default function CampaignCard({ campaign, darkMode }) {
     // Video card with full coverage
     return (
       <div
-        className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300 relative
+        onClick={() => router.push(`/campaign/${campaign.slug}`)}
+        className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300 relative cursor-pointer
           ${darkMode ? 'bg-zinc-800' : 'bg-white'}
           shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
       >
@@ -169,7 +170,10 @@ export default function CampaignCard({ campaign, darkMode }) {
                 </button>
 
                 <button
-                  onClick={() => setOpenShare(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenShare(true);
+                  }}
                   className="flex items-center gap-1 text-zinc-300 hover:text-emerald-400 transition-colors cursor-pointer">
                   <Image
                     src="/share.svg"
@@ -194,8 +198,10 @@ export default function CampaignCard({ campaign, darkMode }) {
   // Image card - original layout
   return (
     <div
-      className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300
+      onClick={() => router.push(`/campaign/${campaign.slug}`)}
+      className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl cursor-pointer overflow-hidden transition-all duration-300
         ${darkMode ? 'bg-zinc-800' : 'bg-white'}
+        
         shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
     >
       <div className="relative aspect-video">
@@ -284,7 +290,10 @@ export default function CampaignCard({ campaign, darkMode }) {
               />
             </button>
             <button
-              onClick={() => setOpenShare(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenShare(true);
+              }}
               className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'}`}>
               <Image
                 src="/share.svg"
