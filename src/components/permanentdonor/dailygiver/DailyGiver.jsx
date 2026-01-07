@@ -1,5 +1,5 @@
 "use client"
-import { useCreateSubscriptionMutation } from "@/utils/slices/permanentDonorApiSlice"
+import { useInitiatePayUMandateMutation } from "@/utils/slices/permanentDonorApiSlice"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -31,7 +31,8 @@ export default function DailyImpactPage({ darkModeFromParent }) {
   const [tipError, setTipError] = useState("")
   const [showError, setShowError] = useState(false)
 const [errorMessage, setErrorMessage] = useState("")
-const [createSubscription, { isLoading }] = useCreateSubscriptionMutation()
+const [initiatePayUMandate, { isLoading }] = useInitiatePayUMandateMutation()
+
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -103,28 +104,37 @@ const getRecommendedTips = () => {
 
 const handleConfirm = async () => {
   const baseAmount = parseFloat(customAmount || amount)
-  const minTip = calculateMinimumTip()
 
   try {
-    const result = await createSubscription({
-      planType: 'daily',
+    const res = await initiatePayUMandate({
+      planType: "daily",
       amount: baseAmount,
+      vpa: "test@upi" // later make this user input
     }).unwrap()
 
-    if (result.message || result.subscription) {
-      setShowSuccess(true)
-      setTimeout(() => {
-        router.push('/')
-      }, 2000)
-    }
+    // Build and submit PayU form
+    const form = document.createElement("form")
+    form.method = "POST"
+    form.action = res.action
+
+    Object.entries(res.payload).forEach(([key, value]) => {
+      const input = document.createElement("input")
+      input.type = "hidden"
+      input.name = key
+      input.value =
+        typeof value === "object" ? JSON.stringify(value) : value
+      form.appendChild(input)
+    })
+
+    document.body.appendChild(form)
+    form.submit()
+
   } catch (err) {
-    console.error('Failed to create subscription:', err)
-    const errorMsg = err.data?.message || 'Failed to create subscription. Please try again.'
+    console.error("Failed to initiate PayU mandate:", err)
+    const errorMsg =
+      err?.data?.message || "Failed to start autopay. Please try again."
     setErrorMessage(errorMsg)
     setShowError(true)
-    setTimeout(() => {
-      setShowError(false)
-    }, 5000)
   }
 }
 
