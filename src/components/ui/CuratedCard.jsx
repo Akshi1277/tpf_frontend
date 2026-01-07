@@ -1,15 +1,12 @@
-// components/ui/CuratedCard.jsx
-"use client";
-import { ArrowRight } from 'lucide-react';
-import {useRouter} from 'next/navigation';
+import { getMediaUrl } from '@/utils/media';
+import { useRouter } from 'next/navigation';
 export default function CuratedCard({ item, darkMode, }) {
-  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
-  const router=useRouter();
+  const router = useRouter();
   return (
     <div
-    onClick={() => {
-      console.log("FULL ITEM:", item)
-      // console.log("route from cms",item?.route);
+      onClick={() => {
+        console.log("FULL ITEM:", item)
+        // console.log("route from cms",item?.route);
 
         if (item?.route) {
           router.push(item.route.trim());
@@ -21,7 +18,7 @@ export default function CuratedCard({ item, darkMode, }) {
     >
       <div className="relative h-32 sm:h-40 md:h-48 overflow-hidden">
         <img
-          src={`${BASE_URL}${item.image}`}
+          src={getMediaUrl(item.image)}
           alt={item.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -30,9 +27,9 @@ export default function CuratedCard({ item, darkMode, }) {
           <h3 className="font-bold text-white text-sm md:text-lg mb-1">{item.title}</h3>
         </div>
       </div>
-    <div className="mt-auto">
- 
-</div>
+      <div className="mt-auto">
+
+      </div>
 
     </div>
   );
