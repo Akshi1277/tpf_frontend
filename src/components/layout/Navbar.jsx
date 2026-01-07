@@ -81,10 +81,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
       });
     } catch (err) {
       showToast({
-        type:"error",
-        title:"Logout Failed",
-        message:err,
-        duration:1000
+        type: "error",
+        title: "Logout Failed",
+        message: err,
+        duration: 1000
       })
       console.log(err)
     } finally {
@@ -136,15 +136,14 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
           <div className="flex items-center justify-between h-16 gap-6">
             {/* LEFT – Logo */}
-            {/* LEFT – Logo */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex items-center">
               <Image
                 src={scrolled && !darkMode ? "/TPFAid-Logo.png" : "/TPFAid-Logo1.png"}
                 alt="TPF Aid Logo"
-                width={120}
-                height={120}
+                width={160}
+                height={40}
                 priority
-                className="cursor-pointer"
+                className="h-8 md:h-9 w-auto cursor-pointer object-contain"
                 onClick={() => router.push('/')}
               />
             </div>
@@ -512,7 +511,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             >
               {/* Modal popup */}
               <div
-                className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[90vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl overflow-hidden transition-transform duration-300 ease-in-out flex flex-col
+                className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[85vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl overflow-hidden transition-all duration-300 ease-in-out flex flex-col
     ${darkMode
                     ? 'bg-zinc-900 shadow-[0_0_40px_rgba(0,0,0,0.9)] border border-zinc-800'
                     : 'bg-white shadow-[0_4px_40px_rgba(0,0,0,0.25)] border border-zinc-200'
@@ -530,7 +529,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   </button>
                 </div>
                 {/* Menu content */}
-                <div className="px-6 py-4 space-y-4 h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden pb-5">
+                <div className="px-6 py-4 space-y-4 flex-1 overflow-y-auto scrollbar-hide pb-8">
 
                   {/* Greeting */}
                   <div>

@@ -48,8 +48,8 @@ export default function Footer({ darkMode }) {
               src={darkMode ? "/TPFAid-Logo1.png" : "/TPFAid-Logo.png"}
               alt="TPF Aid Logo"
               width={160}
-              height={160}
-              className="cursor-pointer mb-4"
+              height={45}
+              className="h-9 w-auto cursor-pointer mb-4 object-contain"
             />
             <p className={`text-sm font-semibold ${darkMode ? 'text-zinc-400' : 'text-gray-600'} leading-relaxed`}>
               Making a difference through community-funded projects and transparent impact.
@@ -209,8 +209,8 @@ export default function Footer({ darkMode }) {
                   type="email"
                   placeholder="Email address"
                   className={`flex-1 px-1 py-3 -ml-5 border rounded-lg focus:outline-gray-500 focus:ring-2 ${darkMode
-                      ? 'bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
+                    ? 'bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                     }`}
                 />
                 <button className="px-6 ml-2 py-3 bg-black hover:bg-gray-900 text-white rounded-lg transition-colors flex items-center justify-center cursor-pointer">
