@@ -4,7 +4,7 @@ export const getMediaUrl = (path) => {
     // If it's already a full external URL, return as is
     if (path.startsWith("http")) return path;
 
-    const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.anatech.fun";
+    const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL || "https://api.anatech.fun";
 
     // Convert old /uploads/ paths to new /api/media/ format
     let cleanPath = path;
