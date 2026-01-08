@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useCMS } from "@/app/CMSContext";
+import { getMediaUrl } from '@/utils/media';
 export default function CommunitiesSection({ darkMode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [scrollIndex, setScrollIndex] = useState(0);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const cms = useCMS();
   const cmsCommunities = cms.filter(item => item.type === "communities");
-  const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`;
-   if (!cmsCommunities || cmsCommunities.length === 0) {
+  if (!cmsCommunities || cmsCommunities.length === 0) {
     return null;
   }
   const COLORS = {
@@ -20,10 +20,10 @@ export default function CommunitiesSection({ darkMode }) {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -33,7 +33,7 @@ export default function CommunitiesSection({ darkMode }) {
 
     const interval = setInterval(() => {
       setScrollIndex(prev => prev + 1);
-    }, 2000); 
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [isMobile, isUserScrolling]);
@@ -48,7 +48,7 @@ export default function CommunitiesSection({ darkMode }) {
     const cardWidth = container.children[0]?.offsetWidth || 0;
     const gap = 20; // 1.25rem = 20px
     const scrollTo = (cardWidth + gap) * scrollIndex;
-    
+
     container.scrollTo({
       left: scrollTo,
       behavior: 'smooth'
@@ -80,7 +80,7 @@ export default function CommunitiesSection({ darkMode }) {
         isScrolling = true;
         setIsUserScrolling(true);
       }
-      
+
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
         isScrolling = false;
@@ -171,7 +171,7 @@ export default function CommunitiesSection({ darkMode }) {
             >
               <div className="relative h-48 overflow-hidden">
                 <img
-                 src={`${BASE_URL}${community.image}`}
+                  src={getMediaUrl(community.image)}
                   alt={community.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="lazy"

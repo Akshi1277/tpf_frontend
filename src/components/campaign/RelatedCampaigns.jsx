@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
+import { getMediaUrl } from '@/utils/media';
 
 export default function RelatedCampaigns({
   category,
@@ -10,7 +11,6 @@ export default function RelatedCampaigns({
   darkMode,
 }) {
   const cms = useCMS();
-  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
   const relatedCampaigns = useMemo(() => {
     if (!Array.isArray(cms) || !currentSlug || !category) return [];
@@ -55,10 +55,10 @@ export default function RelatedCampaigns({
       .map((campaign) => ({
         ...campaign,
         image: campaign.imageUrl
-          ? `${BASE_URL}${campaign.imageUrl}`
+          ? getMediaUrl(campaign.imageUrl)
           : null,
         video: campaign.videoUrl
-          ? `${BASE_URL}${campaign.videoUrl}`
+          ? getMediaUrl(campaign.videoUrl)
           : null,
         raised: Number(campaign.raisedAmount || 0),
         goal: Number(
@@ -79,24 +79,21 @@ export default function RelatedCampaigns({
 
   return (
     <section
-      className={`mt-16 ${
-        darkMode ? 'bg-zinc-900' : 'bg-gray-50'
-      }`}
+      className={`mt-16 ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="mb-6">
           <h2
-            className={`text-2xl sm:text-3xl font-bold ${
-              darkMode ? 'text-white' : 'text-zinc-900'
-            }`}
+            className={`text-2xl sm:text-3xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'
+              }`}
           >
             Related Campaigns
           </h2>
           <p
-            className={`text-sm mt-1 ${
-              darkMode ? 'text-zinc-400' : 'text-zinc-600'
-            }`}
+            className={`text-sm mt-1 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'
+              }`}
           >
             Similar causes you may want to support
           </p>

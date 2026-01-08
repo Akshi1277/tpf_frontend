@@ -1,27 +1,27 @@
 // components/home/StartFundraiserBanner.jsx
 import Image from "next/image";
 import { useCMS } from "@/app/CMSContext";
+import { getMediaUrl } from "@/utils/media";
 
 export default function StartFundraiserBanner({ darkMode }) {
   const cms = useCMS();
   const cmsBeforeFooter = cms.filter(item => item.type === "before-footer");
-  const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`
-    if (!cmsBeforeFooter || cmsBeforeFooter.length === 0) {
+  if (!cmsBeforeFooter || cmsBeforeFooter.length === 0) {
     return null;
   }
   return (
     <section className={`py-14 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-2xl h-64 md:h-96 ">
-        
+
           <img
-            src={`${BASE_URL}${cmsBeforeFooter[0]?.image}`}
+            src={getMediaUrl(cmsBeforeFooter[0]?.image)}
             alt="Start Your Fundraiser"
             className="w-full h-full object-cover object-[50%_75%]"
             loading="lazy"
           />
 
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30"></div>
 
           {/* <img
           src="https://images.unsplash.com/photo-1547069545-e88faa5cac9d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzB8fFJlYWNoJTIwbWlsbGlvbnMlMjBvZiUyMGRvbm9ycyUyMHdvcmxkd2lkZS4lMjBUdXJuJTIweW91ciUyMGNhdXNlJTIwaW50byUyMGltcGFjdCUyMHRvZGF5LnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=600"

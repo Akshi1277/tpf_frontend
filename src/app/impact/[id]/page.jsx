@@ -5,8 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ExternalLink, Loader2, Calendar } from "lucide-react";
 import axios from "axios";
 import GlobalLoader from "@/components/GlobalLoader";
+import { getMediaUrl } from "@/utils/media";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-const UPLOAD_BASE = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
 export default function ImpactStoryDetailPage() {
     const { id } = useParams();
@@ -165,7 +165,7 @@ export default function ImpactStoryDetailPage() {
                             <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-emerald-500/40 bg-zinc-900 shadow-xl sm:shadow-2xl shadow-emerald-500/20">
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
                                 <img
-                                    src={`${UPLOAD_BASE}${story.image}`}
+                                    src={getMediaUrl(story.image)}
                                     alt={story.title}
                                     className="w-full h-[220px] xs:h-[260px] sm:h-[280px] md:h-[320px] object-cover"
                                     loading="lazy"

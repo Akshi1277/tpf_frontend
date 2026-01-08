@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { useToggleWishlistMutation, useGetWishlistQuery } from "@/utils/slices/authApiSlice"
 import ShareModal from "../../ui/ShareModal"
+import { getMediaUrl } from "@/utils/media"
 
 
 export default function MyCampaignsPage({ darkModeFromParent }) {
@@ -75,7 +76,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   const CampaignCard = ({ campaign, isMyCampaign = false }) => {
     const progress = calculateProgress(campaign.raisedAmount, campaign.targetAmount)
     console.log("Campaign inside MyCampaignsPage:", campaign);
-   
+
 
     const handleDonateClick = () => {
       // Ensure the campaign and slug exist
@@ -87,20 +88,20 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     };
 
     const getDaysLeft = (deadline) => {
-  const today = new Date();
-  const endDate = new Date(deadline);
+      const today = new Date();
+      const endDate = new Date(deadline);
 
-  // Normalize times to avoid partial-day issues
-  today.setHours(0, 0, 0, 0);
-  endDate.setHours(0, 0, 0, 0);
+      // Normalize times to avoid partial-day issues
+      today.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
 
-  const diffTime = endDate - today;
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffTime = endDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  return diffDays;
-};
+      return diffDays;
+    };
 
-const daysLeft = getDaysLeft(campaign.deadline);
+    const daysLeft = getDaysLeft(campaign.deadline);
 
 
     return (
@@ -116,7 +117,7 @@ const daysLeft = getDaysLeft(campaign.deadline);
         {/* Image */}
         <div className="relative h-40 sm:h-48 overflow-hidden">
           <img
-            src={`${process.env.NEXT_PUBLIC_UPLOAD_URL}${campaign.imageUrl}`}    
+            src={getMediaUrl(campaign.imageUrl)}
             alt={campaign.title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
@@ -191,27 +192,25 @@ const daysLeft = getDaysLeft(campaign.deadline);
               </span>
             </div>
             <div className="flex items-center gap-1">
-  <Clock
-    className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
-      daysLeft <= 5 && daysLeft > 0
-        ? "text-rose-500"
-        : darkMode
-        ? "text-zinc-400"
-        : "text-gray-600"
-    }`}
-  />
-  <span
-    className={`text-xs sm:text-sm ${
-      daysLeft <= 5 && daysLeft > 0
-        ? "text-rose-500 font-semibold"
-        : darkMode
-        ? "text-zinc-400"
-        : "text-gray-600"
-    }`}
-  >
-    {daysLeft > 0 ? `${daysLeft}d` : "Ended"}
-  </span>
-</div>
+              <Clock
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${daysLeft <= 5 && daysLeft > 0
+                    ? "text-rose-500"
+                    : darkMode
+                      ? "text-zinc-400"
+                      : "text-gray-600"
+                  }`}
+              />
+              <span
+                className={`text-xs sm:text-sm ${daysLeft <= 5 && daysLeft > 0
+                    ? "text-rose-500 font-semibold"
+                    : darkMode
+                      ? "text-zinc-400"
+                      : "text-gray-600"
+                  }`}
+              >
+                {daysLeft > 0 ? `${daysLeft}d` : "Ended"}
+              </span>
+            </div>
 
             {isMyCampaign && (
               <div className="flex items-center gap-1">

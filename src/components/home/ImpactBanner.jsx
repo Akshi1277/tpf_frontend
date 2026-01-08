@@ -1,11 +1,11 @@
 // components/home/ImpactBanner.jsx
 import { heroImages } from '@/lib/constants';
 import { useCMS } from '@/app/CMSContext';
+import { getMediaUrl } from '@/utils/media';
 export default function ImpactBanner({ darkMode }) {
-    const cms = useCMS();
+  const cms = useCMS();
   const cmsStartGiving = cms.filter(item => item.type === "start-giving");
-  const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`
-   if (!cmsStartGiving || cmsStartGiving.length === 0) {
+  if (!cmsStartGiving || cmsStartGiving.length === 0) {
     return null;
   }
   return (
@@ -14,7 +14,7 @@ export default function ImpactBanner({ darkMode }) {
         <div className="relative overflow-hidden rounded-2xl">
           <div className="absolute inset-0"></div>
           <img
-            src={`${BASE_URL}${cmsStartGiving[0].image}`}
+            src={getMediaUrl(cmsStartGiving[0].image)}
             alt="Stand with Gaza"
             className="h-64 md:h-96 w-full object-cover object-[50%_37%]"
             loading='lazy'

@@ -10,6 +10,7 @@ import { Heart } from 'lucide-react';
 import ShareModal from "./ShareModal"
 import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
 import { useSelector } from 'react-redux';
+import { getMediaUrl } from '@/utils/media';
 export default function CampaignCard({ campaign, darkMode }) {
 
   const progress = campaign.requiredAmount
@@ -74,7 +75,7 @@ export default function CampaignCard({ campaign, darkMode }) {
           shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
       >
         <video
-          src={campaign.video}
+          src={getMediaUrl(campaign.video)}
           className="absolute inset-0 w-full h-full object-cover"
           autoPlay
           loop
@@ -206,7 +207,7 @@ export default function CampaignCard({ campaign, darkMode }) {
     >
       <div className="relative aspect-video">
         <img
-          src={campaign.image}
+          src={getMediaUrl(campaign.image)}
           alt={campaign.title}
           className="w-full h-full object-cover"
         />

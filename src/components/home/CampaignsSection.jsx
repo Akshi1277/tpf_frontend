@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import Link from 'next/link';
+import { getMediaUrl } from '@/utils/media';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -13,8 +14,6 @@ export default function CampaignsSection({ darkMode }) {
 
   const containerRef = useRef(null);
   const cms = useCMS();
-
-  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
   /* --------------------------------
      Helpers
@@ -45,10 +44,10 @@ export default function CampaignsSection({ darkMode }) {
       .map((campaign) => ({
         ...campaign,
         image: campaign.imageUrl
-          ? `${BASE_URL}${campaign.imageUrl}`
+          ? getMediaUrl(campaign.imageUrl)
           : null,
         video: campaign.videoUrl
-          ? `${BASE_URL}${campaign.videoUrl}`
+          ? getMediaUrl(campaign.videoUrl)
           : null,
         raised: Number(campaign.raisedAmount || 0),
         goal: Number(campaign.requiredAmount || campaign.goal || 0),
@@ -194,16 +193,14 @@ export default function CampaignsSection({ darkMode }) {
   return (
     <section
       id="campaigns"
-      className={`py-10 ${
-        darkMode ? 'bg-zinc-800' : 'bg-white'
-      }`}
+      className={`py-10 ${darkMode ? 'bg-zinc-800' : 'bg-white'
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2
-            className={`text-3xl md:text-4xl font-bold ${
-              darkMode ? 'text-white' : 'text-zinc-900'
-            }`}
+            className={`text-3xl md:text-4xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'
+              }`}
           >
             Fundraising now
           </h2>

@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import ScrollToTop from '@/components/ui/ScrollToTop';
+import { getMediaUrl } from '@/utils/media';
 
 export default function AllCampaignsPage() {
     const [darkMode, setDarkMode] = useState(() => {
@@ -48,7 +49,7 @@ export default function AllCampaignsPage() {
         ];
     }, [validFundraisers]);
 
-    const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
+
 
     const calcDaysLeft = (deadline) => {
         const end = new Date(deadline);
@@ -107,8 +108,8 @@ export default function AllCampaignsPage() {
                                 <CampaignCard
                                     campaign={{
                                         ...campaign,
-                                        image: campaign.imageUrl ? `${BASE_URL}${campaign.imageUrl}` : null,
-                                        video: campaign.videoUrl ? `${BASE_URL}${campaign.videoUrl}` : null,
+                                        image: campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : null,
+                                        video: campaign.videoUrl ? getMediaUrl(campaign.videoUrl) : null,
                                         raised: Number(campaign.raisedAmount || 0),
                                         goal: Number(campaign.requiredAmount || campaign.goal || 0),
                                         org: campaign.organization || "",

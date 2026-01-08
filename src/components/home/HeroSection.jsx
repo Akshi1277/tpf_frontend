@@ -2,16 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useCMS } from "@/app/CMSContext";
+import { getMediaUrl } from "@/utils/media";
 
 
 export default function HeroSection({ darkMode }) {
   const router = useRouter();
 
-const cms = useCMS();
-const hero = cms?.find((item) => item.type === "hero");
-
-
-    const BASE_URL = `${process.env.NEXT_PUBLIC_UPLOAD_URL}`;
+  const cms = useCMS();
+  const hero = cms?.find((item) => item.type === "hero");
 
   // Optional UI fallback while CMS first arrives
   if (!hero) {
@@ -27,7 +25,7 @@ const hero = cms?.find((item) => item.type === "hero");
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
-          src={`${BASE_URL}${hero.image}`}
+          src={getMediaUrl(hero.image)}
           alt="Hero"
           className="w-full h-full object-cover"
         />
