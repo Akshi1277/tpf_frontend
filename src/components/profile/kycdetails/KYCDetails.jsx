@@ -86,32 +86,46 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   }, [])
 
 
-  useEffect(() => {
-    if (userInfo) {
-      setFormData(prev => ({
-        ...prev,
-        fullName: userInfo.fullName || "",
-        dateOfBirth: userInfo.dob ? userInfo.dob.split("T")[0] : "",
-           gender: userInfo.gender?.toLowerCase() || "",   // <-- FIX HERE
-        profession: userInfo.profession || "",
-        phoneNumber: userInfo.mobileNo || "",
-        email: userInfo.email || "",
-        addressLine1: userInfo.address?.house || "",
-        city: userInfo.address?.city || "",
-        state: userInfo.address?.state || "",
-        postalCode: userInfo.address?.pincode || "",
-        panNumber: userInfo.kycDetails?.panNumber || "",
-        confirmPanNumber: userInfo.kycDetails?.panNumber || "",
-      }));
+useEffect(() => {
+  if (!userInfo) return;
 
-      // if KYC already submitted before → lock UI
-     if (userInfo?.kycDetails?.panNumber) {
-  // KYC submitted
-  setIsSubmitted(true);
-}
+  const hasKyc =
+    !!userInfo.kycDetails &&
+    !!userInfo.kycDetails.submittedAt;
 
-    }
-  }, [userInfo]);
+  // 🔒 Case 1: KYC already submitted → ONLY use kycDetails
+  if (hasKyc) {
+    setFormData(prev => ({
+      ...prev,
+      fullName: userInfo.kycDetails.fullLegalName || "",
+      addressLine1: userInfo.kycDetails.address || "",
+      city: userInfo.kycDetails.city || "",
+      state: userInfo.kycDetails.state || "",
+      postalCode: userInfo.kycDetails.pincode || "",
+      panNumber: userInfo.kycDetails.panNumber || "",
+      confirmPanNumber: userInfo.kycDetails.panNumber || "",
+    }));
+    setIsSubmitted(true);
+    return;
+  }
+
+  // 🟢 Case 2: First-time KYC → prefill from user profile
+  setFormData(prev => ({
+    ...prev,
+    fullName: userInfo.fullName || "",
+    dateOfBirth: userInfo.dob ? userInfo.dob.split("T")[0] : "",
+    gender: userInfo.gender?.toLowerCase() || "",
+    profession: userInfo.profession || "",
+    phoneNumber: userInfo.mobileNo || "",
+    email: userInfo.email || "",
+
+    addressLine1: userInfo.address?.house || "",
+    city: userInfo.address?.city || "",
+    state: userInfo.address?.state || "",
+    postalCode: userInfo.address?.pincode || "",
+  }));
+}, [userInfo]);
+
 
   const fetchStates = async () => {
     setLoadingStates(true)
