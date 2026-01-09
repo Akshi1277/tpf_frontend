@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ExternalLink, Loader2, Calendar } from "lucide-react";
 import axios from "axios";
 import GlobalLoader from "@/components/GlobalLoader";
-import GlobalLoader from "@/components/GlobalLoader";
 import { getMediaUrl } from "@/utils/media";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 

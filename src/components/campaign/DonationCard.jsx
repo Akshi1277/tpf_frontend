@@ -3,7 +3,6 @@ import { Heart, Lock, Shield, Info } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import PayUForm from '../payments/PayUForm';
 import LoginModal from '../login/LoginModal';
-import LoginModal from '../login/LoginModal';
 
 export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
   const [selectedAmount, setSelectedAmount] = useState(null);
@@ -18,16 +17,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
 
 
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const [donationType, setDonationType] = useState('SADAQAH');
 
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [pendingDonate, setPendingDonate] = useState(false);
-  const [isDonating, setIsDonating] = useState(false);
-
-
-  const userInfo = useSelector((state) => state.auth.userInfo);
-
-  const presetAmounts = [500, 1000, 5000, 10000];
   const presetAmounts = [500, 1000, 5000, 10000];
 
   const donationTypes = [
@@ -115,21 +105,6 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
               Your contribution makes a difference
             </p>
           </div>
-    <div className={`${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'} border-2 rounded-lg p-8 sticky top-24`}>
-      {/* Header */}
-      <div className="mb-8 pb-6 border-b-2 border-dashed" style={{ borderColor: darkMode ? '#27272a' : '#f3f4f6' }}>
-        <div className="flex items-start gap-4 mb-3">
-          <div className={`w-11 h-11 rounded-lg ${darkMode ? 'bg-zinc-800' : 'bg-gray-50'} flex items-center justify-center flex-shrink-0`}>
-            <Heart className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} fill="currentColor" />
-          </div>
-          <div className="flex-1">
-            <h3 className={`text-xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Support This Cause
-            </h3>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              Your contribution makes a difference
-            </p>
-          </div>
         </div>
       </div>
 
@@ -137,16 +112,11 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
       <div className="mb-8">
         <label className={`block text-sm font-semibold mb-4 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
           Type of Donation
-      <div className="mb-8">
-        <label className={`block text-sm font-semibold mb-4 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-          Type of Donation
         </label>
-        <div className="grid grid-cols-2 gap-3">
         <div className="grid grid-cols-2 gap-3">
           {donationTypes.map((type) => (
             <button
               key={type.id}
-              onClick={() => !type.disabled && setDonationType(type.id)}
               onClick={() => !type.disabled && setDonationType(type.id)}
               disabled={type.disabled}
               className={`
@@ -184,12 +154,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
       <div className="mb-8">
         <label className={`block text-sm font-semibold mb-4 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
           Choose Amount
-      {/* Amount Selection */}
-      <div className="mb-8">
-        <label className={`block text-sm font-semibold mb-4 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-          Choose Amount
         </label>
-        <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="grid grid-cols-2 gap-3 mb-4">
           {presetAmounts.map((amount) => (
             <button
@@ -208,28 +173,13 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
                     ? 'border-zinc-800 text-gray-300 hover:border-zinc-700'
                     : 'border-gray-200 text-gray-700 hover:border-gray-300'}
               `}
-              className={`
-                h-14 rounded-lg font-semibold text-base border-2 transition-colors
-                ${selectedAmount === amount
-                  ? darkMode
-                    ? 'border-emerald-500 bg-emerald-950/30 text-emerald-400'
-                    : 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                  : darkMode
-                    ? 'border-zinc-800 text-gray-300 hover:border-zinc-700'
-                    : 'border-gray-200 text-gray-700 hover:border-gray-300'}
-              `}
             >
-              ₹{amount.toLocaleString()}
               ₹{amount.toLocaleString()}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Custom Amount */}
-      <div className="mb-8">
-        <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-          Custom Amount
       {/* Custom Amount */}
       <div className="mb-8">
         <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
@@ -242,7 +192,6 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
           </span>
           <input
             type="number"
-            placeholder="Enter amount"
             placeholder="Enter amount"
             value={customAmount}
             onChange={(e) => {
@@ -364,13 +313,6 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
           By donating, you agree to our terms. Donations are tax-deductible and a receipt will be sent to your email.
         </p>
       </div>
-
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        darkMode={darkMode}
-        onLoginSuccess={() => setShowLoginModal(false)}
-      />
 
       <LoginModal
         isOpen={showLoginModal}
