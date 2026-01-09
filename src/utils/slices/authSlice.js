@@ -16,28 +16,36 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    // 🔐 LOGIN / AUTH ONLY
     setCredentials: (state, action) => {
       const identity = action.payload;
 
-      // 1️⃣ Store identity in redux (used everywhere)
       state.userInfo = identity;
-      state.authChecked= true;
-      // 2️⃣ Persist ONLY minimal safe fields
+      state.authChecked = true;
+
       const safePersist = {
         fullName: identity.fullName ?? null,
         email: identity.email ?? null,
         mobileNo: identity.mobileNo ?? null,
       };
 
-      
       state.persistedUser = safePersist;
 
       if (typeof window !== "undefined") {
         localStorage.setItem("userInfo", JSON.stringify(safePersist));
       }
-      
-
     },
+
+    // 🧩 PROFILE / KYC / PARTIAL UPDATES
+    updateUserPartial: (state, action) => {
+      if (!state.userInfo) return;
+
+      state.userInfo = {
+        ...state.userInfo,
+        ...action.payload,
+      };
+    },
+
     setAuthChecked: (state) => {
       state.authChecked = true;
     },
@@ -53,5 +61,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout,setAuthChecked } = authSlice.actions;
+
+export const { setCredentials, logout,setAuthChecked, updateUserPartial } = authSlice.actions;
 export default authSlice.reducer;
