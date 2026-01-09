@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
+
+import { useMemo } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import { getMediaUrl } from '@/utils/media';
@@ -115,8 +117,25 @@ export default function RelatedCampaigns({
               darkMode={darkMode}
             />
           ))}
+        {/* Responsive Grid */}
+        <div
+          className="
+            grid gap-6
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-3
+          "
+        >
+          {relatedCampaigns.map((campaign) => (
+            <CampaignCard
+              key={campaign.slug}
+              campaign={campaign}
+              darkMode={darkMode}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 }
+

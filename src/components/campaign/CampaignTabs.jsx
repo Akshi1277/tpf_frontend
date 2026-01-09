@@ -116,7 +116,9 @@ export default function CampaignTabs({ darkMode, campaign }) {
     } catch (err) {
       console.error("Failed to delete", err);
     }
-  };
+  }, [userInfo, pendingDocsAccess]);
+
+  
 
   return (
     <div className={`${darkMode ? 'bg-zinc-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden`}>
@@ -163,6 +165,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
+          className={`p-6 md:p-8 ${(activeTab === 'documents' || activeTab === 'comments') ? 'min-h-[400px]' : ''}`}
           className={`p-6 md:p-8 ${(activeTab === 'documents' || activeTab === 'comments') ? 'min-h-[400px]' : ''}`}
         >
           {/* ================= ABOUT TAB ================= */}
@@ -272,10 +275,31 @@ export default function CampaignTabs({ darkMode, campaign }) {
                     ))}
                   </div>
                 )}
+                )}
               </div>
 
               {!isAuthenticated && (
+              {!isAuthenticated && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-md bg-black/40 rounded-xl">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-center"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 mx-auto">
+                      <Lock className="w-8 h-8 text-white" />
+                    </div>
+                    <p className="text-white font-semibold text-lg mb-2">Documents Locked</p>
+                    <p className="text-white/80 text-sm mb-4 max-w-xs">
+                      Sign in to access campaign documents and transparency reports
+                    </p>
+                    <button
+                      onClick={handleDocumentsLogin}
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105"
+                    >
+                      Sign In to View
+                    </button>
+                  </motion.div>
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
