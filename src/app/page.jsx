@@ -17,12 +17,13 @@ import StartFundraiserBanner from '@/components/home/FundraiserBanner';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useCMS } from './CMSContext';
+import { useFetchImpactStatsQuery } from '@/utils/slices/campaignApiSlice';
 
 export default function Page() {
   const cms = useCMS()
- 
 
-  
+
+
 
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -36,6 +37,7 @@ export default function Page() {
     return false;
   });
 
+  const { data: statsData } = useFetchImpactStatsQuery();
   const [scrolled, setScrolled] = useState(false);
   const [totalRaised, setTotalRaised] = useState(2547893);
 
@@ -61,11 +63,11 @@ export default function Page() {
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
 
       <section id="hero">
-        <HeroSection darkMode={darkMode}/>
+        <HeroSection darkMode={darkMode} />
       </section>
 
       <section id="impact-stats">
-        <ImpactStatsBar darkMode={darkMode} totalRaised={totalRaised} />
+        <ImpactStatsBar darkMode={darkMode} />
       </section>
 
       <section id="stories">

@@ -21,10 +21,19 @@ export const campaignApiSlice = apiSlice.injectEndpoints({
       ],
     }),
 
+    // ----------------------------------
+    // GET IMPACT STATS (Home page)
+    // ----------------------------------
+    fetchImpactStats: builder.query({
+      query: () => "/campaigns/stats",
+      providesTags: ["Campaign"],
+    }),
+
   }),
 });
 
 export const {
   useFetchCampaignsQuery,
   useFetchCampaignBySlugQuery,
+  useFetchImpactStatsQuery,
 } = campaignApiSlice;

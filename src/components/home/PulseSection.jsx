@@ -1,14 +1,32 @@
-'use client';
 import { currency } from '@/lib/utils';
-import { recentDonations } from '@/lib/constants';
+// import { recentDonations } from '@/lib/constants';
 import { useCMS } from '@/app/CMSContext';
 import { useState, useEffect } from 'react';
 import { getMediaUrl } from '@/utils/media';
+import { useFetchRecentDonationsQuery } from '@/utils/slices/donationApiSlice';
 
 export default function PulseSection({ darkMode, totalRaised }) {
+  const { data: recentData, isLoading: isRecentLoading } = useFetchRecentDonationsQuery();
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
+  };
+
+  const recentDonations = recentData?.donations || [];
+
+  const timeAgo = (dateStr) => {
+    const seconds = Math.floor((new Date() - new Date(dateStr)) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " mins ago";
+    return Math.floor(seconds) + " seconds ago";
   };
   const cms = useCMS();
   const cmsInfluencers = cms.filter(item => item.type === "influencers");
@@ -95,22 +113,22 @@ export default function PulseSection({ darkMode, totalRaised }) {
               <div className="relative z-10 mb-6">
                 <h3 className="text-2xl sm:text-5xl font-bold leading-tight mb-4">
                   <span className={`inline-block transition-all duration-300 hover:scale-105 ${darkMode
-                      ? 'text-emerald-400'
-                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
+                    ? 'text-emerald-400'
+                    : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
                     }`}>
                     Simple.
                   </span>
                   <br />
                   <span className={`inline-block transition-all duration-300 hover:scale-105 ${darkMode
-                      ? 'text-emerald-500'
-                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
+                    ? 'text-emerald-500'
+                    : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
                     }`}>
                     Reliable.
                   </span>
                   <br />
                   <span className={`inline-block transition-all duration-300 hover:scale-105 ${darkMode
-                      ? 'text-emerald-300'
-                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
+                    ? 'text-emerald-300'
+                    : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'
                     }`}>
                     Impactful.
                   </span>
@@ -189,28 +207,34 @@ export default function PulseSection({ darkMode, totalRaised }) {
 
           <div className="max-w-5xl mx-auto">
             {/* MOBILE — horizontal scroll */}
-            <div className="md:hidden relative overflow-x-auto scrollbar-hide flex gap-4 px-2">
-              {recentDonations.map((donation, index) => (
-                <div
-                  key={index}
-                  className={`shrink-0 w-60 p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
-                    } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
-      shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative">
-                    <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
-                      {currency(donation.amount)}
-                    </div>
-                    <div className={`text-xs ${COLORS.neutralBody}`}>
-                      {donation.name}
-                    </div>
-                    <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
-                      {donation.time}
+            <div className="md:hidden relative overflow-x-auto scrollbar-hide flex gap-4 px-2 min-h-[112px]">
+              {isRecentLoading ? (
+                <div className="w-full text-center py-4 text-zinc-500">Loading live donations...</div>
+              ) : recentDonations.length === 0 ? (
+                <div className="w-full text-center py-4 text-zinc-500">No recent donations yet</div>
+              ) : (
+                recentDonations.map((donation, index) => (
+                  <div
+                    key={index}
+                    className={`shrink-0 w-60 p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
+                      } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
+        shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="relative">
+                      <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
+                        {currency(donation.amount)}
+                      </div>
+                      <div className={`text-xs ${COLORS.neutralBody}`}>
+                        {donation.name}
+                      </div>
+                      <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
+                        {timeAgo(donation.time)}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
 
@@ -232,29 +256,35 @@ export default function PulseSection({ darkMode, totalRaised }) {
               </button>
 
               {/* HORIZONTAL TRACK */}
-              <div id="recent-track" className="flex overflow-x-auto scrollbar-hide scroll-smooth">
-                {recentDonations.map((donation, index) => (
-                  <div key={index} className="shrink-0 w-[16.66%] px-2">
-                    <div
-                      className={`relative group p-5 w-full h-28 rounded-xl text-center overflow-hidden transition-all duration-300 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
-                        } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
-          shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="relative">
-                        <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
-                          {currency(donation.amount)}
-                        </div>
-                        <div className={`text-xs ${COLORS.neutralBody}`}>
-                          {donation.name}
-                        </div>
-                        <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
-                          {donation.time}
+              <div id="recent-track" className="flex overflow-x-auto scrollbar-hide scroll-smooth w-full min-h-[112px]">
+                {isRecentLoading ? (
+                  <div className="w-full text-center py-10 text-zinc-500">Loading live donations...</div>
+                ) : recentDonations.length === 0 ? (
+                  <div className="w-full text-center py-10 text-zinc-500">No recent donations yet</div>
+                ) : (
+                  recentDonations.map((donation, index) => (
+                    <div key={index} className="shrink-0 w-[16.66%] px-2">
+                      <div
+                        className={`relative group p-5 w-full h-28 rounded-xl text-center overflow-hidden transition-all duration-300 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
+                          } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
+            shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="relative">
+                          <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
+                            {currency(donation.amount)}
+                          </div>
+                          <div className={`text-xs ${COLORS.neutralBody}`}>
+                            {donation.name}
+                          </div>
+                          <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
+                            {timeAgo(donation.time)}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
 
               {/* RIGHT ARROW */}

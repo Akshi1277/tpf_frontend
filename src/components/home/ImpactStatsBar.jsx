@@ -1,10 +1,18 @@
-// components/home/ImpactStatsBar.jsx
 import { useState, useEffect, useRef } from 'react';
 import StatCounter from '@/components/ui/StatCounter';
+import { useFetchImpactStatsQuery } from '@/utils/slices/campaignApiSlice';
 
-export default function ImpactStatsBar({ darkMode, totalRaised }) {
+export default function ImpactStatsBar({ darkMode }) {
+  const { data: statsData, isLoading } = useFetchImpactStatsQuery();
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef(null);
+
+  const stats = statsData?.stats || {
+    totalRaised: 0,
+    activeCampaigns: 0,
+    totalDonors: 0,
+    livesImpacted: 0
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -28,7 +36,7 @@ export default function ImpactStatsBar({ darkMode, totalRaised }) {
   }, []);
 
   return (
-    <section 
+    <section
       ref={statsRef}
       className={`py-8 border-b relative overflow-hidden ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}
     >
@@ -36,31 +44,31 @@ export default function ImpactStatsBar({ darkMode, totalRaised }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <StatCounter
             label="Total Raised"
-            end={totalRaised}
+            end={stats.totalRaised}
             format="currency"
             darkMode={darkMode}
-            shouldAnimate={statsVisible}
+            shouldAnimate={statsVisible && !isLoading}
           />
           <StatCounter
             label="Active Campaigns"
-            end={150}
+            end={stats.activeCampaigns}
             suffix="+"
             darkMode={darkMode}
-            shouldAnimate={statsVisible}
+            shouldAnimate={statsVisible && !isLoading}
           />
           <StatCounter
             label="Lives Impacted"
-            end={50000}
+            end={stats.livesImpacted}
             suffix="+"
             darkMode={darkMode}
-            shouldAnimate={statsVisible}
+            shouldAnimate={statsVisible && !isLoading}
           />
           <StatCounter
             label="Number Of Donors"
-            end={1000}
+            end={stats.totalDonors}
             suffix="+"
             darkMode={darkMode}
-            shouldAnimate={statsVisible}
+            shouldAnimate={statsVisible && !isLoading}
           />
         </div>
       </div>
