@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 
-import { useMemo } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import { getMediaUrl } from '@/utils/media';
