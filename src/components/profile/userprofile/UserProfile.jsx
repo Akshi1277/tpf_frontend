@@ -1,7 +1,7 @@
 "use client"
 
 import { useSelector, useDispatch } from "react-redux"
-import { setCredentials } from "@/utils/slices/authSlice"
+import { setCredentials, updateUserPartial } from "@/utils/slices/authSlice"
 import { useUpdateProfileMutation } from "@/utils/slices/authApiSlice"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
@@ -96,7 +96,7 @@ export default function ProfilePage({ darkModeFromParent }) {
         dobMonth: user.dob ? String(new Date(user.dob).getMonth() + 1).padStart(2, "0") : "",
         dobYear: user.dob ? String(new Date(user.dob).getFullYear()) : "",
         profession: user.profession || "",
-        address: user?.address?.house || "",
+        address: user?.address || "",
         zakaatAmount: user.zakaatContributor?.amount ?? null
       });
     }
@@ -114,58 +114,39 @@ export default function ProfilePage({ darkModeFromParent }) {
     }
   }
 
-  const handleSaveAll = async () => {
-    try {
-      const payload = {
-        fullName: tempData.fullName,
-        email: tempData.email,
-        bloodGroup: tempData.bloodGroup,
-        gender: tempData.gender || null,
-        dob:
-          tempData.dobYear && tempData.dobMonth && tempData.dobDay
-            ? `${tempData.dobYear}-${tempData.dobMonth}-${tempData.dobDay}`
-            : null,
+const handleSaveAll = async () => {
+  try {
+    const payload = {
+      fullName: tempData.fullName,
+      email: tempData.email,
+      bloodGroup: tempData.bloodGroup,
+      gender: tempData.gender || null,
+      dob:
+        tempData.dobYear && tempData.dobMonth && tempData.dobDay
+          ? `${tempData.dobYear}-${tempData.dobMonth}-${tempData.dobDay}`
+          : null,
+      profession: tempData.profession,
 
-        profession: tempData.profession,
-        address: {
-          house: tempData.address?.split(",")[0] || "",
-          city: tempData.address?.split(",")[1] || "",
-          state: tempData.address?.split(",")[2] || "",
-          pincode: tempData.address?.split(",")[3]?.replace(/\D/g, "") || "",
-        },
-      };
+      // ✅ single string address
+      address: tempData.address || "",
+    };
 
-      const res = await updateProfile(payload).unwrap();
+    const res = await updateProfile(payload).unwrap();
+    dispatch(updateUserPartial(res.user));
 
-      // 🔥 update Redux directly — no need to refetch page
-      dispatch(setCredentials(res.user));
+    setProfileData({
+      ...profileData,
+      address: res.user.address || "",
+    });
 
-      // update UI instantly
-      setProfileData({
-        fullName: res.user.fullName || "",
-        email: res.user.email || "",
-        mobile: res.user.mobileNo || "",
-        bloodGroup: res.user.bloodGroup || "",
-        gender: res.user.gender ?? "",
+    setIsEditMode(false);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+  } catch (err) {
+    alert(err?.data?.message || "Failed to update profile");
+  }
+};
 
-        dobDay: res.user.dob ? new Date(res.user.dob).getDate().toString().padStart(2, "0") : "",
-        dobMonth: res.user.dob ? String(new Date(res.user.dob).getMonth() + 1).padStart(2, "0") : "",
-        dobYear: res.user.dob ? String(new Date(res.user.dob).getFullYear()) : "",
-        profession: res.user.profession || "",
-        address: res.user.address?.house
-          ? `${res.user.address.house}, ${res.user.address.city}, ${res.user.address.state} - ${res.user.address.pincode}`
-          : "",
-        zakaatAmount: res.user.zakaatContributor?.amount ?? null
-      });
-
-
-      setIsEditMode(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2000);
-    } catch (err) {
-      alert(err?.data?.message || "Failed to update profile");
-    }
-  };
 
 
   const handleOpenProfessionModal = () => {
