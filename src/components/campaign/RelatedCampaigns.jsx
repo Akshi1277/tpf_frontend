@@ -135,6 +135,7 @@ export default function RelatedCampaigns({
           ))}
         </div>
       </div>
+      </div>
     </section>
   );
 }

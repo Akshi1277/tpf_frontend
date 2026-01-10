@@ -96,7 +96,7 @@ export default function ProfilePage({ darkModeFromParent }) {
         dobMonth: user.dob ? String(new Date(user.dob).getMonth() + 1).padStart(2, "0") : "",
         dobYear: user.dob ? String(new Date(user.dob).getFullYear()) : "",
         profession: user.profession || "",
-        address: user?.address?.house || "",
+        address: user?.address || "",
         zakaatAmount: user.zakaatContributor?.amount ?? null
       });
     }
