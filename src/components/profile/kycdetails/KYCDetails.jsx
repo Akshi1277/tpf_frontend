@@ -740,48 +740,49 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                 </div>
               </div>
 
-              {/* Address */}
-              <div className={`p-6 rounded-2xl border ${darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
-                }`}>
-                <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                  <MapPin className="w-5 h-5" />
-                  Residential Address
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="sm:col-span-2">
-                    <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                      Address
-                    </p>
-                    <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                      {kyc?.address || "—"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                      City
-                    </p>
-                    <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                      {kyc?.city || "—"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                      State
-                    </p>
-                    <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                      {kyc?.state || "—"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                      Postal Code
-                    </p>
-                    <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                      {kyc?.pincode || "Not provided"}
-                    </p>
-                  </div>
+            {/* Address */}
+            <div className={`p-6 rounded-2xl border ${
+              darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"
+            }`}>
+              <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                <MapPin className="w-5 h-5" />
+                Residential Address
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Address
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.address?.house || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    City
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.kycDetails?.city || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    State
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.kycDetails?.state || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Postal Code
+                  </p>
+                  <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    {userInfo.address?.pincode || "Not provided"}
+                  </p>
                 </div>
               </div>
+            </div>
 
               {/* PAN Details */}
               <div className={`p-6 rounded-2xl border ${darkMode ? "bg-zinc-800/30 border-zinc-700" : "bg-gray-50 border-gray-200"

@@ -77,6 +77,7 @@ export default function ImpactStoryDetailPage() {
     // Loading state
     if (loading) {
         return <GlobalLoader />
+        return <GlobalLoader />
     }
 
     // Error / Not found
