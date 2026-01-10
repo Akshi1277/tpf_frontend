@@ -25,6 +25,7 @@ import {
 import { useFetchMyDonationsQuery } from "@/utils/slices/donationApiSlice"
 import { useSelector } from "react-redux"
 import jsPDF from "jspdf"
+import autoTable from "jspdf-autotable"
 
 export default function DownloadsPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
@@ -186,9 +187,87 @@ export default function DownloadsPage({ darkModeFromParent }) {
     alert(`Downloading Form 10BE for FY ${year}`)
   }
 
-  const handleDownloadInvoice = (txnId) => {
-    alert(`Downloading invoice for transaction ${txnId}`)
-  }
+  const handleDownloadAcknowledgement = async (txn) => {
+    const doc = new jsPDF();
+    const name = userInfo?.fullName || "Valued Donor";
+    const date = new Date(txn.date).toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    // Add Logo placeholder or design
+    doc.setFillColor(16, 185, 129); // Emerald 500
+    doc.rect(0, 0, 210, 40, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.setFont("helvetica", "bold");
+    doc.text("DONATION ACKNOWLEDGEMENT", 105, 25, { align: "center" });
+
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Receipt Number: ${txn.id}`, 190, 50, { align: "right" });
+    doc.text(`Date: ${date}`, 190, 55, { align: "right" });
+
+    doc.setFontSize(12);
+    doc.text("To,", 20, 70);
+    doc.setFont("helvetica", "bold");
+    doc.text(name.toUpperCase(), 20, 78);
+    doc.setFont("helvetica", "normal");
+    doc.text(userInfo?.email || "", 20, 84);
+
+    doc.text("Dear Donor,", 20, 100);
+    doc.text("Thank you for your generous contribution. We deeply appreciate your support towards our cause.", 20, 108);
+
+    autoTable(doc, {
+      startY: 120,
+      head: [['Description', 'Category', 'Mode', 'Amount']],
+      body: [[
+        txn.recipient,
+        txn.cause,
+        txn.paymentMode,
+        `INR ${txn.amount.toLocaleString('en-IN')}`
+      ]],
+      headStyles: { fillColor: [16, 185, 129] },
+      margin: { left: 20, right: 20 }
+    });
+
+    const finalY = doc.lastAutoTable.finalY + 20;
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "italic");
+    doc.text("This is a computer generated acknowledgement and does not require a physical signature.", 105, finalY, { align: "center" });
+
+    doc.setFont("helvetica", "normal");
+    doc.text("The People's Foundation", 105, finalY + 15, { align: "center" });
+    doc.text("www.tpfaid.org", 105, finalY + 22, { align: "center" });
+
+    doc.save(`Acknowledgement_${txn.id}.pdf`);
+  };
+
+  // Helper function to load image and convert to data URL for PDF
+  const getLogoDataUrl = (url) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        resolve({
+          dataUrl: canvas.toDataURL('image/jpeg'),
+          width: img.width,
+          height: img.height
+        });
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  };
 
   const handleDownloadCertificate = async (currentTxn) => {
     // According to user: Date should be the absolute last donation date
@@ -220,53 +299,67 @@ export default function DownloadsPage({ darkModeFromParent }) {
       }
 
       // Text placement adjusted for the provided template layout
-      // The text block is centered on the right white area (roughly X = 195)
+      // The text block is on the right side (centered around X = 200)
       const centerX = 200;
 
-      // 1. "This certificate proudly present to"
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(16);
-      doc.setTextColor(100, 100, 100); // Light grey
-      doc.text("This certificate proudly present to", centerX, 110, { align: "center" });
-
-      // 2. User Name (Large, Bold, Dark)
+      // 1. "CERTIFICATE" heading (large, emerald green, top right)
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(38);
-      doc.setTextColor(60, 60, 67); // Dark navy/grey
-      doc.text(name, centerX, 132, { align: "center" });
+      doc.setFontSize(48);
+      doc.setTextColor(95, 188, 169); // Emerald/teal color matching template
+      doc.text("CERTIFICATE", centerX + 16, 50, { align: "center" });
 
-      // 3. Horizontal Line below name
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.5);
-      doc.line(centerX - 60, 140, centerX + 60, 140);
-
-      // 4. Appreciation Text with Dynamic Date
+      // 2. "of Appreciation" subheading (smaller, grey)
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(13);
+      doc.setFontSize(18);
+      doc.setTextColor(140, 140, 140); // Light grey
+      doc.text("of Appreciation", 230, 62, { align: "left" });
+      // 3. "This certificate proudly present to"
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.setTextColor(120, 120, 120); // Medium grey
+      doc.text("This certificate proudly present to", centerX, 90, { align: "left" });
+
+      // 4. User Name 
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(40);
+      doc.setTextColor(75, 150, 150);
+      doc.text(name, centerX, 112, { align: "center" });
+
+
+
+      // 6. Appreciation Text with Dynamic Date
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
       doc.setTextColor(110, 110, 110);
 
-      const appreciationLine1 = `on ${dateStr} in sincere appreciation of his generous`;
-      const appreciationLine2 = `donation & continued support, which have greatly`;
-      const appreciationLine3 = `contributed to support towards the cause.`;
+      // Line 1: "on [DATE] in sincere appreciation of his generous"
+      const line1Part1 = "on ";
+      const line1Part2 = dateStr;
+      const line1Part3 = " in sincere appreciation of his generous";
 
-      // We need to bold the date part. In jsPDF, we do this by breaking the string.
-      // Calculate starting X for the first part of the line to make the whole line appear centered
-      const textWidthOn = doc.getStringUnitWidth("on ") * doc.internal.getFontSize() / doc.internal.scaleFactor;
-      const textWidthDate = doc.getStringUnitWidth(dateStr) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-      const textWidthRest = doc.getStringUnitWidth(" in sincere appreciation of his generous") * doc.internal.getFontSize() / doc.internal.scaleFactor;
-      const totalWidthLine1 = textWidthOn + textWidthDate + textWidthRest;
-      const startXLine1 = centerX - (totalWidthLine1 / 2);
-
-      doc.text("on ", startXLine1, 152, { align: "left" });
+      // Calculate widths for proper centering
+      doc.setFont("helvetica", "normal");
+      const w1 = doc.getStringUnitWidth(line1Part1) * 14 / doc.internal.scaleFactor;
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(60, 60, 67);
-      doc.text(dateStr, startXLine1 + textWidthOn, 152, { align: "left" });
+      const w2 = doc.getStringUnitWidth(line1Part2) * 14 / doc.internal.scaleFactor;
+      doc.setFont("helvetica", "normal");
+      const w3 = doc.getStringUnitWidth(line1Part3) * 14 / doc.internal.scaleFactor;
+      const totalWidth = w1 + w2 + w3;
+      const startX = centerX - (totalWidth / 3);
+
+      // Render line 1 with bold date
+      doc.setFont("helvetica", "normal");
+      doc.text(line1Part1, startX, 130, { align: "left" });
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(60, 60, 67); // Darker for date
+      doc.text(line1Part2, startX + w1, 130, { align: "left" });
       doc.setFont("helvetica", "normal");
       doc.setTextColor(110, 110, 110);
-      doc.text(" in sincere appreciation of his generous", startXLine1 + textWidthOn + textWidthDate, 152, { align: "left" });
+      doc.text(line1Part3, startX + w1 + w2, 130, { align: "left" });
 
-      doc.text(appreciationLine2, centerX, 160, { align: "center" });
-      doc.text(appreciationLine3, centerX, 168, { align: "center" });
+      // Line 2 & 3: Centered
+      doc.text("donation & continued support, which have greatly", startX + w1 + 2, 140, { align: "left" });
+      doc.text("contributed to support towards the cause.", startX + w2 + 3, 150, { align: "left" });
 
       doc.save(`Appreciation_Certificate_${name.replace(/\s+/g, '_')}.pdf`);
     } catch (error) {
@@ -563,22 +656,37 @@ export default function DownloadsPage({ darkModeFromParent }) {
                     </h2>
                     <p className={`text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
                       }`}>
-                      Download invoices for your donations
+                      Download acknowledgement for your donations
                     </p>
                   </div>
                 </div>
 
                 {pagination.totalDonations > 0 && (
-                  <button
-                    onClick={handleDownloadAllInvoices}
-                    className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
-                      ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                  >
-                    <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                    Download All ({pagination.totalDonations})
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <button
+                      onClick={handleDownloadAllInvoices}
+                      className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                        ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
+                    >
+                      <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                      Download All ({pagination.totalDonations})
+                    </button>
+
+                    <button
+                      onClick={() => handleDownloadCertificate(donations[0])}
+                      disabled={!stats?.lastDonationDate}
+                      className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                        ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 disabled:opacity-50"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+                        }`}
+                    >
+                      <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="hidden sm:inline">Download Certificate</span>
+                      <span className="sm:hidden">Certificate</span>
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -865,20 +973,10 @@ export default function DownloadsPage({ darkModeFromParent }) {
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleDownloadCertificate(txn)}
-                            title="Download Appreciation Certificate"
-                            className={`p-2.5 sm:p-3 rounded-lg transition-all flex-shrink-0 ${darkMode
-                              ? "bg-zinc-700 hover:bg-emerald-500/20 text-zinc-400 hover:text-emerald-400"
-                              : "bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-600"
-                              }`}
-                          >
-                            <Award className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </button>
 
                           <button
-                            onClick={() => handleDownloadInvoice(txn.id)}
-                            title="Download Invoice"
+                            onClick={() => handleDownloadAcknowledgement(txn)}
+                            title="Download Acknowledgement"
                             className={`p-2.5 sm:p-3 rounded-lg transition-all flex-shrink-0 ${darkMode
                               ? "bg-zinc-700 hover:bg-emerald-500/20 text-zinc-400 hover:text-emerald-400"
                               : "bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-600"
