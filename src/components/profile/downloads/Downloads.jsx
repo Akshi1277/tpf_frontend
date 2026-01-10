@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import { 
+import {
   Download,
   FileText,
   Receipt,
@@ -15,21 +15,32 @@ import {
   X,
   FileCheck,
   Clock,
-  ArrowRight
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Award,
+  FileBadge
 } from "lucide-react"
+import { useFetchMyDonationsQuery } from "@/utils/slices/donationApiSlice"
+import { useSelector } from "react-redux"
+import jsPDF from "jspdf"
 
 export default function DownloadsPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
+  const { userInfo } = useSelector((state) => state.auth)
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
       setDarkMode(darkModeFromParent)
     }
   }, [darkModeFromParent])
-  
+
   // Form 10BE State
   const [selectedFinancialYear, setSelectedFinancialYear] = useState("2024-25")
-  
+
+  const [currentPage, setCurrentPage] = useState(1)
+
   // Invoice Filters State
   const [invoiceFilters, setInvoiceFilters] = useState({
     search: "",
@@ -39,7 +50,18 @@ export default function DownloadsPage({ darkModeFromParent }) {
     customEndDate: "",
     show80GOnly: false
   })
-  
+
+  // Fetch real transactions
+  const { data: myDonationsData, isLoading, isFetching } = useFetchMyDonationsQuery({
+    page: currentPage,
+    limit: 5,
+    ...invoiceFilters
+  })
+
+  const donations = myDonationsData?.donations || []
+  const pagination = myDonationsData?.pagination || { currentPage: 1, totalPages: 1, totalDonations: 0 }
+  const stats = myDonationsData?.stats || { totalFilteredAmount: 0, total80GAmount: 0, eligibleDonationsCount: 0 }
+
   const [showCustomDateRange, setShowCustomDateRange] = useState(false)
 
   // Mock Data - Form 10BE Receipts
@@ -160,73 +182,6 @@ export default function DownloadsPage({ darkModeFromParent }) {
     { value: "custom", label: "Custom Range" }
   ]
 
-  // Filter transactions based on selected filters
-  const getFilteredTransactions = () => {
-    let filtered = allTransactions
-
-    // 80G filter
-    if (invoiceFilters.show80GOnly) {
-      filtered = filtered.filter(txn => txn.eligible80G)
-    }
-
-    // Search filter
-    if (invoiceFilters.search) {
-      filtered = filtered.filter(txn =>
-        txn.recipient.toLowerCase().includes(invoiceFilters.search.toLowerCase()) ||
-        txn.cause.toLowerCase().includes(invoiceFilters.search.toLowerCase()) ||
-        txn.id.toLowerCase().includes(invoiceFilters.search.toLowerCase())
-      )
-    }
-
-    // Donation type filter
-    if (invoiceFilters.donationType !== "all") {
-      filtered = filtered.filter(txn => txn.donationType === invoiceFilters.donationType)
-    }
-
-    // Date filter
-    if (invoiceFilters.dateFilter !== "all") {
-      const now = new Date()
-      const filterDate = (dateStr) => {
-        const txnDate = new Date(dateStr)
-        
-        switch(invoiceFilters.dateFilter) {
-          case "last-month":
-            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-            return txnDate >= lastMonth
-          case "last-3-months":
-            const last3Months = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
-            return txnDate >= last3Months
-          case "last-6-months":
-            const last6Months = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
-            return txnDate >= last6Months
-          case "last-year":
-            const lastYear = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
-            return txnDate >= lastYear
-          case "current-year":
-            const currentYear = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-            return txnDate >= currentYear
-          case "custom":
-            if (invoiceFilters.customStartDate && invoiceFilters.customEndDate) {
-              const startDate = new Date(invoiceFilters.customStartDate)
-              const endDate = new Date(invoiceFilters.customEndDate)
-              return txnDate >= startDate && txnDate <= endDate
-            }
-            return true
-          default:
-            return true
-        }
-      }
-      
-      filtered = filtered.filter(txn => filterDate(txn.date))
-    }
-
-    return filtered
-  }
-
-  const filteredTransactions = getFilteredTransactions()
-  const totalFilteredAmount = filteredTransactions.reduce((sum, txn) => sum + txn.amount, 0)
-  const total80GAmount = filteredTransactions.filter(txn => txn.eligible80G).reduce((sum, txn) => sum + txn.amount, 0)
-
   const handleDownload10BE = (year) => {
     alert(`Downloading Form 10BE for FY ${year}`)
   }
@@ -235,8 +190,146 @@ export default function DownloadsPage({ darkModeFromParent }) {
     alert(`Downloading invoice for transaction ${txnId}`)
   }
 
-  const handleDownloadAllInvoices = () => {
-    alert(`Downloading ${filteredTransactions.length} invoices as ZIP`)
+  const handleDownloadCertificate = async (currentTxn) => {
+    // According to user: Date should be the absolute last donation date
+    const lastDate = stats?.lastDonationDate || currentTxn.date;
+    const dateStr = new Date(lastDate).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).replace(/\//g, '.')
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    })
+
+    const name = userInfo?.fullName?.toUpperCase() || "VALUED DONOR"
+
+    try {
+      // Load the template image
+      const templateData = await getLogoDataUrl('/Certificate_Of_Achievement.jpg');
+      if (templateData) {
+        doc.addImage(templateData.dataUrl, 'JPEG', 0, 0, 297, 210);
+      } else {
+        // Fallback to simple design if image fails
+        doc.setDrawColor(16, 185, 129);
+        doc.setLineWidth(1);
+        doc.rect(5, 5, 287, 200);
+      }
+
+      // Text placement adjusted for the provided template layout
+      // The text block is centered on the right white area (roughly X = 195)
+      const centerX = 200;
+
+      // 1. "This certificate proudly present to"
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(16);
+      doc.setTextColor(100, 100, 100); // Light grey
+      doc.text("This certificate proudly present to", centerX, 110, { align: "center" });
+
+      // 2. User Name (Large, Bold, Dark)
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(38);
+      doc.setTextColor(60, 60, 67); // Dark navy/grey
+      doc.text(name, centerX, 132, { align: "center" });
+
+      // 3. Horizontal Line below name
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.line(centerX - 60, 140, centerX + 60, 140);
+
+      // 4. Appreciation Text with Dynamic Date
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(13);
+      doc.setTextColor(110, 110, 110);
+
+      const appreciationLine1 = `on ${dateStr} in sincere appreciation of his generous`;
+      const appreciationLine2 = `donation & continued support, which have greatly`;
+      const appreciationLine3 = `contributed to support towards the cause.`;
+
+      // We need to bold the date part. In jsPDF, we do this by breaking the string.
+      // Calculate starting X for the first part of the line to make the whole line appear centered
+      const textWidthOn = doc.getStringUnitWidth("on ") * doc.internal.getFontSize() / doc.internal.scaleFactor;
+      const textWidthDate = doc.getStringUnitWidth(dateStr) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+      const textWidthRest = doc.getStringUnitWidth(" in sincere appreciation of his generous") * doc.internal.getFontSize() / doc.internal.scaleFactor;
+      const totalWidthLine1 = textWidthOn + textWidthDate + textWidthRest;
+      const startXLine1 = centerX - (totalWidthLine1 / 2);
+
+      doc.text("on ", startXLine1, 152, { align: "left" });
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(60, 60, 67);
+      doc.text(dateStr, startXLine1 + textWidthOn, 152, { align: "left" });
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(110, 110, 110);
+      doc.text(" in sincere appreciation of his generous", startXLine1 + textWidthOn + textWidthDate, 152, { align: "left" });
+
+      doc.text(appreciationLine2, centerX, 160, { align: "center" });
+      doc.text(appreciationLine3, centerX, 168, { align: "center" });
+
+      doc.save(`Appreciation_Certificate_${name.replace(/\s+/g, '_')}.pdf`);
+    } catch (error) {
+      console.error("Certificate generation failed:", error);
+      alert("Failed to generate certificate. Please check if the template image exists.");
+    }
+  }
+
+  const handleDownloadAllInvoices = async () => {
+    try {
+      const queryParams = new URLSearchParams({
+        ...invoiceFilters,
+        download: "true",
+        status: "SUCCESS"
+      })
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/my-donations?${queryParams.toString()}`, {
+        credentials: "include"
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        // Simple CSV escape function
+        const escapeCSV = (str) => {
+          if (str === null || str === undefined) return "";
+          str = String(str);
+          if (str.includes(",") || str.includes("\"") || str.includes("\n")) {
+            return `"${str.replace(/"/g, '""')}"`;
+          }
+          return str;
+        };
+
+        const headers = ["Transaction ID", "Recipient", "Cause", "Amount", "Date", "Donation Type", "Tax Eligible", "Payment Mode"];
+        const rows = data.donations.map(d => [
+          d.id,
+          d.recipient,
+          d.cause,
+          d.amount,
+          new Date(d.date).toLocaleDateString('en-IN'),
+          d.donationType,
+          d.taxEligible ? "Yes" : "No",
+          d.paymentMode
+        ]);
+
+        const csvContent = [
+          headers.join(","),
+          ...rows.map(r => r.map(escapeCSV).join(","))
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `TPF_Donations_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (error) {
+      console.error("CSV Download failed:", error);
+      alert("Failed to download CSV. Please try again.");
+    }
   }
 
   const resetFilters = () => {
@@ -248,6 +341,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
       customEndDate: "",
       show80GOnly: false
     })
+    setCurrentPage(1)
     setShowCustomDateRange(false)
   }
 
@@ -279,12 +373,11 @@ export default function DownloadsPage({ darkModeFromParent }) {
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-gradient-to-br from-emerald-50 via-white to-teal-50"}`}>
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div 
-          className={`absolute inset-0 ${
-            darkMode 
-              ? "bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.02)_1px,transparent_1px)]" 
-              : "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
-          }`}
+        <div
+          className={`absolute inset-0 ${darkMode
+            ? "bg-[linear-gradient(rgba(16,185,129,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.02)_1px,transparent_1px)]"
+            : "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
+            }`}
           style={{ backgroundSize: '48px 48px' }}
         />
         <div className="absolute top-20 right-10 w-72 h-72 bg-emerald-400/10 rounded-full blur-3xl" />
@@ -293,7 +386,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
       {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 lg:pt-20 pb-12 sm:pb-16 lg:pb-24">
-        
+
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -307,29 +400,25 @@ export default function DownloadsPage({ darkModeFromParent }) {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="inline-flex items-center justify-center mb-4 sm:mb-6"
           >
-            <div className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl ${
-              darkMode 
-                ? "bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30" 
-                : "bg-gradient-to-br from-emerald-500 to-teal-500 shadow-xl"
-            }`}>
-              <Download className={`w-12 h-12 sm:w-16 sm:h-16 ${
-                darkMode ? "text-emerald-400" : "text-white"
-              }`} />
+            <div className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl ${darkMode
+              ? "bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30"
+              : "bg-gradient-to-br from-emerald-500 to-teal-500 shadow-xl"
+              }`}>
+              <Download className={`w-12 h-12 sm:w-16 sm:h-16 ${darkMode ? "text-emerald-400" : "text-white"
+                }`} />
             </div>
           </motion.div>
 
-          <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 px-4 ${
-            darkMode ? "text-white" : "text-gray-900"
-          }`}>
+          <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 px-4 ${darkMode ? "text-white" : "text-gray-900"
+            }`}>
             Downloads &{" "}
             <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
               Receipts
             </span>
           </h1>
-          
-          <p className={`text-base sm:text-lg lg:text-xl max-w-3xl mx-auto px-4 ${
-            darkMode ? "text-zinc-400" : "text-gray-600"
-          }`}>
+
+          <p className={`text-base sm:text-lg lg:text-xl max-w-3xl mx-auto px-4 ${darkMode ? "text-zinc-400" : "text-gray-600"
+            }`}>
             Access your Form 10BE certificates and transaction invoices anytime
           </p>
         </motion.div>
@@ -341,29 +430,24 @@ export default function DownloadsPage({ darkModeFromParent }) {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mb-8 sm:mb-12"
         >
-          <div className={`rounded-xl sm:rounded-2xl border overflow-hidden ${
-            darkMode 
-              ? "bg-zinc-800/50 border-zinc-700" 
-              : "bg-white border-gray-200 shadow-lg"
-          }`}>
-            <div className={`p-4 sm:p-6 border-b ${
-              darkMode ? "border-zinc-700" : "border-gray-200"
+          <div className={`rounded-xl sm:rounded-2xl border overflow-hidden ${darkMode
+            ? "bg-zinc-800/50 border-zinc-700"
+            : "bg-white border-gray-200 shadow-lg"
             }`}>
+            <div className={`p-4 sm:p-6 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"
+              }`}>
               <div className="flex items-center gap-3 mb-2">
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${
-                  darkMode ? "bg-emerald-500/20" : "bg-emerald-100"
-                }`}>
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${darkMode ? "bg-emerald-500/20" : "bg-emerald-100"
+                  }`}>
                   <FileText className="w-5 h-5 sm:w-7 sm:h-7 text-emerald-600" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className={`text-lg sm:text-xl lg:text-2xl font-bold truncate ${
-                    darkMode ? "text-white" : "text-gray-900"
-                  }`}>
+                  <h2 className={`text-lg sm:text-xl lg:text-2xl font-bold truncate ${darkMode ? "text-white" : "text-gray-900"
+                    }`}>
                     Form 10BE Receipts
                   </h2>
-                  <p className={`text-xs sm:text-sm ${
-                    darkMode ? "text-zinc-400" : "text-gray-600"
-                  }`}>
+                  <p className={`text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
+                    }`}>
                     Official tax exemption certificates
                   </p>
                 </div>
@@ -378,17 +462,15 @@ export default function DownloadsPage({ darkModeFromParent }) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-                    className={`p-4 sm:p-6 rounded-xl border ${
-                      darkMode
-                        ? "bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50"
-                        : "bg-gray-50 border-gray-200 hover:border-emerald-400"
-                    } transition-all`}
+                    className={`p-4 sm:p-6 rounded-xl border ${darkMode
+                      ? "bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50"
+                      : "bg-gray-50 border-gray-200 hover:border-emerald-400"
+                      } transition-all`}
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className={`text-lg sm:text-xl font-bold mb-1 ${
-                          darkMode ? "text-white" : "text-gray-900"
-                        }`}>
+                        <h3 className={`text-lg sm:text-xl font-bold mb-1 ${darkMode ? "text-white" : "text-gray-900"
+                          }`}>
                           FY {receipt.year}
                         </h3>
                         <div className="flex items-center gap-2">
@@ -402,29 +484,24 @@ export default function DownloadsPage({ darkModeFromParent }) {
                     </div>
 
                     <div className="space-y-2 sm:space-y-3 mb-4">
-                      <div className={`flex justify-between text-xs sm:text-sm ${
-                        darkMode ? "text-zinc-400" : "text-gray-600"
-                      }`}>
-                        <span>Total Amount:</span>
-                        <span className={`font-bold ${
-                          darkMode ? "text-white" : "text-gray-900"
+                      <div className={`flex justify-between text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
                         }`}>
+                        <span>Total Amount:</span>
+                        <span className={`font-bold ${darkMode ? "text-white" : "text-gray-900"
+                          }`}>
                           ₹{receipt.totalAmount.toLocaleString('en-IN')}
                         </span>
                       </div>
-                      <div className={`flex justify-between text-xs sm:text-sm ${
-                        darkMode ? "text-zinc-400" : "text-gray-600"
-                      }`}>
-                        <span>Donations:</span>
-                        <span className={`font-semibold ${
-                          darkMode ? "text-white" : "text-gray-900"
+                      <div className={`flex justify-between text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
                         }`}>
+                        <span>Donations:</span>
+                        <span className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"
+                          }`}>
                           {receipt.transactionCount}
                         </span>
                       </div>
-                      <div className={`flex justify-between text-xs sm:text-sm ${
-                        darkMode ? "text-zinc-400" : "text-gray-600"
-                      }`}>
+                      <div className={`flex justify-between text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
+                        }`}>
                         <span>Issue Date:</span>
                         <span className={darkMode ? "text-zinc-300" : "text-gray-700"}>
                           {new Date(receipt.issueDate).toLocaleDateString('en-IN', {
@@ -438,11 +515,10 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
                     <button
                       onClick={() => handleDownload10BE(receipt.year)}
-                      className={`w-full py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${
-                        darkMode
-                          ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                          : "bg-emerald-600 text-white hover:bg-emerald-700"
-                      }`}
+                      className={`w-full py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                        ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700"
+                        }`}
                     >
                       <Download className="w-4 h-4 sm:w-5 sm:h-5" />
                       Download Receipt
@@ -451,12 +527,10 @@ export default function DownloadsPage({ darkModeFromParent }) {
                 ))}
               </div>
 
-              <div className={`mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg sm:rounded-xl ${
-                darkMode ? "bg-blue-500/10 border border-blue-500/30" : "bg-blue-50 border border-blue-200"
-              }`}>
-                <p className={`text-xs sm:text-sm ${
-                  darkMode ? "text-blue-400" : "text-blue-700"
+              <div className={`mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg sm:rounded-xl ${darkMode ? "bg-blue-500/10 border border-blue-500/30" : "bg-blue-50 border border-blue-200"
                 }`}>
+                <p className={`text-xs sm:text-sm ${darkMode ? "text-blue-400" : "text-blue-700"
+                  }`}>
                   <strong>Note:</strong> Form 10BE certificates are issued after the financial year ends and are available for download within 60 days.
                 </p>
               </div>
@@ -470,89 +544,75 @@ export default function DownloadsPage({ darkModeFromParent }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <div className={`rounded-xl sm:rounded-2xl border overflow-hidden ${
-            darkMode 
-              ? "bg-zinc-800/50 border-zinc-700" 
-              : "bg-white border-gray-200 shadow-lg"
-          }`}>
-            <div className={`p-4 sm:p-6 border-b ${
-              darkMode ? "border-zinc-700" : "border-gray-200"
+          <div className={`rounded-xl sm:rounded-2xl border overflow-hidden ${darkMode
+            ? "bg-zinc-800/50 border-zinc-700"
+            : "bg-white border-gray-200 shadow-lg"
             }`}>
+            <div className={`p-4 sm:p-6 border-b ${darkMode ? "border-zinc-700" : "border-gray-200"
+              }`}>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    darkMode ? "bg-blue-500/20" : "bg-blue-100"
-                  }`}>
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 ${darkMode ? "bg-blue-500/20" : "bg-blue-100"
+                    }`}>
                     <Receipt className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
                   </div>
                   <div className="min-w-0">
-                    <h2 className={`text-lg sm:text-xl lg:text-2xl font-bold truncate ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}>
+                    <h2 className={`text-lg sm:text-xl lg:text-2xl font-bold truncate ${darkMode ? "text-white" : "text-gray-900"
+                      }`}>
                       Transaction Invoices
                     </h2>
-                    <p className={`text-xs sm:text-sm ${
-                      darkMode ? "text-zinc-400" : "text-gray-600"
-                    }`}>
+                    <p className={`text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
+                      }`}>
                       Download invoices for your donations
                     </p>
                   </div>
                 </div>
 
-                {filteredTransactions.length > 0 && (
+                {pagination.totalDonations > 0 && (
                   <button
                     onClick={handleDownloadAllInvoices}
-                    className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${
-                      darkMode
-                        ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
+                    className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                      ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                      }`}
                   >
                     <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                    Download All ({filteredTransactions.length})
+                    Download All ({pagination.totalDonations})
                   </button>
                 )}
               </div>
 
               {/* Summary Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-                <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${
-                  darkMode ? "bg-zinc-900/50 border-zinc-700" : "bg-gray-50 border-gray-200"
-                }`}>
-                  <p className={`text-xs font-medium mb-1 ${
-                    darkMode ? "text-zinc-400" : "text-gray-600"
+                <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${darkMode ? "bg-zinc-900/50 border-zinc-700" : "bg-gray-50 border-gray-200"
                   }`}>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"
+                    }`}>
                     Filtered Total
                   </p>
-                  <p className={`text-xl sm:text-2xl font-bold ${
-                    darkMode ? "text-white" : "text-gray-900"
-                  }`}>
-                    ₹{totalFilteredAmount.toLocaleString('en-IN')}
+                  <p className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-white" : "text-gray-900"
+                    }`}>
+                    ₹{stats.totalFilteredAmount.toLocaleString('en-IN')}
                   </p>
-                  <p className={`text-xs mt-1 ${
-                    darkMode ? "text-zinc-500" : "text-gray-500"
-                  }`}>
-                    {filteredTransactions.length} {filteredTransactions.length === 1 ? 'invoice' : 'invoices'}
+                  <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-gray-500"
+                    }`}>
+                    {pagination.totalDonations} {pagination.totalDonations === 1 ? 'invoice' : 'invoices'}
                   </p>
                 </div>
 
-                <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${
-                  darkMode ? "bg-emerald-900/20 border-emerald-700/50" : "bg-emerald-50 border-emerald-200"
-                }`}>
-                  <p className={`text-xs font-medium mb-1 ${
-                    darkMode ? "text-emerald-400" : "text-emerald-700"
+                <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${darkMode ? "bg-emerald-900/20 border-emerald-700/50" : "bg-emerald-50 border-emerald-200"
                   }`}>
+                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-emerald-400" : "text-emerald-700"
+                    }`}>
                     80G Eligible Amount
                   </p>
-                  <p className={`text-xl sm:text-2xl font-bold ${
-                    darkMode ? "text-emerald-400" : "text-emerald-600"
-                  }`}>
-                    ₹{total80GAmount.toLocaleString('en-IN')}
+                  <p className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-emerald-400" : "text-emerald-600"
+                    }`}>
+                    ₹{stats.total80GAmount.toLocaleString('en-IN')}
                   </p>
-                  <p className={`text-xs mt-1 ${
-                    darkMode ? "text-emerald-500" : "text-emerald-600"
-                  }`}>
-                    {filteredTransactions.filter(txn => txn.eligible80G).length} eligible donations
+                  <p className={`text-xs mt-1 ${darkMode ? "text-emerald-500" : "text-emerald-600"
+                    }`}>
+                    {stats.eligibleDonationsCount} eligible donations
                   </p>
                 </div>
               </div>
@@ -562,40 +622,40 @@ export default function DownloadsPage({ darkModeFromParent }) {
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   {/* Search */}
                   <div className="flex-1 relative">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${
-                      darkMode ? "text-zinc-500" : "text-gray-400"
-                    }`} />
+                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                      }`} />
                     <input
                       type="text"
                       value={invoiceFilters.search}
-                      onChange={(e) => setInvoiceFilters({...invoiceFilters, search: e.target.value})}
+                      onChange={(e) => setInvoiceFilters({ ...invoiceFilters, search: e.target.value })}
                       placeholder="Search..."
-                      className={`w-full pl-9 sm:pl-11 pr-4 py-2.5 rounded-lg border outline-none transition-all text-sm sm:text-base ${
-                        darkMode
-                          ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500 focus:border-emerald-500"
-                          : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                      }`}
+                      className={`w-full pl-9 sm:pl-11 pr-4 py-2.5 rounded-lg border outline-none transition-all text-sm sm:text-base ${darkMode
+                        ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500 focus:border-emerald-500"
+                        : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+                        }`}
                     />
                   </div>
 
                   {/* Donation Type Filter */}
                   <div className="relative">
-                    <Filter className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${
-                      darkMode ? "text-zinc-500" : "text-gray-400"
-                    }`} />
+                    <Filter className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                      }`} />
                     <select
                       value={invoiceFilters.donationType}
-                      onChange={(e) => setInvoiceFilters({...invoiceFilters, donationType: e.target.value})}
-                      className={`pl-9 sm:pl-11 pr-8 py-2.5 rounded-lg border outline-none transition-all appearance-none cursor-pointer text-sm sm:text-base ${
-                        darkMode
-                          ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
-                          : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
-                      }`}
+                      onChange={(e) => {
+                        setInvoiceFilters({ ...invoiceFilters, donationType: e.target.value })
+                        setCurrentPage(1)
+                      }}
+                      className={`pl-9 sm:pl-11 pr-8 py-2.5 rounded-lg border outline-none transition-all appearance-none cursor-pointer text-sm sm:text-base ${darkMode
+                        ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
+                        : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
+                        }`}
                     >
                       <option value="all">All Types</option>
                       <option value="zakat">Zakaat</option>
                       <option value="sadaqah">Sadaqah</option>
-                      <option value="imdaad">Imdaad</option>
+                      <option value="lillah">Lillah</option>
+                      <option value="imdad">Imdaad</option>
                     </select>
                   </div>
                 </div>
@@ -604,16 +664,15 @@ export default function DownloadsPage({ darkModeFromParent }) {
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                   {/* 80G Toggle Button */}
                   <button
-                    onClick={() => setInvoiceFilters({...invoiceFilters, show80GOnly: !invoiceFilters.show80GOnly})}
-                    className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2 ${
-                      invoiceFilters.show80GOnly
-                        ? darkMode
-                          ? "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/50"
-                          : "bg-emerald-500 text-white border-2 border-emerald-600"
-                        : darkMode
+                    onClick={() => setInvoiceFilters({ ...invoiceFilters, show80GOnly: !invoiceFilters.show80GOnly })}
+                    className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2 ${invoiceFilters.show80GOnly
+                      ? darkMode
+                        ? "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/50"
+                        : "bg-emerald-500 text-white border-2 border-emerald-600"
+                      : darkMode
                         ? "bg-zinc-700 text-zinc-400 border-2 border-zinc-600 hover:border-emerald-500/50"
                         : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-emerald-500/50"
-                    }`}
+                      }`}
                   >
                     <Shield className="w-4 h-4" />
                     80G Only
@@ -623,18 +682,18 @@ export default function DownloadsPage({ darkModeFromParent }) {
                     <button
                       key={filter.value}
                       onClick={() => {
-                        setInvoiceFilters({...invoiceFilters, dateFilter: filter.value})
+                        setInvoiceFilters({ ...invoiceFilters, dateFilter: filter.value })
+                        setCurrentPage(1)
                         setShowCustomDateRange(filter.value === "custom")
                       }}
-                      className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all whitespace-nowrap ${
-                        invoiceFilters.dateFilter === filter.value
-                          ? darkMode
-                            ? "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/50"
-                            : "bg-emerald-500 text-white border-2 border-emerald-600"
-                          : darkMode
+                      className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all whitespace-nowrap ${invoiceFilters.dateFilter === filter.value
+                        ? darkMode
+                          ? "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/50"
+                          : "bg-emerald-500 text-white border-2 border-emerald-600"
+                        : darkMode
                           ? "bg-zinc-700 text-zinc-400 border-2 border-zinc-600 hover:border-emerald-500/50"
                           : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-emerald-500/50"
-                      }`}
+                        }`}
                     >
                       {filter.label}
                     </button>
@@ -643,11 +702,10 @@ export default function DownloadsPage({ darkModeFromParent }) {
                   {(invoiceFilters.search || invoiceFilters.donationType !== "all" || invoiceFilters.dateFilter !== "all" || invoiceFilters.show80GOnly) && (
                     <button
                       onClick={resetFilters}
-                      className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2 ${
-                        darkMode
-                          ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                          : "bg-red-100 text-red-600 hover:bg-red-200"
-                      }`}
+                      className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2 ${darkMode
+                        ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                        : "bg-red-100 text-red-600 hover:bg-red-200"
+                        }`}
                     >
                       <X className="w-4 h-4" />
                       Clear
@@ -661,43 +719,38 @@ export default function DownloadsPage({ darkModeFromParent }) {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${
-                      darkMode ? "bg-zinc-900/50 border-zinc-700" : "bg-gray-50 border-gray-200"
-                    }`}
+                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${darkMode ? "bg-zinc-900/50 border-zinc-700" : "bg-gray-50 border-gray-200"
+                      }`}
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div>
-                        <label className={`block text-xs sm:text-sm font-medium mb-2 ${
-                          darkMode ? "text-zinc-400" : "text-gray-700"
-                        }`}>
+                        <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-400" : "text-gray-700"
+                          }`}>
                           Start Date
                         </label>
                         <input
                           type="date"
                           value={invoiceFilters.customStartDate}
-                          onChange={(e) => setInvoiceFilters({...invoiceFilters, customStartDate: e.target.value})}
-                          className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border outline-none transition-all text-sm sm:text-base ${
-                            darkMode
-                              ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
-                              : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
-                          }`}
+                          onChange={(e) => setInvoiceFilters({ ...invoiceFilters, customStartDate: e.target.value })}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border outline-none transition-all text-sm sm:text-base ${darkMode
+                            ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
+                            : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
+                            }`}
                         />
                       </div>
                       <div>
-                        <label className={`block text-xs sm:text-sm font-medium mb-2 ${
-                          darkMode ? "text-zinc-400" : "text-gray-700"
-                        }`}>
+                        <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-400" : "text-gray-700"
+                          }`}>
                           End Date
                         </label>
                         <input
                           type="date"
                           value={invoiceFilters.customEndDate}
-                          onChange={(e) => setInvoiceFilters({...invoiceFilters, customEndDate: e.target.value})}
-                          className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border outline-none transition-all text-sm sm:text-base ${
-                            darkMode
-                              ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
-                              : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
-                          }`}
+                          onChange={(e) => setInvoiceFilters({ ...invoiceFilters, customEndDate: e.target.value })}
+                          className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg border outline-none transition-all text-sm sm:text-base ${darkMode
+                            ? "bg-zinc-700 border-zinc-600 text-white focus:border-emerald-500"
+                            : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
+                            }`}
                         />
                       </div>
                     </div>
@@ -707,96 +760,94 @@ export default function DownloadsPage({ darkModeFromParent }) {
             </div>
 
             {/* Transaction List */}
-            <div className={`divide-y ${darkMode ? "divide-zinc-800" : "divide-zinc-100"}`}>
-              {filteredTransactions.length === 0 ? (
-                <div className="p-8 sm:p-12 text-center">
-                  <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
-                    darkMode ? "bg-zinc-700" : "bg-gray-100"
-                  }`}>
-                    <FileCheck className={`w-6 h-6 sm:w-8 sm:h-8 ${
-                      darkMode ? "text-zinc-500" : "text-gray-400"
-                    }`} />
+            <div className={`divide-y relative ${darkMode ? "divide-zinc-800" : "divide-zinc-100"}`}>
+              {/* Loading Overlay */}
+              {(isLoading || isFetching) && (
+                <div className={`absolute inset-0 z-20 flex items-center justify-center ${darkMode ? "bg-zinc-900/40" : "bg-white/40"} backdrop-blur-[2px]`}>
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                    <p className={`text-xs font-medium ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>Loading transactions...</p>
                   </div>
-                  <p className={`text-base sm:text-lg font-medium mb-1 ${
-                    darkMode ? "text-white" : "text-gray-900"
-                  }`}>
+                </div>
+              )}
+
+              {donations.length === 0 && !isLoading && !isFetching ? (
+                <div className="p-8 sm:p-12 text-center">
+                  <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${darkMode ? "bg-zinc-700" : "bg-gray-100"
+                    }`}>
+                    <FileCheck className={`w-6 h-6 sm:w-8 sm:h-8 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                      }`} />
+                  </div>
+                  <p className={`text-base sm:text-lg font-medium mb-1 ${darkMode ? "text-white" : "text-gray-900"
+                    }`}>
                     No invoices found
                   </p>
-                  <p className={`text-xs sm:text-sm ${
-                    darkMode ? "text-zinc-400" : "text-gray-600"
-                  }`}>
+                  <p className={`text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
+                    }`}>
                     Try adjusting your filters
                   </p>
                 </div>
               ) : (
-                filteredTransactions.map((txn, index) => (
+                donations.map((txn, index) => (
                   <motion.div
                     key={txn.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className={`p-3 sm:p-4 lg:p-5 transition-all group ${
-                      darkMode ? "hover:bg-zinc-700/30" : "hover:bg-gray-50"
-                    }`}
+                    className={`p-3 sm:p-4 lg:p-5 transition-all group ${darkMode ? "hover:bg-zinc-700/30" : "hover:bg-gray-50"
+                      }`}
                   >
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                       {/* Icon */}
-                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110 ${
-                        getTypeBg(txn.color)
-                      }`}>
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110 ${getTypeBg(txn.color)
+                        }`}>
                         <Wallet className={`w-5 h-5 sm:w-6 sm:h-6 ${getTypeColor(txn.color)}`} />
                       </div>
 
                       {/* Details */}
                       <div className="flex-1 min-w-0 w-full sm:w-auto">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <h3 className={`font-semibold text-sm sm:text-base truncate ${
-                            darkMode ? "text-white" : "text-gray-900"
-                          }`}>
+                          <h3 className={`font-semibold text-sm sm:text-base truncate ${darkMode ? "text-white" : "text-gray-900"
+                            }`}>
                             {txn.recipient}
                           </h3>
-                          {txn.eligible80G && (
-                            <div className={`px-2 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1 flex-shrink-0 ${
-                              darkMode ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-700"
-                            }`}>
+                          {txn.taxEligible && (
+                            <div className={`px-2 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1 flex-shrink-0 ${darkMode ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-700"
+                              }`}>
                               <Shield className="w-3 h-3" />
                               80G
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                            getTypeBg(txn.color)
-                          } ${getTypeColor(txn.color)}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getTypeBg(txn.color)
+                            } ${getTypeColor(txn.color)}`}>
                             {txn.cause}
                           </span>
-                          <span className={`text-xs ${
-                            darkMode ? "text-zinc-500" : "text-gray-500"
-                          }`}>•</span>
-                          <span className={`text-xs capitalize ${
-                            darkMode ? "text-zinc-400" : "text-gray-600"
-                          }`}>
+                          <span className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"
+                            }`}>•</span>
+                          <span className={`text-xs capitalize ${darkMode ? "text-zinc-400" : "text-gray-600"
+                            }`}>
                             {txn.donationType}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center gap-2 text-xs flex-wrap">
-                          <Calendar className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${
-                            darkMode ? "text-zinc-500" : "text-gray-400"
-                          }`} />
+                          <Calendar className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                            }`} />
                           <span className={darkMode ? "text-zinc-500" : "text-gray-500"}>
-                            {new Date(txn.date).toLocaleDateString('en-IN', { 
-                              day: 'numeric', 
-                              month: 'short', 
-                              year: 'numeric' 
+                            {new Date(txn.date).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
                             })}
                           </span>
                           <span className={`hidden sm:inline ${darkMode ? "text-zinc-600" : "text-gray-400"}`}>
                             •
                           </span>
                           <span className={`hidden sm:inline ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-                            {txn.id}
+                            ID: {txn.id}
                           </span>
                         </div>
                       </div>
@@ -807,27 +858,105 @@ export default function DownloadsPage({ darkModeFromParent }) {
                           <p className={`text-lg sm:text-xl font-bold ${getTypeColor(txn.color)}`}>
                             ₹{txn.amount.toLocaleString('en-IN')}
                           </p>
-                          <p className={`text-xs ${
-                            darkMode ? "text-zinc-500" : "text-gray-500"
-                          }`}>
-                            {txn.paymentMethod}
+                          <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"
+                            }`}>
+                            {txn.paymentMode || "Payment Mode"}
                           </p>
                         </div>
 
-                        <button
-                          onClick={() => handleDownloadInvoice(txn.id)}
-                          className={`p-2.5 sm:p-3 rounded-lg transition-all flex-shrink-0 ${
-                            darkMode
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDownloadCertificate(txn)}
+                            title="Download Appreciation Certificate"
+                            className={`p-2.5 sm:p-3 rounded-lg transition-all flex-shrink-0 ${darkMode
                               ? "bg-zinc-700 hover:bg-emerald-500/20 text-zinc-400 hover:text-emerald-400"
                               : "bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-600"
-                          }`}
-                        >
-                          <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
+                              }`}
+                          >
+                            <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </button>
+
+                          <button
+                            onClick={() => handleDownloadInvoice(txn.id)}
+                            title="Download Invoice"
+                            className={`p-2.5 sm:p-3 rounded-lg transition-all flex-shrink-0 ${darkMode
+                              ? "bg-zinc-700 hover:bg-emerald-500/20 text-zinc-400 hover:text-emerald-400"
+                              : "bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-600"
+                              }`}
+                          >
+                            <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
                 ))
+              )}
+
+              {/* Pagination Controls */}
+              {pagination.totalPages > 1 && (
+                <div className={`p-4 flex flex-col sm:flex-row items-center justify-between gap-4 ${darkMode ? "border-t border-zinc-800" : "border-t border-gray-100"}`}>
+                  <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    Showing <span className="font-semibold text-emerald-500">{(pagination.currentPage - 1) * 5 + 1}</span> to <span className="font-semibold text-emerald-500">{Math.min(pagination.currentPage * 5, pagination.totalDonations)}</span> of <span className="font-semibold text-emerald-500">{pagination.totalDonations}</span> results
+                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={pagination.currentPage === 1 || isFetching}
+                      className={`p-2 rounded-lg border transition-all ${darkMode
+                        ? "bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-white disabled:opacity-50"
+                        : "bg-white border-gray-200 text-gray-600 hover:text-gray-900 disabled:opacity-50"
+                        }`}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {[...Array(pagination.totalPages)].map((_, i) => {
+                        const pageNum = i + 1;
+                        // Basic logic to show limited page numbers
+                        if (
+                          pageNum === 1 ||
+                          pageNum === pagination.totalPages ||
+                          (pageNum >= pagination.currentPage - 1 && pageNum <= pagination.currentPage + 1)
+                        ) {
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${pagination.currentPage === pageNum
+                                ? "bg-emerald-500 text-white"
+                                : darkMode
+                                  ? "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        } else if (
+                          (pageNum === 2 && pagination.currentPage > 3) ||
+                          (pageNum === pagination.totalPages - 1 && pagination.currentPage < pagination.totalPages - 2)
+                        ) {
+                          return <span key={pageNum} className={darkMode ? "text-zinc-600" : "text-gray-400"}>...</span>;
+                        }
+                        return null;
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                      disabled={pagination.currentPage === pagination.totalPages || isFetching}
+                      className={`p-2 rounded-lg border transition-all ${darkMode
+                        ? "bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-white disabled:opacity-50"
+                        : "bg-white border-gray-200 text-gray-600 hover:text-gray-900 disabled:opacity-50"
+                        }`}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -838,29 +967,24 @@ export default function DownloadsPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.9 }}
-          className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-xl sm:rounded-2xl ${
-            darkMode 
-              ? "bg-gradient-to-br from-blue-900/30 to-emerald-900/30 border border-blue-700/30" 
-              : "bg-gradient-to-br from-blue-50 to-emerald-50 border border-blue-200"
-          }`}
+          className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-xl sm:rounded-2xl ${darkMode
+            ? "bg-gradient-to-br from-blue-900/30 to-emerald-900/30 border border-blue-700/30"
+            : "bg-gradient-to-br from-blue-50 to-emerald-50 border border-blue-200"
+            }`}
         >
           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-            <div className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl flex-shrink-0 ${
-              darkMode ? "bg-blue-500/20" : "bg-blue-100"
-            }`}>
-              <FileText className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                darkMode ? "text-blue-400" : "text-blue-600"
-              }`} />
+            <div className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl flex-shrink-0 ${darkMode ? "bg-blue-500/20" : "bg-blue-100"
+              }`}>
+              <FileText className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? "text-blue-400" : "text-blue-600"
+                }`} />
             </div>
             <div>
-              <h3 className={`font-bold text-base sm:text-lg mb-2 ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
+              <h3 className={`font-bold text-base sm:text-lg mb-2 ${darkMode ? "text-white" : "text-gray-900"
+                }`}>
                 Important Information
               </h3>
-              <ul className={`space-y-1.5 sm:space-y-2 text-xs sm:text-sm ${
-                darkMode ? "text-zinc-400" : "text-gray-600"
-              }`}>
+              <ul className={`space-y-1.5 sm:space-y-2 text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"
+                }`}>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
                   <span>All invoices are generated automatically upon successful donation</span>
@@ -889,14 +1013,12 @@ export default function DownloadsPage({ darkModeFromParent }) {
           transition={{ duration: 0.6, delay: 1 }}
           className="text-center mt-6 sm:mt-8 px-4"
         >
-          <p className={`text-xs sm:text-sm mb-2 ${
-            darkMode ? "text-zinc-500" : "text-gray-500"
-          }`}>
+          <p className={`text-xs sm:text-sm mb-2 ${darkMode ? "text-zinc-500" : "text-gray-500"
+            }`}>
             Need help? Contact our support team for assistance.
           </p>
-          <a href="/contactus" className={`text-xs sm:text-sm font-medium underline ${
-            darkMode ? "text-emerald-400 hover:text-emerald-500" : "text-emerald-600 hover:text-emerald-700"
-          }`}>
+          <a href="/contactus" className={`text-xs sm:text-sm font-medium underline ${darkMode ? "text-emerald-400 hover:text-emerald-500" : "text-emerald-600 hover:text-emerald-700"
+            }`}>
             Visit Support Center
           </a>
         </motion.div>
