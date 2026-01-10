@@ -21,17 +21,30 @@ import WhatWeDoSection from '@/components/aboutus/WhatWeDoSection';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutPage() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [scrolled, setScrolled] = useState(true); // 👈 Always true
-
+  
+  const [scrolled, setScrolled] = useState(true); 
+  
+    const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('darkMode') === 'true'
+    }
+    return false
+  })
+  
   useEffect(() => {
-    const savedMode = localStorage.getItem('darkMode');
-    setDarkMode(savedMode === 'true');
-  }, []);
+    const handleStorageChange = () => {
+      const savedMode = localStorage.getItem('darkMode')
+      setDarkMode(savedMode === 'true')
+    }
 
-  useEffect(() => {
-    localStorage.setItem('darkMode', darkMode);
-  }, [darkMode]);
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('darkModeChanged', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('darkModeChanged', handleStorageChange)
+    }
+  }, [])
 
   useEffect(() => {
     const lenis = new Lenis({

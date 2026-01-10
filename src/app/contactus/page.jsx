@@ -7,17 +7,30 @@ import React from 'react'
 import { useEffect, useState } from 'react';
 
 const page = () => {
-      const [darkMode, setDarkMode] = useState(false);
+
       const [scrolled, setScrolled] = useState(true); // 👈 Always true
     
-      useEffect(() => {
-        const savedMode = localStorage.getItem('darkMode');
-        setDarkMode(savedMode === 'true');
-      }, []);
-    
-      useEffect(() => {
-        localStorage.setItem('darkMode', darkMode);
-      }, [darkMode]);
+        const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('darkMode') === 'true'
+    }
+    return false
+  })
+  
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedMode = localStorage.getItem('darkMode')
+      setDarkMode(savedMode === 'true')
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('darkModeChanged', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('darkModeChanged', handleStorageChange)
+    }
+  }, [])
 
   return (
     <div>
