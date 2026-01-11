@@ -31,6 +31,13 @@ export default function DownloadsPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
   const { userInfo } = useSelector((state) => state.auth)
 
+
+
+
+  useEffect(() =>
+
+)
+
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
       setDarkMode(darkModeFromParent)
@@ -196,53 +203,117 @@ export default function DownloadsPage({ darkModeFromParent }) {
       year: 'numeric'
     });
 
-    // Add Logo placeholder or design
-    doc.setFillColor(16, 185, 129); // Emerald 500
-    doc.rect(0, 0, 210, 40, 'F');
+    // 1. Logo (Top Left)
+    // Using a placeholder TPF logo or text if image not available
+    const logoData = await getLogoDataUrl('/TPFAid-Logo.png'); // Assuming standard logo path
+    if (logoData) {
+      doc.addImage(logoData.dataUrl, 'PNG', 15, 15, 40, 15);
+    } else {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.setTextColor(16, 185, 129); // Emerald
+      doc.text("TPF Aid", 15, 25);
+    }
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
+    // 2. Company Address (Top Right)
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(80, 80, 80);
+    const addressLines = [
+      "The People's Foundation",
+      "123, Charity Lane, Main Street,",
+      "Mumbai - 400001, Maharashtra. https://www.tpfaid.org",
+      "| info@tpfaid.org | (+91) 9876543210"
+    ];
+    doc.text(addressLines, 200, 18, { align: "right" });
+
+    // 3. Header: "Acknowledgement Of Payment" with Orange Underline
     doc.setFont("helvetica", "bold");
-    doc.text("DONATION ACKNOWLEDGEMENT", 105, 25, { align: "center" });
+    doc.setFontSize(16);
+    doc.setTextColor(40, 40, 40);
+    doc.text("Acknowledgement Of Payment", 15, 50);
 
-    doc.setTextColor(60, 60, 60);
+    // Orange Underline
+    doc.setDrawColor(245, 158, 11); // Orange
+    doc.setLineWidth(1);
+    doc.line(15, 52, 100, 52);
+
+    // 4. Receipt Details Section
+    let startY = 65;
+    const lineHeight = 7;
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Receipt Number: ${txn.id}`, 190, 50, { align: "right" });
-    doc.text(`Date: ${date}`, 190, 55, { align: "right" });
+    doc.setTextColor(0, 0, 0);
 
-    doc.setFontSize(12);
-    doc.text("To,", 20, 70);
+    // Helper for bold label + normal value
+    const addField = (label, value, y) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(label, 15, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(value, 55, y);
+    };
+
+    addField("Receipt No:", txn.id, startY);
+    addField("Payment Mode:", txn.paymentMode || "Online", startY + lineHeight);
+
+    startY += 20;
+
+    addField("Donor Name:", name, startY);
+    addField("Donation Date:", date, startY + lineHeight);
+
+    // For "Donation To", we might need text wrapping if the cause title is long
     doc.setFont("helvetica", "bold");
-    doc.text(name.toUpperCase(), 20, 78);
+    doc.text("Donation To:", 15, startY + lineHeight * 2);
     doc.setFont("helvetica", "normal");
-    doc.text(userInfo?.email || "", 20, 84);
+    const causeTitle = txn.recipient || txn.cause || "General Donation";
+    const splitCause = doc.splitTextToSize(causeTitle, 140);
+    doc.text(splitCause, 55, startY + lineHeight * 2);
 
-    doc.text("Dear Donor,", 20, 100);
-    doc.text("Thank you for your generous contribution. We deeply appreciate your support towards our cause.", 20, 108);
+    // Adjust Y based on lines wrapped
+    const causeHeight = splitCause.length * lineHeight;
+    let currentY = startY + lineHeight * 2 + Math.max(lineHeight, causeHeight);
 
-    autoTable(doc, {
-      startY: 120,
-      head: [['Description', 'Category', 'Mode', 'Amount']],
-      body: [[
-        txn.recipient,
-        txn.cause,
-        txn.paymentMode,
-        `INR ${txn.amount.toLocaleString('en-IN')}`
-      ]],
-      headStyles: { fillColor: [16, 185, 129] },
-      margin: { left: 20, right: 20 }
-    });
+    addField("Fundraiser Type:", "Charity", currentY);
+    addField("Fundraiser Owner:", "The People's Foundation", currentY + lineHeight);
 
-    const finalY = doc.lastAutoTable.finalY + 20;
+    currentY += 15;
 
-    doc.setFontSize(11);
+    addField("Donation Amount:", `INR ${txn.amount.toLocaleString('en-IN')}`, currentY);
+    addField("Transaction ID:", txn.id, currentY + lineHeight);
+    addField("Order Date:", date, currentY + lineHeight * 2); // Same as donation date for now
+
+    // 5. Footer Note
+    currentY += 25;
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("Note: Click on below link to download your 80G tax benefit certificate.", 15, currentY);
+
+    currentY += 6;
+    doc.setTextColor(29, 78, 216); // Blue link color
+    doc.text("https://www.tpfaid.org/profile/downloads", 15, currentY);
+
+    // Separator line
+    currentY += 8;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY, 195, currentY);
+
+    // Disclaimer
+    currentY += 8;
     doc.setFont("helvetica", "italic");
-    doc.text("This is a computer generated acknowledgement and does not require a physical signature.", 105, finalY, { align: "center" });
+    doc.setFontSize(8);
+    doc.setTextColor(80, 80, 80);
+    const disclaimer = "This document is only an acknowledgement of your payment. If you have donated to an organization which is offering tax-exemption, you will receive the same from the non-profit within a month of your transaction. Please consider this as your transaction receipt for future reference.";
+    const splitDisclaimer = doc.splitTextToSize(disclaimer, 180);
+    doc.text(splitDisclaimer, 15, currentY);
+
+    currentY += splitDisclaimer.length * 4 + 8;
 
     doc.setFont("helvetica", "normal");
-    doc.text("The People's Foundation", 105, finalY + 15, { align: "center" });
-    doc.text("www.tpfaid.org", 105, finalY + 22, { align: "center" });
+    doc.text("For any further queries about your contribution, please write to ", 15, currentY);
+
+    doc.setTextColor(29, 78, 216);
+    doc.text("info@tpfaid.org", 95, currentY); // Adjust X based on text length
+    doc.text(".", 118, currentY); // Period after email
 
     doc.save(`Acknowledgement_${txn.id}.pdf`);
   };
