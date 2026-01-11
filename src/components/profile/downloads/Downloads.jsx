@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { useFetchMyDonationsQuery } from "@/utils/slices/donationApiSlice"
 import { useSelector } from "react-redux"
+import { getMediaUrl } from "@/utils/media"
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 
@@ -203,9 +204,9 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
     // 1. Logo (Top Left)
     // Using a placeholder TPF logo or text if image not available
-    const logoData = await getLogoDataUrl('/TPFAid-Logo.png'); // Assuming standard logo path
+    const logoData = await getLogoDataUrl('/TPFAid-Logo.png');
     if (logoData) {
-      doc.addImage(logoData.dataUrl, 'PNG', 15, 15, 40, 15);
+      doc.addImage(logoData.dataUrl, 'PNG', 15, 15, 50, 15);
     } else {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(22);
@@ -218,7 +219,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
     doc.setFontSize(8);
     doc.setTextColor(80, 80, 80);
     const addressLines = [
-      "The People's Foundation",
+      "True Path Foundation",
       "123, Charity Lane, Main Street,",
       "Mumbai - 400001, Maharashtra. https://www.tpfaid.org",
       "| info@tpfaid.org | (+91) 9876543210"
@@ -235,6 +236,16 @@ export default function DownloadsPage({ darkModeFromParent }) {
     doc.setDrawColor(245, 158, 11); // Orange
     doc.setLineWidth(1);
     doc.line(15, 52, 100, 52);
+
+    // Add "Tax Benefit" Badge if eligible
+    if (txn.taxEligible) {
+      doc.setFillColor(236, 253, 245); // Light emerald bg
+      doc.roundedRect(150, 44, 45, 8, 1, 1, 'F');
+      doc.setTextColor(5, 150, 105); // Emerald 600 text
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("80G Tax Benefit Eligible", 172.5, 49.5, { align: "center" });
+    }
 
     // 4. Receipt Details Section
     let startY = 65;
@@ -270,8 +281,8 @@ export default function DownloadsPage({ darkModeFromParent }) {
     const causeHeight = splitCause.length * lineHeight;
     let currentY = startY + lineHeight * 2 + Math.max(lineHeight, causeHeight);
 
-    addField("Fundraiser Type:", "Charity", currentY);
-    addField("Fundraiser Owner:", "The People's Foundation", currentY + lineHeight);
+    addField("Fundraiser Type:", txn.cause || "General Charity", currentY);
+    addField("Fundraiser Owner:", txn.beneficiaryName || txn.campaignerName || "True Path Foundation", currentY + lineHeight);
 
     currentY += 15;
 
@@ -313,6 +324,64 @@ export default function DownloadsPage({ darkModeFromParent }) {
     doc.text("info@tpfaid.org", 95, currentY); // Adjust X based on text length
     doc.text(".", 118, currentY); // Period after email
 
+    // 6. Impact Banner (Bottom Section) - Always show, with fallback image
+    try {
+      const bannerImgPath = txn.imageUrl ? getMediaUrl(txn.imageUrl) : '/funding.jpg';
+      const campaignImageData = await getLogoDataUrl(bannerImgPath);
+
+      if (campaignImageData) {
+        let bannerY = currentY + 15;
+        // If it doesn't fit at bottom, push to new page or just move it up slightly
+        if (bannerY + 60 > 290) {
+          doc.addPage();
+          bannerY = 20;
+        }
+
+        // Light background for banner
+        doc.setFillColor(248, 250, 252);
+        doc.roundedRect(15, bannerY, 180, 50, 2, 2, 'F');
+
+        // Left Content
+        doc.setTextColor(30, 41, 59);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        const bannerTitle = (txn.cause === 'Healthcare' || txn.cause === 'Medical')
+          ? "Be a Lifesaver"
+          : "Support the Cause";
+        doc.text(bannerTitle, 25, bannerY + 15);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(71, 85, 105);
+        doc.text("Your contribution makes a world of difference.", 25, bannerY + 22);
+        doc.text("Share this story to help us reach our goal faster!", 25, bannerY + 27);
+
+        // Button-like CTA
+        const ctaX = 25;
+        const ctaY = bannerY + 34;
+        const ctaW = 45;
+        const ctaH = 10;
+
+        doc.setFillColor(16, 185, 129);
+        doc.roundedRect(ctaX, ctaY, ctaW, ctaH, 1, 1, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("Spread the Word", ctaX + (ctaW / 2), ctaY + 6.5, { align: "center" });
+
+        // Make the button clickable
+        const campaignLink = txn.slug ? `https://www.tpfaid.org/campaign/${txn.slug}` : 'https://www.tpfaid.org';
+        doc.link(ctaX, ctaY, ctaW, ctaH, { url: campaignLink });
+
+        // Right Content: Campaign Image
+        doc.setFillColor(255, 255, 255);
+        doc.rect(130, bannerY + 5, 55, 40, 'F');
+        doc.addImage(campaignImageData.dataUrl, 'JPEG', 131, bannerY + 6, 53, 38, undefined, 'FAST');
+      }
+    } catch (err) {
+      console.error("Impact banner image failed to load:", err);
+    }
+
     doc.save(`Acknowledgement_${txn.id}.pdf`);
   };
 
@@ -328,7 +397,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
         resolve({
-          dataUrl: canvas.toDataURL('image/jpeg'),
+          dataUrl: canvas.toDataURL('image/png'),
           width: img.width,
           height: img.height
         });
