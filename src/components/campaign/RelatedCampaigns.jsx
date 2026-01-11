@@ -70,7 +70,7 @@ export default function RelatedCampaigns({
         zakatVerified: Boolean(campaign.zakatVerified),
         slug: campaign.campaignSlug,
       }))
-      .slice(0, 6); // UX limit
+      .slice(0, 3); 
   }, [cms, category, currentSlug]);
 
   /* 🚫 DO NOT RENDER IF EMPTY */
@@ -116,24 +116,7 @@ export default function RelatedCampaigns({
               darkMode={darkMode}
             />
           ))}
-        {/* Responsive Grid */}
-        <div
-          className="
-            grid gap-6
-            grid-cols-1
-            sm:grid-cols-2
-            lg:grid-cols-3
-          "
-        >
-          {relatedCampaigns.map((campaign) => (
-            <CampaignCard
-              key={campaign.slug}
-              campaign={campaign}
-              darkMode={darkMode}
-            />
-          ))}
         </div>
-      </div>
       </div>
     </section>
   );
