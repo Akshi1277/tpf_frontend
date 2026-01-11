@@ -34,9 +34,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
 
 
-  useEffect(() =>
 
-)
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
