@@ -1,19 +1,23 @@
 export const getMediaUrl = (path) => {
-    if (!path) return "";
+    if (!path || path === "undefined") return "";
 
-    // If it's already a full external URL, return as is
+    // Already a full URL
     if (path.startsWith("http")) return path;
 
-    const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL || "https://api.anatech.fun";
+    const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
-    // Convert old /uploads/ paths to new /api/media/ format
+    if (!BASE_URL) {
+        console.error("NEXT_PUBLIC_UPLOAD_URL is not defined");
+        return "";
+    }
+
     let cleanPath = path;
+
     if (path.startsWith("/uploads/")) {
         cleanPath = path.replace("/uploads/", "");
     } else if (path.startsWith("uploads/")) {
         cleanPath = path.replace("uploads/", "");
     }
 
-    // Always use the backend's media proxy
     return `${BASE_URL}/api/media/${cleanPath}`;
 };

@@ -4,12 +4,15 @@ import { useSelector } from "react-redux";
 import { redirect } from "next/navigation";
 
 export default function ProfileLayout({ children }) {
-  const { userInfo } = useSelector((state) => state.auth);
+ const { userInfo, authChecked } = useSelector((state) => state.auth);
 
-  // Auth is GUARANTEED resolved by UserAuthProvider
-  if (!userInfo) {
-    redirect("/login");
-  }
+// ⛔ Wait until auth state is resolved
+if (!authChecked) return null;
 
-  return children;
+if (!userInfo) {
+  redirect("/login");
+}
+
+return children;
+
 }

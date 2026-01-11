@@ -16,19 +16,19 @@ export default function UserAuthProvider({ children }) {
 
   const { data, error, isFetching } = useGetMeQuery();
 
-  useEffect(() => {
-    if (data?.data) {
-      dispatch(setCredentials(data.data));
-    }
+ useEffect(() => {
+  if (isFetching) return;
 
-    if (error?.status === 401) {
-      dispatch(logout());
-    }
+  if (data?.data) {
+    dispatch(setCredentials(data.data));
+  } else if (error?.status === 401) {
+    dispatch(logout());
+  }
 
-    if (!isFetching) {
-      dispatch(setAuthChecked());
-    }
-  }, [data, error, isFetching, dispatch]);
+  // ✅ mark auth resolved only AFTER handling data/error
+  dispatch(setAuthChecked());
+}, [isFetching, data, error, dispatch]);
+
 
   // 🔒 BLOCK ENTIRE APP UNTIL AUTH IS RESOLVED
   if (!authChecked) {

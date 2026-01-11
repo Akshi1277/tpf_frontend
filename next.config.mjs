@@ -1,8 +1,36 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-
   images: {
-    domains: ["images.unsplash.com", "localhost", "api.anatech.fun", "plus.unsplash.com", "media.istockphoto.com", "i.etsystatic.com", "cdn.builder.io", "www.shutterstock.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.tpfaid.org",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "media.istockphoto.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.etsystatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.builder.io",
+      },
+      {
+        protocol: "https",
+        hostname: "www.shutterstock.com",
+      },
+    ],
   },
 };
 
