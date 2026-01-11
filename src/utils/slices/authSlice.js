@@ -7,10 +7,11 @@ const persistedUser =
     : null;
 
 const initialState = {
-  userInfo: null,          // AUTH IDENTITY (redux)
-  persistedUser,           // SAFE fallback (localStorage)
+  userInfo: persistedUser,   // ✅ IMPORTANT
+  persistedUser,
   authChecked: false,
 };
+
 
 const authSlice = createSlice({
   name: "auth",
@@ -37,14 +38,28 @@ const authSlice = createSlice({
     },
 
     // 🧩 PROFILE / KYC / PARTIAL UPDATES
-    updateUserPartial: (state, action) => {
-      if (!state.userInfo) return;
+  updateUserPartial: (state, action) => {
+  if (!state.userInfo) return;
 
-      state.userInfo = {
-        ...state.userInfo,
-        ...action.payload,
-      };
-    },
+  state.userInfo = {
+    ...state.userInfo,
+    ...action.payload,
+  };
+
+  // ✅ persist SAFE identity again
+  const safePersist = {
+    fullName: state.userInfo.fullName ?? null,
+    email: state.userInfo.email ?? null,
+    mobileNo: state.userInfo.mobileNo ?? null,
+  };
+
+  state.persistedUser = safePersist;
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem("userInfo", JSON.stringify(safePersist));
+  }
+},
+
 
     setAuthChecked: (state) => {
       state.authChecked = true;
