@@ -1,7 +1,7 @@
 // components/home/CampaignsSection.jsx
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import Link from 'next/link';
@@ -9,9 +9,6 @@ import { getMediaUrl } from '@/utils/media';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [campaignScrollIndex, setCampaignScrollIndex] = useState(0);
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
-
   const containerRef = useRef(null);
   const cms = useCMS();
 
@@ -21,14 +18,11 @@ export default function CampaignsSection({ darkMode }) {
   const calcDaysLeft = (deadline) => {
     const end = new Date(deadline);
     const now = new Date();
-    return Math.max(
-      0,
-      Math.ceil((end - now) / (1000 * 60 * 60 * 24))
-    );
+    return Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
   };
 
   /* --------------------------------
-     🔒 ACTIVE CAMPAIGNS (HARD GATE)
+     ACTIVE CAMPAIGNS
   --------------------------------- */
   const activeCampaigns = useMemo(() => {
     if (!Array.isArray(cms)) return [];
@@ -43,149 +37,50 @@ export default function CampaignsSection({ darkMode }) {
       )
       .map((campaign) => ({
         ...campaign,
-        image: campaign.imageUrl
-          ? getMediaUrl(campaign.imageUrl)
-          : null,
-        video: campaign.videoUrl
-          ? getMediaUrl(campaign.videoUrl)
-          : null,
+        image: campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : null,
+        video: campaign.videoUrl ? getMediaUrl(campaign.videoUrl) : null,
         raised: Number(campaign.raisedAmount || 0),
         goal: Number(campaign.requiredAmount || campaign.goal || 0),
         org: campaign.organization || '',
         urgent: Boolean(campaign.isUrgent),
         taxBenefit: Boolean(campaign.taxBenefits),
-        validityDate: campaign.deadline
-          ? calcDaysLeft(campaign.deadline)
-          : null,
+        validityDate: campaign.deadline ? calcDaysLeft(campaign.deadline) : null,
         zakatVerified: Boolean(campaign.zakatVerified),
         slug: campaign.campaignSlug,
       }));
   }, [cms]);
 
   /* --------------------------------
-     Category Filter (ACTIVE ONLY)
+     Category Filter
   --------------------------------- */
   const filteredCampaigns = useMemo(() => {
     if (selectedCategory === 'all') return activeCampaigns;
-    return activeCampaigns.filter(
-      (c) => c.category === selectedCategory
-    );
+    return activeCampaigns.filter((c) => c.category === selectedCategory);
   }, [activeCampaigns, selectedCategory]);
 
   /* --------------------------------
-     🚫 HARD STOP — NO ACTIVE CAMPAIGNS
+     NO ACTIVE CAMPAIGNS
   --------------------------------- */
-  if (!filteredCampaigns.length) {
-    return null;
-  }
-
-  /* --------------------------------
-     Infinite Scroll Setup
-  --------------------------------- */
-  const MIN_CARDS_FOR_INFINITE = 5;
-  const enableInfiniteScroll =
-    filteredCampaigns.length > MIN_CARDS_FOR_INFINITE;
-
-  const infiniteCampaigns = useMemo(() => {
-    return enableInfiniteScroll
-      ? [...filteredCampaigns, ...filteredCampaigns]
-      : filteredCampaigns;
-  }, [filteredCampaigns, enableInfiniteScroll]);
+  if (!filteredCampaigns.length) return null;
 
   /* --------------------------------
      Scroll Helpers
   --------------------------------- */
-  const getScrollAmount = () => {
-    const container = containerRef.current;
-    if (!container) return 0;
-    const cardWidth = container.children[0]?.offsetWidth || 0;
-    return cardWidth + 20;
-  };
-
-  const scrollLeft = () => {
-    containerRef.current?.scrollBy({
-      left: -getScrollAmount(),
-      behavior: 'smooth',
-    });
-  };
-
-  const scrollRight = () => {
-    containerRef.current?.scrollBy({
-      left: getScrollAmount(),
-      behavior: 'smooth',
-    });
-  };
-
-  /* --------------------------------
-     Auto Scroll
-  --------------------------------- */
-  useEffect(() => {
-    if (!enableInfiniteScroll || isUserScrolling) return;
-
-    const interval = setInterval(() => {
-      setCampaignScrollIndex((i) => i + 1);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [enableInfiniteScroll, isUserScrolling]);
-
-  useEffect(() => {
+  const scroll = (direction) => {
     const container = containerRef.current;
     if (!container) return;
-
-    const scrollAmount = getScrollAmount();
-
-    container.scrollTo({
-      left: scrollAmount * campaignScrollIndex,
+    
+    const cardWidth = 285;
+    const gap = 20;
+    const scrollAmount = (cardWidth + gap) * 2;
+    
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     });
+  };
 
-    if (
-      enableInfiniteScroll &&
-      campaignScrollIndex >= filteredCampaigns.length
-    ) {
-      setTimeout(() => {
-        container.scrollTo({ left: 0, behavior: 'auto' });
-        setCampaignScrollIndex(0);
-      }, 400);
-    }
-  }, [campaignScrollIndex, filteredCampaigns.length, enableInfiniteScroll]);
-
-  /* --------------------------------
-     User Scroll Detection
-  --------------------------------- */
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    let timeout;
-
-    const onScroll = () => {
-      setIsUserScrolling(true);
-      clearTimeout(timeout);
-      timeout = setTimeout(
-        () => setIsUserScrolling(false),
-        2000
-      );
-    };
-
-    container.addEventListener('scroll', onScroll, {
-      passive: true,
-    });
-    return () =>
-      container.removeEventListener('scroll', onScroll);
-  }, []);
-
-  /* --------------------------------
-     Reset on Category Change
-  --------------------------------- */
-  useEffect(() => {
-    setCampaignScrollIndex(0);
-    containerRef.current?.scrollTo({
-      left: 0,
-      behavior: 'auto',
-    });
-  }, [selectedCategory]);
+  const showArrows = filteredCampaigns.length > 3;
 
   /* --------------------------------
      Render
@@ -193,62 +88,93 @@ export default function CampaignsSection({ darkMode }) {
   return (
     <section
       id="campaigns"
-      className={`py-10 ${darkMode ? 'bg-zinc-800' : 'bg-white'
-        }`}
+      className={`py-8 sm:py-10 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}
     >
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2
-            className={`text-3xl md:text-4xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'
-              }`}
-          >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+          <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
             Fundraising now
           </h2>
 
           <Link href="/all-campaigns">
-            <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-4 py-2 rounded-full text-white hover:animate-pulse">
+            <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-4 py-2 rounded-full text-white hover:bg-emerald-700 transition-colors">
               Discover more
             </button>
           </Link>
         </div>
 
-        <div className="relative">
-          {enableInfiniteScroll && (
+        {/* Carousel */}
+        <div className="relative group">
+          {/* Left Arrow - Subtle & Elegant */}
+          {showArrows && (
             <button
-              onClick={scrollLeft}
-              className="hidden md:flex absolute -left-10 top-1/2 -translate-y-1/2 z-10"
+              onClick={() => scroll('left')}
+              aria-label="Scroll left"
+              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${
+                darkMode 
+                  ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg' 
+                  : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
+              } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
             >
-              ◀
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
           )}
 
+          {/* Cards Container */}
           <div
             ref={containerRef}
-            className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide"
+            className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide"
           >
-            {infiniteCampaigns.map((campaign, index) => (
-              <div
-                key={`${campaign._id}-${index}`}
-                className="flex-shrink-0 w-[285px]"
-              >
-                <CampaignCard
-                  campaign={campaign}
-                  darkMode={darkMode}
-                />
-              </div>
-            ))}
+            <div className="flex gap-4 sm:gap-5">
+              {filteredCampaigns.map((campaign) => (
+                <div
+                  key={campaign._id}
+                  className="flex-shrink-0 w-[280px] sm:w-[285px]"
+                >
+                  <CampaignCard campaign={campaign} darkMode={darkMode} />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {enableInfiniteScroll && (
+          {/* Right Arrow - Subtle & Elegant */}
+          {showArrows && (
             <button
-              onClick={scrollRight}
-              className="hidden md:flex absolute -right-10 top-1/2 -translate-y-1/2 z-10"
+              onClick={() => scroll('right')}
+              aria-label="Scroll right"
+              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${
+                darkMode 
+                  ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg' 
+                  : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
+              } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
             >
-              ▶
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           )}
         </div>
+
+        {/* Mobile Scroll Hint */}
+        <div className="md:hidden mt-3 text-center">
+          <p className={`text-xs ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            ← Swipe to see more →
+          </p>
+        </div>
       </div>
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </section>
   );
 }

@@ -751,21 +751,11 @@ const handleSaveAll = async () => {
                     <p className={`text-xs font-bold mb-2 tracking-wide ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                       Email Address
                     </p>
-                    {isEditMode ? (
-                      <input
-                        type="email"
-                        value={tempData.email}
-                        onChange={(e) => setTempData(prev => ({ ...prev, email: e.target.value }))}
-                        className={`w-full text-sm font-semibold px-3 py-2 rounded-lg border outline-none transition-colors ${darkMode
-                          ? "bg-zinc-900 border-zinc-700 text-white hover:border-zinc-600 focus:border-emerald-500"
-                          : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
-                          }`}
-                      />
-                    ) : (
+            
                       <p className={`text-sm font-bold break-all ${darkMode ? "text-white" : "text-gray-900"}`}>
                         {profileData.email}
                       </p>
-                    )}
+                    
                   </div>
                 </div>
 
@@ -786,21 +776,11 @@ const handleSaveAll = async () => {
                     <p className={`text-xs font-bold mb-2 tracking-wide ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                       Mobile Number
                     </p>
-                    {isEditMode ? (
-                      <input
-                        type="tel"
-                        value={tempData.mobileNo}
-                        onChange={(e) => setTempData(prev => ({ ...prev, mobileNo: e.target.value }))}
-                        className={`w-full text-sm font-semibold px-3 py-2 rounded-lg border outline-none transition-colors ${darkMode
-                          ? "bg-zinc-900 border-zinc-700 text-white hover:border-zinc-600 focus:border-emerald-500"
-                          : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
-                          }`}
-                      />
-                    ) : (
+                   
                       <p className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
                         +91 {profileData.mobileNo}
                       </p>
-                    )}
+                   
                   </div>
                 </div>
 
