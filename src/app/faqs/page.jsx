@@ -4,17 +4,18 @@ import Footer from '@/components/layout/Footer';
 import Navbar from '@/components/layout/Navbar';
 import React from 'react'
 import { useEffect, useState } from 'react';
+import CampaignCarouselSection from '@/components/common/CampaignCarouselSection';
 
 const page = () => {
-      const [scrolled, setScrolled] = useState(true); // 👈 Always true
-    
-   const [darkMode, setDarkMode] = useState(() => {
+  const [scrolled, setScrolled] = useState(true); // 👈 Always true
+
+  const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true'
     }
     return false
   })
-  
+
   useEffect(() => {
     const handleStorageChange = () => {
       const savedMode = localStorage.getItem('darkMode')
@@ -28,17 +29,23 @@ const page = () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('darkModeChanged', handleStorageChange)
     }
-  }, [])   
+  }, [])
 
   return (
     <div>
-         <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-              <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
-        
+      <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
+
         <FAQSection darkMode={darkMode} />
 
-          <Footer darkMode={darkMode} />
-        </div>
+        <CampaignCarouselSection
+          darkMode={darkMode}
+          title="Support a Cause"
+          subtitle="Explore our ongoing fundraisers and help those in need today."
+        />
+
+        <Footer darkMode={darkMode} />
+      </div>
     </div>
   )
 }

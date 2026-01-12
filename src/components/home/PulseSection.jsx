@@ -4,9 +4,14 @@ import { useCMS } from '@/app/CMSContext';
 import { useState, useEffect } from 'react';
 import { getMediaUrl } from '@/utils/media';
 import { useFetchRecentDonationsQuery } from '@/utils/slices/donationApiSlice';
+import { useFetchImpactStatsQuery } from '@/utils/slices/campaignApiSlice';
 
-export default function PulseSection({ darkMode, totalRaised }) {
+export default function PulseSection({ darkMode }) {
   const { data: recentData, isLoading: isRecentLoading } = useFetchRecentDonationsQuery();
+  const { data: statsData } = useFetchImpactStatsQuery();
+
+  const totalRaised = statsData?.stats?.totalRaised || 0;
+
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
@@ -202,12 +207,12 @@ export default function PulseSection({ darkMode, totalRaised }) {
                 {currency(totalRaised)}
               </div>
             </div>
-            <div className={`text-sm ${COLORS.neutralBody} mt-3`}>raised in the last hour</div>
+            <div className={`text-sm ${COLORS.neutralBody} mt-3`}>Total raised</div>
           </div>
 
           <div className="max-w-5xl mx-auto">
             {/* MOBILE — horizontal scroll */}
-            <div className="md:hidden relative overflow-x-auto scrollbar-hide flex gap-4 px-2 min-h-[112px]">
+            <div className={`md:hidden relative overflow-x-auto scrollbar-hide flex gap-4 px-2 min-h-[112px] ${recentDonations.length < 2 ? 'justify-center' : 'justify-start'}`}>
               {isRecentLoading ? (
                 <div className="w-full text-center py-4 text-zinc-500">Loading live donations...</div>
               ) : recentDonations.length === 0 ? (
@@ -248,22 +253,22 @@ export default function PulseSection({ darkMode, totalRaised }) {
                   document.getElementById("recent-track")
                     ?.scrollBy({ left: -250, behavior: "smooth" })
                 }
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10
+                className={`absolute left-0 top-1/2 -translate-y-1/2 z-10
                bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm
-               p-2 rounded-full shadow"
+               p-2 rounded-full shadow ${recentDonations.length <= 6 ? 'hidden' : 'flex'}`}
               >
                 ←
               </button>
 
               {/* HORIZONTAL TRACK */}
-              <div id="recent-track" className="flex overflow-x-auto scrollbar-hide scroll-smooth w-full min-h-[112px]">
+              <div id="recent-track" className={`flex overflow-x-auto scrollbar-hide scroll-smooth w-full min-h-[112px] ${recentDonations.length < 6 ? 'justify-center' : 'justify-start'}`}>
                 {isRecentLoading ? (
                   <div className="w-full text-center py-10 text-zinc-500">Loading live donations...</div>
                 ) : recentDonations.length === 0 ? (
                   <div className="w-full text-center py-10 text-zinc-500">No recent donations yet</div>
                 ) : (
                   recentDonations.map((donation, index) => (
-                    <div key={index} className="shrink-0 w-[16.66%] px-2">
+                    <div key={index} className="shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-[16.66%] px-2">
                       <div
                         className={`relative group p-5 w-full h-28 rounded-xl text-center overflow-hidden transition-all duration-300 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
                           } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
@@ -293,9 +298,9 @@ export default function PulseSection({ darkMode, totalRaised }) {
                   document.getElementById("recent-track")
                     ?.scrollBy({ left: 250, behavior: "smooth" })
                 }
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10
+                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10
                bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm
-               p-2 rounded-full shadow"
+               p-2 rounded-full shadow ${recentDonations.length <= 6 ? 'hidden' : 'flex'}`}
               >
                 →
               </button>

@@ -68,6 +68,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
   const donations = myDonationsData?.donations || []
   const pagination = myDonationsData?.pagination || { currentPage: 1, totalPages: 1, totalDonations: 0 }
   const stats = myDonationsData?.stats || { totalFilteredAmount: 0, total80GAmount: 0, eligibleDonationsCount: 0 }
+  const kycDetails = myDonationsData?.kycDetails || null
 
   const [showCustomDateRange, setShowCustomDateRange] = useState(false)
 
@@ -202,6 +203,12 @@ export default function DownloadsPage({ darkModeFromParent }) {
       year: 'numeric'
     });
 
+    // 0. KYC Check for 80G
+    if (txn.taxEligible && kycDetails?.status !== 'verified') {
+      alert("KYC verification is required to download a valid 80G tax receipt. Please complete your KYC in the Profile section and wait for admin approval (usually within 24 working hours).");
+      return;
+    }
+
     // 1. Logo (Top Left)
     // Using a placeholder TPF logo or text if image not available
     const logoData = await getLogoDataUrl('/TPFAid-Logo.png');
@@ -226,11 +233,11 @@ export default function DownloadsPage({ darkModeFromParent }) {
     ];
     doc.text(addressLines, 200, 18, { align: "right" });
 
-    // 3. Header: "Acknowledgement Of Payment" with Orange Underline
+    // 3. Header: "Acknowledgement of Payment" with Orange Underline
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(40, 40, 40);
-    doc.text("Acknowledgement Of Payment", 15, 50);
+    doc.text("Acknowledgement of Payment", 15, 50);
 
     // Orange Underline
     doc.setDrawColor(245, 158, 11); // Orange
@@ -261,12 +268,20 @@ export default function DownloadsPage({ darkModeFromParent }) {
       doc.text(value, 55, y);
     };
 
-    addField("Receipt No:", txn.id, startY);
+    addField("Receipt Number:", txn.id, startY);
     addField("Payment Mode:", txn.paymentMode || "Online", startY + lineHeight);
 
     startY += 20;
 
-    addField("Donor Name:", name, startY);
+    if (txn.taxEligible && kycDetails?.status === 'verified') {
+      addField("Donor PAN:", kycDetails.panNumber || "N/A", startY);
+      addField("City:", kycDetails.city || "N/A", startY + lineHeight);
+      addField("State:", kycDetails.state || "N/A", startY + lineHeight * 2);
+      startY += lineHeight; // Small offset for the next section
+    } else {
+      addField("Donor Name:", name, startY);
+    }
+
     addField("Donation Date:", date, startY + lineHeight);
 
     // For "Donation To", we might need text wrapping if the cause title is long
@@ -294,11 +309,24 @@ export default function DownloadsPage({ darkModeFromParent }) {
     currentY += 25;
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    doc.text("Note: Click on below link to download your 80G tax benefit certificate.", 15, currentY);
+    doc.setTextColor(0, 0, 0);
+    const noteText = "Note: You can download your 80G Receipt from the TPF portal. ";
+    doc.text(noteText, 15, currentY);
 
-    currentY += 6;
-    doc.setTextColor(29, 78, 216); // Blue link color
-    doc.text("https://www.tpfaid.org/profile/downloads", 15, currentY);
+    // "Click Here" Button - Dynamically placed after text
+    const textWidth = doc.getTextWidth(noteText);
+    const btnX = 15 + textWidth + 2;
+    const btnY = currentY - 5.5; // Adjusted for better vertical center
+    const btnW = 28;
+    const btnH = 8;
+
+    doc.setFillColor(16, 185, 129); // Emerald
+    doc.roundedRect(btnX, btnY, btnW, btnH, 1, 1, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    // Vertical center: btnY + (btnH/2) + (fontSize in mm / 2) roughly
+    doc.text("Click Here", btnX + (btnW / 2), btnY + 4.8, { align: "center" });
+    doc.link(btnX, btnY, btnW, btnH, { url: "https://www.tpfaid.org/profile/downloads" });
 
     // Separator line
     currentY += 8;
@@ -306,23 +334,34 @@ export default function DownloadsPage({ darkModeFromParent }) {
     doc.setLineWidth(0.5);
     doc.line(15, currentY, 195, currentY);
 
-    // Disclaimer
-    currentY += 8;
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(8);
-    doc.setTextColor(80, 80, 80);
-    const disclaimer = "This document is only an acknowledgement of your payment. If you have donated to an organization which is offering tax-exemption, you will receive the same from the non-profit within a month of your transaction. Please consider this as your transaction receipt for future reference.";
-    const splitDisclaimer = doc.splitTextToSize(disclaimer, 180);
-    doc.text(splitDisclaimer, 15, currentY);
-
-    currentY += splitDisclaimer.length * 4 + 8;
+    // Disclaimer - REMOVED per user request
+    currentY += 10;
 
     doc.setFont("helvetica", "normal");
-    doc.text("For any further queries about your contribution, please write to ", 15, currentY);
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    const queryText = "For any further queries about your contribution, click ";
+    doc.text(queryText, 15, currentY);
 
-    doc.setTextColor(29, 78, 216);
-    doc.text("info@tpfaid.org", 95, currentY); // Adjust X based on text length
-    doc.text(".", 118, currentY); // Period after email
+    // "Raise a Query" Button - Dynamically placed
+    const queryWidth = doc.getTextWidth(queryText);
+    const qBtnX = 15 + queryWidth + 2;
+    const qBtnY = currentY - 5.5;
+    const qBtnW = 32;
+    const qBtnH = 8;
+
+    doc.setFillColor(59, 130, 246); // Blue
+    doc.roundedRect(qBtnX, qBtnY, qBtnW, qBtnH, 1, 1, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.text("Raise a Query", qBtnX + (qBtnW / 2), qBtnY + 4.8, { align: "center" });
+    doc.link(qBtnX, qBtnY, qBtnW, qBtnH, { url: "https://www.tpfaid.org/contactus" });
+
+    // 5.5 Computer generated disclaimer at bottom
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.setFont("helvetica", "italic");
+    doc.text("This is a computer-generated email. No signature is required.", 105, 285, { align: "center" });
 
     // 6. Impact Banner (Bottom Section) - Always show, with fallback image
     try {
@@ -948,13 +987,9 @@ export default function DownloadsPage({ darkModeFromParent }) {
                   {(invoiceFilters.search || invoiceFilters.donationType !== "all" || invoiceFilters.dateFilter !== "all" || invoiceFilters.show80GOnly) && (
                     <button
                       onClick={resetFilters}
-                      className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2 ${darkMode
-                        ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                        : "bg-red-100 text-red-600 hover:bg-red-200"
-                        }`}
+                      className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base border-2 border-red-500/30 text-red-500 hover:bg-red-500/10 transition-all`}
                     >
-                      <X className="w-4 h-4" />
-                      Clear
+                      Reset
                     </button>
                   )}
                 </div>

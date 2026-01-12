@@ -17,20 +17,21 @@ import MissionVisionSection from '@/components/aboutus/MissionVisionSection';
 import OurTeamSection from '@/components/aboutus/OurTeamSection';
 import CuratedSection from '@/components/home/CuratedSection';
 import WhatWeDoSection from '@/components/aboutus/WhatWeDoSection';
+import CampaignCarouselSection from '@/components/common/CampaignCarouselSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutPage() {
-  
-  const [scrolled, setScrolled] = useState(true); 
-  
-    const [darkMode, setDarkMode] = useState(() => {
+
+  const [scrolled, setScrolled] = useState(true);
+
+  const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true'
     }
     return false
   })
-  
+
   useEffect(() => {
     const handleStorageChange = () => {
       const savedMode = localStorage.getItem('darkMode')
@@ -72,6 +73,11 @@ export default function AboutPage() {
       <MissionVisionSection darkMode={darkMode} />
       <OurTeamSection darkMode={darkMode} />
       <WhatWeDoSection darkMode={darkMode} />
+      <CampaignCarouselSection
+        darkMode={darkMode}
+        title="Our Campaigns"
+        subtitle="Be a part of our journey to help humanity. Your contribution matters."
+      />
       <Footer darkMode={darkMode} />
     </div>
   );

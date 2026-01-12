@@ -39,19 +39,11 @@ export default function Page() {
 
   const { data: statsData } = useFetchImpactStatsQuery();
   const [scrolled, setScrolled] = useState(false);
-  const [totalRaised, setTotalRaised] = useState(2547893);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 0);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTotalRaised(prev => prev + Math.floor(Math.random() * 100));
-    }, 3000);
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -95,7 +87,7 @@ export default function Page() {
       </section>
 
       <section id="pulse">
-        <PulseSection darkMode={darkMode} totalRaised={totalRaised} />
+        <PulseSection darkMode={darkMode} />
       </section>
 
       <section id="fundraiser-banner">
