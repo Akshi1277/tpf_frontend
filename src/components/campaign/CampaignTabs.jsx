@@ -18,6 +18,7 @@ import {
   Loader2,
   Trash2,
   Check,
+  Activity,
 } from 'lucide-react';
 import {
   useGetCommentsQuery,
@@ -126,6 +127,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
           { id: 'about', icon: Info, label: 'About' },
           { id: 'documents', icon: FileText, label: 'Documents', badge: documents.length },
           { id: 'comments', icon: MessageCircle, label: 'Comments', badge: commentsData?.data?.length || 0 },
+          { id: 'status', icon: Activity, label: 'Current Status' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -173,22 +175,26 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   About This Campaign
                 </h3>
+                {/* Beneficiary */}
+                {campaign?.beneficiaryName && (
+                  <div className={`p-5 mb-5 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gray-50 border border-gray-200'}`}>
+                    <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      Beneficiary Details
+                    </h4>
+                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="font-medium">Beneficiary Name:</span> {campaign.beneficiaryName}
+                    </p>
+                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="font-medium">Campaigner Name:</span> {campaign.campaignerName || campaign.fullName}
+                    </p>
+                  </div>
+                )}
                 <p className={`whitespace-pre-line leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   {campaign?.about || 'No description provided.'}
                 </p>
               </div>
 
-              {/* Beneficiary */}
-              {campaign?.beneficiaryName && (
-                <div className={`p-5 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gray-50 border border-gray-200'}`}>
-                  <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    Beneficiary Details
-                  </h4>
-                  <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <span className="font-medium">Beneficiary:</span> {campaign.beneficiaryName}
-                  </p>
-                </div>
-              )}
+
 
               {/* Impact Goals */}
               {impactGoals.length > 0 && (
@@ -262,8 +268,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`px-4 py-2 rounded-lg font-medium transition-colors ${darkMode
-                              ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
-                              : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                            ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+                            : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                             }`}
                         >
                           View Document
@@ -479,6 +485,45 @@ export default function CampaignTabs({ darkMode, campaign }) {
                   </motion.div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ================= CURRENT STATUS TAB ================= */}
+          {activeTab === 'status' && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`p-3 rounded-xl ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
+                  <Activity className="w-6 h-6 text-emerald-500" />
+                </div>
+                <div>
+                  <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    Current Status
+                  </h3>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Latest updates from the ground
+                  </p>
+                </div>
+              </div>
+
+              <div className={`p-6 rounded-2xl border transition-all ${darkMode
+                  ? 'bg-zinc-900/50 border-zinc-700'
+                  : 'bg-white border-gray-200 shadow-sm'
+                }`}>
+                {campaign?.currentStatus ? (
+                  <p className={`whitespace-pre-line leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {campaign.currentStatus}
+                  </p>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className={`w-16 h-16 rounded-full mb-4 flex items-center justify-center ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`}>
+                      <Info className={`w-8 h-8 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                    </div>
+                    <p className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      No status updates have been posted yet.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </motion.div>

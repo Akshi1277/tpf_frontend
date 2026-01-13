@@ -216,15 +216,15 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
       {/* Tip Section */}
       <div className="mb-8">
         <label className={`block text-sm font-semibold mb-3 ${darkMode ? 'text-gray-200' : 'text-gray-800'} flex items-center gap-2`}>
-          Support TPF (15% Tip)
+          Support TPF
           <div className="group relative">
-            <Info className="w-4 h-4 text-gray-400 cursor-help" />
+            <Info className="w-4 h-4 text-emerald-500 cursor-help" />
             <div className={`
-              absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 rounded-lg text-xs
+              absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-6 rounded-lg text-sm
               ${darkMode ? 'bg-zinc-800 text-gray-200 border border-zinc-700' : 'bg-gray-900 text-white'}
               opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center
             `}>
-              This tip will be used for similar campaigns like this or for the platform.
+              This tip will be used for similar campaigns like this or for the platform expenses.
             </div>
           </div>
         </label>

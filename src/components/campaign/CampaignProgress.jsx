@@ -3,7 +3,7 @@ import {
   TrendingUp,
   Calendar,
   Users,
-  DollarSign,
+  IndianRupee,
   Shield,
   CheckCircle,
   Target,
@@ -39,12 +39,12 @@ export default function CampaignProgress({ darkMode, campaign }) {
 
   const daysLeft = deadline
     ? Math.max(
-        0,
-        Math.ceil(
-          (new Date(deadline).getTime() - Date.now()) /
-            (1000 * 60 * 60 * 24)
-        )
+      0,
+      Math.ceil(
+        (new Date(deadline).getTime() - Date.now()) /
+        (1000 * 60 * 60 * 24)
       )
+    )
     : 0;
 
   const avgDonation =
@@ -58,9 +58,8 @@ export default function CampaignProgress({ darkMode, campaign }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className={`${
-        darkMode ? "bg-zinc-800" : "bg-white"
-      } rounded-2xl shadow-lg p-6 md:p-8 mb-8`}
+      className={`${darkMode ? "bg-zinc-800" : "bg-white"
+        } rounded-2xl shadow-lg p-6 md:p-8 mb-8`}
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* ===================== LEFT: PROGRESS ===================== */}
@@ -71,18 +70,16 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 <TrendingUp className="w-5 h-5 text-emerald-500" />
               </div>
               <h3
-                className={`text-lg font-semibold ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-lg font-semibold ${darkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 Campaign Progress
               </h3>
             </div>
-            <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-              darkMode 
-                ? 'bg-emerald-500/10 text-emerald-400' 
-                : 'bg-emerald-100 text-emerald-700'
-            }`}>
+            <div className={`px-3 py-1 rounded-full text-sm font-semibold ${darkMode
+              ? 'bg-emerald-500/10 text-emerald-400'
+              : 'bg-emerald-100 text-emerald-700'
+              }`}>
               {percentage}% Complete
             </div>
           </div>
@@ -91,7 +88,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
           <div className="mb-6">
             <div className="flex items-end gap-3 mb-4">
               <div className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                ₹{formatNumber(raisedAmount)}
+                {percentage}%
               </div>
               <div className={`text-lg pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                 of ₹{formatNumber(targetAmount)}
@@ -101,9 +98,8 @@ export default function CampaignProgress({ darkMode, campaign }) {
             {/* Progress bar */}
             <div className="relative">
               <div
-                className={`relative w-full h-3 rounded-full overflow-hidden ${
-                  darkMode ? "bg-zinc-700" : "bg-gray-200"
-                }`}
+                className={`relative w-full h-3 rounded-full overflow-hidden ${darkMode ? "bg-zinc-700" : "bg-gray-200"
+                  }`}
               >
                 <motion.div
                   initial={{ width: 0 }}
@@ -119,24 +115,23 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 </motion.div>
               </div>
               {percentage > 0 && (
-                <div 
+                <div
                   className="absolute top-0 h-3 w-1 bg-white rounded-full shadow-lg"
                   style={{ left: `${Math.min(percentage, 98)}%` }}
                 />
               )}
             </div>
-            
+
             {/* Motivational message */}
             {percentage < 100 && (
               <motion.div
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className={`mt-4 px-4 py-3 rounded-lg border-l-4 border-emerald-500 ${
-                  darkMode 
-                    ? "bg-gradient-to-r from-emerald-500/10 to-transparent text-gray-200" 
-                    : "bg-gradient-to-r from-emerald-50 to-transparent text-gray-800"
-                }`}
+                className={`mt-4 px-4 py-3 rounded-lg border-l-4 border-emerald-500 ${darkMode
+                  ? "bg-gradient-to-r from-emerald-500/10 to-transparent text-gray-200"
+                  : "bg-gradient-to-r from-emerald-50 to-transparent text-gray-800"
+                  }`}
               >
                 <p className="text-sm font-medium">
                   Every contribution brings hope to those in need
@@ -163,7 +158,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
             />
             <StatCard
               darkMode={darkMode}
-              icon={<DollarSign className="w-5 h-5" />}
+              icon={<IndianRupee className="w-5 h-5" />}
               value={`₹${formatNumber(avgDonation)}`}
               label="Avg. Donation"
               color="purple"
@@ -178,22 +173,20 @@ export default function CampaignProgress({ darkMode, campaign }) {
             <div className={`absolute top-0 right-0 w-32 h-32 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-600'} blur-3xl`} />
             <div className={`absolute bottom-0 left-0 w-32 h-32 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-600'} blur-3xl`} />
           </div>
-          
+
           <div
-            className={`relative p-6 rounded-xl h-full ${
-              darkMode
-                ? "bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700"
-                : "bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-2 border-emerald-100"
-            }`}
+            className={`relative p-6 rounded-xl h-full ${darkMode
+              ? "bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700"
+              : "bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-2 border-emerald-100"
+              }`}
           >
             <div className="flex items-center gap-2 mb-5">
               <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-100'}`}>
                 <Shield className="w-5 h-5 text-emerald-600" />
               </div>
               <h4
-                className={`font-semibold ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 Trust & Safety
               </h4>
@@ -241,9 +234,8 @@ function StatCard({ darkMode, icon, value, label, color }) {
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className={`p-4 rounded-xl border transition-all ${
-        darkMode ? "bg-zinc-900/50 border-zinc-700 hover:border-zinc-600" : "bg-white border-gray-200 hover:border-gray-300 shadow-sm"
-      }`}
+      className={`p-4 rounded-xl border transition-all ${darkMode ? "bg-zinc-900/50 border-zinc-700 hover:border-zinc-600" : "bg-white border-gray-200 hover:border-gray-300 shadow-sm"
+        }`}
     >
       <div className={`w-10 h-10 rounded-lg ${bgClasses[color]} flex items-center justify-center mb-3`}>
         <div className={colorClasses[color]}>
@@ -251,16 +243,14 @@ function StatCard({ darkMode, icon, value, label, color }) {
         </div>
       </div>
       <div
-        className={`text-xl font-bold mb-1 ${
-          darkMode ? "text-white" : "text-gray-900"
-        }`}
+        className={`text-xl font-bold mb-1 ${darkMode ? "text-white" : "text-gray-900"
+          }`}
       >
         {value}
       </div>
       <p
-        className={`text-xs font-medium ${
-          darkMode ? "text-gray-400" : "text-gray-600"
-        }`}
+        className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
+          }`}
       >
         {label}
       </p>
@@ -270,7 +260,7 @@ function StatCard({ darkMode, icon, value, label, color }) {
 
 function TrustItem({ darkMode, title, subtitle }) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       className="flex items-start gap-3"
@@ -280,16 +270,14 @@ function TrustItem({ darkMode, title, subtitle }) {
       </div>
       <div>
         <p
-          className={`text-sm font-semibold mb-0.5 ${
-            darkMode ? "text-gray-200" : "text-gray-900"
-          }`}
+          className={`text-sm font-semibold mb-0.5 ${darkMode ? "text-gray-200" : "text-gray-900"
+            }`}
         >
           {title}
         </p>
         <p
-          className={`text-xs ${
-            darkMode ? "text-gray-400" : "text-gray-600"
-          }`}
+          className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-600"
+            }`}
         >
           {subtitle}
         </p>

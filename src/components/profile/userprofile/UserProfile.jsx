@@ -22,7 +22,8 @@ import {
   Briefcase,
   Users,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  Search
 } from "lucide-react"
 
 export default function ProfilePage({ darkModeFromParent }) {
@@ -114,38 +115,38 @@ export default function ProfilePage({ darkModeFromParent }) {
     }
   }
 
-const handleSaveAll = async () => {
-  try {
-    const payload = {
-      fullName: tempData.fullName,
-      email: tempData.email,
-      bloodGroup: tempData.bloodGroup,
-      gender: tempData.gender || null,
-      dob:
-        tempData.dobYear && tempData.dobMonth && tempData.dobDay
-          ? `${tempData.dobYear}-${tempData.dobMonth}-${tempData.dobDay}`
-          : null,
-      profession: tempData.profession,
+  const handleSaveAll = async () => {
+    try {
+      const payload = {
+        fullName: tempData.fullName,
+        email: tempData.email,
+        bloodGroup: tempData.bloodGroup,
+        gender: tempData.gender || null,
+        dob:
+          tempData.dobYear && tempData.dobMonth && tempData.dobDay
+            ? `${tempData.dobYear}-${tempData.dobMonth}-${tempData.dobDay}`
+            : null,
+        profession: tempData.profession,
 
-      // ✅ single string address
-      address: tempData.address || "",
-    };
+        // ✅ single string address
+        address: tempData.address || "",
+      };
 
-    const res = await updateProfile(payload).unwrap();
-    dispatch(updateUserPartial(res.user));
+      const res = await updateProfile(payload).unwrap();
+      dispatch(updateUserPartial(res.user));
 
-    setProfileData({
-      ...profileData,
-      address: res.user.address || "",
-    });
+      setProfileData({
+        ...profileData,
+        address: res.user.address || "",
+      });
 
-    setIsEditMode(false);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 2000);
-  } catch (err) {
-    alert(err?.data?.message || "Failed to update profile");
-  }
-};
+      setIsEditMode(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2000);
+    } catch (err) {
+      alert(err?.data?.message || "Failed to update profile");
+    }
+  };
 
 
 
@@ -158,16 +159,16 @@ const handleSaveAll = async () => {
     setShowProfessionModal(true)
   }
 
- const handleSaveProfession = () => {
-  if (showOtherProfession && otherProfession?.trim()) {
-    setTempData(prev => ({ ...prev, profession: otherProfession.trim() }))
-  } else if (tempProfession && tempProfession !== "Other") {
-    setTempData(prev => ({ ...prev, profession: tempProfession }))
+  const handleSaveProfession = () => {
+    if (showOtherProfession && otherProfession?.trim()) {
+      setTempData(prev => ({ ...prev, profession: otherProfession.trim() }))
+    } else if (tempProfession && tempProfession !== "Other") {
+      setTempData(prev => ({ ...prev, profession: tempProfession }))
+    }
+    setShowProfessionModal(false)
+    setShowOtherProfession(false)
+    setOtherProfession("")
   }
-  setShowProfessionModal(false)
-  setShowOtherProfession(false)
-  setOtherProfession("")
-}
 
   const handleOpenDobModal = () => {
     setTempDob({
@@ -243,74 +244,67 @@ const handleSaveAll = async () => {
     </div>
   )
 
- const EditableTag = ({ icon: Icon, label, value, field, color = "blue", type = "text", options = null, onModalOpen }) => {
-  const displayValue = tempData[field]
+  const EditableTag = ({ icon: Icon, label, value, field, color = "blue", type = "text", options = null, onModalOpen }) => {
+    const displayValue = tempData[field]
 
-  return (
-    <div className={`px-4 py-3 rounded-xl border transition-all ${
-      darkMode
-        ? "bg-zinc-800/90 border-zinc-700/70 hover:border-zinc-600"
-        : "bg-white/95 border-gray-200 hover:border-gray-300"
-    }`}>
-      <div className="flex items-center gap-3">
-        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-          darkMode ? `bg-${color}-500/20` : `bg-${color}-100`
+    return (
+      <div className={`px-4 py-3 rounded-xl border transition-all ${darkMode
+          ? "bg-zinc-800/90 border-zinc-700/70 hover:border-zinc-600"
+          : "bg-white/95 border-gray-200 hover:border-gray-300"
         }`}>
-          <Icon className={`w-4 h-4 ${darkMode ? `text-${color}-400` : `text-${color}-600`}`} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className={`text-xs font-semibold mb-1.5 tracking-wide uppercase ${
-            darkMode ? "text-zinc-400" : "text-gray-600"
-          }`}>
-            {label}
-          </p>
-          {type === "select" && options ? (
-            <div className="relative">
-              <select
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${darkMode ? `bg-${color}-500/20` : `bg-${color}-100`
+            }`}>
+            <Icon className={`w-4 h-4 ${darkMode ? `text-${color}-400` : `text-${color}-600`}`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`text-xs font-semibold mb-1.5 tracking-wide uppercase ${darkMode ? "text-zinc-400" : "text-gray-600"
+              }`}>
+              {label}
+            </p>
+            {type === "select" && options ? (
+              <div className="relative">
+                <select
+                  value={displayValue}
+                  onChange={(e) => setTempData(prev => ({ ...prev, [field]: e.target.value }))}
+                  className={`w-full text-sm font-bold px-3 py-2 pr-8 rounded-lg border outline-none appearance-none transition-colors ${darkMode
+                      ? "bg-zinc-900 border-zinc-600 text-white hover:border-zinc-500 focus:border-emerald-500"
+                      : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
+                    }`}
+                >
+                  {options.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${darkMode ? "text-zinc-400" : "text-gray-500"
+                  }`} />
+              </div>
+            ) : type === "modal" ? (
+              <button
+                onClick={onModalOpen}
+                className={`w-full text-left text-sm font-bold px-3 py-2 rounded-lg border transition-colors ${darkMode
+                    ? "bg-zinc-900 border-zinc-600 text-white hover:border-emerald-500"
+                    : "bg-white border-gray-300 text-gray-900 hover:border-emerald-500"
+                  }`}
+              >
+                {displayValue || value}
+              </button>
+            ) : (
+              <input
+                type={type}
                 value={displayValue}
                 onChange={(e) => setTempData(prev => ({ ...prev, [field]: e.target.value }))}
-                className={`w-full text-sm font-bold px-3 py-2 pr-8 rounded-lg border outline-none appearance-none transition-colors ${
-                  darkMode
+                className={`w-full text-sm font-bold px-3 py-2 rounded-lg border outline-none transition-colors ${darkMode
                     ? "bg-zinc-900 border-zinc-600 text-white hover:border-zinc-500 focus:border-emerald-500"
                     : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
-                }`}
-              >
-                {options.map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-              <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none ${
-                darkMode ? "text-zinc-400" : "text-gray-500"
-              }`} />
-            </div>
-          ) : type === "modal" ? (
-            <button
-              onClick={onModalOpen}
-              className={`w-full text-left text-sm font-bold px-3 py-2 rounded-lg border transition-colors ${
-                darkMode
-                  ? "bg-zinc-900 border-zinc-600 text-white hover:border-emerald-500"
-                  : "bg-white border-gray-300 text-gray-900 hover:border-emerald-500"
-              }`}
-            >
-              {displayValue || value}
-            </button>
-          ) : (
-            <input
-              type={type}
-              value={displayValue}
-              onChange={(e) => setTempData(prev => ({ ...prev, [field]: e.target.value }))}
-              className={`w-full text-sm font-bold px-3 py-2 rounded-lg border outline-none transition-colors ${
-                darkMode
-                  ? "bg-zinc-900 border-zinc-600 text-white hover:border-zinc-500 focus:border-emerald-500"
-                  : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
-              }`}
-            />
-          )}
+                  }`}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
 
   return (
     <div className="mt-5 min-h-screen">
@@ -365,26 +359,53 @@ const handleSaveAll = async () => {
                   </button>
                 </div>
 
-                <div className="space-y-3 mb- max-h-96 overflow-y-auto scrollbar-hide">
-                  {professions.map((prof) => (
-                    <button
-                      key={prof}
-                      onClick={() => {
-                        setTempProfession(prof)
-                        setShowOtherProfession(prof === "Other")
-                      }}
-                      className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${tempProfession === prof
-                        ? darkMode
-                          ? "bg-emerald-500/20 border-emerald-500 text-white"
-                          : "bg-emerald-50 border-emerald-500 text-gray-900"
-                        : darkMode
-                          ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-zinc-600"
-                          : "bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300"
-                        }`}
-                    >
-                      {prof}
-                    </button>
-                  ))}
+                {/* Profession Search */}
+                <div className="mb-4 relative">
+                  <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                  <input
+                    type="text"
+                    value={professionSearch}
+                    onChange={(e) => setProfessionSearch(e.target.value)}
+                    placeholder="Search profession..."
+                    className={`w-full pl-10 pr-4 py-2 text-sm rounded-xl border outline-none transition-all ${darkMode
+                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
+                        : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
+                      }`}
+                  />
+                </div>
+
+                <div className="space-y-3 mb-6 max-h-64 overflow-y-auto scrollbar-hide">
+                  {professions
+                    .filter(prof => {
+                      if (!professionSearch) return true;
+                      const s = professionSearch.toLowerCase();
+                      const p = prof.toLowerCase();
+                      if (p.includes(s)) return true;
+                      // Fuzzy match: photography -> Photographer, engineering -> Engineer
+                      if (s.endsWith('y') && p.includes(s.slice(0, -1))) return true;
+                      if (s.endsWith('er') && p.includes(s.slice(0, -2))) return true;
+                      if (s.endsWith('ing') && p.includes(s.slice(0, -3))) return true;
+                      return false;
+                    })
+                    .map((prof) => (
+                      <button
+                        key={prof}
+                        onClick={() => {
+                          setTempProfession(prof)
+                          setShowOtherProfession(prof === "Other")
+                        }}
+                        className={`w-full text-left px-4 py-3 rounded-xl border transition-all ${tempProfession === prof
+                          ? darkMode
+                            ? "bg-emerald-500/20 border-emerald-500 text-white"
+                            : "bg-emerald-50 border-emerald-500 text-gray-900"
+                          : darkMode
+                            ? "bg-zinc-800/50 border-zinc-700 text-white hover:border-zinc-600"
+                            : "bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300"
+                          }`}
+                      >
+                        {prof}
+                      </button>
+                    ))}
                 </div>
 
                 {showOtherProfession && (
@@ -416,28 +437,27 @@ const handleSaveAll = async () => {
                   >
                     Cancel
                   </button>
-                 <button
-  onClick={handleSaveProfession}
-  disabled={showOtherProfession && !otherProfession?.trim()}
-  className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-colors ${
-    showOtherProfession && !otherProfession?.trim()
-      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-      : "bg-emerald-500 text-white hover:bg-emerald-600"
-  }`}
->
-  Choose
-</button>
+                  <button
+                    onClick={handleSaveProfession}
+                    disabled={showOtherProfession && !otherProfession?.trim()}
+                    className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-colors ${showOtherProfession && !otherProfession?.trim()
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-emerald-500 text-white hover:bg-emerald-600"
+                      }`}
+                  >
+                    Choose
+                  </button>
                 </div>
               </div>
             </motion.div>
           </motion.div>
         )
-  }
+        }
       </AnimatePresence >
 
-    {/* DOB Modal */ }
-    < AnimatePresence >
-    { showDobModal && (
+      {/* DOB Modal */}
+      < AnimatePresence >
+        {showDobModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -558,8 +578,8 @@ const handleSaveAll = async () => {
               </div>
             </motion.div>
           </motion.div>
-    )
-}
+        )
+        }
       </AnimatePresence >
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -651,83 +671,83 @@ const handleSaveAll = async () => {
 
 
                 {/* Editable Tags */}
-<div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
-  {isEditMode ? (
-    <>
-      <EditableTag
-        icon={Droplet}
-        label="Blood Group"
-        value={tempData.bloodGroup || "Not Selected"}
-        field="bloodGroup"
-        color="red"
-        type="select"
-        options={["Select", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
-      />
-      <EditableTag
-        icon={Users}
-        label="Gender"
-        value={tempData.gender || "Not Selected"}
-        field="gender"
-        color="blue"
-        type="select"
-        options={["Select", "Male", "Female"]}
-      />
-      <EditableTag
-        icon={Calendar}
-        label="Date of Birth"
-        value={
-          tempData.dobDay && tempData.dobMonth && tempData.dobYear
-            ? `${tempData.dobDay}/${tempData.dobMonth}/${tempData.dobYear}`
-            : "Not Selected"
-        }
-        field="dob"
-        color="purple"
-        type="modal"
-        onModalOpen={handleOpenDobModal}
-      />
-      <DisplayTag
-        icon={Calendar}
-        label="Age"
-        value={
-          tempData.dobDay && tempData.dobMonth && tempData.dobYear
-            ? `${calculateAge(tempData.dobDay, tempData.dobMonth, tempData.dobYear)} years`
-            : "Not Provided"
-        }
-        color="purple"
-      />
-      <EditableTag
-        icon={Briefcase}
-        label="Profession"
-        value={tempData.profession || "Not Selected"}
-        field="profession"
-        color="orange"
-        type="modal"
-        onModalOpen={handleOpenProfessionModal}
-      />
-    </>
-  ) : (
-    <>
-      <DisplayTag icon={Droplet} label="Blood Group" value={profileData.bloodGroup || "Not Selected"} color="red" />
-      <DisplayTag
-        icon={Users}
-        label="Gender"
-        value={profileData.gender || "Not Selected"}
-        color="blue"
-      />
-      <DisplayTag 
-        icon={Calendar} 
-        label="Age" 
-        value={
-          profileData.dobDay && profileData.dobMonth && profileData.dobYear
-            ? `${calculateAge(profileData.dobDay, profileData.dobMonth, profileData.dobYear)} years`
-            : "Not Provided"
-        } 
-        color="purple" 
-      />
-      <DisplayTag icon={Briefcase} label="Profession" value={profileData.profession || "Not Selected"} color="orange" />
-    </>
-  )}
-</div>
+                <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+                  {isEditMode ? (
+                    <>
+                      <EditableTag
+                        icon={Droplet}
+                        label="Blood Group"
+                        value={tempData.bloodGroup || "Not Selected"}
+                        field="bloodGroup"
+                        color="red"
+                        type="select"
+                        options={["Select", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
+                      />
+                      <EditableTag
+                        icon={Users}
+                        label="Gender"
+                        value={tempData.gender || "Not Selected"}
+                        field="gender"
+                        color="blue"
+                        type="select"
+                        options={["Select", "Male", "Female"]}
+                      />
+                      <EditableTag
+                        icon={Calendar}
+                        label="Date of Birth"
+                        value={
+                          tempData.dobDay && tempData.dobMonth && tempData.dobYear
+                            ? `${tempData.dobDay}/${tempData.dobMonth}/${tempData.dobYear}`
+                            : "Not Selected"
+                        }
+                        field="dob"
+                        color="purple"
+                        type="modal"
+                        onModalOpen={handleOpenDobModal}
+                      />
+                      <DisplayTag
+                        icon={Calendar}
+                        label="Age"
+                        value={
+                          tempData.dobDay && tempData.dobMonth && tempData.dobYear
+                            ? `${calculateAge(tempData.dobDay, tempData.dobMonth, tempData.dobYear)} years`
+                            : "Not Provided"
+                        }
+                        color="purple"
+                      />
+                      <EditableTag
+                        icon={Briefcase}
+                        label="Profession"
+                        value={tempData.profession || "Not Selected"}
+                        field="profession"
+                        color="orange"
+                        type="modal"
+                        onModalOpen={handleOpenProfessionModal}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <DisplayTag icon={Droplet} label="Blood Group" value={profileData.bloodGroup || "Not Selected"} color="red" />
+                      <DisplayTag
+                        icon={Users}
+                        label="Gender"
+                        value={profileData.gender || "Not Selected"}
+                        color="blue"
+                      />
+                      <DisplayTag
+                        icon={Calendar}
+                        label="Age"
+                        value={
+                          profileData.dobDay && profileData.dobMonth && profileData.dobYear
+                            ? `${calculateAge(profileData.dobDay, profileData.dobMonth, profileData.dobYear)} years`
+                            : "Not Provided"
+                        }
+                        color="purple"
+                      />
+                      <DisplayTag icon={Briefcase} label="Profession" value={profileData.profession || "Not Selected"} color="orange" />
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -751,11 +771,11 @@ const handleSaveAll = async () => {
                     <p className={`text-xs font-bold mb-2 tracking-wide ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                       Email Address
                     </p>
-            
-                      <p className={`text-sm font-bold break-all ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        {profileData.email}
-                      </p>
-                    
+
+                    <p className={`text-sm font-bold break-all ${darkMode ? "text-white" : "text-gray-900"}`}>
+                      {profileData.email}
+                    </p>
+
                   </div>
                 </div>
 
@@ -776,11 +796,11 @@ const handleSaveAll = async () => {
                     <p className={`text-xs font-bold mb-2 tracking-wide ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                       Mobile Number
                     </p>
-                   
-                      <p className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        +91 {profileData.mobileNo}
-                      </p>
-                   
+
+                    <p className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                      +91 {profileData.mobileNo}
+                    </p>
+
                   </div>
                 </div>
 
@@ -810,8 +830,7 @@ const handleSaveAll = async () => {
                       // Show button if no valid zakat amount
                       <button
                         onClick={() => (window.location.href = "/zakat-calculator")}
-    className={`text-sm font-bold transition-colors flex items-center gap-1.5 ${
-      darkMode ? "text-emerald-300 hover:text-emerald-200" : "text-emerald-700 hover:text-emerald-800"
+                        className={`text-sm font-bold transition-colors flex items-center gap-1.5 ${darkMode ? "text-emerald-300 hover:text-emerald-200" : "text-emerald-700 hover:text-emerald-800"
                           }`}
                       >
                         Calculate Zakat <Sparkles className="w-4 h-4" />
