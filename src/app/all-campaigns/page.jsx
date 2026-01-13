@@ -72,7 +72,7 @@ export default function AllCampaignsPage() {
         <div className={`min-h-screen font-sans ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
             <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
 
-            <main className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <main className="pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                 <div className="text-center mb-12">
                     <h1 className={`text-4xl md:text-5xl font-bold mb-4 ${COLORS.neutralHeading}`}>
                         All Campaigns
