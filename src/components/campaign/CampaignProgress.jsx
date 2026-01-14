@@ -76,12 +76,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 Campaign Progress
               </h3>
             </div>
-            <div className={`px-3 py-1 rounded-full text-sm font-semibold ${darkMode
-              ? 'bg-emerald-500/10 text-emerald-400'
-              : 'bg-emerald-100 text-emerald-700'
-              }`}>
-              {percentage}% Complete
-            </div>
+          
           </div>
 
           {/* Amount */}

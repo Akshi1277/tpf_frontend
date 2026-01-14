@@ -19,6 +19,7 @@ import {
   Trash2,
   Check,
   Activity,
+  User,
 } from 'lucide-react';
 import {
   useGetCommentsQuery,
@@ -125,9 +126,10 @@ export default function CampaignTabs({ darkMode, campaign }) {
       <div className={`flex border-b ${darkMode ? 'border-zinc-700' : 'border-gray-200'}`}>
         {[
           { id: 'about', icon: Info, label: 'About' },
+          { id: 'status', icon: Activity, label: 'Current Status' },
+
           { id: 'documents', icon: FileText, label: 'Documents', badge: documents.length },
           { id: 'comments', icon: MessageCircle, label: 'Comments', badge: commentsData?.data?.length || 0 },
-          { id: 'status', icon: Activity, label: 'Current Status' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -175,18 +177,45 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   About This Campaign
                 </h3>
-                {/* Beneficiary */}
+                {/* Beneficiary & Campaigner Info Boxes */}
                 {campaign?.beneficiaryName && (
-                  <div className={`p-5 mb-5 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gray-50 border border-gray-200'}`}>
-                    <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                      Beneficiary Details
-                    </h4>
-                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      <span className="font-medium">Beneficiary Name:</span> {campaign.beneficiaryName}
-                    </p>
-                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      <span className="font-medium">Campaigner Name:</span> {campaign.campaignerName || campaign.fullName}
-                    </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                  
+
+                    {/* Campaigner Box */}
+                    <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-blue-500/50' : 'bg-blue-50/30 border-blue-100 hover:border-blue-300'}`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-blue-500/10 group-hover:bg-blue-500/20' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
+                          <User className="w-5 h-5 text-blue-500" />
+                        </div>
+                        <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                          Campaigner
+                        </h4>
+                      </div>
+                      <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {campaign.campaignerName || campaign.fullName}
+                      </p>
+                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        Verified campaign organizer
+                      </p>
+                    </div>
+                      {/* Beneficiary Box */}
+                    <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50' : 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-300'}`}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}>
+                          <Heart className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                          Beneficiary
+                        </h4>
+                      </div>
+                      <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {campaign.beneficiaryName}
+                      </p>
+                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        The primary recipient of this fund
+                      </p>
+                    </div>
                   </div>
                 )}
                 <p className={`whitespace-pre-line leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -506,8 +535,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
               </div>
 
               <div className={`p-6 rounded-2xl border transition-all ${darkMode
-                  ? 'bg-zinc-900/50 border-zinc-700'
-                  : 'bg-white border-gray-200 shadow-sm'
+                ? 'bg-zinc-900/50 border-zinc-700'
+                : 'bg-white border-gray-200 shadow-sm'
                 }`}>
                 {campaign?.currentStatus ? (
                   <p className={`whitespace-pre-line leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
