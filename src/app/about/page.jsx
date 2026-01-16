@@ -10,16 +10,13 @@ import TeamSection from '@/components/aboutus/TeamSection';
 import TimelineSection from '@/components/aboutus/MissionVisionSection';
 import ValuesSection from '@/components/aboutus/OurTeamSection';
 import NewsletterBanner from '@/components/aboutus/NewsletterBanner';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
+
 import MissionVisionSection from '@/components/aboutus/MissionVisionSection';
 import OurTeamSection from '@/components/aboutus/OurTeamSection';
 import CuratedSection from '@/components/home/CuratedSection';
 import WhatWeDoSection from '@/components/aboutus/WhatWeDoSection';
 import CampaignCarouselSection from '@/components/common/CampaignCarouselSection';
 
-gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutPage() {
 
@@ -47,23 +44,7 @@ export default function AboutPage() {
     }
   }, [])
 
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smooth: true,
-    });
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
-  }, []);
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>

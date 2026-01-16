@@ -43,7 +43,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
             showToast({
                 type: "error",
                 title: "Login failed",
-                message: error?.data?.message || error?.data?.data?.message ||'Please try again!',
+                message: error?.data?.message || error?.data?.data?.message || 'Please try again!',
                 duration: 2000,
             });
             console.error(error)
@@ -88,6 +88,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
         setOtp(['', '', '', ''])
         setStep(1)
         setShowSuccess(false)
+        window.lenis?.start();   // safety
         onClose()
     }
 
@@ -170,6 +171,44 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
         setShowSignup(false)
         onLoginSuccess?.(user)
     }
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        // 1) Stop Lenis completely
+        window.lenis?.stop();
+
+        // 2) Hard block wheel + touch
+        const blockScroll = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+        };
+
+        // 3) Apply listeners at capture phase
+        document.addEventListener("wheel", blockScroll, { passive: false, capture: true });
+        document.addEventListener("touchmove", blockScroll, { passive: false, capture: true });
+        document.addEventListener("scroll", blockScroll, { passive: false, capture: true });
+
+        // 4) Also lock body as fallback
+        const original = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.removeEventListener("wheel", blockScroll, true);
+            document.removeEventListener("touchmove", blockScroll, true);
+            document.removeEventListener("scroll", blockScroll, true);
+
+            document.body.style.overflow = original;
+
+            // Restart Lenis
+            window.lenis?.start();
+        };
+    }, [isOpen]);
+
+
+
+
 
     useEffect(() => {
         if (isOpen) {
@@ -382,8 +421,8 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
 
                                                     <p className={`text-center text-xs sm:text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                                                         Don't have an account?{" "}
-                                                        <button 
-                                                            type="button" 
+                                                        <button
+                                                            type="button"
                                                             onClick={handleSignupClick}
                                                             className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
                                                         >

@@ -241,17 +241,7 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
                                     }`} />
                             </div>
 
-                            <button
-                                type="button"
-                                onClick={handleClose}
-                                disabled={showSuccess}
-                                className={`absolute top-6 right-6 z-10 p-2 rounded-full transition-all ${darkMode
-                                    ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white"
-                                    : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900"
-                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
+                           
 
                             <AnimatePresence>
                                 {showSuccess && (

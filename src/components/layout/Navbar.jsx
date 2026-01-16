@@ -347,7 +347,12 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
               {/* profile initials instead of hamburger when logged in */}
               {hasMounted && userInfo ? (
                 <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  onClick={() => {
+                    setMobileMenuOpen(!mobileMenuOpen);
+                    if (!mobileMenuOpen) window.lenis?.stop();
+                    else window.lenis?.start();
+                  }}
+
                   className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold tracking-wide text-[14px] sm:text-[15px] cursor-pointer transition-all duration-300
     ring-2 ring-white/70 dark:ring-white/40
     ${darkMode
@@ -511,6 +516,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             >
               {/* Modal popup */}
               <div
+                data-lenis-prevent
                 className={`fixed md:relative right-0 top-0 h-full md:h-auto md:max-h-[85vh] w-full md:w-96 md:max-w-md md:mx-4 md:rounded-2xl overflow-hidden transition-all duration-300 ease-in-out flex flex-col
     ${darkMode
                     ? 'bg-zinc-900 shadow-[0_0_40px_rgba(0,0,0,0.9)] border border-zinc-800'
@@ -529,7 +535,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   </button>
                 </div>
                 {/* Menu content */}
-                <div className="px-6 py-4 space-y-4 flex-1 overflow-y-auto scrollbar-hide pb-8">
+                <div
+                  className="px-6 py-4 space-y-4 flex-1 overflow-y-auto scrollbar-hide pb-8"
+                  data-lenis-prevent
+                >
 
                   {/* Greeting */}
                   <div>

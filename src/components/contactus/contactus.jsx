@@ -592,9 +592,10 @@ export default function ContactPage({ darkMode }) {
   ];
 
   return (
+    <>
     <section
-      ref={ref}
-      className={`py-16 sm:py-20 md:py-24 ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
+    ref={ref}
+    className={`py-16 sm:py-20 md:py-24 ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
         } relative overflow-hidden`}
     >
       {/* Background decoration */}
@@ -1005,13 +1006,14 @@ export default function ContactPage({ darkMode }) {
 
           <HelpCentreSection darkMode={darkMode} isInView={isInView} />
         </motion.div>
+      </div>
+    </section>
         <LoginModal
           isOpen={showLoginModal}
           onClose={() => setShowLoginModal(false)}
           darkMode={darkMode}
           onLoginSuccess={handleLoginSuccess}
         />
-      </div>
-    </section>
+          </>
   );
 }

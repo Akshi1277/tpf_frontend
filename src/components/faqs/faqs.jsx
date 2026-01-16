@@ -129,270 +129,272 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay: 0.6 }}
-      className={`mt-12 sm:mt-16 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 ${darkMode
-        ? 'bg-gradient-to-br from-zinc-800 to-zinc-800/50 border-zinc-700/50'
-        : 'bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-100'
-        } border relative overflow-hidden`}
-    >
-      <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 rounded-full blur-3xl"></div>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className={`mt-12 sm:mt-16 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 ${darkMode
+          ? 'bg-gradient-to-br from-zinc-800 to-zinc-800/50 border-zinc-700/50'
+          : 'bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-100'
+          } border relative overflow-hidden`}
+      >
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 rounded-full blur-3xl"></div>
 
-      <div className="relative z-10">
-        <AnimatePresence mode="wait">
-          {/* Initial Search Stage */}
-          {stage === 'initial' && (
-            <motion.div
-              key="initial"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              className="text-center"
-            >
-              <h3 className={`text-2xl sm:text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                Still Have Questions?
-              </h3>
-              <p className={`text-base sm:text-lg mb-8 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                Search for answers or ask us directly
-              </p>
+        <div className="relative z-10">
+          <AnimatePresence mode="wait">
+            {/* Initial Search Stage */}
+            {stage === 'initial' && (
+              <motion.div
+                key="initial"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="text-center"
+              >
+                <h3 className={`text-2xl sm:text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  Still Have Questions?
+                </h3>
+                <p className={`text-base sm:text-lg mb-8 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                  Search for answers or ask us directly
+                </p>
 
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Type your question here..."
-                    className={`w-full px-6 py-4 pr-14 rounded-xl text-base ${darkMode
-                      ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                      : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                      } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:shadow-lg transition-all duration-300"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                  </button>
-                </div>
-              </form>
-
-              <div className="mt-8">
-                <a
-                  href="https://tpf-aid.vercel.app/contactus"
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${darkMode ? 'bg-zinc-700/30 hover:bg-zinc-700/50 text-zinc-300' : 'bg-white/60 hover:bg-white text-zinc-700'
-                    } transition-all duration-300 group`}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                  </svg>
-                  <span className="font-medium">Contact Us</span>
-                </a>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Search Result Stage */}
-          {stage === 'result' && (
-            <motion.div
-              key="result"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              {searchResult ? (
-                <div className="max-w-3xl mx-auto">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                      Found an Answer
-                    </h3>
-                    <button
-                      onClick={handleReset}
-                      className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
-                        } transition-all duration-300`}
-                    >
-                      <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-700/30' : 'bg-white/60'
-                    } mb-8`}>
-                    <h4 className={`text-lg font-semibold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                      {searchResult.q}
-                    </h4>
-                    <p className={`text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                      {searchResult.a}
-                    </p>
-                  </div>
-
-                  <div className="text-center">
-                    <p className={`text-lg mb-4 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                      Was this helpful?
-                    </p>
-                    <div className="flex gap-4 justify-center">
-                      <button
-                        onClick={() => handleFeedback(true)}
-                        className="px-8 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
-                      >
-                        Yes, thank you!
-                      </button>
-                      <button
-                        onClick={() => handleFeedback(false)}
-                        className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
-                          ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
-                          : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
-                          }`}
-                      >
-                        No, I need more help
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="max-w-3xl mx-auto text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500/20 to-emerald-500/20 flex items-center justify-center">
-                    <svg className={`w-8 h-8 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-                    </svg>
-                  </div>
-                  <h3 className={`text-xl sm:text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                    No Match Found
-                  </h3>
-                  <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                    We couldn't find an answer to your question in our FAQ.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button
-                      onClick={handleReset}
-                      className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
-                        ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
-                        : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
-                        }`}
-                    >
-                      Try Another Search
-                    </button>
-                    <button
-                      onClick={() => setStage('question')}
-                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
-                    >
-                      Ask Your Question
-                    </button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* Thank You Stage */}
-          {stage === 'thankYou' && (
-            <motion.div
-              key="thankYou"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4 }}
-              className="text-center py-8"
-            >
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                Great! We're Happy to Help
-              </h3>
-            </motion.div>
-          )}
-
-          {/* Question Form Stage */}
-          {stage === 'question' && (
-            <motion.div
-              key="question"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              className="max-w-2xl mx-auto"
-            >
-              {!submitted ? (
-                <>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                      Ask Your Question
-                    </h3>
-                    <button
-                      onClick={handleReset}
-                      className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
-                        } transition-all duration-300`}
-                    >
-                      <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                    Please describe your question in detail, and we'll get back to you as soon as possible.
-                  </p>
-
-                  <form onSubmit={handleQuestionSubmit}>
-                    <textarea
-                      value={userQuestion}
-                      onChange={(e) => setUserQuestion(e.target.value)}
+                <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Type your question here..."
-                      rows="6"
-                      required
-                      className={`w-full px-6 py-4 rounded-xl text-base resize-none ${darkMode
+                      className={`w-full px-6 py-4 pr-14 rounded-xl text-base ${darkMode
                         ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
                         : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
                         } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
                     />
                     <button
                       type="submit"
-                      className="w-full mt-4 px-6 py-4 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:shadow-lg transition-all duration-300"
                     >
-                      Submit Question
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                      </svg>
                     </button>
-                  </form>
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
                   </div>
-                  <h3 className={`text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                    Question Submitted!
-                  </h3>
-                  <p className={`text-base ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                    We'll review your question and get back to you soon.
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <LoginModal
-          isOpen={showLoginModal}
-          onClose={() => {
-            setShowLoginModal(false);
-            setPendingSubmit(false);
-          }}
-          darkMode={darkMode}
-          onLoginSuccess={handleLoginSuccess}
-        />
+                </form>
 
-      </div>
-    </motion.div>
+                <div className="mt-8">
+                  <a
+                    href="https://tpf-aid.vercel.app/contactus"
+                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${darkMode ? 'bg-zinc-700/30 hover:bg-zinc-700/50 text-zinc-300' : 'bg-white/60 hover:bg-white text-zinc-700'
+                      } transition-all duration-300 group`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                    </svg>
+                    <span className="font-medium">Contact Us</span>
+                  </a>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Search Result Stage */}
+            {stage === 'result' && (
+              <motion.div
+                key="result"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+              >
+                {searchResult ? (
+                  <div className="max-w-3xl mx-auto">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                        Found an Answer
+                      </h3>
+                      <button
+                        onClick={handleReset}
+                        className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
+                          } transition-all duration-300`}
+                      >
+                        <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-700/30' : 'bg-white/60'
+                      } mb-8`}>
+                      <h4 className={`text-lg font-semibold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                        {searchResult.q}
+                      </h4>
+                      <p className={`text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                        {searchResult.a}
+                      </p>
+                    </div>
+
+                    <div className="text-center">
+                      <p className={`text-lg mb-4 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                        Was this helpful?
+                      </p>
+                      <div className="flex gap-4 justify-center">
+                        <button
+                          onClick={() => handleFeedback(true)}
+                          className="px-8 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
+                        >
+                          Yes, thank you!
+                        </button>
+                        <button
+                          onClick={() => handleFeedback(false)}
+                          className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
+                            ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
+                            : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
+                            }`}
+                        >
+                          No, I need more help
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="max-w-3xl mx-auto text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500/20 to-emerald-500/20 flex items-center justify-center">
+                      <svg className={`w-8 h-8 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                      </svg>
+                    </div>
+                    <h3 className={`text-xl sm:text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                      No Match Found
+                    </h3>
+                    <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                      We couldn't find an answer to your question in our FAQ.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <button
+                        onClick={handleReset}
+                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
+                          ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
+                          : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
+                          }`}
+                      >
+                        Try Another Search
+                      </button>
+                      <button
+                        onClick={() => setStage('question')}
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
+                      >
+                        Ask Your Question
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* Thank You Stage */}
+            {stage === 'thankYou' && (
+              <motion.div
+                key="thankYou"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4 }}
+                className="text-center py-8"
+              >
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  Great! We're Happy to Help
+                </h3>
+              </motion.div>
+            )}
+
+            {/* Question Form Stage */}
+            {stage === 'question' && (
+              <motion.div
+                key="question"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="max-w-2xl mx-auto"
+              >
+                {!submitted ? (
+                  <>
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                        Ask Your Question
+                      </h3>
+                      <button
+                        onClick={handleReset}
+                        className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
+                          } transition-all duration-300`}
+                      >
+                        <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                      Please describe your question in detail, and we'll get back to you as soon as possible.
+                    </p>
+
+                    <form onSubmit={handleQuestionSubmit}>
+                      <textarea
+                        value={userQuestion}
+                        onChange={(e) => setUserQuestion(e.target.value)}
+                        placeholder="Type your question here..."
+                        rows="6"
+                        required
+                        className={`w-full px-6 py-4 rounded-xl text-base resize-none ${darkMode
+                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                          } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
+                      />
+                      <button
+                        type="submit"
+                        className="w-full mt-4 px-6 py-4 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
+                      >
+                        Submit Question
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h3 className={`text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                      Question Submitted!
+                    </h3>
+                    <p className={`text-base ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                      We'll review your question and get back to you soon.
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+        </div>
+      </motion.div>
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => {
+          setShowLoginModal(false);
+          setPendingSubmit(false);
+        }}
+        darkMode={darkMode}
+        onLoginSuccess={handleLoginSuccess}
+      />
+    </>
   );
 }
 
