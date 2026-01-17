@@ -19,7 +19,7 @@ import {
   DollarSign,
   IndianRupee
 } from "lucide-react"
-import { useToggleWishlistMutation, useGetWishlistQuery } from "@/utils/slices/authApiSlice"
+import { useToggleWishlistMutation, useGetWishlistQuery, useGetMyApplicationsQuery } from "@/utils/slices/authApiSlice"
 import ShareModal from "../../ui/ShareModal"
 import { getMediaUrl } from "@/utils/media"
 
@@ -33,6 +33,8 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
 
   const router = useRouter();
   const { data: wishlistedCampaigns = [], isLoading } = useGetWishlistQuery();
+  const { data: applicationsData, isLoading: isLoadingApps } = useGetMyApplicationsQuery();
+  const applications = applicationsData?.data || [];
   const [toggleWishlist] = useToggleWishlistMutation();
   // Sync with parent dark mode
   useEffect(() => {
@@ -41,11 +43,17 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
-  const myCampaigns = userInfo?.campaigns || [];
+  const myItems = applications.map(app => {
+    if (app.status === 'approved' && app.campaignId && typeof app.campaignId === 'object') {
+      return { type: 'campaign', data: { ...app.campaignId, status: 'active' }, original: app };
+    }
+    return { type: 'application', data: app, status: app.status };
+  });
+
   // Mock user data
   const currentUser = {
     name: userInfo?.fullName,
-    totalCampaigns: myCampaigns.length,
+    totalCampaigns: myItems.filter(i => i.type === 'campaign').length,
     totalWishlisted: wishlistedCampaigns.length,
   };
 
@@ -59,12 +67,29 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         : "bg-emerald-100 text-emerald-700 border-emerald-200",
       completed: darkMode
         ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-        : "bg-blue-100 text-blue-700 border-blue-200"
+        : "bg-blue-100 text-blue-700 border-blue-200",
+      pending: darkMode
+        ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
+        : "bg-amber-100 text-amber-700 border-amber-200",
+      rejected: darkMode
+        ? "bg-rose-500/20 text-rose-400 border-rose-500/30"
+        : "bg-rose-100 text-rose-700 border-rose-200",
+      clarification: darkMode
+        ? "bg-purple-500/20 text-purple-400 border-purple-500/30"
+        : "bg-purple-100 text-purple-700 border-purple-200"
+    }
+
+    const labels = {
+      active: "Active",
+      completed: "Completed",
+      pending: "Pending Approval",
+      rejected: "Rejected",
+      clarification: "Clarification Needed"
     }
 
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${styles[status]}`}>
-        {status === "active" ? "Active" : "Completed"}
+      <span className={`px-3 py-1 rounded-full text-center text-xs font-semibold border ${styles[status] || styles.pending}`}>
+        {labels[status] || status}
       </span>
     )
   }
@@ -72,6 +97,60 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   const calculateProgress = (raised, goal) => {
     return Math.min((raised / goal) * 100, 100)
   }
+
+  const ApplicationCard = ({ application }) => {
+    const isRejected = application.status === 'rejected';
+    const isClarification = application.status === 'clarification';
+    const reason = application.groundReport?.reason || "No specific reason provided.";
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`rounded-xl sm:rounded-2xl overflow-hidden border p-6 flex flex-col justify-between h-full ${darkMode
+          ? "bg-zinc-800/50 border-zinc-700"
+          : "bg-white border-gray-200 shadow-lg"
+          }`}
+      >
+        <div>
+          <div className="flex justify-between items-start mb-4">
+            <h3 className={`text-lg font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+              Financial Aid Application
+            </h3>
+            {getStatusBadge(application.status)}
+          </div>
+
+          <div className={`mb-4 text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+            <p className="mb-2"><span className="font-semibold">ID:</span> #{application._id.slice(-6).toUpperCase()}</p>
+            <p><span className="font-semibold">Applied on:</span> {new Date(application.createdAt).toLocaleDateString()}</p>
+          </div>
+
+          {(isRejected || isClarification) && (
+            <div className={`p-4 rounded-lg text-sm mb-4 ${darkMode ? "bg-red-500/10 border border-red-500/20" : "bg-red-50 border border-red-100"
+              }`}>
+              <p className={`font-semibold mb-1 ${darkMode ? "text-red-400" : "text-red-700"}`}>
+                {isClarification ? "Clarification Required:" : "Reason for Rejection:"}
+              </p>
+              <p className={darkMode ? "text-zinc-300" : "text-gray-600"}>
+                {reason}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-700">
+          <p className={`text-xs text-center ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+            {application.status === 'pending'
+              ? "Our team is reviewing your application. You will be notified of any updates."
+              : isClarification
+                ? "Please contact support or check your email for more details."
+                : "Create a new application or contact support for help."}
+          </p>
+        </div>
+      </motion.div>
+    );
+  };
 
   const CampaignCard = ({ campaign, isMyCampaign = false }) => {
     const progress = calculateProgress(campaign.raisedAmount, campaign.targetAmount)
@@ -115,12 +194,40 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
           } transition-all hover:shadow-xl`}
       >
         {/* Image */}
-        <div className="relative h-40 sm:h-48 overflow-hidden">
-          <img
-            src={getMediaUrl(campaign.imageUrl)}
-            alt={campaign.title}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-          />
+        <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
+          {campaign.imageUrl ? (
+            <img
+              src={getMediaUrl(campaign.imageUrl)}
+              alt={campaign.title}
+              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-4 text-center">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${darkMode ? "bg-zinc-700" : "bg-gray-200"
+                }`}>
+                <Clock className={`w-6 h-6 ${darkMode ? "text-zinc-400" : "text-gray-400"}`} />
+              </div>
+              <p className={`text-xs font-semibold ${darkMode ? "text-zinc-400" : "text-gray-500"}`}>
+                Image Pending
+              </p>
+            </div>
+          )}
+
+          {/* Fallback for when image fails to load (hidden by default) */}
+          <div className="hidden absolute inset-0 flex-col items-center justify-center p-4 text-center bg-gray-100 dark:bg-zinc-800">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${darkMode ? "bg-zinc-700" : "bg-gray-200"
+              }`}>
+              <Clock className={`w-6 h-6 ${darkMode ? "text-zinc-400" : "text-gray-400"}`} />
+            </div>
+            <p className={`text-xs font-semibold ${darkMode ? "text-zinc-400" : "text-gray-500"}`}>
+              Image Unavailable
+            </p>
+          </div>
+
           <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
             {isMyCampaign ? (
               getStatusBadge(campaign.status)
@@ -137,7 +244,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             ? "bg-zinc-900/80 text-white"
             : "bg-white/80 text-gray-900"
             } backdrop-blur-sm`}>
-            {campaign.category}
+            {campaign.category || "General"}
           </div>
         </div>
 
@@ -194,18 +301,18 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             <div className="flex items-center gap-1">
               <Clock
                 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${daysLeft <= 5 && daysLeft > 0
-                    ? "text-rose-500"
-                    : darkMode
-                      ? "text-zinc-400"
-                      : "text-gray-600"
+                  ? "text-rose-500"
+                  : darkMode
+                    ? "text-zinc-400"
+                    : "text-gray-600"
                   }`}
               />
               <span
                 className={`text-xs sm:text-sm ${daysLeft <= 5 && daysLeft > 0
-                    ? "text-rose-500 font-semibold"
-                    : darkMode
-                      ? "text-zinc-400"
-                      : "text-gray-600"
+                  ? "text-rose-500 font-semibold"
+                  : darkMode
+                    ? "text-zinc-400"
+                    : "text-gray-600"
                   }`}
               >
                 {daysLeft > 0 ? `${daysLeft}d` : "Ended"}
@@ -227,18 +334,14 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
           {/* Action Buttons */}
           {isMyCampaign ? (
             <div className="flex gap-2">
-              <button className={`flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 ${darkMode
-                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                : "bg-emerald-500 text-white hover:bg-emerald-600"
-                }`}>
+              <button
+                onClick={handleDonateClick} // Reusing the navigate logic
+                className={`flex-1 py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 ${darkMode
+                  ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                  : "bg-emerald-500 text-white hover:bg-emerald-600"
+                  }`}>
                 <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">View</span>
-              </button>
-              <button className={`py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg font-semibold transition-all ${darkMode
-                ? "bg-zinc-700 text-white hover:bg-zinc-600"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}>
-                <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
               <button
                 className={`py-2 sm:py-2.5 px-3 sm:px-4 cursor-pointer rounded-lg font-semibold transition-all ${darkMode
@@ -396,7 +499,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                   : "text-gray-600 hover:text-gray-900"
                 }`}
             >
-              My Campaigns ({myCampaigns.length})
+              My Campaigns ({myItems.length})
             </button>
 
           </div>
@@ -405,8 +508,12 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         {/* Content */}
         {activeTab === "my-campaigns" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-            {myCampaigns.map((campaign) => (
-              <CampaignCard key={campaign.id} campaign={campaign} isMyCampaign={true} />
+            {myItems.map((item) => (
+              item.type === 'campaign' ? (
+                <CampaignCard key={item.data._id} campaign={item.data} isMyCampaign={true} />
+              ) : (
+                <ApplicationCard key={item.data._id} application={item.data} />
+              )
             ))}
           </div>
         ) : (
@@ -418,7 +525,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         )}
 
         {/* Empty State */}
-        {activeTab === "my-campaigns" && myCampaigns.length === 0 && (
+        {activeTab === "my-campaigns" && myItems.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

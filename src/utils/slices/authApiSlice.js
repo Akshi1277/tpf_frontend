@@ -108,6 +108,12 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
 
 
+
+    getMyApplications: builder.query({
+      query: () => "/financial-aid/my-applications",
+      keepUnusedDataFor: 0,
+    }),
+
   }),
 });
 
@@ -122,5 +128,6 @@ export const {
   useGetWishlistQuery,
   useGetRecentTransactionsQuery,
   useGetPeopleHelpedStatsQuery,
+  useGetMyApplicationsQuery,
 
 } = authApiSlice;
