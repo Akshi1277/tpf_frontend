@@ -305,7 +305,7 @@ export default function Footer({ darkMode }) {
 
             {/* Instagram */}
             <a
-              href="#"
+              href="https://www.instagram.com/tpf_aid?igsh=MTgyZG8weHdncmI1Yw=="
               className="social-icon-link group"
               aria-label="Visit our Instagram page"
             >
