@@ -17,9 +17,10 @@ import {
   Eye,
   Calendar,
   DollarSign,
-  IndianRupee
+  IndianRupee,
+  Upload
 } from "lucide-react"
-import { useToggleWishlistMutation, useGetWishlistQuery, useGetMyApplicationsQuery } from "@/utils/slices/authApiSlice"
+import { useToggleWishlistMutation, useGetWishlistQuery, useGetMyApplicationsQuery, useUploadClarificationDocumentsMutation } from "@/utils/slices/authApiSlice"
 import ShareModal from "../../ui/ShareModal"
 import { getMediaUrl } from "@/utils/media"
 
@@ -103,6 +104,58 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     const isClarification = application.status === 'clarification';
     const reason = application.groundReport?.reason || "No specific reason provided.";
 
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [isDragging, setIsDragging] = useState(false);
+    const [uploadClarificationDocuments, { isLoading: isUploading }] = useUploadClarificationDocumentsMutation();
+
+    const handleFileSelect = (e) => {
+      const files = Array.from(e.target.files || []);
+      setSelectedFiles(prev => [...prev, ...files]);
+    };
+
+    const handleDragOver = (e) => {
+      e.preventDefault();
+      setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+      e.preventDefault();
+      setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const files = Array.from(e.dataTransfer.files || []);
+      setSelectedFiles(prev => [...prev, ...files]);
+    };
+
+    const removeFile = (index) => {
+      setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleUpload = async () => {
+      if (selectedFiles.length === 0) return;
+
+      const formData = new FormData();
+      selectedFiles.forEach((file) => {
+        formData.append('supportingDocuments', file);
+      });
+
+      try {
+        await uploadClarificationDocuments({
+          applicationId: application._id,
+          formData
+        }).unwrap();
+
+        setSelectedFiles([]);
+        alert('Documents uploaded successfully!');
+      } catch (error) {
+        console.error('Upload failed:', error);
+        alert('Failed to upload documents. Please try again.');
+      }
+    };
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -137,6 +190,85 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
               </p>
             </div>
           )}
+
+          {/* Upload Section for Clarification */}
+          {isClarification && (
+            <div className="mb-4">
+              <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                Upload Clarification Documents
+              </label>
+
+              {/* Drag and Drop Area */}
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDragging
+                  ? darkMode ? "border-emerald-500 bg-emerald-500/10" : "border-emerald-500 bg-emerald-50"
+                  : darkMode ? "border-zinc-600 bg-zinc-800/50" : "border-gray-300 bg-gray-50"
+                  }`}
+              >
+                <Upload className={`w-8 h-8 mx-auto mb-2 ${darkMode ? "text-zinc-400" : "text-gray-400"}`} />
+                <p className={`text-sm mb-2 ${darkMode ? "text-zinc-300" : "text-gray-600"}`}>
+                  Drag and drop files here, or click to select
+                </p>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id={`file-upload-${application._id}`}
+                  accept="image/*,.pdf,.doc,.docx"
+                />
+                <label
+                  htmlFor={`file-upload-${application._id}`}
+                  className={`inline-block px-4 py-2 rounded-lg cursor-pointer text-sm font-semibold transition-colors ${darkMode
+                    ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                    : "bg-emerald-500 text-white hover:bg-emerald-600"
+                    }`}
+                >
+                  Select Files
+                </label>
+              </div>
+
+              {/* Selected Files List */}
+              {selectedFiles.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {selectedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between p-2 rounded-lg ${darkMode ? "bg-zinc-700/50" : "bg-gray-100"
+                        }`}
+                    >
+                      <span className={`text-sm truncate flex-1 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                        {file.name}
+                      </span>
+                      <button
+                        onClick={() => removeFile(index)}
+                        className={`ml-2 p-1 rounded hover:bg-red-500/20 transition-colors ${darkMode ? "text-red-400" : "text-red-600"
+                          }`}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    onClick={handleUpload}
+                    disabled={isUploading}
+                    className={`w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all ${isUploading
+                      ? darkMode ? "bg-zinc-600 text-zinc-400 cursor-not-allowed" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : darkMode
+                        ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                        : "bg-emerald-500 text-white hover:bg-emerald-600"
+                      }`}
+                  >
+                    {isUploading ? "Uploading..." : "Upload Documents"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-700">
@@ -144,7 +276,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             {application.status === 'pending'
               ? "Our team is reviewing your application. You will be notified of any updates."
               : isClarification
-                ? "Please contact support or check your email for more details."
+                ? "Please upload the requested documents above."
                 : "Create a new application or contact support for help."}
           </p>
         </div>

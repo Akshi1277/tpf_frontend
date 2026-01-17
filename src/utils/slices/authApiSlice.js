@@ -112,6 +112,16 @@ export const authApiSlice = apiSlice.injectEndpoints({
     getMyApplications: builder.query({
       query: () => "/financial-aid/my-applications",
       keepUnusedDataFor: 0,
+      providesTags: ["MyApplications"],
+    }),
+
+    uploadClarificationDocuments: builder.mutation({
+      query: ({ applicationId, formData }) => ({
+        url: `/financial-aid/${applicationId}/clarification`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["MyApplications"],
     }),
 
   }),
@@ -129,5 +139,6 @@ export const {
   useGetRecentTransactionsQuery,
   useGetPeopleHelpedStatsQuery,
   useGetMyApplicationsQuery,
+  useUploadClarificationDocumentsMutation,
 
 } = authApiSlice;
