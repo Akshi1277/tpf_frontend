@@ -249,8 +249,8 @@ export default function ProfilePage({ darkModeFromParent }) {
 
     return (
       <div className={`px-4 py-3 rounded-xl border transition-all ${darkMode
-          ? "bg-zinc-800/90 border-zinc-700/70 hover:border-zinc-600"
-          : "bg-white/95 border-gray-200 hover:border-gray-300"
+        ? "bg-zinc-800/90 border-zinc-700/70 hover:border-zinc-600"
+        : "bg-white/95 border-gray-200 hover:border-gray-300"
         }`}>
         <div className="flex items-center gap-3">
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${darkMode ? `bg-${color}-500/20` : `bg-${color}-100`
@@ -268,8 +268,8 @@ export default function ProfilePage({ darkModeFromParent }) {
                   value={displayValue}
                   onChange={(e) => setTempData(prev => ({ ...prev, [field]: e.target.value }))}
                   className={`w-full text-sm font-bold px-3 py-2 pr-8 rounded-lg border outline-none appearance-none transition-colors ${darkMode
-                      ? "bg-zinc-900 border-zinc-600 text-white hover:border-zinc-500 focus:border-emerald-500"
-                      : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
+                    ? "bg-zinc-900 border-zinc-600 text-white hover:border-zinc-500 focus:border-emerald-500"
+                    : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
                     }`}
                 >
                   {options.map(opt => (
@@ -283,8 +283,8 @@ export default function ProfilePage({ darkModeFromParent }) {
               <button
                 onClick={onModalOpen}
                 className={`w-full text-left text-sm font-bold px-3 py-2 rounded-lg border transition-colors ${darkMode
-                    ? "bg-zinc-900 border-zinc-600 text-white hover:border-emerald-500"
-                    : "bg-white border-gray-300 text-gray-900 hover:border-emerald-500"
+                  ? "bg-zinc-900 border-zinc-600 text-white hover:border-emerald-500"
+                  : "bg-white border-gray-300 text-gray-900 hover:border-emerald-500"
                   }`}
               >
                 {displayValue || value}
@@ -295,8 +295,8 @@ export default function ProfilePage({ darkModeFromParent }) {
                 value={displayValue}
                 onChange={(e) => setTempData(prev => ({ ...prev, [field]: e.target.value }))}
                 className={`w-full text-sm font-bold px-3 py-2 rounded-lg border outline-none transition-colors ${darkMode
-                    ? "bg-zinc-900 border-zinc-600 text-white hover:border-zinc-500 focus:border-emerald-500"
-                    : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
+                  ? "bg-zinc-900 border-zinc-600 text-white hover:border-zinc-500 focus:border-emerald-500"
+                  : "bg-white border-gray-300 text-gray-900 hover:border-gray-400 focus:border-emerald-500"
                   }`}
               />
             )}
@@ -307,7 +307,8 @@ export default function ProfilePage({ darkModeFromParent }) {
   }
 
   return (
-    <div className="mt-5 min-h-screen">
+    <div className="relative mt-5">
+
       <AnimatePresence>
         {showSuccess && (
           <motion.div
@@ -368,8 +369,8 @@ export default function ProfilePage({ darkModeFromParent }) {
                     onChange={(e) => setProfessionSearch(e.target.value)}
                     placeholder="Search profession..."
                     className={`w-full pl-10 pr-4 py-2 text-sm rounded-xl border outline-none transition-all ${darkMode
-                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
-                        : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
+                      ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-emerald-500"
                       }`}
                   />
                 </div>
@@ -441,8 +442,8 @@ export default function ProfilePage({ darkModeFromParent }) {
                     onClick={handleSaveProfession}
                     disabled={showOtherProfession && !otherProfession?.trim()}
                     className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-colors ${showOtherProfession && !otherProfession?.trim()
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-emerald-500 text-white hover:bg-emerald-600"
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-emerald-500 text-white hover:bg-emerald-600"
                       }`}
                   >
                     Choose

@@ -1,11 +1,11 @@
 'use client';
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, XCircle, AlertTriangle } from "lucide-react";
+import { Check, XCircle, AlertTriangle, Info } from "lucide-react";
 import { useAppToast } from "@/app/AppToastContext";
 
 export default function AppToast({ darkMode = false }) {
-  const { toast } = useAppToast(); // ✅ READ FROM CONTEXT
+  const { toast } = useAppToast();
 
   if (!toast) return null;
 
@@ -13,12 +13,14 @@ export default function AppToast({ darkMode = false }) {
     success: <Check className="w-5 h-5 text-white" strokeWidth={3} />,
     error: <XCircle className="w-5 h-5 text-white" strokeWidth={3} />,
     warning: <AlertTriangle className="w-5 h-5 text-white" strokeWidth={3} />,
+    info: <Info className="w-5 h-5 text-white" strokeWidth={3} />,
   };
 
   const COLOR_MAP = {
     success: "bg-emerald-500",
     error: "bg-red-500",
     warning: "bg-yellow-500",
+    info: "bg-blue-500",
   };
 
   return (

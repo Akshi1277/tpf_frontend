@@ -623,8 +623,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
   if (isKycApproved) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="relative flex items-center justify-center p-4">
+        <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
           <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
             }`} />
           <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
@@ -754,7 +754,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     Address
                   </p>
                   <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {userInfo.address?.house || "—"}
+                    {kyc?.address || "—"}
                   </p>
                 </div>
                 <div>
@@ -762,7 +762,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     City
                   </p>
                   <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {userInfo.kycDetails?.city || "—"}
+                    {kyc?.city || "—"}
                   </p>
                 </div>
                 <div>
@@ -770,7 +770,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     State
                   </p>
                   <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {userInfo.kycDetails?.state || "—"}
+                    {kyc?.state || "—"}
                   </p>
                 </div>
                 <div>
@@ -778,7 +778,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
                     Postal Code
                   </p>
                   <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                    {userInfo.address?.pincode || "Not provided"}
+                    {kyc?.pincode || "Not provided"}
                   </p>
                 </div>
               </div>
@@ -834,8 +834,8 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="relative flex items-center justify-center p-4">
+        <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
           <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
             }`} />
           <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
@@ -907,7 +907,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="relative">
       {/* Success Toast */}
       <AnimatePresence>
         {showSuccess && (
@@ -939,7 +939,7 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
       </AnimatePresence>
 
       {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
         <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
           }`} />
         <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
