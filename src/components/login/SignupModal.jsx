@@ -80,8 +80,25 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
         }
     }
 
+
+    const isValidEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+
+
     const handleFinalSubmit = async () => {
         if (!fullName || !email) return
+
+        if (!isValidEmail(email)) {
+            showToast({
+                type: "error",
+                title: "Invalid Email",
+                message: "Please enter a valid email address.",
+                duration: 2000,
+            });
+            return;
+        }
 
         try {
             const profileData = { fullName, email }
@@ -241,7 +258,7 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
                                     }`} />
                             </div>
 
-                           
+
 
                             <AnimatePresence>
                                 {showSuccess && (

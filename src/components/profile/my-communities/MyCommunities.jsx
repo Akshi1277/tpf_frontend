@@ -128,10 +128,10 @@ export default function MyCommunitiesPage({ darkModeFromParent }) {
   )
 
   return (
-    <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-gradient-to-br from-emerald-50 via-white to-teal-50"}`}>
+    <div className={`relative ${darkMode ? "bg-zinc-900" : "bg-transparent"}`}>
 
       {/* Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
         <div 
           className={`absolute inset-0 ${
             darkMode 

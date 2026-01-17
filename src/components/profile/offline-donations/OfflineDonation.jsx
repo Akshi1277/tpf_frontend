@@ -161,7 +161,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="relative">
+
 
       {/* SUCCESS TOAST — unchanged UI */}
       <AnimatePresence>
@@ -193,7 +194,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
       </AnimatePresence>
 
       {/* BACKGROUND + MAIN UI (UNCHANGED) */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
         <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
           }`} />
         <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"

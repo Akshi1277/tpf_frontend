@@ -51,6 +51,8 @@ export default function SignUpPage({ darkMode }) {
     }
   }
 
+
+
   const handleOtpSubmit = async () => {
     try {
       if (otp.length !== 4) return;
@@ -78,9 +80,24 @@ export default function SignUpPage({ darkMode }) {
     }
   }
 
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+
   const handleFinalSubmit = async () => {
     try {
       if (!email || !fullName) return;
+
+      if (!isValidEmail(email)) {
+        showToast({
+          type: "error",
+          title: "Invalid Email",
+          message: "Please enter a valid email address.",
+          duration: 2000,
+        });
+        return;
+      }
 
       const profileData = { fullName, email }
       const res = await updateProfile(profileData).unwrap();

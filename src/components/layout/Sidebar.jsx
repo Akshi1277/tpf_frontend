@@ -9,7 +9,6 @@ import {
   User,
   Heart,
   FileCheck,
-  Receipt,
   ChevronRight,
   X,
   Menu,
@@ -91,117 +90,103 @@ const menuItems = [
 const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-useEffect(() => setMounted(true), []);
 
+  useEffect(() => setMounted(true), []);
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto scrollbar-hide">
-      {/* HEADER */}
-      {/* HEADER */}
-<div
-  className={`px-4 py-4 sm:px-6 sm:py-5 border-b flex-shrink-0 ${
-    darkMode ? "border-zinc-800" : "border-gray-200"
-  }`}
->
-  <div className="flex items-center justify-between mb-1">
-    <h2
-      className={`text-lg sm:text-xl font-bold ${
-        darkMode ? "text-white" : "text-gray-900"
-      }`}
-    >
-      {menuItems.find((i) => i.path === pathname)?.name || "My Profile"}
-    </h2>
-
-    <button
-      onClick={onClose}
-      className={`lg:hidden p-2 rounded-lg transition-colors ${
-        darkMode
-          ? "hover:bg-zinc-800 text-zinc-400"
-          : "hover:bg-gray-100 text-gray-600"
-      }`}
-    >
-      <X className="w-5 h-5" />
-    </button>
-  </div>
-
-  {/* 🔥 HYDRATION-SAFE PROFILE COMPLETION SECTION */}
-  {mounted && (
-    <>
-      {profileCompletion < 100 && (
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <span
-              className={`text-xs sm:text-sm font-medium ${
-                darkMode ? "text-zinc-300" : "text-gray-700"
-              }`}
-            >
-              Profile Completion
-            </span>
-            <span
-              className={`text-xs sm:text-sm font-bold ${
-                darkMode ? "text-zinc-400" : "text-gray-600"
-              }`}
-            >
-              {`${profileCompletion}%`}
-            </span>
-          </div>
-
-          <div
-            className={`w-full h-2 rounded-full overflow-hidden ${
-              darkMode ? "bg-zinc-800" : "bg-gray-200"
-            }`}
-          >
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${profileCompletion}%` }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className={`h-full rounded-full ${
-                profileCompletion >= 75
-                  ? "bg-gradient-to-r from-blue-500 to-indigo-500"
-                  : profileCompletion >= 50
-                  ? "bg-gradient-to-r from-orange-500 to-amber-500"
-                  : "bg-gradient-to-r from-red-500 to-rose-500"
-              }`}
-            />
-          </div>
-
-          <p
-            className={`text-[10px] sm:text-xs mt-1.5 ${
-              darkMode ? "text-zinc-500" : "text-gray-500"
-            }`}
-          >
-            Complete your profile to unlock all features
-          </p>
-        </div>
-      )}
-
-      {profileCompletion === 100 && (
-        <div
-          className={`mt-4 px-4 py-3 rounded-xl text-center border backdrop-blur-sm ${
-            darkMode
-              ? "bg-emerald-900/10 border-emerald-800/40"
-              : "bg-emerald-50/70 border-emerald-200"
+    <div className="flex flex-col h-full">
+      {/* HEADER - Fixed height, no scroll */}
+      <div
+        className={`px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b flex-shrink-0 ${darkMode ? "border-zinc-800" : "border-gray-200"
           }`}
-        >
-          <p
-            className={`text-[13px] font-semibold ${
-              darkMode ? "text-emerald-300" : "text-emerald-700"
-            }`}
+      >
+        <div className="flex items-center justify-between mb-1">
+          <h2
+            className={`text-base sm:text-lg lg:text-xl font-bold truncate ${darkMode ? "text-white" : "text-gray-900"
+              }`}
           >
-            “Every act of kindness is a charity.”
-          </p>
+            {menuItems.find((i) => i.path === pathname)?.name || "My Profile"}
+          </h2>
+
+          <button
+            onClick={onClose}
+            className={`lg:hidden p-1.5 sm:p-2 rounded-lg transition-colors ${darkMode
+                ? "hover:bg-zinc-800 text-zinc-400"
+                : "hover:bg-gray-100 text-gray-600"
+              }`}
+          >
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
         </div>
-      )}
-    </>
-  )}
-</div>
 
+        {/* Profile Completion - Compact */}
+        {mounted && (
+          <>
+            {profileCompletion < 100 && (
+              <div className="mt-2 sm:mt-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span
+                    className={`text-[10px] sm:text-xs font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"
+                      }`}
+                  >
+                    Profile Completion
+                  </span>
+                  <span
+                    className={`text-[10px] sm:text-xs font-bold ${darkMode ? "text-zinc-400" : "text-gray-600"
+                      }`}
+                  >
+                    {`${profileCompletion}%`}
+                  </span>
+                </div>
 
-      
+                <div
+                  className={`w-full h-1.5 sm:h-2 rounded-full overflow-hidden ${darkMode ? "bg-zinc-800" : "bg-gray-200"
+                    }`}
+                >
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${profileCompletion}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className={`h-full rounded-full ${profileCompletion >= 75
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-500"
+                        : profileCompletion >= 50
+                          ? "bg-gradient-to-r from-orange-500 to-amber-500"
+                          : "bg-gradient-to-r from-red-500 to-rose-500"
+                      }`}
+                  />
+                </div>
 
-      {/* MENU */}
-      <nav className="flex-1 p-2 sm:p-3 pb-6">
-        <div className="flex flex-col space-y-1.5 sm:space-y-2">
+                <p
+                  className={`text-[9px] sm:text-[10px] mt-1 ${darkMode ? "text-zinc-500" : "text-gray-500"
+                    }`}
+                >
+                  Complete to unlock all features
+                </p>
+              </div>
+            )}
+
+            {profileCompletion === 100 && (
+              <div
+                className={`mt-2 sm:mt-3 px-2 sm:px-3 py-2 rounded-lg text-center border backdrop-blur-sm ${darkMode
+                    ? "bg-emerald-900/10 border-emerald-800/40"
+                    : "bg-emerald-50/70 border-emerald-200"
+                  }`}
+              >
+                <p
+                  className={`text-[10px] sm:text-xs font-semibold ${darkMode ? "text-emerald-300" : "text-emerald-700"
+                    }`}
+                >
+                  "Every act of kindness is a charity."
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* MENU - Scrollable but optimized for screen height */}
+      <nav className="flex-1 overflow-y-auto scrollbar-hide px-2 sm:px-3 py-2 sm:py-3">
+        <div className="flex flex-col space-y-1 sm:space-y-1.5">
           {menuItems.map((item, index) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
@@ -211,66 +196,60 @@ useEffect(() => setMounted(true), []);
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`relative group rounded-xl sm:rounded-2xl transition-all duration-300 border-2 ${
-                    isActive
+                  transition={{ delay: index * 0.05 }}
+                  className={`relative group rounded-lg sm:rounded-xl transition-all duration-300 border-2 ${isActive
                       ? darkMode
                         ? "bg-zinc-800/80 shadow-xl border-transparent"
                         : "bg-gradient-to-r from-gray-50 to-white shadow-xl border-gray-200"
                       : darkMode
-                      ? "hover:bg-zinc-800/50 border-transparent"
-                      : "hover:bg-gray-50 border-transparent"
-                  }`}
+                        ? "hover:bg-zinc-800/50 border-transparent"
+                        : "hover:bg-gray-50 border-transparent"
+                    }`}
                 >
-                  {/* RED ALERT ICON FOR INCOMPLETE SECTIONS */}
-                {mounted && item.incomplete && (
-  <AlertTriangle className="absolute right-9 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
-)}
+                  {/* Alert Icon */}
+                  {mounted && item.incomplete && (
+                    <AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                  )}
 
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-r-full bg-gradient-to-b ${item.gradient} shadow-lg`}
+                      className={`absolute left-0 top-0 bottom-0 w-1 sm:w-1.5 rounded-r-full bg-gradient-to-b ${item.gradient} shadow-lg`}
                     />
                   )}
 
-                  <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5">
-                    <div className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-                      isActive
+                  <div className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5">
+                    <div className={`relative w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${isActive
                         ? `bg-gradient-to-br ${item.gradient} shadow-lg shadow-${item.activeColor}-500/30`
                         : darkMode
-                        ? "bg-zinc-800"
-                        : "bg-gray-100"
-                    }`}>
-                      <Icon className={`w-5 h-5 ${
-                        isActive ? "text-white" : darkMode ? "text-zinc-400" : "text-gray-600"
-                      }`} />
+                          ? "bg-zinc-800"
+                          : "bg-gray-100"
+                      }`}>
+                      <Icon className={`w-4 h-4 sm:w-4 sm:h-4 lg:w-5 lg:h-5 ${isActive ? "text-white" : darkMode ? "text-zinc-400" : "text-gray-600"
+                        }`} />
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className={`text-sm sm:text-base font-semibold mb-0.5 ${
-                        isActive
+                      <h3 className={`text-xs sm:text-sm font-semibold mb-0.5 truncate ${isActive
                           ? darkMode ? "text-white" : "text-gray-900"
                           : darkMode ? "text-zinc-300" : "text-gray-700"
-                      }`}>
+                        }`}>
                         {item.name}
                       </h3>
-                      <p className={`text-[10px] sm:text-xs truncate ${
-                        isActive
+                      <p className={`text-[9px] sm:text-[10px] truncate ${isActive
                           ? darkMode ? "text-zinc-400" : "text-gray-600"
                           : darkMode ? "text-zinc-500" : "text-gray-500"
-                      }`}>
+                        }`}>
                         {item.description}
                       </p>
                     </div>
 
-                    <ChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${
-                      isActive
-                        ? darkMode ? "text-white translate-x-1" : "text-gray-900 translate-x-1"
+                    <ChevronRight className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-all ${isActive
+                        ? darkMode ? "text-white translate-x-0.5" : "text-gray-900 translate-x-0.5"
                         : darkMode
-                        ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
-                        : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
-                    }`} />
+                          ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                          : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                      }`} />
                   </div>
                 </motion.div>
               </Link>
@@ -292,43 +271,31 @@ function Sidebar({ darkMode }) {
   const toggleMobileMenu = useCallback(() => setIsMobileOpen((prev) => !prev), []);
   const closeMobileMenu = useCallback(() => setIsMobileOpen(false), []);
 
-  // PHASE 1 — Profile fields 50%
+  // Profile completion calculation
   const calcProfile = () => {
-  let score = 0;
-  if (user?.fullName) score += 15;
-  if (user?.email) score += 15;
-  if (user?.mobileNo) score += 15;
-  if (user?.bloodGroup) score += 15;
-  if (user?.gender) score += 15;
-  if (user?.dob) score += 15;
-  if (user?.profession) score += 10;
+    let score = 0;
+    if (user?.fullName) score += 15;
+    if (user?.email) score += 15;
+    if (user?.mobileNo) score += 15;
+    if (user?.bloodGroup) score += 15;
+    if (user?.gender) score += 15;
+    if (user?.dob) score += 15;
+    if (user?.profession) score += 10;
+    return score;
+  };
 
-  return score; // 0–100
-};
-
-
-  // PHASE 2 — KYC 50%
   const calcKyc = () => {
-  const k = user?.kycDetails;
-  if (!k) return 0;
+    const k = user?.kycDetails;
+    if (!k) return 0;
+    const hasAll = k.fullLegalName && k.panNumber && k.address && k.city && k.state;
+    return hasAll ? 100 : 0;
+  };
 
-  const hasAll =
-    k.fullLegalName &&
-    k.panNumber &&
-    k.address &&
-    k.city &&
-    k.state ;
-
-  return hasAll ? 100 : 0;
-};
-
-
-  const profilePhase = calcProfile(); // 0–100
-  const kycPhase = calcKyc(); // 0–100
-
+  const profilePhase = calcProfile();
+  const kycPhase = calcKyc();
   const totalCompletion = Math.round(profilePhase * 0.5 + kycPhase * 0.5);
 
-  // FLAG for red ❗ markers
+  // Update incomplete flags
   menuItems.find((i) => i.path === "/profile/userprofile").incomplete = profilePhase < 100;
   menuItems.find((i) => i.path === "/profile/kyc-details").incomplete = kycPhase < 100;
 
@@ -336,18 +303,21 @@ function Sidebar({ darkMode }) {
 
   useEffect(() => {
     document.body.style.overflow = isMobileOpen ? "hidden" : "unset";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, [isMobileOpen]);
 
   return (
     <>
-      {/* MOBILE BUTTON */}
+      {/* MOBILE FLOATING BUTTON */}
       <button
         onClick={toggleMobileMenu}
-        className={`lg:hidden fixed right-4 sm:right-6 bottom-20 sm:bottom-24 z-40 p-3 sm:p-4 rounded-full shadow-2xl transition-all ${
-          darkMode
-            ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text:white"
-            : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white"
-        }`}
+        aria-label="Open menu"
+        className={`lg:hidden fixed right-4 bottom-20 sm:bottom-24 z-40 p-3 sm:p-3.5 rounded-full shadow-2xl transition-all active:scale-95 ${darkMode
+            ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
+            : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+          } text-white`}
       >
         <Menu className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
       </button>
@@ -365,7 +335,7 @@ function Sidebar({ darkMode }) {
         )}
       </AnimatePresence>
 
-      {/* MOBILE SIDEBAR */}
+      {/* MOBILE SIDEBAR - Full height, responsive width */}
       <AnimatePresence>
         {isMobileOpen && (
           <motion.aside
@@ -373,9 +343,8 @@ function Sidebar({ darkMode }) {
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className={`lg:hidden fixed top-0 left-0 bottom-0 w-72 sm:w-80 z-50 ${
-              darkMode ? "bg-zinc-900" : "bg-white"
-            } shadow-2xl`}
+            className={`lg:hidden fixed top-0 left-0 bottom-0 w-[280px] sm:w-[320px] z-50 ${darkMode ? "bg-zinc-900" : "bg-white"
+              }`}
           >
             <SidebarContent
               onClose={closeMobileMenu}
@@ -386,12 +355,11 @@ function Sidebar({ darkMode }) {
         )}
       </AnimatePresence>
 
-      {/* DESKTOP SIDEBAR */}
+      {/* DESKTOP SIDEBAR - Scrollable, not sticky */}
       <aside
-        className={`hidden lg:block sticky w-64 xl:w-80 border-r ${
-          darkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-200"
-        } shadow-xl`}
-        style={{ top: "64px", height: "calc(100vh - 64px)", zIndex: 20 }}
+        className={`hidden lg:block w-60 xl:w-72 2xl:w-80 border-r flex-shrink-0 ${darkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-gray-100"
+          } overflow-y-auto`}
+
       >
         <SidebarContent darkMode={darkMode} profileCompletion={totalCompletion} />
       </aside>

@@ -149,9 +149,10 @@ export default function ContactPage({ darkModeFromParent }) {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-gradient-to-br from-emerald-50 via-white to-teal-50"}`}>
-      {/* Background Pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+   <div className="relative">
+
+      <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
+
         <div 
           className={`absolute inset-0 ${
             darkMode 
