@@ -35,6 +35,9 @@ export default function CampaignsSection({ darkMode }) {
           typeof item.campaignSlug === 'string' &&
           item.campaignSlug.trim().length > 0
       )
+      .sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )
       .map((campaign) => ({
         ...campaign,
         image: campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : null,
@@ -69,11 +72,11 @@ export default function CampaignsSection({ darkMode }) {
   const scroll = (direction) => {
     const container = containerRef.current;
     if (!container) return;
-    
+
     const cardWidth = 285;
     const gap = 20;
     const scrollAmount = (cardWidth + gap) * 2;
-    
+
     container.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
@@ -81,6 +84,7 @@ export default function CampaignsSection({ darkMode }) {
   };
 
   const showArrows = filteredCampaigns.length > 3;
+
 
   /* --------------------------------
      Render
@@ -111,11 +115,10 @@ export default function CampaignsSection({ darkMode }) {
             <button
               onClick={() => scroll('left')}
               aria-label="Scroll left"
-              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${
-                darkMode 
-                  ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg' 
-                  : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
-              } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
+              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${darkMode
+                ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg'
+                : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
+                } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -145,11 +148,10 @@ export default function CampaignsSection({ darkMode }) {
             <button
               onClick={() => scroll('right')}
               aria-label="Scroll right"
-              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${
-                darkMode 
-                  ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg' 
-                  : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
-              } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
+              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${darkMode
+                ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg'
+                : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
+                } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
