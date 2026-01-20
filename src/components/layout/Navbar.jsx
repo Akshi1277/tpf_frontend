@@ -281,7 +281,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                       <div className={`p-2 border-t ${darkMode ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-100 bg-zinc-50/50'}`}>
                         <button
                           onClick={() => {
-                            router.push('/#campaigns');
+                            router.push('/all-campaigns');
                             setShowDropdown(false);
                             setSearchQuery('');
                           }}
