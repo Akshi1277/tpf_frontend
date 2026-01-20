@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCMS } from "@/app/CMSContext";
 import { getMediaUrl } from '@/utils/media';
+import Link from 'next/link';
 export default function CommunitiesSection({ darkMode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [scrollIndex, setScrollIndex] = useState(0);
@@ -181,11 +182,22 @@ export default function CommunitiesSection({ darkMode }) {
                   <h3 className="font-semibold text-white text-lg mb-2 drop-shadow-md">
                     {community.title}
                   </h3>
-                  <button
-                    className="cursor-pointer text-xs flex items-center justify-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-colors duration-200"
-                  >
-                    Join Now
-                  </button>
+                  {community.route ? (
+                    <Link href={community.route}>
+                      <button
+                        className="cursor-pointer text-xs flex items-center justify-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-colors duration-200"
+                      >
+                        Join Now
+                      </button>
+                    </Link>
+                  ) : (
+                    <button
+                      // disabled
+                      className="text-xs px-3 py-1.5 bg-gray-400 text-white rounded-2xl cursor-not-allowed"
+                    >
+                      Join Now
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
