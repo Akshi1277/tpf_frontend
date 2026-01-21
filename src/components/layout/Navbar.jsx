@@ -12,6 +12,8 @@ import { useFetchCampaignsQuery } from '@/utils/slices/campaignApiSlice';
 import { Search, MapPin, Building2, TrendingUp } from 'lucide-react';
 import { useAppToast } from '@/app/AppToastContext';
 import { getMediaUrl } from '@/utils/media';
+import { Award } from 'lucide-react';
+
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -635,6 +637,22 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Discover inspiring campaigns →</span>
+                  </Link>
+
+                  {/* Join as Volunteer link */}
+                  <Link
+                    href="/volunteer/register"
+                    className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
+                   ${darkMode
+                        ? 'text-emerald-400 hover:bg-zinc-800'
+                        : 'text-emerald-600 hover:bg-zinc-50'
+                      }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <div className={`p-1 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
+                      <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
+                    </div>
+                    <span className="font-semibold tracking-wide">Join as a Volunteer</span>
                   </Link>
 
                   {/* Main menu items with icons */}

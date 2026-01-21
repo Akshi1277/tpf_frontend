@@ -128,9 +128,15 @@ export default function Footer({ darkMode }) {
                 'Notices'
               ].map(item => (
                 <li key={item}>
-                  <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
-                    {item}
-                  </a>
+                  {item === 'Volunteer Now' ? (
+                    <Link href="/volunteer/register" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                      {item}
+                    </Link>
+                  ) : (
+                    <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                      {item}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

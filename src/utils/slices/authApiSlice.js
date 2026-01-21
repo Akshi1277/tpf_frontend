@@ -124,6 +124,20 @@ export const authApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["MyApplications"],
     }),
 
+    registerVolunteer: builder.mutation({
+      query: (volunteerData) => ({
+        url: "/user/register-volunteer",
+        method: "POST",
+        body: volunteerData,
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setCredentials(data.user));
+        } catch (error) { }
+      },
+    }),
+
   }),
 });
 
@@ -131,6 +145,7 @@ export const {
   useSendOtpMutation,
   useVerifyOtpMutation,
   useUpdateProfileMutation,
+  useRegisterVolunteerMutation,
   useGetMeQuery,
   useLogoutUserMutation,
   useLazyGetMeQuery,
