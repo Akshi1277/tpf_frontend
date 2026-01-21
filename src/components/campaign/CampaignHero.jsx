@@ -1,8 +1,34 @@
 import { motion } from "framer-motion";
 import { getMediaUrl } from "@/utils/media";
-
+import { useState, useEffect } from "react";
 export default function CampaignHero({ campaign, darkMode }) {
   if (!campaign) return null;
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const primaryImage = campaign.imageUrl;
+
+  const galleryImages = (campaign.imageGallery || []).filter(
+    (img) => img !== primaryImage
+  );
+
+  const orderedImages = primaryImage
+    ? [primaryImage, ...galleryImages]
+    : galleryImages;
+  useEffect(() => {
+    if (!orderedImages.length) return;
+    console.log("orderedImages", orderedImages);
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) =>
+        prev === orderedImages.length - 1 ? 0 : prev + 1
+      );
+    }, 4000); // ⏱️ 4 seconds
+
+    return () => clearInterval(interval);
+  }, [orderedImages.length]);
+
+
+
 
   return (
     <motion.div
@@ -11,15 +37,20 @@ export default function CampaignHero({ campaign, darkMode }) {
       className="relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden mb-8"
     >
       {/* IMAGE */}
-      <img
-        src={
-          campaign.imageUrl
-            ? getMediaUrl(campaign.imageUrl)
-            : "https://via.placeholder.com/1200x400?text=Campaign"
-        }
-        alt={campaign.title}
-        className="w-full h-full object-cover"
-      />
+      <div className="absolute inset-0">
+        {orderedImages.map((img, index) => (
+          <motion.img
+            key={img}
+            src={getMediaUrl(img)}
+            alt={campaign.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: index === currentIndex ? 1 : 0 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+          />
+        ))}
+      </div>
+
 
       {/* OVERLAY */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
