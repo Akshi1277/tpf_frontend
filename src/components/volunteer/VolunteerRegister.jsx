@@ -127,14 +127,19 @@ export default function VolunteerRegister({ darkMode }) {
             })
 
             setTimeout(() => {
-                router.push("/")
+                router.push("/login")
             }, 2500)
         } catch (error) {
             console.error("Volunteer Reg Error:", error)
+
+            // Handle specific error cases
+            const errorMessage = error?.data?.message || "Could not complete registration";
+
             showToast({
                 title: "Registration Failed",
-                message: error?.data?.message || "Could not complete registration",
-                type: "error"
+                message: errorMessage,
+                type: "error",
+                duration: 4000
             })
         } finally {
             setLoading(false)
@@ -517,7 +522,7 @@ export default function VolunteerRegister({ darkMode }) {
                                             onClose={() => setOpenDropdown(null)}
                                             title="Gender Selection"
                                             showSearch={false}
-                                            items={["Male", "Female", "Other"]}
+                                            items={["Male", "Female"]}
                                             onSelect={(val) => setFormData(prev => ({ ...prev, gender: val }))}
                                         />
                                     </div>

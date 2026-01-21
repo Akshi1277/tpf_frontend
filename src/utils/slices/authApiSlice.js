@@ -130,12 +130,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: volunteerData,
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setCredentials(data.user));
-        } catch (error) { }
-      },
+      // No auto-login - user must login manually after registration
     }),
 
   }),
