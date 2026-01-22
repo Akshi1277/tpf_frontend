@@ -54,7 +54,32 @@ export default function VolunteerRegister({ darkMode }) {
     useEffect(() => {
         loadStates()
         loadProfessions()
-    }, [])
+
+        // CASE 1: Pre-fill form if user is logged in
+        if (userInfo) {
+            setFormData(prev => ({
+                ...prev,
+                fullName: userInfo.fullName || "",
+                email: userInfo.email || "",
+                phone: userInfo.mobileNo || "",
+                gender: userInfo.gender || "",
+                state: userInfo.kycDetails?.state || "",
+                city: userInfo.kycDetails?.city || "",
+                expertise: userInfo.profession || ""
+            }))
+        }
+    }, [userInfo])
+
+    // Load cities if a state is already pre-filled from userInfo
+    useEffect(() => {
+        if (userInfo?.kycDetails?.state && states.length > 0) {
+            const matchedState = states.find(s => s.name === userInfo.kycDetails.state)
+            if (matchedState) {
+                setSelectedStateCode(matchedState.iso2)
+                loadCities(matchedState.iso2)
+            }
+        }
+    }, [userInfo, states])
 
     useEffect(() => {
         if (selectedStateCode && citiesCache[selectedStateCode]) {
