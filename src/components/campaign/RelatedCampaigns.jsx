@@ -1,6 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
@@ -14,13 +17,9 @@ export default function RelatedCampaigns({
   const cms = useCMS();
 
   const relatedCampaigns = useMemo(() => {
-    if (!Array.isArray(cms) || !currentSlug || !category) return [];
+    if (!Array.isArray(cms) || !currentSlug) return [];
 
     const normalizedCurrentSlug = String(currentSlug)
-      .trim()
-      .toLowerCase();
-
-    const normalizedCategory = String(category)
       .trim()
       .toLowerCase();
 
@@ -37,17 +36,8 @@ export default function RelatedCampaigns({
           .trim()
           .toLowerCase();
 
-        const itemCategory = String(item.category || '')
-          .trim()
-          .toLowerCase();
-
-        // 🚫 EXCLUDE CURRENT CAMPAIGN (HARD STOP)
+        // Exclude current campaign
         if (itemSlug === normalizedCurrentSlug) {
-          return false;
-        }
-
-        // ✅ SAME CATEGORY ONLY
-        if (itemCategory !== normalizedCategory) {
           return false;
         }
 
@@ -69,9 +59,22 @@ export default function RelatedCampaigns({
         taxBenefit: Boolean(campaign.taxBenefits),
         zakatVerified: Boolean(campaign.zakatVerified),
         slug: campaign.campaignSlug,
-      }))
-      .slice(0, 3); 
-  }, [cms, category, currentSlug]);
+      }));
+  }, [cms, currentSlug]);
+
+  const scrollRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (!scrollRef.current) return;
+
+    const { current } = scrollRef;
+    const scrollAmount = 350;
+
+    current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  };
 
   /* 🚫 DO NOT RENDER IF EMPTY */
   if (relatedCampaigns.length === 0) {
@@ -84,6 +87,7 @@ export default function RelatedCampaigns({
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
+
         {/* Header */}
         <div className="mb-6">
           <h2
@@ -100,25 +104,54 @@ export default function RelatedCampaigns({
           </p>
         </div>
 
-        {/* Responsive Grid */}
-        <div
-          className="
-            grid gap-6
-            grid-cols-1
-            sm:grid-cols-2
-            lg:grid-cols-3
-          "
-        >
-          {relatedCampaigns.map((campaign) => (
-            <CampaignCard
-              key={campaign.slug}
-              campaign={campaign}
-              darkMode={darkMode}
-            />
-          ))}
+        {/* Scroll Row with External Buttons */}
+        <div className="flex items-center gap-4">
+
+          {/* Left Button */}
+          <button
+            onClick={() => scroll('left')}
+            className={`p-3 rounded-full shadow-md transition ${darkMode
+                ? 'bg-zinc-800 text-white hover:bg-zinc-700'
+                : 'bg-white text-zinc-900 hover:bg-gray-100'
+              }`}
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          {/* Scroll Container */}
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar py-4"
+          >
+            {relatedCampaigns.map((campaign) => (
+              <div
+                key={campaign.slug}
+                className="min-w-[300px] max-w-[320px] flex-shrink-0"
+              >
+                <CampaignCard
+                  campaign={campaign}
+                  darkMode={darkMode}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Right Button */}
+          <button
+            onClick={() => scroll('right')}
+            className={`p-3 rounded-full shadow-md transition ${darkMode
+                ? 'bg-zinc-800 text-white hover:bg-zinc-700'
+                : 'bg-white text-zinc-900 hover:bg-gray-100'
+              }`}
+          >
+            <ChevronRight size={20} />
+          </button>
+
         </div>
       </div>
     </section>
+
+
   );
 }
 

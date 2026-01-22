@@ -1,24 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Heart, Lock, Shield, Info } from 'lucide-react';
+import { Heart, Lock, Info, Check } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import PayUForm from '../payments/PayUForm';
 import LoginModal from '../login/LoginModal';
 
-export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
+export default function DonationCard({ darkMode, campaignId, zakatVerified, taxEligible }) {
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
-  const [tipAmount, setTipAmount] = useState(0); // State for Tip
+  const [tipAmount, setTipAmount] = useState(0);
+  const [tipPercentage, setTipPercentage] = useState(18);
   const [payuData, setPayuData] = useState(null);
   const [donationType, setDonationType] = useState('SADAQAH');
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [claim80G, setClaim80G] = useState(false);
 
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingDonate, setPendingDonate] = useState(false);
   const [isDonating, setIsDonating] = useState(false);
 
-
   const userInfo = useSelector((state) => state.auth.userInfo);
 
   const presetAmounts = [500, 1000, 5000, 10000];
+  const tipPercentages = [2, 5, 10, 15, 18];
 
   const donationTypes = [
     { id: 'ZAKAAT', label: 'Zakat', desc: 'Obligatory charity', disabled: !zakatVerified },
@@ -28,7 +31,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
   ];
 
   const handleDonate = async () => {
-    if (isDonating) return; // HARD STOP: no duplicate calls
+    if (isDonating) return;
 
     const amount = selectedAmount || parseInt(customAmount);
     if (!amount) return;
@@ -56,9 +59,11 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
           credentials: "include",
           body: JSON.stringify({
             amount,
-            tipAmount, // Include tip amount
+            tipAmount,
             campaignId,
             donationType,
+            isAnonymous,
+            isTaxEligible: claim80G,
           }),
         }
       );
@@ -72,22 +77,25 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
     }
   };
 
-
   useEffect(() => {
     if (userInfo && pendingDonate) {
       handleDonate();
     }
   }, [userInfo, pendingDonate]);
 
-  // Effect to calculate 15% tip when amount changes
+  // Calculate tip based on percentage
   useEffect(() => {
     const baseAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
     if (baseAmount > 0) {
-      setTipAmount(Math.round(baseAmount * 0.15));
+      setTipAmount(Math.round(baseAmount * (tipPercentage / 100)));
     } else {
       setTipAmount(0);
     }
-  }, [selectedAmount, customAmount]);
+  }, [selectedAmount, customAmount, tipPercentage]);
+
+  const handleTipPercentageClick = (percentage) => {
+    setTipPercentage(percentage);
+  };
 
   return (
     <>
@@ -187,8 +195,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
             Custom Amount
           </label>
           <div className="relative">
-            <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}>
+            <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               ₹
             </span>
             <input
@@ -221,17 +228,39 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
             <div className="group relative">
               <Info className="w-4 h-4 text-emerald-500 cursor-help" />
               <div className={`
-              absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-6 rounded-lg text-sm
+              absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-4 rounded-lg text-xs leading-relaxed
               ${darkMode ? 'bg-zinc-800 text-gray-200 border border-zinc-700' : 'bg-gray-900 text-white'}
-              opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center
+              opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10
             `}>
-                This tip will be used for similar campaigns like this or for the platform expenses.
+                We do not charge for our services and rely on your generosity. Your support helps us run this platform, enabling us to connect donors with worthy causes and sustain similar campaigns.
               </div>
             </div>
           </label>
+
+          {/* Tip Percentage Buttons */}
+          <div className="grid grid-cols-5 gap-2 mb-3">
+            {tipPercentages.map((percentage) => (
+              <button
+                key={percentage}
+                onClick={() => handleTipPercentageClick(percentage)}
+                className={`
+                  py-2 rounded-lg text-sm font-semibold border-2 transition-colors
+                  ${tipPercentage === percentage
+                    ? darkMode
+                      ? 'border-emerald-500 bg-emerald-950/30 text-emerald-400'
+                      : 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                    : darkMode
+                      ? 'border-zinc-800 text-gray-400 hover:border-zinc-700'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'}
+                `}
+              >
+                {percentage}%
+              </button>
+            ))}
+          </div>
+
           <div className="relative">
-            <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'
-              }`}>
+            <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               ₹
             </span>
             <input
@@ -241,6 +270,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
               onChange={(e) => {
                 const val = parseInt(e.target.value);
                 setTipAmount(isNaN(val) ? 0 : val);
+                setTipPercentage(null);
               }}
               className={`
               w-full h-14 pl-10 pr-4 text-base rounded-lg border-2 transition-colors
@@ -256,6 +286,46 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
             />
           </div>
         </div>
+
+        {/* Anonymous Donation Checkbox */}
+        <div className="mb-6">
+          <label className={`flex items-center gap-3 cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${isAnonymous
+              ? 'bg-emerald-500 border-emerald-500'
+              : darkMode ? 'border-zinc-600' : 'border-gray-300'
+              }`}>
+              {isAnonymous && <Check className="w-3 h-3 text-white" />}
+            </div>
+            <input
+              type="checkbox"
+              checked={isAnonymous}
+              onChange={(e) => setIsAnonymous(e.target.checked)}
+              className="hidden"
+            />
+            <span className="text-sm font-medium">Make my donation anonymous</span>
+          </label>
+        </div>
+
+        {/* 80G Tax Benefit Checkbox */}
+        {taxEligible && (
+          <div className="mb-6">
+            <label className={`flex items-center gap-3 cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${claim80G
+                ? 'bg-emerald-500 border-emerald-500'
+                : darkMode ? 'border-zinc-600' : 'border-gray-300'
+                }`}>
+                {claim80G && <Check className="w-3 h-3 text-white" />}
+              </div>
+              <input
+                type="checkbox"
+                checked={claim80G}
+                onChange={(e) => setClaim80G(e.target.checked)}
+                className="hidden"
+              />
+              <span className="text-sm font-medium">Claim 80G tax benefits</span>
+            </label>
+          </div>
+        )}
 
         {/* Donate Button */}
         <button
@@ -299,14 +369,10 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
             </>
           ) : (
             selectedAmount || customAmount
-              ? `Donate ₹${(selectedAmount || parseInt(customAmount) || 0).toLocaleString()} + ₹${(tipAmount || 0).toLocaleString()} Tip`
+              ?  `Donate ₹${((selectedAmount || Number(customAmount) || 0) + (tipAmount || 0)).toLocaleString()}`
               : 'Select Amount to Continue'
           )}
         </button>
-
-
-        {/* Security Badge */}
-
 
         {/* Terms */}
         <div className={`pt-6 border-t-2 border-dashed`} style={{ borderColor: darkMode ? '#27272a' : '#f3f4f6' }}>
@@ -314,7 +380,6 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
             By donating, you agree to our terms. Donations are tax-deductible and a receipt will be sent to your email.
           </p>
         </div>
-
 
         {payuData && (
           <PayUForm
@@ -329,7 +394,6 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified }) {
         darkMode={darkMode}
         onLoginSuccess={() => setShowLoginModal(false)}
       />
-
     </>
   );
 }
