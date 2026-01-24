@@ -1,23 +1,27 @@
 export const getMediaUrl = (path) => {
-    if (!path || path === "undefined") return "";
+  if (!path || path === "undefined") return null;
 
-    // Already a full URL
-    if (path.startsWith("http")) return path;
+  // Already absolute URL
+  if (typeof path === "string" && path.startsWith("http")) {
+    return path;
+  }
 
-    const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
+  const BASE_URL = process.env.NEXT_PUBLIC_UPLOAD_URL;
 
-    if (!BASE_URL) {
-        console.error("NEXT_PUBLIC_UPLOAD_URL is not defined");
-        return "";
+  if (!BASE_URL) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("NEXT_PUBLIC_UPLOAD_URL is not defined");
     }
+    return null;
+  }
 
-    let cleanPath = path;
+  let cleanPath = path;
 
-    if (path.startsWith("/uploads/")) {
-        cleanPath = path.replace("/uploads/", "");
-    } else if (path.startsWith("uploads/")) {
-        cleanPath = path.replace("uploads/", "");
-    }
+  if (cleanPath.startsWith("/uploads/")) {
+    cleanPath = cleanPath.replace("/uploads/", "");
+  } else if (cleanPath.startsWith("uploads/")) {
+    cleanPath = cleanPath.replace("uploads/", "");
+  }
 
-    return `${BASE_URL}/api/media/${cleanPath}`;
+  return `${BASE_URL}/api/media/${cleanPath}`;
 };

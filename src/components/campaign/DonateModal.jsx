@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import PayUForm from '../payments/PayUForm';
 import LoginModal from '../login/LoginModal';
 
-export default function DonateModal({ isOpen, onClose, darkMode, campaignId, zakatVerified, taxEligible }) {
+export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId,ribaEligible, zakatVerified, taxEligible }) {
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [tipAmount, setTipAmount] = useState(0);
@@ -26,6 +26,7 @@ export default function DonateModal({ isOpen, onClose, darkMode, campaignId, zak
 
   const donationTypes = [
     { id: 'ZAKAAT', label: 'Zakat', desc: 'Obligatory charity', disabled: !zakatVerified },
+    { id: 'RIBA', label: 'Riba', desc: 'Interest Money', disabled: !ribaEligible },
     { id: 'SADAQAH', label: 'Sadaqah', desc: 'Voluntary charity' },
     { id: 'LILLAH', label: 'Lillah', desc: 'For sake of Allah' },
     { id: 'IMDAD', label: 'Imdad', desc: 'Emergency relief' },

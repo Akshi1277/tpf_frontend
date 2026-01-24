@@ -115,7 +115,9 @@ export default function CampaignPage() {
               targetAmount={campaign.targetAmount}
               zakatVerified={campaign.zakatVerified}
               taxEligible={campaign.taxBenefits}
+              ribaEligible={campaign.ribaEligible}
               darkMode={darkMode}
+
             />
           </div>
         </div>

@@ -20,6 +20,13 @@ import {
   Check,
   Activity,
   User,
+  Share2,
+  Instagram,
+  Facebook,
+  Youtube,
+  Twitter,
+  Linkedin,
+  ExternalLink,
 } from 'lucide-react';
 import {
   useGetCommentsQuery,
@@ -44,8 +51,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-
-
   /* ---------------- API HOOKS ---------------- */
   const { data: commentsData, isLoading: commentsLoading, isFetching: commentsFetching } = useGetCommentsQuery({
     campaignId: campaign?._id,
@@ -60,6 +65,114 @@ export default function CampaignTabs({ darkMode, campaign }) {
   /* ---------------- SAFE DATA ---------------- */
   const impactGoals = campaign?.impactGoals ?? [];
   const documents = campaign?.documents ?? [];
+
+  // Get social media links from the latest submission
+  const socialMediaLinks = campaign?.socialMediaSubmissions?.[0]?.links || {};
+  const hasSocialMedia = Object.values(socialMediaLinks).some(link => link && link.trim() !== '');
+
+  // Helper to get social media icon and color
+  const getSocialConfig = (platform) => {
+    const configs = {
+      instagram: { 
+        icon: Instagram, 
+        color: 'from-purple-500 to-pink-500',
+        hoverColor: 'hover:border-purple-500/50',
+        darkHoverColor: 'hover:border-purple-400/50',
+        bgLight: 'bg-purple-50/30',
+        bgDark: 'bg-purple-500/10',
+        iconBgLight: 'bg-purple-100',
+        iconBgDark: 'bg-purple-500/10',
+        iconHoverLight: 'group-hover:bg-purple-200',
+        iconHoverDark: 'group-hover:bg-purple-500/20',
+        textLight: 'text-purple-600',
+        textDark: 'text-purple-400'
+      },
+      facebook: { 
+        icon: Facebook, 
+        color: 'from-blue-600 to-blue-700',
+        hoverColor: 'hover:border-blue-500/50',
+        darkHoverColor: 'hover:border-blue-400/50',
+        bgLight: 'bg-blue-50/30',
+        bgDark: 'bg-blue-500/10',
+        iconBgLight: 'bg-blue-100',
+        iconBgDark: 'bg-blue-500/10',
+        iconHoverLight: 'group-hover:bg-blue-200',
+        iconHoverDark: 'group-hover:bg-blue-500/20',
+        textLight: 'text-blue-600',
+        textDark: 'text-blue-400'
+      },
+      youtube: { 
+        icon: Youtube, 
+        color: 'from-red-500 to-red-600',
+        hoverColor: 'hover:border-red-500/50',
+        darkHoverColor: 'hover:border-red-400/50',
+        bgLight: 'bg-red-50/30',
+        bgDark: 'bg-red-500/10',
+        iconBgLight: 'bg-red-100',
+        iconBgDark: 'bg-red-500/10',
+        iconHoverLight: 'group-hover:bg-red-200',
+        iconHoverDark: 'group-hover:bg-red-500/20',
+        textLight: 'text-red-600',
+        textDark: 'text-red-400'
+      },
+      twitter: { 
+        icon: Twitter, 
+        color: 'from-sky-400 to-sky-500',
+        hoverColor: 'hover:border-sky-500/50',
+        darkHoverColor: 'hover:border-sky-400/50',
+        bgLight: 'bg-sky-50/30',
+        bgDark: 'bg-sky-500/10',
+        iconBgLight: 'bg-sky-100',
+        iconBgDark: 'bg-sky-500/10',
+        iconHoverLight: 'group-hover:bg-sky-200',
+        iconHoverDark: 'group-hover:bg-sky-500/20',
+        textLight: 'text-sky-600',
+        textDark: 'text-sky-400'
+      },
+      linkedin: { 
+        icon: Linkedin, 
+        color: 'from-blue-600 to-blue-700',
+        hoverColor: 'hover:border-blue-600/50',
+        darkHoverColor: 'hover:border-blue-500/50',
+        bgLight: 'bg-blue-50/30',
+        bgDark: 'bg-blue-600/10',
+        iconBgLight: 'bg-blue-100',
+        iconBgDark: 'bg-blue-600/10',
+        iconHoverLight: 'group-hover:bg-blue-200',
+        iconHoverDark: 'group-hover:bg-blue-600/20',
+        textLight: 'text-blue-700',
+        textDark: 'text-blue-400'
+      },
+      other: { 
+        icon: ExternalLink, 
+        color: 'from-gray-500 to-gray-600',
+        hoverColor: 'hover:border-gray-500/50',
+        darkHoverColor: 'hover:border-gray-400/50',
+        bgLight: 'bg-gray-50/30',
+        bgDark: 'bg-gray-500/10',
+        iconBgLight: 'bg-gray-100',
+        iconBgDark: 'bg-gray-500/10',
+        iconHoverLight: 'group-hover:bg-gray-200',
+        iconHoverDark: 'group-hover:bg-gray-500/20',
+        textLight: 'text-gray-600',
+        textDark: 'text-gray-400'
+      },
+    };
+    return configs[platform] || configs.other;
+  };
+
+  // Helper to get platform display name
+  const getPlatformName = (platform) => {
+    const names = {
+      instagram: 'Instagram',
+      facebook: 'Facebook',
+      youtube: 'YouTube',
+      twitter: 'Twitter',
+      linkedin: 'LinkedIn',
+      other: 'Website',
+    };
+    return names[platform] || platform;
+  };
 
   const handleDocumentsLogin = () => {
     if (!userInfo) {
@@ -127,7 +240,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
         {[
           { id: 'about', icon: Info, label: 'About' },
           { id: 'status', icon: Activity, label: 'Current Status' },
-
           { id: 'documents', icon: FileText, label: 'Documents', badge: documents.length },
           { id: 'comments', icon: MessageCircle, label: 'Comments', badge: commentsData?.data?.length || 0 },
         ].map((tab) => (
@@ -177,53 +289,109 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   About This Campaign
                 </h3>
+                
                 {/* Beneficiary & Campaigner Info Boxes */}
                 {campaign?.beneficiaryName && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                  
+                  <div className="space-y-4 mb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Campaigner Box */}
+                      <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-blue-500/50' : 'bg-blue-50/30 border-blue-100 hover:border-blue-300'}`}>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-blue-500/10 group-hover:bg-blue-500/20' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
+                            <User className="w-5 h-5 text-blue-500" />
+                          </div>
+                          <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                            Campaigner
+                          </h4>
+                        </div>
+                        <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {campaign.campaignerName || campaign.fullName}
+                        </p>
+                        <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          Verified campaign organizer
+                        </p>
+                      </div>
 
-                    {/* Campaigner Box */}
-                    <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-blue-500/50' : 'bg-blue-50/30 border-blue-100 hover:border-blue-300'}`}>
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-blue-500/10 group-hover:bg-blue-500/20' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
-                          <User className="w-5 h-5 text-blue-500" />
-                        </div>
-                        <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
-                          Campaigner
-                        </h4>
-                      </div>
-                      <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {campaign.campaignerName || campaign.fullName}
-                      </p>
-                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                        Verified campaign organizer
-                      </p>
-                    </div>
                       {/* Beneficiary Box */}
-                    <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50' : 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-300'}`}>
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}>
-                          <Heart className="w-5 h-5 text-emerald-500" />
+                      <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50' : 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-300'}`}>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}>
+                            <Heart className="w-5 h-5 text-emerald-500" />
+                          </div>
+                          <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                            Beneficiary
+                          </h4>
                         </div>
-                        <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                          Beneficiary
-                        </h4>
+                        <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {campaign.beneficiaryName}
+                        </p>
+                        <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          The primary recipient of this fund
+                        </p>
                       </div>
-                      <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {campaign.beneficiaryName}
-                      </p>
-                      <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                        The primary recipient of this fund
-                      </p>
                     </div>
+
+                    {/* Social Media Box */}
+                    {hasSocialMedia && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-teal-500/50' : 'bg-teal-50/30 border-teal-100 hover:border-teal-300'}`}
+                      >
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-teal-500/10 group-hover:bg-teal-500/20' : 'bg-teal-100 group-hover:bg-teal-200'}`}>
+                            <Share2 className="w-5 h-5 text-teal-500" />
+                          </div>
+                          <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}>
+                            Follow Campaign Updates
+                          </h4>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(socialMediaLinks).map(([platform, url]) => {
+                            if (!url || url.trim() === '') return null;
+                            const config = getSocialConfig(platform);
+                            const Icon = config.icon;
+                            
+                            return (
+                              <a
+                                key={platform}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`group/link flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-md ${
+                                  darkMode 
+                                    ? `${config.bgDark} border-zinc-700 ${config.darkHoverColor}` 
+                                    : `${config.bgLight} border-gray-200 ${config.hoverColor}`
+                                }`}
+                              >
+                                <div className={`p-1.5 rounded-md transition-colors ${
+                                  darkMode 
+                                    ? `${config.iconBgDark} ${config.iconHoverDark}` 
+                                    : `${config.iconBgLight} ${config.iconHoverLight}`
+                                }`}>
+                                  <Icon className={`w-4 h-4 ${darkMode ? config.textDark : config.textLight}`} />
+                                </div>
+                                <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                  {getPlatformName(platform)}
+                                </span>
+                                <ExternalLink className={`w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity ${
+                                  darkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`} />
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
                 )}
+
                 <p className={`whitespace-pre-line leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   {campaign?.about || 'No description provided.'}
                 </p>
               </div>
-
-
 
               {/* Impact Goals */}
               {impactGoals.length > 0 && (

@@ -12,11 +12,24 @@ import {
   ArrowRight
 } from "lucide-react";
 import { useState } from "react";
+import Image from 'next/image';
 import DonateModal from "./DonationCard";
 import DonatePopUpModal from "./DonateModal";
+import ShareModal from "../ui/ShareModal";
+import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 export default function CampaignProgress({ darkMode, campaign }) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openShare, setOpenShare] = useState(false);
+  
+  const router = useRouter();
+  const { userInfo } = useSelector((state) => state.auth);
+  const wishlist = userInfo?.wishlist || [];
+  
+  const [toggleWishlist] = useToggleWishlistMutation();
+  
   if (!campaign) return null;
 
   const {
@@ -24,7 +37,17 @@ export default function CampaignProgress({ darkMode, campaign }) {
     targetAmount = 0,
     totalDonors = 0,
     deadline,
+    _id: campaignId,
+    slug,
+    title,
   } = campaign;
+
+  const saved = wishlist.includes(campaignId);
+
+  const shareUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/campaign/${slug}`
+      : "";
 
   const percentage =
     targetAmount > 0
@@ -45,6 +68,22 @@ export default function CampaignProgress({ darkMode, campaign }) {
     totalDonors > 0 ? Math.round(raisedAmount / totalDonors) : 0;
 
   const formatNumber = (num) => num.toLocaleString('en-IN');
+
+  const handleToggleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!userInfo) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      await toggleWishlist(campaignId).unwrap();
+    } catch (err) {
+      console.error("Wishlist toggle failed", err);
+    }
+  };
 
   return (
     <>
@@ -69,6 +108,43 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 >
                   Campaign Progress
                 </h3>
+              </div>
+
+              {/* Share and Wishlist Buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleToggleWishlist}
+                  className={`transition-all duration-200 hover:scale-110 ${saved
+                    ? "text-red-500"
+                    : darkMode
+                      ? "text-zinc-400 hover:text-red-400"
+                      : "text-zinc-600 hover:text-red-600"
+                    }`}
+                  title={saved ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                  <Heart
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    fill={saved ? "currentColor" : "none"}
+                  />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenShare(true);
+                  }}
+                  className={`flex items-center gap-1 transition-all duration-200 hover:scale-110 ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'
+                    }`}
+                  title="Share campaign"
+                >
+                  <Image
+                    src="/share.svg"
+                    alt="Share"
+                    width={24}
+                    height={24}
+                    className="w-5 h-5 sm:w-6 sm:h-6 rotate-45"
+                  />
+                </button>
               </div>
             </div>
 
@@ -152,7 +228,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 animate={{ x: ["-200%", "200%"] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
               />
-              
+
               {/* Button content */}
               <div className="relative flex items-center gap-2.5">
                 <Heart className="w-5 h-5 sm:w-5 sm:h-5" fill="currentColor" />
@@ -243,21 +319,38 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 <TrustItem
                   darkMode={darkMode}
                   title="Platform Sustainability"
-                  subtitle="Surplus supports similar campaigns"
+                  subtitle="Surplus funds may support similar campaigns or platform operational expenses"
+                />
+
+                <TrustItem
+                  darkMode={darkMode}
+                  title="No Unsolicited Fundraising"
+                  subtitle="TPFAid does not solicit donations via SMS, phone calls, or unsolicited messages"
                 />
               </div>
             </div>
           </div>
         </div>
       </motion.div>
+
+      {/* Modals */}
       <DonatePopUpModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         darkMode={darkMode}
-        campaignId={campaign._id}
+        campaignId={campaignId}
         zakatVerified={campaign.zakatVerified}
+        ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}
       />
+
+      {openShare && (
+        <ShareModal
+          url={shareUrl}
+          title={title}
+          onClose={() => setOpenShare(false)}
+        />
+      )}
     </>
   );
 }
