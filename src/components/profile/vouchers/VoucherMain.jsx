@@ -62,6 +62,12 @@ export default function VoucherMain({ darkModeFromParent }) {
     const [formData, setFormData] = useState({
         amount: "",
         description: "",
+        particulars: "",
+        quantity: "",
+        unit: "unit",
+        transactionDate: new Date().toISOString().split('T')[0],
+        city: "",
+        state: "",
         proof: null,
     });
 
@@ -86,6 +92,13 @@ export default function VoucherMain({ darkModeFromParent }) {
         const data = new FormData();
         data.append("amount", formData.amount);
         data.append("description", formData.description);
+        data.append("particulars", formData.particulars);
+        data.append("quantity", formData.quantity);
+        data.append("unit", formData.unit);
+        data.append("transactionDate", formData.transactionDate);
+        data.append("city", formData.city);
+        data.append("state", formData.state);
+
         if (formData.proof) {
             data.append("proof", formData.proof);
         }
@@ -111,13 +124,29 @@ export default function VoucherMain({ darkModeFromParent }) {
             setFormData({
                 amount: voucher.amount,
                 description: voucher.description,
+                particulars: voucher.particulars || "",
+                quantity: voucher.quantity || "",
+                unit: voucher.unit || "unit",
+                transactionDate: voucher.transactionDate ? new Date(voucher.transactionDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                city: voucher.city || "",
+                state: voucher.state || "",
                 proof: null
             });
             setPreviewUrl(voucher.proofDocument?.fileUrl);
         } else {
             setSelectedVoucher(null);
             setIsEditing(false);
-            setFormData({ amount: "", description: "", proof: null });
+            setFormData({
+                amount: "",
+                description: "",
+                particulars: "",
+                quantity: "",
+                unit: "unit",
+                transactionDate: new Date().toISOString().split('T')[0],
+                city: "",
+                state: "",
+                proof: null
+            });
             setPreviewUrl(null);
         }
         setView("form");
@@ -128,7 +157,17 @@ export default function VoucherMain({ darkModeFromParent }) {
         setView("list");
         setSelectedVoucher(null);
         setIsEditing(false);
-        setFormData({ amount: "", description: "", proof: null });
+        setFormData({
+            amount: "",
+            description: "",
+            particulars: "",
+            quantity: "",
+            unit: "unit",
+            transactionDate: new Date().toISOString().split('T')[0],
+            city: "",
+            state: "",
+            proof: null
+        });
         setPreviewUrl(null);
     };
 
@@ -317,9 +356,15 @@ export default function VoucherMain({ darkModeFromParent }) {
                                                     {voucher.status === "clarification" ? (
                                                         <button
                                                             onClick={() => handleOpenForm(voucher)}
-                                                            className="text-orange-500 hover:text-orange-600 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/5 hover:bg-orange-500/10 transition-all font-black text-[10px] uppercase tracking-wider"
+                                                            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 shadow-lg active:scale-95 group/btn ${darkMode
+                                                                    ? "bg-orange-500 text-white hover:bg-orange-600 shadow-orange-500/20"
+                                                                    : "bg-orange-600 text-white hover:bg-orange-700 shadow-orange-600/20"
+                                                                }`}
                                                         >
-                                                            <AlertCircle className="w-3.5 h-3.5" />
+                                                            <div className="relative">
+                                                                <AlertCircle className="w-4 h-4" />
+                                                                <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-25" />
+                                                            </div>
                                                             Action Required
                                                         </button>
                                                     ) : (
@@ -374,6 +419,126 @@ export default function VoucherMain({ darkModeFromParent }) {
                                     </div>
                                 )}
 
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-3">
+                                        <label className={`block text-xs font-black uppercase tracking-[0.15em] ml-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                                            Item Particulars (e.g. Rice, Laptop)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={formData.particulars}
+                                            onChange={(e) => setFormData(p => ({ ...p, particulars: e.target.value }))}
+                                            placeholder="What is this expense for?"
+                                            className={`w-full px-6 py-4 rounded-2xl outline-none transition-all font-semibold border-2 ${darkMode
+                                                ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-white'
+                                                : 'bg-gray-50 border-gray-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'
+                                                }`}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className={`block text-xs font-black uppercase tracking-[0.15em] ml-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                                            Quantity & Unit
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="number"
+                                                required
+                                                value={formData.quantity}
+                                                onChange={(e) => setFormData(p => ({ ...p, quantity: e.target.value }))}
+                                                placeholder="Qty"
+                                                className={`w-24 px-4 py-4 rounded-2xl outline-none transition-all font-semibold border-2 ${darkMode
+                                                    ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-white'
+                                                    : 'bg-gray-50 border-gray-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'
+                                                    }`}
+                                            />
+                                            <select
+                                                required
+                                                value={formData.unit}
+                                                onChange={(e) => setFormData(p => ({ ...p, unit: e.target.value }))}
+                                                className={`flex-1 px-4 py-4 rounded-2xl outline-none transition-all font-semibold border-2 ${darkMode
+                                                    ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 text-white'
+                                                    : 'bg-gray-50 border-gray-100 focus:border-emerald-500 text-gray-900'
+                                                    }`}
+                                            >
+                                                <option value="unit">Unit</option>
+                                                <option value="piece">Piece</option>
+                                                <option value="kg">KG</option>
+                                                <option value="gram">Gram</option>
+                                                <option value="litre">Litre</option>
+                                                <option value="ml">ML</option>
+                                                <option value="packet">Packet</option>
+                                                <option value="box">Box</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label className={`block text-xs font-black uppercase tracking-[0.15em] ml-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                                        Expense Description
+                                    </label>
+                                    <textarea
+                                        required
+                                        rows="3"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
+                                        placeholder="Briefly explain the purpose of this expense..."
+                                        className={`w-full px-6 py-5 rounded-[2rem] outline-none transition-all resize-none font-semibold text-base border-2 ${darkMode
+                                            ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-white'
+                                            : 'bg-gray-50 border-gray-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'
+                                            }`}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-3">
+                                        <label className={`block text-xs font-black uppercase tracking-[0.15em] ml-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                                            Transaction Date
+                                        </label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={formData.transactionDate}
+                                            onChange={(e) => setFormData(p => ({ ...p, transactionDate: e.target.value }))}
+                                            className={`w-full px-6 py-4 rounded-2xl outline-none transition-all font-semibold border-2 ${darkMode
+                                                ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 text-white'
+                                                : 'bg-gray-50 border-gray-100 focus:border-emerald-500 text-gray-900'
+                                                }`}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className={`block text-xs font-black uppercase tracking-[0.15em] ml-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                                            Location (City & State) - Optional
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={formData.city}
+                                                onChange={(e) => setFormData(p => ({ ...p, city: e.target.value }))}
+                                                placeholder="City"
+                                                className={`w-full px-4 py-4 rounded-2xl outline-none transition-all font-semibold border-2 ${darkMode
+                                                    ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 text-white'
+                                                    : 'bg-gray-50 border-gray-100 focus:border-emerald-500 text-gray-900'
+                                                    }`}
+                                            />
+                                            <input
+                                                type="text"
+                                                value={formData.state}
+                                                onChange={(e) => setFormData(p => ({ ...p, state: e.target.value }))}
+                                                placeholder="State"
+                                                className={`w-full px-4 py-4 rounded-2xl outline-none transition-all font-semibold border-2 ${darkMode
+                                                    ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 text-white'
+                                                    : 'bg-gray-50 border-gray-100 focus:border-emerald-500 text-gray-900'
+                                                    }`}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="space-y-3">
                                     <label className={`block text-xs font-black uppercase tracking-[0.15em] ml-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
                                         Claim Amount (INR)
@@ -387,28 +552,11 @@ export default function VoucherMain({ darkModeFromParent }) {
                                             onChange={(e) => setFormData(p => ({ ...p, amount: e.target.value }))}
                                             placeholder="0.00"
                                             className={`w-full pl-12 pr-6 py-5 rounded-3xl outline-none transition-all text-2xl font-black border-2 ${darkMode
-                                                    ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-white'
-                                                    : 'bg-gray-50 border-gray-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'
+                                                ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-white'
+                                                : 'bg-gray-50 border-gray-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'
                                                 }`}
                                         />
                                     </div>
-                                </div>
-
-                                <div className="space-y-3">
-                                    <label className={`block text-xs font-black uppercase tracking-[0.15em] ml-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
-                                        Expense Description
-                                    </label>
-                                    <textarea
-                                        required
-                                        rows="4"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
-                                        placeholder="Briefly explain the purpose of this expense..."
-                                        className={`w-full px-6 py-5 rounded-[2rem] outline-none transition-all resize-none font-semibold text-base border-2 ${darkMode
-                                                ? 'bg-zinc-950 border-zinc-800 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-white'
-                                                : 'bg-gray-50 border-gray-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 text-gray-900'
-                                            }`}
-                                    />
                                 </div>
 
                                 <div className="space-y-3">
@@ -427,8 +575,8 @@ export default function VoucherMain({ darkModeFromParent }) {
                                         <label
                                             htmlFor="proof-upload"
                                             className={`flex flex-col items-center justify-center gap-4 p-10 border-2 border-dashed rounded-[3rem] cursor-pointer transition-all ${previewUrl
-                                                    ? (darkMode ? "border-emerald-500/30 bg-emerald-500/5" : "border-emerald-500/50 bg-emerald-50")
-                                                    : (darkMode ? "border-zinc-800 hover:border-emerald-500" : "border-gray-100 hover:border-emerald-500 shadow-sm")
+                                                ? (darkMode ? "border-emerald-500/30 bg-emerald-500/5" : "border-emerald-500/50 bg-emerald-50")
+                                                : (darkMode ? "border-zinc-800 hover:border-emerald-500" : "border-gray-100 hover:border-emerald-500 shadow-sm")
                                                 }`}
                                         >
                                             {previewUrl ? (
@@ -452,7 +600,8 @@ export default function VoucherMain({ darkModeFromParent }) {
                                                     </div>
                                                     <div className="text-center">
                                                         <p className="text-lg font-black">Drop your receipt here</p>
-                                                        <p className={`${darkMode ? 'text-zinc-500' : 'text-gray-400'} text-xs font-bold mt-1`}>Supports JPG, PNG up to 10MB</p>
+                                                        <p className={`${darkMode ? 'text-zinc-500' : 'text-gray-400'} text-xs font-bold mt-1`}>Please upload a <span className="text-emerald-500 italic">geo-tagged photo</span></p>
+                                                        <p className={`${darkMode ? 'text-zinc-700' : 'text-gray-300'} text-[10px] mt-2`}>Supports JPG, PNG up to 10MB</p>
                                                     </div>
                                                 </>
                                             )}
