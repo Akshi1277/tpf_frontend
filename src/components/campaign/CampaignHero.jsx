@@ -109,6 +109,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
         darkMode={darkMode}
         campaignId={campaign._id} // or campaign.id depending on your schema
         zakatVerified={campaign.zakatVerified}
+        ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}
       />
 
