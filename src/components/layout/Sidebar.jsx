@@ -18,6 +18,7 @@ import {
   HandHeartIcon,
   Download,
   IndianRupeeIcon,
+  Ticket,
 } from "lucide-react";
 
 const menuItems = [
@@ -85,9 +86,19 @@ const menuItems = [
     activeColor: "rose",
     description: "Submit Queries and Feedbacks"
   },
+  {
+    name: "Raise a Voucher",
+    path: "/profile/vouchers",
+    icon: Ticket, // lucide icon
+    gradient: "from-orange-400 to-pink-500",
+    activeColor: "orange",
+    description: "Submit expense for reimbursement",
+    role: "volunteer"
+  },
 ];
 
-const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
+const SidebarContent = memo(({ onClose, darkMode, profileCompletion, role }) => {
+  const filteredMenuItems = menuItems.filter(item => !item.role || item.role === role);
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
@@ -105,14 +116,14 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
             className={`text-base sm:text-lg lg:text-xl font-bold truncate ${darkMode ? "text-white" : "text-gray-900"
               }`}
           >
-            {menuItems.find((i) => i.path === pathname)?.name || "My Profile"}
+            {filteredMenuItems.find((i) => i.path === pathname)?.name || "My Profile"}
           </h2>
 
           <button
             onClick={onClose}
             className={`lg:hidden p-1.5 sm:p-2 rounded-lg transition-colors ${darkMode
-                ? "hover:bg-zinc-800 text-zinc-400"
-                : "hover:bg-gray-100 text-gray-600"
+              ? "hover:bg-zinc-800 text-zinc-400"
+              : "hover:bg-gray-100 text-gray-600"
               }`}
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -148,10 +159,10 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
                     animate={{ width: `${profileCompletion}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
                     className={`h-full rounded-full ${profileCompletion >= 75
-                        ? "bg-gradient-to-r from-blue-500 to-indigo-500"
-                        : profileCompletion >= 50
-                          ? "bg-gradient-to-r from-orange-500 to-amber-500"
-                          : "bg-gradient-to-r from-red-500 to-rose-500"
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-500"
+                      : profileCompletion >= 50
+                        ? "bg-gradient-to-r from-orange-500 to-amber-500"
+                        : "bg-gradient-to-r from-red-500 to-rose-500"
                       }`}
                   />
                 </div>
@@ -168,8 +179,8 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
             {profileCompletion === 100 && (
               <div
                 className={`mt-2 sm:mt-3 px-2 sm:px-3 py-2 rounded-lg text-center border backdrop-blur-sm ${darkMode
-                    ? "bg-emerald-900/10 border-emerald-800/40"
-                    : "bg-emerald-50/70 border-emerald-200"
+                  ? "bg-emerald-900/10 border-emerald-800/40"
+                  : "bg-emerald-50/70 border-emerald-200"
                   }`}
               >
                 <p
@@ -187,7 +198,7 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
       {/* MENU - Scrollable but optimized for screen height */}
       <nav className="flex-1 overflow-y-auto scrollbar-hide px-2 sm:px-3 py-2 sm:py-3">
         <div className="flex flex-col space-y-1 sm:space-y-1.5">
-          {menuItems.map((item, index) => {
+          {filteredMenuItems.map((item, index) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
 
@@ -198,12 +209,12 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
                   className={`relative group rounded-lg sm:rounded-xl transition-all duration-300 border-2 ${isActive
-                      ? darkMode
-                        ? "bg-zinc-800/80 shadow-xl border-transparent"
-                        : "bg-gradient-to-r from-gray-50 to-white shadow-xl border-gray-200"
-                      : darkMode
-                        ? "hover:bg-zinc-800/50 border-transparent"
-                        : "hover:bg-gray-50 border-transparent"
+                    ? darkMode
+                      ? "bg-zinc-800/80 shadow-xl border-transparent"
+                      : "bg-gradient-to-r from-gray-50 to-white shadow-xl border-gray-200"
+                    : darkMode
+                      ? "hover:bg-zinc-800/50 border-transparent"
+                      : "hover:bg-gray-50 border-transparent"
                     }`}
                 >
                   {/* Alert Icon */}
@@ -220,10 +231,10 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
 
                   <div className="flex items-center gap-2 sm:gap-2.5 p-2 sm:p-2.5">
                     <div className={`relative w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${isActive
-                        ? `bg-gradient-to-br ${item.gradient} shadow-lg shadow-${item.activeColor}-500/30`
-                        : darkMode
-                          ? "bg-zinc-800"
-                          : "bg-gray-100"
+                      ? `bg-gradient-to-br ${item.gradient} shadow-lg shadow-${item.activeColor}-500/30`
+                      : darkMode
+                        ? "bg-zinc-800"
+                        : "bg-gray-100"
                       }`}>
                       <Icon className={`w-4 h-4 sm:w-4 sm:h-4 lg:w-5 lg:h-5 ${isActive ? "text-white" : darkMode ? "text-zinc-400" : "text-gray-600"
                         }`} />
@@ -231,24 +242,24 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion }) => {
 
                     <div className="flex-1 min-w-0">
                       <h3 className={`text-xs sm:text-sm font-semibold mb-0.5 truncate ${isActive
-                          ? darkMode ? "text-white" : "text-gray-900"
-                          : darkMode ? "text-zinc-300" : "text-gray-700"
+                        ? darkMode ? "text-white" : "text-gray-900"
+                        : darkMode ? "text-zinc-300" : "text-gray-700"
                         }`}>
                         {item.name}
                       </h3>
                       <p className={`text-[9px] sm:text-[10px] truncate ${isActive
-                          ? darkMode ? "text-zinc-400" : "text-gray-600"
-                          : darkMode ? "text-zinc-500" : "text-gray-500"
+                        ? darkMode ? "text-zinc-400" : "text-gray-600"
+                        : darkMode ? "text-zinc-500" : "text-gray-500"
                         }`}>
                         {item.description}
                       </p>
                     </div>
 
                     <ChevronRight className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-all ${isActive
-                        ? darkMode ? "text-white translate-x-0.5" : "text-gray-900 translate-x-0.5"
-                        : darkMode
-                          ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
-                          : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                      ? darkMode ? "text-white translate-x-0.5" : "text-gray-900 translate-x-0.5"
+                      : darkMode
+                        ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                        : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
                       }`} />
                   </div>
                 </motion.div>
@@ -315,8 +326,8 @@ function Sidebar({ darkMode }) {
         onClick={toggleMobileMenu}
         aria-label="Open menu"
         className={`lg:hidden fixed right-4 bottom-20 sm:bottom-24 z-40 p-3 sm:p-3.5 rounded-full shadow-2xl transition-all active:scale-95 ${darkMode
-            ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
-            : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+          ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
+          : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
           } text-white`}
       >
         <Menu className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
@@ -350,6 +361,7 @@ function Sidebar({ darkMode }) {
               onClose={closeMobileMenu}
               darkMode={darkMode}
               profileCompletion={totalCompletion}
+              role={user?.role}
             />
           </motion.aside>
         )}
@@ -361,7 +373,7 @@ function Sidebar({ darkMode }) {
           } overflow-y-auto`}
 
       >
-        <SidebarContent darkMode={darkMode} profileCompletion={totalCompletion} />
+        <SidebarContent darkMode={darkMode} profileCompletion={totalCompletion} role={user?.role} />
       </aside>
     </>
   );
