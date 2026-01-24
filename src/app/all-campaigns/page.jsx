@@ -32,10 +32,17 @@ export default function AllCampaignsPage() {
     const cms = useCMS();
 
     const validFundraisers = useMemo(() => {
-        const fundraisers = cms?.filter((item) => item.type === "fundraiser") || [];
-        return fundraisers.filter(
-            (f) => typeof f.campaignSlug === "string" && f.campaignSlug.length > 0
-        );
+        if (!Array.isArray(cms)) return [];
+
+        return cms
+            .filter(
+                (item) =>
+                    item.type === "fundraiser" &&
+                    item.campaignStatus === "ACTIVE" &&
+                    typeof item.campaignSlug === "string" &&
+                    item.campaignSlug.trim().length > 0
+            )
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }, [cms]);
 
     // Dynamic categories extracted from valid fundraisers
