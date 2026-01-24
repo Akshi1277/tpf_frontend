@@ -50,7 +50,7 @@ export default function ImpactStatsBar({ darkMode }) {
             shouldAnimate={statsVisible && !isLoading}
           />
           <StatCounter
-            label="Active Campaigns"
+            label="Total Campaigns"
             end={stats.activeCampaigns}
             suffix="+"
             darkMode={darkMode}
