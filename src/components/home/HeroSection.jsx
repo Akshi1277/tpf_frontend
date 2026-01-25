@@ -45,10 +45,10 @@ export default function HeroSection({ darkMode }) {
 
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-4">
               <button
-                onClick={() => router.push("/permanent-donor")}
+                onClick={() => router.push(hero.buttonRoute || "/")}
                 className="w-full cursor-pointer sm:w-auto px-6 md:px-8 lg:px-10 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold shadow-lg"
               >
-                Start Giving
+                 {hero.buttonText || "Start Giving" }
               </button>
 
               <button
