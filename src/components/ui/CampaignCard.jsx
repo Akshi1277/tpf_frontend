@@ -110,27 +110,43 @@ export default function CampaignCard({ campaign, darkMode }) {
 
             <div className="mb-3">
               <div className="flex justify-between text-xs sm:text-sm mb-2">
-                <span className="font-medium text-white">
-                  {currency(campaign.receivedAmount)
-                  }
-                </span>
-                <span className="text-zinc-200">
-                  of {currency(campaign.requiredAmount)}
-                </span>
+                {campaign.source === "FOUNDATION" ? (
+                  <span className="font-medium text-white">
+                    {currency(campaign.fundsDisbursed || 0)} <span className="text-[10px] opacity-70">disbursed</span>
+                  </span>
+                ) : (
+                  <span className="font-medium text-white">
+                    {progress}% <span className="text-[10px] opacity-70">funded</span>
+                  </span>
+                )}
+                {campaign.source !== "FOUNDATION" && (
+                  <span className="text-zinc-200">
+                    of {currency(campaign.requiredAmount)}
+                  </span>
+                )}
               </div>
 
-              {campaign.validityDate && (
+              {campaign.source === "FOUNDATION" ? (
+                <div className="mb-2">
+                  <span className="text-[10px] sm:text-xs font-bold bg-emerald-500 text-white px-2 py-0.5 rounded flex items-center gap-1 w-fit">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    Permanent Fund
+                  </span>
+                </div>
+              ) : campaign.validityDate ? (
                 <div className="mb-2">
                   <span className="text-[10px] sm:text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
                     {campaign.validityDate} Days Left
                   </span>
                 </div>
+              ) : (
+                <div className="mb-2 h-[18px] sm:h-[22px]" />
               )}
 
               <div className="w-full bg-zinc-700/50 rounded-full h-2">
                 <div
-                  className="bg-emerald-600 h-2 rounded-full transition-all"
-                  style={{ width: `${progress}%` }}
+                  className={`bg-emerald-600 h-2 rounded-full transition-all ${campaign.source === "FOUNDATION" ? 'w-full' : ''}`}
+                  style={{ width: campaign.source === "FOUNDATION" ? '100%' : `${progress}%` }}
                 ></div>
               </div>
             </div>
@@ -141,7 +157,7 @@ export default function CampaignCard({ campaign, darkMode }) {
                 {campaign.donorCount} donors
               </span>
               <span className="font-medium text-emerald-400">
-                {progress}% funded
+                {campaign.source === "FOUNDATION" ? "Ongoing" : `${progress}% funded`}
               </span>
             </div>
 
@@ -234,26 +250,43 @@ export default function CampaignCard({ campaign, darkMode }) {
 
         <div className="mb-3">
           <div className="flex justify-between text-xs sm:text-sm mb-2">
-            <span className={`font-medium ${COLORS.neutralHeading}`}>
-              {currency(campaign.receivedAmount)}
-            </span>
-            <span className={COLORS.neutralBody}>
-              of {currency(campaign.requiredAmount)}
-            </span>
+            {campaign.source === "FOUNDATION" ? (
+              <span className={`font-medium ${COLORS.neutralHeading}`}>
+                {currency(campaign.fundsDisbursed || 0)} <span className="text-[10px] opacity-70">disbursed</span>
+              </span>
+            ) : (
+              <span className={`font-medium ${COLORS.neutralHeading}`}>
+                {progress}% <span className="text-[10px] opacity-70">funded</span>
+              </span>
+            )}
+            {campaign.source !== "FOUNDATION" && (
+              <span className={COLORS.neutralBody}>
+                of {currency(campaign.requiredAmount)}
+              </span>
+            )}
           </div>
 
-          {campaign.validityDate && (
+          {campaign.source === "FOUNDATION" ? (
+            <div className="mb-2">
+              <span className="text-[10px] sm:text-xs font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded flex items-center gap-1 w-fit">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Permanent Fund
+              </span>
+            </div>
+          ) : campaign.validityDate ? (
             <div className="mb-2">
               <span className="text-[10px] sm:text-xs font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
                 {campaign.validityDate} Days Left
               </span>
             </div>
+          ) : (
+            <div className="mb-2 h-[18px] sm:h-[22px]" /> // Spacer to match height
           )}
 
           <div className={`w-full ${darkMode ? 'bg-zinc-700' : 'bg-zinc-200'} rounded-full h-2`}>
             <div
-              className="bg-emerald-600 h-2 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
+              className={`bg-emerald-600 h-2 rounded-full transition-all ${campaign.source === "FOUNDATION" ? 'w-full' : ''}`}
+              style={{ width: campaign.source === "FOUNDATION" ? '100%' : `${progress}%` }}
             ></div>
           </div>
         </div>
@@ -264,7 +297,7 @@ export default function CampaignCard({ campaign, darkMode }) {
             {campaign.donorCount} donors
           </span>
           <span className="font-medium text-emerald-600">
-            {progress}% funded
+            {campaign.source === "FOUNDATION" ? "Ongoing" : `${progress}% funded`}
           </span>
         </div>
         <Link href={`/campaign/${campaign.slug}`} prefetch className="w-full block">

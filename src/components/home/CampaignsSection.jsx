@@ -50,6 +50,8 @@ export default function CampaignsSection({ darkMode }) {
         validityDate: campaign.deadline ? calcDaysLeft(campaign.deadline) : null,
         zakatVerified: Boolean(campaign.zakatVerified),
         slug: campaign.campaignSlug,
+        source: campaign.source,
+        fundsDisbursed: Number(campaign.fundsDisbursed || 0),
       }));
   }, [cms]);
 
