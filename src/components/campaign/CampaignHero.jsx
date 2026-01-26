@@ -111,6 +111,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
         zakatVerified={campaign.zakatVerified}
         ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}
+        allowedDonationTypes={campaign.allowedDonationTypes}
       />
 
     </>
