@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import PayUForm from '../payments/PayUForm';
 import LoginModal from '../login/LoginModal';
 
-export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId,ribaEligible, zakatVerified, taxEligible }) {
+export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId, ribaEligible, zakatVerified, taxEligible, allowedDonationTypes = [] }) {
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [tipAmount, setTipAmount] = useState(0);
@@ -24,13 +24,24 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
   const presetAmounts = [500, 1000, 5000, 10000];
   const tipPercentages = [2, 5, 10, 15, 18];
 
-  const donationTypes = [
+  const allDonationTypes = [
     { id: 'ZAKAAT', label: 'Zakat', desc: 'Obligatory charity', disabled: !zakatVerified },
-    { id: 'RIBA', label: 'Riba', desc: 'Interest Money', disabled: !ribaEligible },
+    { id: 'RIBA', label: 'RIBA', desc: 'Interest Money', disabled: !ribaEligible },
     { id: 'SADAQAH', label: 'Sadaqah', desc: 'Voluntary charity' },
     { id: 'LILLAH', label: 'Lillah', desc: 'For sake of Allah' },
     { id: 'IMDAD', label: 'Imdad', desc: 'Emergency relief' },
   ];
+
+  const filteredDonationTypes = allowedDonationTypes?.length > 0
+    ? allDonationTypes.filter(t => allowedDonationTypes.some(at => at.toUpperCase() === t.id.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')))
+    : allDonationTypes;
+
+  // Set default donation type if restricted
+  useEffect(() => {
+    if (allowedDonationTypes?.length > 0 && !allowedDonationTypes.some(at => at.toUpperCase() === donationType.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && donationType === 'ZAKAAT'))) {
+      setDonationType(filteredDonationTypes[0]?.id || 'SADAQAH');
+    }
+  }, [allowedDonationTypes, filteredDonationTypes]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -139,9 +150,8 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                   {/* Close Button */}
                   <button
                     onClick={onClose}
-                    className={`sticky top-3 right-3 md:top-4 md:right-4 float-right w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors z-10 ${
-                      darkMode ? 'bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
-                    }`}
+                    className={`sticky top-3 right-3 md:top-4 md:right-4 float-right w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors z-10 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+                      }`}
                   >
                     <X className="w-4 h-4 md:w-5 md:h-5" />
                   </button>
@@ -176,7 +186,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                           Type of Donation
                         </label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {donationTypes.map((type) => (
+                          {filteredDonationTypes.map((type) => (
                             <motion.button
                               key={type.id}
                               whileHover={{ scale: type.disabled ? 1 : 1.02 }}
@@ -199,7 +209,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                                 <span className={`font-bold text-xs md:text-sm ${donationType === type.id
                                   ? darkMode ? 'text-emerald-400' : 'text-emerald-700'
                                   : darkMode ? 'text-gray-200' : 'text-gray-900'
-                                }`}>
+                                  }`}>
                                   {type.label}
                                 </span>
                                 {type.id === 'ZAKAAT' && !zakatVerified && (
@@ -354,7 +364,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                           <div className={`w-4 h-4 md:w-5 md:h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${isAnonymous
                             ? 'bg-emerald-500 border-emerald-500'
                             : darkMode ? 'border-zinc-600' : 'border-gray-300'
-                          }`}>
+                            }`}>
                             {isAnonymous && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />}
                           </div>
                           <input
@@ -373,7 +383,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                             <div className={`w-4 h-4 md:w-5 md:h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${claim80G
                               ? 'bg-emerald-500 border-emerald-500'
                               : darkMode ? 'border-zinc-600' : 'border-gray-300'
-                            }`}>
+                              }`}>
                               {claim80G && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />}
                             </div>
                             <input

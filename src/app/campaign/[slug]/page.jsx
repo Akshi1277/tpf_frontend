@@ -65,15 +65,15 @@ export default function CampaignPage() {
             type="button"
             onClick={() => router.back()}
             className={`group flex items-center gap-2 transition-colors duration-200 ${darkMode
-                ? "text-white hover:text-emerald-400"
-                : "text-gray-900 hover:text-emerald-600"
+              ? "text-white hover:text-emerald-400"
+              : "text-gray-900 hover:text-emerald-600"
               }`}
             aria-label="Go back"
           >
             <div
               className={`flex items-center justify-center w-10 h-10 rounded-xl border backdrop-blur-md shadow-lg transition-all duration-200 ${darkMode
-                  ? "bg-black/40 border-white/20 hover:border-emerald-500/50 hover:bg-black/60"
-                  : "bg-white/70 border-gray-200 hover:border-emerald-500/40 hover:bg-white"
+                ? "bg-black/40 border-white/20 hover:border-emerald-500/50 hover:bg-black/60"
+                : "bg-white/70 border-gray-200 hover:border-emerald-500/40 hover:bg-white"
                 }`}
             >
               <ArrowLeft size={20} strokeWidth={2.5} />
@@ -116,8 +116,8 @@ export default function CampaignPage() {
               zakatVerified={campaign.zakatVerified}
               taxEligible={campaign.taxBenefits}
               ribaEligible={campaign.ribaEligible}
+              allowedDonationTypes={campaign.allowedDonationTypes}
               darkMode={darkMode}
-
             />
           </div>
         </div>

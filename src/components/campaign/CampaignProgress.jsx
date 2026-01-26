@@ -23,13 +23,13 @@ import { useRouter } from 'next/navigation';
 export default function CampaignProgress({ darkMode, campaign }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openShare, setOpenShare] = useState(false);
-  
+
   const router = useRouter();
   const { userInfo } = useSelector((state) => state.auth);
   const wishlist = userInfo?.wishlist || [];
-  
+
   const [toggleWishlist] = useToggleWishlistMutation();
-  
+
   if (!campaign) return null;
 
   const {
@@ -40,7 +40,12 @@ export default function CampaignProgress({ darkMode, campaign }) {
     _id: campaignId,
     slug,
     title,
+    source,
+    fundsDisbursed = 0,
+    allowedDonationTypes = [],
   } = campaign;
+
+  const isFoundation = source === "FOUNDATION";
 
   const saved = wishlist.includes(campaignId);
 
@@ -50,9 +55,9 @@ export default function CampaignProgress({ darkMode, campaign }) {
       : "";
 
   const percentage =
-    targetAmount > 0
+    !isFoundation && targetAmount > 0
       ? Math.min(Math.round((raisedAmount / targetAmount) * 100), 100)
-      : 0;
+      : 100;
 
   const daysLeft = deadline
     ? Math.max(
@@ -150,14 +155,25 @@ export default function CampaignProgress({ darkMode, campaign }) {
 
             {/* Amount */}
             <div className="mb-6">
-              <div className="flex flex-wrap items-end gap-2 sm:gap-3 mb-4">
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  {percentage}%
+              {isFoundation ? (
+                <div className="flex flex-wrap items-end gap-2 sm:gap-3 mb-4">
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    ₹{formatNumber(fundsDisbursed)}
+                  </div>
+                  <div className={`text-sm sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    Total Funds Disbursed
+                  </div>
                 </div>
-                <div className={`text-sm sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-                  of ₹{formatNumber(targetAmount)}
+              ) : (
+                <div className="flex flex-wrap items-end gap-2 sm:gap-3 mb-4">
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    {percentage}%
+                  </div>
+                  <div className={`text-sm sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    of ₹{formatNumber(targetAmount)}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Progress bar */}
               <div className="relative">
@@ -255,8 +271,8 @@ export default function CampaignProgress({ darkMode, campaign }) {
               <StatCard
                 darkMode={darkMode}
                 icon={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />}
-                value={formatNumber(daysLeft)}
-                label="Days Left"
+                value={isFoundation ? "Permanent" : formatNumber(daysLeft)}
+                label={isFoundation ? "Fund Status" : "Days Left"}
                 color="blue"
               />
               <StatCard
@@ -342,6 +358,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
         zakatVerified={campaign.zakatVerified}
         ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}
+        allowedDonationTypes={allowedDonationTypes}
       />
 
       {openShare && (

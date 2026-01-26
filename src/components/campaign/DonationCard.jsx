@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import PayUForm from '../payments/PayUForm';
 import LoginModal from '../login/LoginModal';
 
-export default function DonationCard({ darkMode, campaignId, zakatVerified, taxEligible, ribaEligible }) {
+export default function DonationCard({ darkMode, campaignId, zakatVerified, taxEligible, ribaEligible, allowedDonationTypes = [] }) {
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [tipAmount, setTipAmount] = useState(0);
@@ -23,13 +23,24 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified, taxE
   const presetAmounts = [500, 1000, 5000, 10000];
   const tipPercentages = [2, 5, 10, 15, 18];
 
-  const donationTypes = [
+  const allDonationTypes = [
     { id: 'ZAKAAT', label: 'Zakat', desc: 'Obligatory charity', disabled: !zakatVerified },
-    { id: 'RIBA', label: 'Riba', desc: 'Interest Money', disabled: !ribaEligible },
+    { id: 'RIBA', label: 'RIBA', desc: 'Interest Money', disabled: !ribaEligible },
     { id: 'SADAQAH', label: 'Sadaqah', desc: 'Voluntary charity' },
     { id: 'LILLAH', label: 'Lillah', desc: 'For sake of Allah' },
     { id: 'IMDAD', label: 'Imdad', desc: 'Emergency relief' },
   ];
+
+  const filteredDonationTypes = allowedDonationTypes?.length > 0
+    ? allDonationTypes.filter(t => allowedDonationTypes.some(at => at.toUpperCase() === t.id.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')))
+    : allDonationTypes;
+
+  // Set default donation type if restricted
+  useEffect(() => {
+    if (allowedDonationTypes?.length > 0 && !allowedDonationTypes.some(at => at.toUpperCase() === donationType.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && donationType === 'ZAKAAT'))) {
+      setDonationType(filteredDonationTypes[0]?.id || 'SADAQAH');
+    }
+  }, [allowedDonationTypes, filteredDonationTypes]);
 
   const handleDonate = async () => {
     if (isDonating) return;
@@ -124,7 +135,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified, taxE
             Type of Donation
           </label>
           <div className="grid grid-cols-2 gap-3">
-            {donationTypes.map((type) => (
+            {filteredDonationTypes.map((type) => (
               <button
                 key={type.id}
                 onClick={() => !type.disabled && setDonationType(type.id)}
@@ -370,7 +381,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified, taxE
             </>
           ) : (
             selectedAmount || customAmount
-              ?  `Donate ₹${((selectedAmount || Number(customAmount) || 0) + (tipAmount || 0)).toLocaleString()}`
+              ? `Donate ₹${((selectedAmount || Number(customAmount) || 0) + (tipAmount || 0)).toLocaleString()}`
               : 'Select Amount to Continue'
           )}
         </button>
