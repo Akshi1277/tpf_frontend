@@ -35,9 +35,7 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
 
         try {
             const res = await sendOtp({ mobileNo: mobile, type: "signup" }).unwrap()
-            if (res.otp) {
-                toast.info(`Your OTP is ${res.otp}`)
-            }
+           
             setStep(2)
             setTimeout(() => otpInputs.current[0]?.focus(), 300)
         } catch (error) {
@@ -176,9 +174,7 @@ function SignupModal({ isOpen, onClose, darkMode = false, onSignupSuccess }) {
     const handleResendOtp = async () => {
         try {
             const res = await sendOtp({ mobileNo: mobile, type: "signup" }).unwrap()
-            if (res.otp) {
-                toast.info(`Your OTP is ${res.otp}`)
-            }
+           
             toast.success("OTP resent successfully")
             setOtp(['', '', '', ''])
             otpInputs.current[0]?.focus()

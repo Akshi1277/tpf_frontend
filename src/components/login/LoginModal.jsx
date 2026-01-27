@@ -34,9 +34,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
 
         try {
             const res = await sendOtp({ mobileNo: mobile, type: "login" }).unwrap()
-            if (res.otp) {
-                toast.info(`Your OTP is ${res.otp}`)
-            }
+           
             setStep(2)
             setTimeout(() => otpInputs.current[0]?.focus(), 300)
         } catch (error) {
@@ -132,9 +130,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     const handleResendOtp = async () => {
         try {
             const res = await sendOtp({ mobileNo: mobile, type: "login" }).unwrap()
-            if (res.otp) {
-                toast.info(`Your OTP is ${res.otp}`)
-            }
+           
             showToast({
                 type: "success",
                 title: "Otp Resent Successfully!",
