@@ -28,7 +28,7 @@ export default function VoiceAssistant() {
     useEffect(() => {
         if (history.length === 0) {
             setHistory([
-                { role: "assistant", text: "Hello! I am your True Path Foundation Assistant. How can I help you today?" }
+                { role: "assistant", text: "Assalamu Alaikum! I am your True Path Foundation Assistant. How can I help you today?" }
             ]);
         }
     }, [history.length]);
@@ -145,8 +145,8 @@ export default function VoiceAssistant() {
     const sendToAI = async (audioBlob, transcript) => {
         setIsProcessing(true);
 
-        // Add user message with WHATEVER was captured (even if empty, show something professional)
-        const userMsgText = transcript || "Querying...";
+        // Add user message with captured transcript or professional placeholder
+        const userMsgText = transcript || "Unlocking insights...";
         setHistory(prev => [...prev, { role: "user", text: userMsgText }]);
 
         const formData = new FormData();
@@ -255,7 +255,6 @@ export default function VoiceAssistant() {
             {/* Launcher */}
             {!isExpanded && (
                 <motion.div
-                    layoutId="assistant-btn"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
