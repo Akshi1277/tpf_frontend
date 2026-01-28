@@ -95,7 +95,6 @@ export default function Page() {
       </section>
 
       <Footer darkMode={darkMode} />
-      <ScrollToTop scrolled={scrolled} />
     </div>
   );
 }

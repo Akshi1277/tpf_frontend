@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AppToastProvider } from './AppToastContext'
 import AppToast from '@/components/AppToast'
 import SmoothScrollProvider from './SmoothScrollProvider'
+import VoiceAssistant from '@/components/ai/VoiceAssistant'
 const _geist = V0_Font_Geist({
   subsets: ['latin'],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -54,9 +55,10 @@ export default async function RootLayout({ children }) {
         {/* CMS available app-wide without refetching */}
 
         <Providers cms={cms}>
-        <SmoothScrollProvider>
-          {children}
-        </SmoothScrollProvider>
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
+          <VoiceAssistant />
         </Providers>
 
 
