@@ -476,11 +476,13 @@ export default function VoiceAssistant() {
             }
         }
 
-        // AUTO: High-Quality Google Indian/English
+        // AUTO: High-Quality Google Indian/English/Hindi
         const premiumMaleVoice = voices.find(v => v.lang === "en-IN" && v.name.includes("Google"))
+            || voices.find(v => v.lang === "hi-IN" && v.name.includes("Google"))
             || voices.find(v => v.lang === "en-IN" && (v.name.includes("Ravi") || v.name.includes("Hemant")))
             || voices.find(v => (v.name.includes("Google") || v.name.includes("Natural")) && v.lang.startsWith("en") && !v.name.includes("Female"))
             || voices.find(v => v.lang === "en-GB" && v.name.includes("Male"))
+            || voices.find(v => v.lang === "hi-IN")
             || voices[0];
 
         if (premiumMaleVoice) utterance.voice = premiumMaleVoice;
