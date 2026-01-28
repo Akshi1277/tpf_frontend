@@ -30,14 +30,7 @@ export default function SignUpPage({ darkMode }) {
       const res = await sendOtp({ mobileNo: mobile, type: "signup" }).unwrap();
 
       // show OTP only for development
-      if (res.otp) {
-        showToast({
-          type: "success",
-          title: `Your OTP is ${res.otp}`,
-          message: ' ',
-          duration: 2000,
-        });
-      }
+     
       setStep(2);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {

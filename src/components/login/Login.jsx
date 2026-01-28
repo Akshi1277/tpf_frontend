@@ -29,15 +29,7 @@ const [verifyOtp, {isLoading:verifyingOtp}]= useVerifyOtpMutation()
       
 
       // show OTP only for development
-      if (res.otp) {
-        
-         showToast({
-        type: "success",
-        title: `Your OTP is ${res.otp}`,
-        message: ' ',
-        duration: 2000,
-      });
-      }
+      
        
       setStep(2)
      }
