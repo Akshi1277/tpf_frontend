@@ -332,7 +332,7 @@ export default function VoiceAssistant() {
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
                                     <div className={`p-3 rounded-2xl rounded-tl-none flex items-center gap-3 shadow-sm border ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'}`}>
                                         <Loader2 className="w-3 h-3 text-emerald-500 animate-spin" />
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Gemini is Thinking</span>
+                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Support assistant is Thinking</span>
                                     </div>
                                 </motion.div>
                             )}
