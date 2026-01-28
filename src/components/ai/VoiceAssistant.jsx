@@ -1,10 +1,112 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, X, Volume2, VolumeX, Loader2, Bot, Trash2, User, Sparkles } from "lucide-react";
+import { Mic, X, Volume2, VolumeX, Loader2, Bot, Trash2, User, Sparkles, Calculator, UserPlus, AlertCircle, Settings2 } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { useGetPeopleHelpedStatsQuery, useRegisterVolunteerMutation } from "@/utils/slices/authApiSlice";
+import { useFetchMyDonationsQuery } from "@/utils/slices/donationApiSlice";
+import { useFetchCampaignsQuery } from "@/utils/slices/campaignApiSlice";
+import { useAppToast } from "@/app/AppToastContext";
+import { getMediaUrl } from "@/utils/media";
+
+// Sub-component for Campaign Card (Stable definition outside)
+const CampaignCard = ({ data, isDarkMode, router }) => {
+    const goalAmount = data.goal || 0;
+    const raisedAmount = data.raised || 0;
+    const progress = goalAmount > 0 ? Math.min(Math.round((raisedAmount / goalAmount) * 100), 100) : 0;
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`mt-3 p-3 rounded-2xl border ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'} shadow-md overflow-hidden`}
+        >
+            <div className="relative h-24 mb-3 rounded-xl overflow-hidden bg-gray-100">
+                <img
+                    src={getMediaUrl(data.image)}
+                    alt={data.title}
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute top-2 right-2 px-2 py-0.5 bg-emerald-500 text-white text-[8px] font-bold rounded-full">
+                    ACTIVE
+                </div>
+            </div>
+            <h4 className={`text-[11px] font-bold mb-2 line-clamp-1 ${isDarkMode ? 'text-zinc-100' : 'text-gray-900'}`}>{data.title}</h4>
+            <div className="space-y-1.5">
+                <div className="flex justify-between text-[10px] items-end">
+                    <span className="text-emerald-500 font-bold">₹{(raisedAmount).toLocaleString()}</span>
+                    <span className={isDarkMode ? 'text-zinc-500' : 'text-gray-400'}>Goal: ₹{(goalAmount).toLocaleString()}</span>
+                </div>
+                <div className={`h-1.5 w-full rounded-full overflow-hidden ${isDarkMode ? 'bg-zinc-800' : 'bg-gray-100'}`}>
+                    <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-400"
+                    />
+                </div>
+            </div>
+            <button
+                onClick={() => router.push(`/campaign/${data.slug}`)}
+                className="pointer-events-auto w-full mt-3 py-2 bg-emerald-600 text-white text-[10px] font-bold rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+                DONATE NOW
+            </button>
+        </motion.div>
+    );
+};
+
+// Sub-component for Waveform Visualizer
+const WaveformVisualizer = ({ isSpeaking }) => {
+    return (
+        <div className="flex items-center gap-1 h-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+                <motion.div
+                    key={i}
+                    animate={{
+                        height: isSpeaking ? [4, 16, 8, 14, 6] : 4,
+                    }}
+                    transition={{
+                        duration: 0.6,
+                        repeat: Infinity,
+                        delay: i * 0.1,
+                        ease: "easeInOut"
+                    }}
+                    className="w-1 bg-emerald-500 rounded-full"
+                />
+            ))}
+        </div>
+    );
+};
+
+// Sub-component for Quick Action Buttons
+const QuickActions = ({ onAction, isDarkMode }) => {
+    const actions = [
+        { id: 'zakat', label: 'Calculate Zakat', icon: <Calculator size={14} />, query: 'How can I calculate my Zakat?' },
+        { id: 'volunteer', label: 'Be a Volunteer', icon: <UserPlus size={14} />, query: 'I want to register as a volunteer.' },
+        { id: 'urgent', label: 'Urgent Causes', icon: <AlertCircle size={14} />, query: 'Show me some urgent campaigns.' },
+    ];
+
+    return (
+        <div className="flex flex-wrap gap-2 mt-2">
+            {actions.map((action) => (
+                <button
+                    key={action.id}
+                    onClick={() => onAction(action.query)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border ${isDarkMode
+                        ? 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:border-emerald-500/50'
+                        : 'bg-white border-gray-100 text-gray-600 shadow-sm hover:border-emerald-500/50 hover:bg-emerald-50/50 hover:text-emerald-700'
+                        }`}
+                >
+                    <span className="text-emerald-500">{action.icon}</span>
+                    {action.label}
+                </button>
+            ))}
+        </div>
+    );
+};
 
 export default function VoiceAssistant() {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -17,8 +119,55 @@ export default function VoiceAssistant() {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const router = useRouter();
 
+    // Redux & API Data for Personalization
+    const { userInfo } = useSelector((state) => state.auth);
+
+    // Memoize arguments to prevent infinite re-fetch loops
+    const donationParams = useMemo(() => ({ limit: 1 }), []);
+
+    const { data: impactData } = useGetPeopleHelpedStatsQuery(undefined, { skip: !userInfo });
+    const { data: donationsData } = useFetchMyDonationsQuery(donationParams, { skip: !userInfo });
+    const { data: campaignList } = useFetchCampaignsQuery();
+
+    const activeCampaigns = useMemo(() =>
+        campaignList?.campaigns?.slice(0, 3).map(c => ({
+            title: c.title,
+            raised: c.raisedAmount,
+            goal: c.targetAmount,
+            slug: c.slug,
+            image: c.imageUrl
+        })) || []
+        , [campaignList]);
+
+    const userContext = useMemo(() => ({
+        fullName: userInfo?.fullName || "Guest",
+        isLoggedIn: !!userInfo,
+        peopleHelped: impactData?.data?.totalPeopleHelped || 0,
+        lastDonation: donationsData?.donations?.[0] ? {
+            amount: donationsData.donations[0].amount,
+            date: donationsData.donations[0].date,
+            txnid: donationsData.donations[0].id,
+            taxEligible: donationsData.donations[0].taxEligible
+        } : null,
+        featuredCampaigns: activeCampaigns
+    }), [userInfo, impactData, donationsData, activeCampaigns]);
+
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
+
+    // Hands-Free Form Filling State
+    const [isIntakeActive, setIsIntakeActive] = useState(false);
+    const [volunteerData, setVolunteerData] = useState({
+        fullName: "", email: "", phone: "", gender: "", state: "", city: "", expertise: ""
+    });
+    const [lastCapturedField, setLastCapturedField] = useState(null);
+
+    const [registerVolunteer] = useRegisterVolunteerMutation();
+    const { showToast } = useAppToast();
+
+    const fetchCampaigns = useFetchCampaignsQuery();
+    const campaigns = useMemo(() => fetchCampaigns?.data?.campaigns || [], [fetchCampaigns.data]);
+
     const synthesisRef = useRef(null);
     const recognitionRef = useRef(null);
     const scrollRef = useRef(null);
@@ -27,11 +176,15 @@ export default function VoiceAssistant() {
     // Initial Welcome Message
     useEffect(() => {
         if (history.length === 0) {
+            const greeting = userContext?.fullName
+                ? `Assalamu Alaikum, ${userContext.fullName}! ${userContext.peopleHelped > 0 ? `Your support has helped ${userContext.peopleHelped} ${userContext.peopleHelped === 1 ? 'family' : 'families'} so far.` : ''} How can I help you today?`
+                : "Assalamu Alaikum! I am your True Path Foundation Assistant. How can I help you today?";
+
             setHistory([
-                { role: "assistant", text: "Assalamu Alaikum! I am your True Path Foundation Assistant. How can I help you today?" }
+                { role: "assistant", text: greeting }
             ]);
         }
-    }, [history.length]);
+    }, [history.length, userContext?.fullName, userContext?.peopleHelped]);
 
     // Handle Dark Mode Sync
     useEffect(() => {
@@ -150,8 +303,16 @@ export default function VoiceAssistant() {
         setHistory(prev => [...prev, { role: "user", text: userMsgText }]);
 
         const formData = new FormData();
-        formData.append("audio", audioBlob, "query.webm");
+        if (audioBlob) {
+            formData.append("audio", audioBlob, "query.webm");
+        }
+        if (transcript) {
+            formData.append("transcript", transcript);
+        }
         formData.append("history", JSON.stringify(history));
+        if (userContext) {
+            formData.append("userContext", JSON.stringify(userContext));
+        }
 
         try {
             const res = await axios.post(
@@ -169,8 +330,42 @@ export default function VoiceAssistant() {
                     const path = gotoMatch[1].trim();
                     console.log("Assistant Redirecting to:", path);
                     router.push(path);
-                    // Remove the tag from the text displayed and spoken
                     aiText = aiText.replace(/\[GOTO:\s*([^\]]+)\]/, "").trim();
+                }
+
+                // Handle Intake Mode Tags
+                const intakeMatches = [...aiText.matchAll(/\[INTAKE:\s*({.*?})\]/g)];
+                if (intakeMatches.length > 0) {
+                    setIsIntakeActive(true);
+                    intakeMatches.forEach(match => {
+                        try {
+                            const data = JSON.parse(match[1]);
+                            setVolunteerData(prev => ({ ...prev, [data.field]: data.value }));
+                            setLastCapturedField(data.field);
+                        } catch (e) {
+                            console.error("Intake parse error:", e);
+                        }
+                    });
+                    aiText = aiText.replace(/\[INTAKE:\s*({.*?})\]/g, "").trim();
+                }
+
+                // Handle Submission Tag
+                if (aiText.includes("[SUBMIT_VOLUNTEER: true]")) {
+                    handleVolunteerSubmit();
+                    aiText = aiText.replace("[SUBMIT_VOLUNTEER: true]", "").trim();
+                    setIsIntakeActive(false);
+                }
+
+                // Handle Support Ticket Creation
+                const ticketMatch = aiText.match(/\[CREATE_TICKET:\s*({.*?})\]/);
+                if (ticketMatch) {
+                    try {
+                        const ticketData = JSON.parse(ticketMatch[1]);
+                        handleTicketCreation(ticketData);
+                        aiText = aiText.replace(/\[CREATE_TICKET:\s*({.*?})\]/, "").trim();
+                    } catch (e) {
+                        console.error("Ticket parse error:", e);
+                    }
                 }
 
                 setHistory(prev => [...prev, { role: "assistant", text: aiText }]);
@@ -187,11 +382,83 @@ export default function VoiceAssistant() {
         }
     };
 
+    const handleVolunteerSubmit = async () => {
+        try {
+            // Map frontend field names to backend expectations
+            const payload = {
+                fullName: volunteerData.fullName,
+                email: volunteerData.email,
+                mobileNo: volunteerData.phone, // Backend expects 'mobileNo'
+                gender: volunteerData.gender,
+                state: volunteerData.state,
+                city: volunteerData.city,
+                profession: volunteerData.expertise // Backend expects 'profession'
+            };
+
+            await registerVolunteer(payload).unwrap();
+            showToast({
+                title: "Mubarak!",
+                message: "You are now a registered TPF Volunteer.",
+                type: "success"
+            });
+            setVolunteerData({ fullName: "", email: "", phone: "", gender: "", state: "", city: "", expertise: "" });
+        } catch (err) {
+            console.error("Volunteer submission error:", err);
+            showToast({
+                title: "Submission Error",
+                message: err?.data?.message || "Failed to submit registration.",
+                type: "error"
+            });
+        }
+    };
+
+    const handleTicketCreation = async (ticketData) => {
+        try {
+            const payload = {
+                fullName: userContext?.fullName || "Anonymous User",
+                email: userContext?.email || "support@tpfaid.org",
+                queryType: ticketData.category || "General Query",
+                message: ticketData.summary || "User requested support via AI assistant.",
+                status: "Unresolved"
+            };
+
+            const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/tickets-queries/create`,
+                payload
+            );
+
+            if (response.data.success) {
+                showToast({
+                    title: "Support Ticket Created",
+                    message: "Our team will reach out to you shortly.",
+                    type: "success"
+                });
+            }
+        } catch (err) {
+            console.error("Ticket creation error:", err);
+            showToast({
+                title: "Ticket Creation Failed",
+                message: "Please try contacting us directly.",
+                type: "error"
+            });
+        }
+    };
+
     const speak = (text) => {
         if (!synthesisRef.current) return;
         synthesisRef.current.cancel();
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        const cleanText = text
+            .replace(/\[CARD:.*?\]/g, "")
+            .replace(/\[GOTO:.*?\]/g, "")
+            .replace(/\[INTAKE:.*?\]/g, "")
+            .replace(/\[SUBMIT_VOLUNTEER:.*?\]/g, "")
+            .replace(/\[CREATE_TICKET:.*?\]/g, "")
+            .trim();
+
+        if (!cleanText) return;
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
         const voices = synthesisRef.current.getVoices();
 
         // Use manually selected voice if available
@@ -200,12 +467,11 @@ export default function VoiceAssistant() {
             if (selected) {
                 utterance.voice = selected;
                 utterance.rate = 1.1;
-                utterance.pitch = 0.9;
+                utterance.pitch = 0.95;
                 utterance.onstart = () => setIsSpeaking(true);
                 utterance.onend = () => setIsSpeaking(false);
                 utterance.onerror = () => setIsSpeaking(false);
                 synthesisRef.current.speak(utterance);
-                console.log("Using manual voice:", selected.name);
                 return;
             }
         }
@@ -220,18 +486,27 @@ export default function VoiceAssistant() {
         if (premiumMaleVoice) utterance.voice = premiumMaleVoice;
         utterance.rate = 1.1;
         utterance.pitch = 0.95;
+
         utterance.onstart = () => setIsSpeaking(true);
         utterance.onend = () => setIsSpeaking(false);
         utterance.onerror = () => setIsSpeaking(false);
 
-        console.log("Using auto voice:", premiumMaleVoice?.name);
         synthesisRef.current.speak(utterance);
     };
 
     const clearHistory = () => {
-        setHistory([{ role: "assistant", text: "How else can I assist you today?" }]);
-        if (isSpeaking) synthesisRef.current.cancel();
+        setHistory([history[0]]);
+        setIsIntakeActive(false);
+        setVolunteerData({ fullName: "", email: "", phone: "", gender: "", state: "", city: "", expertise: "" });
+        setLastCapturedField(null);
+        if (isSpeaking) {
+            synthesisRef.current.cancel();
+            setIsSpeaking(false);
+        }
     };
+
+    // Waveform Visualizer Section moved out to props based if needed, or kept inline but simplified
+
 
     return (
         <div className={`fixed bottom-6 right-6 z-[1000000] flex flex-col items-end gap-3 pointer-events-none`}>
@@ -297,12 +572,13 @@ export default function VoiceAssistant() {
                                 </div>
                                 <div>
                                     <h3 className="text-white font-bold text-sm tracking-tight">Support Assistant</h3>
-                                    <div className="flex items-center gap-1.5 mt-0.5">
-
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <WaveformVisualizer isSpeaking={isSpeaking} />
                                     </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
+
                                 <button onClick={clearHistory} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all">
                                     <Trash2 size={18} />
                                 </button>
@@ -311,6 +587,9 @@ export default function VoiceAssistant() {
                                 </button>
                             </div>
                         </div>
+
+                        {/* Settings Panel */}
+
 
                         <div
                             ref={scrollRef}
@@ -333,7 +612,48 @@ export default function VoiceAssistant() {
                                             ? isDarkMode ? "bg-zinc-800 text-zinc-100 border border-zinc-700/50 rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tr-none"
                                             : "bg-emerald-600 text-white rounded-tl-none font-medium"
                                             }`}>
-                                            {msg.text}
+                                            {msg.role === 'assistant' ? (
+                                                <>
+                                                    {msg.text.split(/\[CARD:.*?\]/g).map((part, i) => <span key={i}>{part}</span>)}
+                                                    {(() => {
+                                                        const match = msg.text.match(/\[CARD:(.*?)\]/);
+                                                        if (!match) return null;
+                                                        try {
+                                                            const cardData = JSON.parse(match[1]);
+                                                            return <CampaignCard data={cardData} isDarkMode={isDarkMode} router={router} />;
+                                                        } catch (e) {
+                                                            return null;
+                                                        }
+                                                    })()}
+
+                                                    {/* Show Quick Actions only on the first message */}
+                                                    {idx === 0 && history.length === 1 && (
+                                                        <QuickActions onAction={(q) => sendToAI(null, q)} isDarkMode={isDarkMode} />
+                                                    )}
+                                                    {/* Show Intake Progress if active */}
+                                                    {isIntakeActive && idx === history.length - 1 && (
+                                                        <div className={`mt-3 p-3 rounded-2xl border ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/30' : 'bg-emerald-50 border-emerald-100'}`}>
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Registration Progress</span>
+                                                                <span className="text-[10px] font-bold text-emerald-500">
+                                                                    {Object.values(volunteerData).filter(v => v !== "").length}/7 Fields
+                                                                </span>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                {Object.entries(volunteerData).map(([key, val]) => (
+                                                                    val && (
+                                                                        <div key={key} className="flex items-center gap-2">
+                                                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                                            <span className={`text-[10px] font-medium capitalize ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{key}:</span>
+                                                                            <span className={`text-[10px] font-bold truncate ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>{val}</span>
+                                                                        </div>
+                                                                    )
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            ) : msg.text}
                                         </div>
                                     </div>
                                 </motion.div>
