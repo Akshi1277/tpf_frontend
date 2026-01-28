@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, X, Volume2, VolumeX, Loader2, Bot, Trash2, User, Sparkles } from "lucide-react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function VoiceAssistant() {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -14,6 +15,7 @@ export default function VoiceAssistant() {
     const [interimTranscript, setInterimTranscript] = useState("");
     const [error, setError] = useState(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const router = useRouter();
 
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
@@ -159,7 +161,18 @@ export default function VoiceAssistant() {
             );
 
             if (res.data.success) {
-                const aiText = res.data.data;
+                let aiText = res.data.data;
+
+                // Handle Page Redirection Tag
+                const gotoMatch = aiText.match(/\[GOTO:\s*([^\]]+)\]/);
+                if (gotoMatch) {
+                    const path = gotoMatch[1].trim();
+                    console.log("Assistant Redirecting to:", path);
+                    router.push(path);
+                    // Remove the tag from the text displayed and spoken
+                    aiText = aiText.replace(/\[GOTO:\s*([^\]]+)\]/, "").trim();
+                }
+
                 setHistory(prev => [...prev, { role: "assistant", text: aiText }]);
                 speak(aiText);
             }
@@ -286,7 +299,7 @@ export default function VoiceAssistant() {
                                 <div>
                                     <h3 className="text-white font-bold text-sm tracking-tight">Support Assistant</h3>
                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                       
+
                                     </div>
                                 </div>
                             </div>
@@ -420,7 +433,7 @@ export default function VoiceAssistant() {
                             </div>
 
                             <div className="mt-4 flex items-center justify-center gap-2 opacity-30 grayscale pointer-events-none">
-                               
+
                             </div>
                         </div>
                     </motion.div>
