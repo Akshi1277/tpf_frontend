@@ -124,21 +124,35 @@ export default function Footer({ darkMode }) {
                 'Join TPF Aid',
                 'Volunteer Now',
                 'TPF Aid in News',
-                'Blog',
+                'Blogs',
                 'Notices'
               ].map(item => (
                 <li key={item}>
                   {item === 'Volunteer Now' ? (
-                    <Link href="/volunteer/register" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                    <Link
+                      href="/volunteer/register"
+                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                    >
+                      {item}
+                    </Link>
+                  ) : item === 'Blogs' ? (
+                    <Link
+                      href="/blogs"
+                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                    >
                       {item}
                     </Link>
                   ) : (
-                    <a href="#" className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}>
+                    <a
+                      href="#"
+                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                    >
                       {item}
                     </a>
                   )}
                 </li>
               ))}
+
             </ul>
           </div>
 
