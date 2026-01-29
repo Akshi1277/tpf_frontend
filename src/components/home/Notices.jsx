@@ -81,9 +81,9 @@ export default function PublicNoticesPage({ darkMode }) {
 
     return (
         <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'}`}>
-            {/* Hero Section */}
+            {/* Hero Section - ONLY CHANGED THIS LINE: Added pt-20 for mobile, kept lg:py-20 for desktop */}
             <div className="bg-gradient-to-br from-emerald-500 to-emerald-600">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 sm:py-16 lg:py-20">
                     {/* Back Button - Mobile & Desktop */}
                     <div className="mb-6 sm:mb-8">
                         <button
@@ -276,7 +276,7 @@ export default function PublicNoticesPage({ darkMode }) {
                                         <div className={`flex items-center justify-between pt-3 sm:pt-4 border-t ${darkMode ? 'border-zinc-700' : 'border-gray-100'
                                             }`}>
                                             <button
-                                                className="inline-flex items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium text-xs sm:text-sm transition-colors group"
+                                                className="inline-flex cursor-pointer items-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium text-xs sm:text-sm transition-colors group"
                                                 onClick={() => handleReadMore(notice._id)}
                                             >
                                                 Read more
@@ -335,13 +335,7 @@ export default function PublicNoticesPage({ darkMode }) {
 
                         <button
                             onClick={() => router.push('/blogs')}
-                            className="
-          inline-flex items-center gap-2
-          px-6 py-3 cursor-pointer
-          bg-emerald-500 hover:bg-emerald-600
-          text-white font-medium rounded-lg
-          transition-colors 
-        "
+                            className="inline-flex items-center gap-2 px-6 py-3 cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors"
                         >
                             Explore Blogs
                             <svg
@@ -529,32 +523,13 @@ export default function PublicNoticesPage({ darkMode }) {
                                 }`}>
                                 <button
                                     onClick={handleCloseModal}
-                                    className={`px-4 sm:px-6 py-2 sm:py-2.5 font-medium rounded-lg border transition-colors text-sm sm:text-base ${darkMode
+                                    className={`px-4 sm:px-6 py-2 cursor-pointer sm:py-2.5 font-medium rounded-lg border transition-colors text-sm sm:text-base ${darkMode
                                         ? 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'
-                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                                        : 'bg-white text-gray-700 cursor-pointer border-gray-300 hover:bg-gray-100'
                                         }`}
                                 >
                                     Close
                                 </button>
-                                {/* <button
-                                    onClick={() => window.print()}
-                                    className="px-4 sm:px-6 py-2 sm:py-2.5 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition-colors inline-flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base"
-                                >
-                                    <svg
-                                        className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-                                        />
-                                    </svg>
-                                    <span className="hidden sm:inline">Print</span>
-                                </button> */}
                             </div>
                         </div>
                     </div>
