@@ -110,6 +110,7 @@ const QuickActions = ({ onAction, isDarkMode }) => {
 
 export default function VoiceAssistant() {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showLauncherGreeting, setShowLauncherGreeting] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
@@ -185,6 +186,22 @@ export default function VoiceAssistant() {
             ]);
         }
     }, [history.length, userContext?.fullName, userContext?.peopleHelped]);
+
+    // Show launcher greeting after a delay and keep it visible
+    useEffect(() => {
+        let timer;
+        if (!isExpanded) {
+            timer = setTimeout(() => {
+                setShowLauncherGreeting(true);
+            }, 3000);
+        } else {
+            setShowLauncherGreeting(false);
+        }
+
+        return () => {
+            if (timer) clearTimeout(timer);
+        };
+    }, [isExpanded]);
 
     // Handle Dark Mode Sync
     useEffect(() => {
@@ -423,7 +440,7 @@ export default function VoiceAssistant() {
             };
 
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/tickets-queries/create`,
+                `${process.env.NEXT_PUBLIC_API_URL}/ticket/create`,
                 payload
             );
 
@@ -535,22 +552,45 @@ export default function VoiceAssistant() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
-                    className="flex flex-col items-center gap-2 pointer-events-auto cursor-pointer"
-                    onClick={toggleAssistant}
+                    className="flex flex-col items-end gap-2 pointer-events-auto cursor-pointer relative"
+                    onClick={() => {
+                        setIsExpanded(true);
+                        setShowLauncherGreeting(false);
+                    }}
                 >
+                    <AnimatePresence>
+                        {showLauncherGreeting && (
+                            <motion.div
+                                initial={{ opacity: 0, x: 20, y: 10, scale: 0.5 }}
+                                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, x: 20, scale: 0.5 }}
+                                className={`absolute bottom-full right-0 mb-4 px-4 py-2 rounded-2xl rounded-br-none shadow-lg border whitespace-nowrap text-xs font-bold ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-100' : 'bg-white border-emerald-100 text-emerald-900'}`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                                    Salam! I am your assistant.
+                                </div>
+                                <motion.div
+                                    className="absolute -bottom-2 right-4 w-4 h-4 rotate-45 border-r border-b"
+                                    style={{
+                                        backgroundColor: isDarkMode ? '#18181b' : '#ffffff',
+                                        borderColor: isDarkMode ? '#27272a' : '#ecfdf5'
+                                    }}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     <div className="relative group">
                         {!isDarkMode && <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500"></div>}
-                        <button className={`relative w-16 h-16 rounded-full flex items-center justify-center shadow-xl border-2 transition-all ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}>
+                        <button className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-xl border-2 transition-all ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-white'}`}>
                             <img
                                 src={isDarkMode ? "/TPFAid-Logo1.png" : "/TPFAid-Logo.png"}
                                 alt="TPF"
-                                className="w-10 h-10 object-contain"
+                                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                             />
                         </button>
                     </div>
-                    <span className={`text-[10px] font-bold px-3 py-1 rounded-full shadow-sm border uppercase tracking-widest ${isDarkMode ? 'bg-zinc-900 text-zinc-100 border-zinc-800' : 'bg-white text-emerald-900 border-emerald-50'}`}>
-                        TPF Assistant
-                    </span>
                 </motion.div>
             )}
 
@@ -561,7 +601,7 @@ export default function VoiceAssistant() {
                         initial={{ opacity: 0, y: 30, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 30, scale: 0.95 }}
-                        className={`w-[320px] sm:w-[400px] h-[600px] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border flex flex-col overflow-hidden pointer-events-auto transition-colors duration-300 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-gray-100'}`}
+                        className={`w-[calc(100vw-2rem)] sm:w-[400px] h-[550px] sm:h-[600px] max-h-[85vh] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border flex flex-col overflow-hidden pointer-events-auto transition-colors duration-300 ${isDarkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-gray-100'}`}
                     >
                         <div className="bg-emerald-600 p-4 shrink-0 flex items-center justify-between border-b border-white/10">
                             <div className="flex items-center gap-3">
@@ -596,7 +636,7 @@ export default function VoiceAssistant() {
                         <div
                             ref={scrollRef}
                             data-lenis-prevent
-                            className={`flex-1 overflow-y-auto p-5 space-y-5 flex flex-col scroll-smooth custom-scrollbar pointer-events-auto ${isDarkMode ? 'bg-zinc-950' : 'bg-gray-50/50'}`}
+                            className={`flex-1 overflow-y-auto px-4 py-5 sm:p-5 space-y-5 flex flex-col scroll-smooth custom-scrollbar pointer-events-auto ${isDarkMode ? 'bg-zinc-950' : 'bg-gray-50/50'}`}
                             style={{ WebkitOverflowScrolling: 'touch' }}
                         >
                             {history.map((msg, idx) => (
@@ -671,8 +711,8 @@ export default function VoiceAssistant() {
                                 </motion.div>
                             )}
 
-                            {/* Live Transcript - Clean Bubble */}
-                            {interimTranscript && (
+                            {/* Live Transcript - Only show while user is recording */}
+                            {isRecording && interimTranscript && (
                                 <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="flex justify-end">
                                     <div className={`p-4 rounded-2xl rounded-tr-none text-xs leading-relaxed border shadow-sm ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-800'}`}>
                                         <div className="flex items-center gap-2 mb-1">
@@ -686,7 +726,7 @@ export default function VoiceAssistant() {
                         </div>
 
                         {/* Footer Controls - Clean & Minimalist */}
-                        <div className={`p-5 border-t ${isDarkMode ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-gray-100'}`}>
+                        <div className={`p-4 sm:p-5 border-t ${isDarkMode ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-gray-100'}`}>
                             {error && (
                                 <p className="text-red-500 text-[10px] font-bold mb-4 text-center uppercase tracking-widest">{error}</p>
                             )}
@@ -707,8 +747,8 @@ export default function VoiceAssistant() {
                                             onClick={startRecording}
                                             className={`flex-1 h-12 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-900/10 active:scale-95 flex items-center justify-center gap-3 ${isProcessing ? 'opacity-50' : ''}`}
                                         >
-                                            <Mic size={20} />
-                                            <span>Start Speaking</span>
+                                            <Mic size={18} className="sm:w-5 sm:h-5" />
+                                            <span className="text-sm sm:text-base">Start Speaking</span>
                                         </button>
 
                                         {/* Voice Cycle Button - Hidden Feature for Customization */}
