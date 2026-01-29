@@ -142,6 +142,13 @@ export default function Footer({ darkMode }) {
                     >
                       {item}
                     </Link>
+                  ) : item === 'Notices' ? (
+                    <Link
+                      href="/notices"
+                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
+                    >
+                      {item}
+                    </Link>
                   ) : (
                     <a
                       href="#"
