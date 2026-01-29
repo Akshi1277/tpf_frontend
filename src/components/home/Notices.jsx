@@ -88,7 +88,7 @@ export default function PublicNoticesPage({ darkMode }) {
                     <div className="mb-6 sm:mb-8">
                         <button
                             onClick={() => router.back()}
-                            className="inline-flex items-center text-emerald-50 hover:text-white transition-colors group"
+                            className="inline-flex cursor-pointer items-center text-emerald-50 hover:text-white transition-colors group"
                         >
                             <svg
                                 className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2 group-hover:-translate-x-1 transition-transform"
@@ -337,7 +337,7 @@ export default function PublicNoticesPage({ darkMode }) {
                             onClick={() => router.push('/blogs')}
                             className="
           inline-flex items-center gap-2
-          px-6 py-3
+          px-6 py-3 cursor-pointer
           bg-emerald-500 hover:bg-emerald-600
           text-white font-medium rounded-lg
           transition-colors 
