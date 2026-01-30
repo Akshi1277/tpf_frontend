@@ -5,8 +5,10 @@ import { useState, useEffect } from 'react';
 import { getMediaUrl } from '@/utils/media';
 import { useFetchRecentDonationsQuery } from '@/utils/slices/donationApiSlice';
 import { useFetchImpactStatsQuery } from '@/utils/slices/campaignApiSlice';
+import { useRouter } from 'next/navigation';
 
 export default function PulseSection({ darkMode }) {
+  const router = useRouter();
   const { data: recentData, isLoading: isRecentLoading } = useFetchRecentDonationsQuery();
   const { data: statsData } = useFetchImpactStatsQuery();
 
@@ -87,7 +89,8 @@ export default function PulseSection({ darkMode }) {
                 <p className={`text-sm ${COLORS.neutralBody} mb-4`}>
                   Join a trusted network of givers who believe in impact without barriers. With no platform fees and access to a community of donors <span className='font-bold'>by India, for India, within India</span>, your campaign can reach hearts across the country. Start your journey toward change today.
                 </p>
-                <button className="px-6 py-2 rounded-full cursor-pointer font-semibold border transition-colors bg-white text-zinc-900 hover:bg-zinc-50 shadow-sm w-fit text-sm">
+                <button className="px-6 py-2 rounded-full cursor-pointer font-semibold border transition-colors bg-white text-zinc-900 hover:bg-zinc-50 shadow-sm w-fit text-sm"
+                onClick={() => router.push('/financial-aid')}>
                   Start fundraising today
                 </button>
               </div>
