@@ -155,13 +155,7 @@ function InteractiveSearchSection({ darkMode, isInView, faqData, dynamicFAQs }) 
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="text-center"
               >
-                <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-black uppercase tracking-widest mb-8 border border-emerald-500/20">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  Smart AI Search
-                </div>
+                
                 <h3 className={`text-4xl sm:text-5xl font-black mb-6 tracking-tight ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
                   Still Have Questions?
                 </h3>
