@@ -303,65 +303,69 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
     addField("Donation Amount:", `INR ${txn.amount.toLocaleString('en-IN')}`, currentY);
     addField("Transaction ID:", txn.id, currentY + lineHeight);
-    addField("Order Date:", date, currentY + lineHeight * 2); // Same as donation date for now
+    addField("Order Date:", date, currentY + lineHeight * 2);
+
+    // Helper for professional buttons
+    const drawProfessionalButton = (x, y, w, h, text, rgb, url) => {
+      // Button Shadow
+      doc.setFillColor(220, 220, 220);
+      doc.roundedRect(x + 0.4, y + 0.4, w, h, 1, 1, 'F');
+      // Main Button
+      doc.setFillColor(rgb[0], rgb[1], rgb[2]); // Using RGB array
+      doc.roundedRect(x, y, w, h, 1, 1, 'F');
+      // Button Text
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(text, x + (w / 2), y + (h / 2) + 1, { align: "center" });
+      if (url) doc.link(x, y, w, h, { url });
+    };
 
     // 5. Footer Note
     currentY += 25;
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(40, 40, 40);
     const noteText = "Note: You can download your 80G Receipt from the TPF portal. ";
     doc.text(noteText, 15, currentY);
 
-    // "Click Here" Button - Dynamically placed after text
+    // "Click Here" Button
     const textWidth = doc.getTextWidth(noteText);
-    const btnX = 15 + textWidth + 2;
-    const btnY = currentY - 5.5; // Adjusted for better vertical center
-    const btnW = 28;
-    const btnH = 8;
-
-    doc.setFillColor(16, 185, 129); // Emerald
-    doc.roundedRect(btnX, btnY, btnW, btnH, 1, 1, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    // Vertical center: btnY + (btnH/2) + (fontSize in mm / 2) roughly
-    doc.text("Click Here", btnX + (btnW / 2), btnY + 4.8, { align: "center" });
-    doc.link(btnX, btnY, btnW, btnH, { url: "https://www.tpfaid.org/profile/downloads" });
+    drawProfessionalButton(
+      15 + textWidth + 1,
+      currentY - 5.5,
+      28,
+      8,
+      "Click Here",
+      [16, 185, 129], // Emerald
+      "https://www.tpfaid.org/profile/downloads"
+    );
 
     // Separator line
     currentY += 8;
-    doc.setDrawColor(200, 200, 200);
+    doc.setDrawColor(220, 220, 220);
     doc.setLineWidth(0.5);
     doc.line(15, currentY, 195, currentY);
 
-    // Disclaimer - REMOVED per user request
-    currentY += 10;
+    currentY += 12;
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(60, 60, 60);
     const queryText = "For any further queries about your contribution, click ";
     doc.text(queryText, 15, currentY);
 
-    // "Raise a Query" Button - Dynamically placed
+    // "Raise a Query" Button
     const queryWidth = doc.getTextWidth(queryText);
-    const qBtnX = 15 + queryWidth + 2;
-    const qBtnY = currentY - 5.5;
-    const qBtnW = 32;
-    const qBtnH = 8;
-
-    doc.setFillColor(59, 130, 246); // Blue
-    doc.roundedRect(qBtnX, qBtnY, qBtnW, qBtnH, 1, 1, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
-    doc.text("Raise a Query", qBtnX + (qBtnW / 2), qBtnY + 4.8, { align: "center" });
-    doc.link(qBtnX, qBtnY, qBtnW, qBtnH, { url: "https://www.tpfaid.org/contactus" });
-
-    // 5.5 Computer generated disclaimer at bottom
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.setFont("helvetica", "italic");
-    doc.text("This is a computer-generated email. No signature is required.", 105, 285, { align: "center" });
+    drawProfessionalButton(
+      15 + queryWidth + 1,
+      currentY - 5.5,
+      32,
+      8,
+      "Raise a Query",
+      [59, 130, 246], // Blue
+      "https://www.tpfaid.org/contactus"
+    );
 
     // 6. Impact Banner (Bottom Section) - Always show, with fallback image
     try {
@@ -395,11 +399,15 @@ export default function DownloadsPage({ darkModeFromParent }) {
         doc.text("Your contribution makes a world of difference.", 25, bannerY + 22);
         doc.text("Share this story to help us reach our goal faster!", 25, bannerY + 27);
 
-        // Button-like CTA
+        // Button-like CTA with Shadow
         const ctaX = 25;
         const ctaY = bannerY + 34;
         const ctaW = 45;
         const ctaH = 10;
+
+        // Shadow for CTA
+        doc.setFillColor(220, 220, 220);
+        doc.roundedRect(ctaX + 0.4, ctaY + 0.4, ctaW, ctaH, 1, 1, 'F');
 
         doc.setFillColor(16, 185, 129);
         doc.roundedRect(ctaX, ctaY, ctaW, ctaH, 1, 1, 'F');
@@ -416,10 +424,58 @@ export default function DownloadsPage({ darkModeFromParent }) {
         doc.setFillColor(255, 255, 255);
         doc.rect(130, bannerY + 5, 55, 40, 'F');
         doc.addImage(campaignImageData.dataUrl, 'JPEG', 131, bannerY + 6, 53, 38, undefined, 'FAST');
+
+        currentY = bannerY + 50;
       }
     } catch (err) {
       console.error("Impact banner image failed to load:", err);
     }
+
+    // 7. Social Media Section
+    currentY += 10;
+    if (currentY + 25 > 290) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(80, 80, 80);
+    doc.text("Connect With Us", 105, currentY, { align: "center" });
+
+    currentY += 8;
+    const socialIcons = [
+      { name: 'Instagram', icon: '/instagram.png', url: 'https://www.instagram.com/tpf_aid' },
+      { name: 'Facebook', icon: '/facebook.png', url: 'https://facebook.com/tpfaid' },
+      { name: 'Twitter', icon: '/twitter.png', url: 'https://twitter.com/tpfaid' },
+      { name: 'YouTube', icon: '/youtube.png', url: 'https://youtube.com/@tpfaid' }
+    ];
+
+    const iconSize = 8;
+    const spacing = 12;
+    const totalSocWidth = socialIcons.length * iconSize + (socialIcons.length - 1) * spacing;
+    let socX = (210 - totalSocWidth) / 2;
+
+    for (const soc of socialIcons) {
+      const socData = await getLogoDataUrl(soc.icon);
+      if (socData) {
+        doc.addImage(socData.dataUrl, 'PNG', socX, currentY, iconSize, iconSize);
+        doc.link(socX, currentY, iconSize, iconSize, { url: soc.url });
+      } else {
+        // Fallback text if icon fails
+        doc.setFontSize(7);
+        doc.setTextColor(100, 100, 100);
+        doc.text(soc.name, socX + iconSize / 2, currentY + iconSize / 2, { align: "center" });
+        doc.link(socX, currentY, iconSize, iconSize, { url: soc.url });
+      }
+      socX += iconSize + spacing;
+    }
+
+    // 5.5 Computer generated disclaimer at bottom
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.setFont("helvetica", "italic");
+    doc.text("This is a computer-generated acknowledgement. No signature is required.", 105, 285, { align: "center" });
 
     doc.save(`Acknowledgement_${txn.id}.pdf`);
   };

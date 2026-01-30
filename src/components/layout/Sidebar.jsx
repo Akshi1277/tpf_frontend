@@ -325,12 +325,12 @@ function Sidebar({ darkMode }) {
       <button
         onClick={toggleMobileMenu}
         aria-label="Open menu"
-        className={`lg:hidden fixed right-4 bottom-20 sm:bottom-24 z-40 p-3 sm:p-3.5 rounded-full shadow-2xl transition-all active:scale-95 ${darkMode
-          ? "bg-gradient-to-br from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
-          : "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
-          } text-white`}
+        className={`lg:hidden fixed left-6 bottom-6 z-40 p-4 rounded-2xl shadow-2xl transition-all active:scale-95 border-2 ${darkMode
+          ? "bg-gradient-to-br from-emerald-600/90 to-teal-700/90 border-emerald-500/30 text-white backdrop-blur-md shadow-emerald-900/20"
+          : "bg-gradient-to-br from-emerald-500 to-teal-500 border-white/40 text-white shadow-emerald-500/20"
+          }`}
       >
-        <Menu className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
+        <User className="w-6 h-6" strokeWidth={2.5} />
       </button>
 
       {/* MOBILE OVERLAY */}

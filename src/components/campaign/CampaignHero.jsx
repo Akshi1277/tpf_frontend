@@ -37,7 +37,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative h-[450px] md:h-[550px] rounded-3xl overflow-hidden mb-6 max-w-5xl mx-auto"
+        className="relative h-[350px] sm:h-[450px] md:h-[550px] sm:rounded-3xl overflow-hidden mb-4 sm:mb-6 max-w-5xl mx-auto"
       >
         {/* IMAGE */}
         <div className="absolute inset-0">
@@ -58,7 +58,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
         {/* CONTENT */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-10">
           {/* BADGES */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {campaign.isUrgent && (
@@ -81,7 +81,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
           </div>
 
           {/* TITLE */}
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">
             {campaign.title}
           </h2>
 

@@ -26,6 +26,7 @@ import {
   AlertCircle,
   Check,
 } from "lucide-react"
+import { useAppToast } from "@/app/AppToastContext"
 
 export default function OfflineDonationsPage({ darkModeFromParent }) {
   const [darkMode, setDarkMode] = useState(false)
@@ -95,12 +96,23 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
   // FIXED — backend only accepts donation details, donor auto detected
   const dispatch = useDispatch();
+  const { showToast } = useAppToast();
 
   const handleSubmit = async () => {
     try {
+      const amount = Number(formData.amount);
+      if (!amount || amount < 100) {
+        showToast({
+          title: "Minimum Amount",
+          message: "The minimum donation amount is ₹100.",
+          type: "error"
+        });
+        return;
+      }
+
       const payload = {
         method: formData.method,
-        amount: Number(formData.amount), // ✅ FIX
+        amount, // ✅ FIX
         remarks: formData.remarks || "",
 
         bankName: formData.bankName,
@@ -336,12 +348,12 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                                 </p>
                                 <p
                                   className={`text-sm leading-snug ${donation.status === "rejected"
-                                      ? darkMode
-                                        ? "text-red-400"
-                                        : "text-red-600"
-                                      : darkMode
-                                        ? "text-zinc-300"
-                                        : "text-gray-700"
+                                    ? darkMode
+                                      ? "text-red-400"
+                                      : "text-red-600"
+                                    : darkMode
+                                      ? "text-zinc-300"
+                                      : "text-gray-700"
                                     }`}
                                 >
                                   {donation.remarks}
@@ -612,12 +624,22 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                                 value={formData.amount}
                                 onChange={handleInputChange}
                                 placeholder="Enter amount in ₹"
-                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+                                className={`w-full h-15 pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
+                                  ? formData.amount && formData.amount < 100 ? "bg-red-500/5 border-red-500 text-white focus:border-red-500" : "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                  : formData.amount && formData.amount < 100 ? "bg-red-50 border-red-500 text-gray-900 focus:border-red-500" : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
                                   }`}
                               />
                             </div>
+                            {formData.amount && formData.amount < 100 && (
+                              <p className="mt-2 text-xs font-semibold text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" /> Minimum donation is ₹100
+                              </p>
+                            )}
+                            {!formData.amount && (
+                              <p className={`mt-2 text-xs font-medium ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                Min. ₹100 contribution required
+                              </p>
+                            )}
                           </div>
 
                         </div>

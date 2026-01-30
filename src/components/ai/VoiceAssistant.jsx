@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, X, Volume2, VolumeX, Loader2, Bot, Trash2, User, Sparkles, Calculator, UserPlus, AlertCircle, Settings2 } from "lucide-react";
+import { Mic, X, Volume2, VolumeX, Loader2, Bot, Trash2, User, Sparkles, Calculator, UserPlus, AlertCircle, Settings2, Send } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -118,6 +118,7 @@ export default function VoiceAssistant() {
     const [interimTranscript, setInterimTranscript] = useState("");
     const [error, setError] = useState(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [textInput, setTextInput] = useState("");
     const router = useRouter();
 
     // Redux & API Data for Personalization
@@ -346,8 +347,23 @@ export default function VoiceAssistant() {
                 if (gotoMatch) {
                     const path = gotoMatch[1].trim();
                     console.log("Assistant Redirecting to:", path);
-                    router.push(path);
-                    aiText = aiText.replace(/\[GOTO:\s*([^\]]+)\]/, "").trim();
+
+                    // Add a friendly redirection message if AI didn't provide enough text
+                    let displayAiText = aiText.replace(/\[GOTO:\s*([^\]]+)\]/, "").trim();
+                    if (!displayAiText || displayAiText.length < 5) {
+                        displayAiText = "Sure! I'm redirecting you to that page now to help you with your question.";
+                    }
+
+                    setHistory(prev => [...prev, { role: "assistant", text: displayAiText }]);
+                    speak(displayAiText);
+
+                    // Delay redirection slightly so user can hear/read the response, then close
+                    setTimeout(() => {
+                        router.push(path);
+                        setIsExpanded(false);
+                    }, 3500);
+
+                    return; // Exit early as we've already handled history and speech
                 }
 
                 // Handle Intake Mode Tags
@@ -518,10 +534,22 @@ export default function VoiceAssistant() {
         setIsIntakeActive(false);
         setVolunteerData({ fullName: "", email: "", phone: "", gender: "", state: "", city: "", expertise: "" });
         setLastCapturedField(null);
+        setTextInput("");
         if (isSpeaking) {
             synthesisRef.current.cancel();
             setIsSpeaking(false);
         }
+    };
+
+    const handleTextSubmit = () => {
+        if (!textInput.trim() || isProcessing) return;
+        const query = textInput.trim();
+        setTextInput("");
+        if (isSpeaking) {
+            synthesisRef.current.cancel();
+            setIsSpeaking(false);
+        }
+        sendToAI(null, query);
     };
 
     // Waveform Visualizer Section moved out to props based if needed, or kept inline but simplified
@@ -731,70 +759,97 @@ export default function VoiceAssistant() {
                                 <p className="text-red-500 text-[10px] font-bold mb-4 text-center uppercase tracking-widest">{error}</p>
                             )}
 
-                            <div className="flex gap-3">
-                                {isRecording ? (
-                                    <button
-                                        onClick={stopRecording}
-                                        className="w-full h-12 bg-red-600 text-white rounded-2xl font-bold transition-all shadow-lg shadow-red-900/20 active:scale-95 flex items-center justify-center gap-3"
-                                    >
-                                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                                        <span>STOP & SEND</span>
-                                    </button>
-                                ) : (
-                                    <>
+                            <div className="flex flex-col gap-3">
+                                {!isRecording && (
+                                    <div className="relative group">
+                                        <input
+                                            type="text"
+                                            value={textInput}
+                                            onChange={(e) => setTextInput(e.target.value)}
+                                            onKeyDown={(e) => e.key === "Enter" && handleTextSubmit()}
+                                            placeholder="Ask me anything..."
+                                            className={`w-full h-12 pl-4 pr-12 rounded-2xl text-[13px] border transition-all outline-none ${isDarkMode
+                                                ? 'bg-zinc-900 border-zinc-800 text-zinc-100 focus:border-emerald-500/50'
+                                                : 'bg-gray-50 border-gray-100 text-gray-900 focus:border-emerald-500/50'
+                                                }`}
+                                        />
                                         <button
-                                            disabled={isProcessing}
-                                            onClick={startRecording}
-                                            className={`flex-1 h-12 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-900/10 active:scale-95 flex items-center justify-center gap-3 ${isProcessing ? 'opacity-50' : ''}`}
+                                            onClick={handleTextSubmit}
+                                            disabled={!textInput.trim() || isProcessing}
+                                            className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-all ${textInput.trim()
+                                                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/10'
+                                                : 'text-zinc-400'
+                                                }`}
                                         >
-                                            <Mic size={18} className="sm:w-5 sm:h-5" />
-                                            <span className="text-sm sm:text-base">Start Speaking</span>
+                                            <Send size={16} />
                                         </button>
-
-                                        {/* Voice Cycle Button - Hidden Feature for Customization */}
-                                        <button
-                                            onClick={() => {
-                                                const voices = synthesisRef.current.getVoices();
-                                                const maleVoices = voices.filter(v =>
-                                                    (v.lang.includes("en") || v.lang.includes("ar")) &&
-                                                    (v.name.includes("Male") || v.name.includes("David") || v.name.includes("Mark") || v.name.includes("Ravi") || v.name.includes("Google") || v.name.includes("Natural"))
-                                                );
-                                                // Find current index and pick next
-                                                let currentVoiceName = synthesisRef.current.currentVoiceName;
-                                                let currentIndex = maleVoices.findIndex(v => v.name === currentVoiceName);
-                                                let nextVoice = maleVoices[(currentIndex + 1) % maleVoices.length] || voices[0];
-
-                                                // Save preference temporarily
-                                                synthesisRef.current.currentVoiceName = nextVoice.name;
-
-                                                // Feedback speak
-                                                synthesisRef.current.cancel();
-                                                const utt = new SpeechSynthesisUtterance("Voice changed. How is this?");
-                                                utt.voice = nextVoice;
-                                                utt.rate = 1.1;
-                                                utt.pitch = 0.9; // Deeper tone
-                                                synthesisRef.current.speak(utt);
-                                            }}
-                                            className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${isDarkMode ? 'bg-zinc-900 text-zinc-400 hover:text-emerald-400' : 'bg-gray-100 text-gray-500 hover:text-emerald-600'}`}
-                                            title="Change Voice"
-                                        >
-                                            <Sparkles size={20} />
-                                        </button>
-
-                                        {isSpeaking && (
-                                            <button
-                                                onClick={() => { synthesisRef.current.cancel(); setIsSpeaking(false); }}
-                                                className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${isDarkMode ? 'bg-zinc-900 text-zinc-400' : 'bg-gray-100 text-gray-500'}`}
-                                            >
-                                                <VolumeX size={20} />
-                                            </button>
-                                        )}
-                                    </>
+                                    </div>
                                 )}
-                            </div>
 
-                            <div className="mt-4 flex items-center justify-center gap-2 opacity-30 grayscale pointer-events-none">
+                                <div className="flex gap-3">
+                                    {isRecording ? (
+                                        <button
+                                            onClick={stopRecording}
+                                            className="w-full h-12 bg-red-600 text-white rounded-2xl font-bold transition-all shadow-lg shadow-red-900/20 active:scale-95 flex items-center justify-center gap-3"
+                                        >
+                                            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                            <span>STOP & SEND</span>
+                                        </button>
+                                    ) : (
+                                        <>
+                                            <button
+                                                disabled={isProcessing}
+                                                onClick={startRecording}
+                                                className={`flex-1 h-12 bg-emerald-600/10 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-600/20 rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-3 ${isProcessing ? 'opacity-50' : ''}`}
+                                            >
+                                                <Mic size={18} className="sm:w-5 sm:h-5" />
+                                                <span className="text-sm">Speak</span>
+                                            </button>
 
+                                            {/* Voice Cycle Button - Hidden Feature for Customization */}
+                                            <button
+                                                onClick={() => {
+                                                    const voices = synthesisRef.current.getVoices();
+                                                    const maleVoices = voices.filter(v =>
+                                                        (v.lang.includes("en") || v.lang.includes("ar")) &&
+                                                        (v.name.includes("Male") || v.name.includes("David") || v.name.includes("Mark") || v.name.includes("Ravi") || v.name.includes("Google") || v.name.includes("Natural"))
+                                                    );
+                                                    // Find current index and pick next
+                                                    let currentVoiceName = synthesisRef.current.currentVoiceName;
+                                                    let currentIndex = maleVoices.findIndex(v => v.name === currentVoiceName);
+                                                    let nextVoice = maleVoices[(currentIndex + 1) % maleVoices.length] || voices[0];
+
+                                                    // Save preference temporarily
+                                                    synthesisRef.current.currentVoiceName = nextVoice.name;
+
+                                                    // Feedback speak
+                                                    synthesisRef.current.cancel();
+                                                    const utt = new SpeechSynthesisUtterance("Voice changed. How is this?");
+                                                    utt.voice = nextVoice;
+                                                    utt.rate = 1.1;
+                                                    utt.pitch = 0.9; // Deeper tone
+                                                    synthesisRef.current.speak(utt);
+                                                }}
+                                                className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${isDarkMode ? 'bg-zinc-900 text-zinc-400 hover:text-emerald-400' : 'bg-gray-100 text-gray-500 hover:text-emerald-600'}`}
+                                                title="Change Voice"
+                                            >
+                                                <Sparkles size={20} />
+                                            </button>
+
+                                            {isSpeaking && (
+                                                <button
+                                                    onClick={() => { synthesisRef.current.cancel(); setIsSpeaking(false); }}
+                                                    className={`w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${isDarkMode ? 'bg-zinc-900 text-zinc-400' : 'bg-gray-100 text-gray-500'}`}
+                                                >
+                                                    <VolumeX size={20} />
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="mt-4 flex items-center justify-center gap-2 opacity-30 grayscale pointer-events-none">
+                                </div>
                             </div>
                         </div>
                     </motion.div>

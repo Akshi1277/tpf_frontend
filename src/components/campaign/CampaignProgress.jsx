@@ -97,7 +97,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className={`${darkMode ? "bg-zinc-800" : "bg-white"
-          } rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6`}
+          } rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* LEFT: PROGRESS */}
@@ -156,20 +156,20 @@ export default function CampaignProgress({ darkMode, campaign }) {
             {/* Amount */}
             <div className="mb-6">
               {isFoundation ? (
-                <div className="flex flex-wrap items-end gap-2 sm:gap-3 mb-4">
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                <div className="flex flex-wrap items-end gap-1.5 sm:gap-3 mb-4 sm:mb-6">
+                  <div className="text-2xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent leading-none">
                     ₹{formatNumber(fundsDisbursed)}
                   </div>
-                  <div className={`text-sm sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className={`text-xs sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                     Total Funds Disbursed
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-wrap items-end gap-2 sm:gap-3 mb-4">
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                <div className="flex flex-wrap items-end gap-1.5 sm:gap-3 mb-4 sm:mb-6">
+                  <div className="text-2xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent leading-none">
                     {percentage}%
                   </div>
-                  <div className={`text-sm sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                  <div className={`text-xs sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                     of ₹{formatNumber(targetAmount)}
                   </div>
                 </div>
@@ -228,14 +228,14 @@ export default function CampaignProgress({ darkMode, campaign }) {
               className={`
                 w-full sm:w-auto mb-6
                 group relative overflow-hidden
-                px-6 sm:px-8 py-3 sm:py-3.5
+                px-5 sm:px-8 py-3 sm:py-3.5
                 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500
                 text-white font-bold text-sm sm:text-base
                 rounded-xl
                 shadow-lg shadow-emerald-500/30
                 hover:shadow-xl hover:shadow-emerald-500/40
                 transition-all duration-300
-                flex items-center justify-center gap-2.5
+                flex items-center justify-center gap-2
               `}
             >
               {/* Shine effect */}
@@ -397,7 +397,7 @@ function StatCard({ darkMode, icon, value, label, color }) {
         </div>
       </div>
       <div
-        className={`text-base sm:text-lg md:text-xl font-bold mb-1 ${darkMode ? "text-white" : "text-gray-900"
+        className={`text-sm sm:text-lg md:text-xl font-bold mb-0.5 sm:mb-1 ${darkMode ? "text-white" : "text-gray-900"
           }`}
       >
         {value}

@@ -58,9 +58,9 @@ export default function CampaignPage() {
       />
 
       {/* Hero Section - Full width with overlay back button */}
-      <div className="relative w-full pt-16 md:pt-20">
+      <div className="relative w-full pt-14 md:pt-20">
         {/* BACK BUTTON - Absolute positioned over hero */}
-        <div className="absolute top-20 md:top-24 left-4 md:left-8 z-20">
+        <div className="absolute top-16 md:top-24 left-2 sm:left-4 md:left-8 z-20">
           <button
             type="button"
             onClick={() => router.back()}
@@ -71,17 +71,13 @@ export default function CampaignPage() {
             aria-label="Go back"
           >
             <div
-              className={`flex items-center justify-center w-10 h-10 rounded-xl border backdrop-blur-md shadow-lg transition-all duration-200 ${darkMode
+              className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border backdrop-blur-md shadow-lg transition-all duration-200 ${darkMode
                 ? "bg-black/40 border-white/20 hover:border-emerald-500/50 hover:bg-black/60"
                 : "bg-white/70 border-gray-200 hover:border-emerald-500/40 hover:bg-white"
                 }`}
             >
-              <ArrowLeft size={20} strokeWidth={2.5} />
+              <ArrowLeft size={18} className="sm:size-[20px]" strokeWidth={2.5} />
             </div>
-
-            <span className="hidden sm:inline text-sm font-semibold tracking-wide">
-              Back
-            </span>
           </button>
         </div>
 
@@ -97,7 +93,7 @@ export default function CampaignPage() {
       {/* Main Content Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* PROGRESS */}
-        <div className="mt-6">
+        <div className="mt-4 sm:mt-6">
           <CampaignProgress darkMode={darkMode} campaign={campaign} />
         </div>
 

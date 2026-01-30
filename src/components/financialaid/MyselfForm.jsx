@@ -300,7 +300,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                   {/* Connecting Line */}
                   {index < 4 && (
                     <div
-                      className={`w-8 sm:w-12 md:w-16 -mt-5 md:-mt-5 h-1 mx-2 sm:mx-4 rounded transition-all ${currentStep > step
+                      className={`w-4 sm:w-12 md:w-16 -mt-5 md:-mt-5 h-1 mx-2 sm:mx-4 rounded transition-all ${currentStep > step
                         ? "bg-emerald-600"
                         : darkMode
                           ? "bg-zinc-700"

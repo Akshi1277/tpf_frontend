@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Heart, Lock, Info, Check } from 'lucide-react';
+import { Heart, Lock, Info, Check, AlertCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import LoginModal from '../login/LoginModal';
+import { useAppToast } from '@/app/AppToastContext';
 
 export default function DonationCard({
   darkMode,
@@ -27,6 +28,7 @@ export default function DonationCard({
   const [isDonating, setIsDonating] = useState(false);
 
   const userInfo = useSelector((state) => state.auth.userInfo);
+  const { showToast } = useAppToast();
 
   const presetAmounts = [500, 1000, 5000, 10000];
   const tipPercentages = [2, 5, 10, 15, 18];
@@ -42,12 +44,12 @@ export default function DonationCard({
   const filteredDonationTypes =
     allowedDonationTypes?.length > 0
       ? allDonationTypes.filter((t) =>
-          allowedDonationTypes.some(
-            (at) =>
-              at.toUpperCase() === t.id.toUpperCase() ||
-              (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
-          )
+        allowedDonationTypes.some(
+          (at) =>
+            at.toUpperCase() === t.id.toUpperCase() ||
+            (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
         )
+      )
       : allDonationTypes;
 
   /* ------------------------------
@@ -92,6 +94,15 @@ export default function DonationCard({
 
     const amount = selectedAmount || parseInt(customAmount, 10);
     if (!amount) return;
+
+    if (amount < 100) {
+      showToast({
+        title: "Minimum Amount",
+        message: "The minimum donation amount is ₹100.",
+        type: "error"
+      });
+      return;
+    }
 
     if (!userInfo) {
       setPendingDonate(true);
@@ -146,53 +157,53 @@ export default function DonationCard({
   /* ------------------------------
      Cashfree Redirect
   ------------------------------ */
- useEffect(() => {
-  if (!cashfreeData?.paymentSessionId) return;
+  useEffect(() => {
+    if (!cashfreeData?.paymentSessionId) return;
 
-  const loadCashfree = () => {
-    const cashfree = new window.Cashfree({
-      mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || "sandbox", 
-      // use "production" in prod
-    });
+    const loadCashfree = () => {
+      const cashfree = new window.Cashfree({
+        mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || "sandbox",
+        // use "production" in prod
+      });
 
-    cashfree.checkout({
-      paymentSessionId: cashfreeData.paymentSessionId,
-      redirectTarget: "_self",
-    });
-  };
+      cashfree.checkout({
+        paymentSessionId: cashfreeData.paymentSessionId,
+        redirectTarget: "_self",
+      });
+    };
 
-  if (window.Cashfree) {
-    loadCashfree();
-    return;
-  }
+    if (window.Cashfree) {
+      loadCashfree();
+      return;
+    }
 
-  const script = document.createElement("script");
-  script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
-  script.async = true;
-  script.onload = loadCashfree;
+    const script = document.createElement("script");
+    script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    script.async = true;
+    script.onload = loadCashfree;
 
-  document.body.appendChild(script);
+    document.body.appendChild(script);
 
-  return () => {
-    document.body.removeChild(script);
-  };
-}, [cashfreeData]);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [cashfreeData]);
 
 
   return (
     <>
-      <div className={`${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'} border-2 rounded-lg p-8 sticky top-24`}>
+      <div className={`${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'} border-2 rounded-xl p-5 sm:p-8 md:sticky top-24`}>
         {/* Header */}
-        <div className="mb-8 pb-6 border-b-2 border-dashed" style={{ borderColor: darkMode ? '#27272a' : '#f3f4f6' }}>
-          <div className="flex items-start gap-4 mb-3">
-            <div className={`w-11 h-11 rounded-lg ${darkMode ? 'bg-zinc-800' : 'bg-gray-50'} flex items-center justify-center flex-shrink-0`}>
-              <Heart className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} fill="currentColor" />
+        <div className="mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-dashed" style={{ borderColor: darkMode ? '#27272a' : '#f3f4f6' }}>
+          <div className="flex items-start gap-3 sm:gap-4 mb-3">
+            <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-lg ${darkMode ? 'bg-zinc-800' : 'bg-gray-50'} flex items-center justify-center flex-shrink-0`}>
+              <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} fill="currentColor" />
             </div>
             <div className="flex-1">
-              <h3 className={`text-xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h3 className={`text-lg sm:text-xl font-bold mb-0.5 sm:mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 Support This Cause
               </h3>
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className={`text-xs sm:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 Your contribution makes a difference
               </p>
             </div>
@@ -204,14 +215,14 @@ export default function DonationCard({
           <label className={`block text-sm font-semibold mb-4 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
             Type of Donation
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {filteredDonationTypes.map((type) => (
               <button
                 key={type.id}
                 onClick={() => !type.disabled && setDonationType(type.id)}
                 disabled={type.disabled}
                 className={`
-                p-4 rounded-lg border-2 text-left transition-colors
+                p-3 sm:p-4 rounded-lg border-2 text-left transition-colors
                 ${donationType === type.id
                     ? darkMode
                       ? 'border-emerald-500 bg-emerald-950/30'
@@ -223,7 +234,7 @@ export default function DonationCard({
               `}
               >
                 <div className="flex items-start justify-between mb-2">
-                  <span className={`font-bold text-base ${donationType === type.id
+                  <span className={`font-bold text-sm sm:text-base ${donationType === type.id
                     ? darkMode ? 'text-emerald-400' : 'text-emerald-700'
                     : darkMode ? 'text-gray-200' : 'text-gray-900'
                     }`}>
@@ -277,7 +288,7 @@ export default function DonationCard({
             Custom Amount
           </label>
           <div className="relative">
-            <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <span className={`absolute left-4 top-7 -translate-y-1/2 text-lg font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               ₹
             </span>
             <input
@@ -292,14 +303,24 @@ export default function DonationCard({
               w-full h-14 pl-10 pr-4 text-base rounded-lg border-2 transition-colors
               ${customAmount
                   ? darkMode
-                    ? 'border-emerald-500 bg-emerald-950/30 text-white'
-                    : 'border-emerald-600 bg-emerald-50 text-gray-900'
+                    ? customAmount < 100 ? 'border-red-500 bg-red-500/5 text-white' : 'border-emerald-500 bg-emerald-950/30 text-white'
+                    : customAmount < 100 ? 'border-red-500 bg-red-50 text-gray-900' : 'border-emerald-600 bg-emerald-50 text-gray-900'
                   : darkMode
                     ? 'border-zinc-800 bg-zinc-900 text-white placeholder-gray-600'
                     : 'border-gray-200 bg-white text-gray-900 placeholder-gray-400'}
               focus:outline-none focus:ring-0
             `}
             />
+            {customAmount && customAmount < 100 && (
+              <p className="mt-2 text-xs font-semibold text-red-500 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" /> Minimum donation is ₹100
+              </p>
+            )}
+            {!customAmount && !selectedAmount && (
+              <p className={`mt-2 text-xs font-medium ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                Min. ₹100 contribution required
+              </p>
+            )}
           </div>
         </div>
 
@@ -450,9 +471,12 @@ export default function DonationCard({
               Processing Donation…
             </>
           ) : (
-            selectedAmount || customAmount
-              ? `Donate ₹${((selectedAmount || Number(customAmount) || 0) + (tipAmount || 0)).toLocaleString()}`
-              : 'Select Amount to Continue'
+            (() => {
+              const amount = selectedAmount || Number(customAmount) || 0;
+              if (amount === 0) return 'Enter Amount to Continue';
+              if (amount < 100) return 'Amount must be ≥ ₹100';
+              return `Donate ₹${(amount + (tipAmount || 0)).toLocaleString()}`;
+            })()
           )}
         </button>
 
@@ -463,7 +487,7 @@ export default function DonationCard({
           </p>
         </div>
 
-        
+
       </div>
       <LoginModal
         isOpen={showLoginModal}

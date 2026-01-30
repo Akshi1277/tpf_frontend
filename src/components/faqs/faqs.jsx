@@ -3,9 +3,10 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import LoginModal from "../login/LoginModal"
-import { useCreateTicketMutation } from '@/utils/slices/tickets-queriesApiSlice';
+import { useAskFAQQuestionMutation, useGetAnsweredFAQsQuery } from '@/utils/slices/faqApiSlice';
+import { ChevronLeft, ChevronRight, HelpCircle, X, Send, Search, ChevronDown } from 'lucide-react';
 // Interactive Search Component
-function InteractiveSearchSection({ darkMode, isInView, faqData }) {
+function InteractiveSearchSection({ darkMode, isInView, faqData, dynamicFAQs }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [stage, setStage] = useState('initial'); // initial, result, feedback, question
@@ -14,44 +15,56 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
   const user = useSelector(state => state.auth.userInfo);
-  const [createTicket, { isLoading }] = useCreateTicketMutation();
+  const [askQuestion, { isLoading }] = useAskFAQQuestionMutation();
 
   const searchFAQs = (query) => {
     if (!query.trim()) return null;
 
     const lowerQuery = query.toLowerCase();
+    const queryWords = lowerQuery.split(/\s+/).filter(w => w.length > 2);
+
     let bestMatch = null;
     let highestScore = 0;
 
-    Object.keys(faqData).forEach(category => {
-      faqData[category].forEach(faq => {
-        const qLower = faq.q.toLowerCase();
-        const aLower = faq.a.toLowerCase();
+    // Combine static and dynamic FAQs for searching
+    const allFAQs = [];
+    Object.keys(faqData).forEach(cat => {
+      faqData[cat].forEach(faq => allFAQs.push({ ...faq, category: cat }));
+    });
+    dynamicFAQs?.forEach(faq => allFAQs.push({ ...faq, dynamic: true }));
 
-        let score = 0;
-        if (qLower.includes(lowerQuery)) score += 3;
-        if (aLower.includes(lowerQuery)) score += 1;
+    allFAQs.forEach(faq => {
+      const qLower = faq.q?.toLowerCase() || "";
+      const aLower = faq.a?.toLowerCase() || "";
 
-        const queryWords = lowerQuery.split(' ');
-        queryWords.forEach(word => {
-          if (word.length > 2) {
-            if (qLower.includes(word)) score += 2;
-            if (aLower.includes(word)) score += 0.5;
-          }
-        });
+      let score = 0;
 
-        if (score > highestScore) {
-          highestScore = score;
-          bestMatch = faq;
-        }
+      // Exact matching scores higher
+      if (qLower.includes(lowerQuery)) score += 20;
+      if (aLower.includes(lowerQuery)) score += 10;
+
+      // Keyword matching
+      queryWords.forEach(word => {
+        if (qLower.includes(word)) score += 5;
+        if (aLower.includes(word)) score += 2;
+
+        // Bonus for word equality (start of word)
+        if (qLower.split(/\W+/).some(w => w === word)) score += 10;
       });
+
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = faq;
+      }
     });
 
-    return highestScore > 1 ? bestMatch : null;
+    // Minimum score threshold to avoid unrelated results
+    return highestScore > 5 ? bestMatch : null;
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
+    if (!searchQuery.trim()) return;
     const result = searchFAQs(searchQuery);
     setSearchResult(result);
     setStage('result');
@@ -64,7 +77,7 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
         setStage('initial');
         setSearchQuery('');
         setSearchResult(null);
-      }, 2000);
+      }, 3000);
     } else {
       setStage('question');
     }
@@ -73,12 +86,8 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
   const submitQuestion = async () => {
     try {
       setSubmitted(true);
-
-      await createTicket({
-        fullName: user.fullName || "Authenticated User",
-        email: user.email,
-        queryType: "faqs",          // ✅ IMPORTANT
-        message: userQuestion,      // ✅ FAQ question
+      await askQuestion({
+        question: userQuestion,
       }).unwrap();
 
       setTimeout(() => {
@@ -88,7 +97,7 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
         setUserQuestion("");
         setSubmitted(false);
         setPendingSubmit(false);
-      }, 2000);
+      }, 3000);
 
     } catch (error) {
       console.error("FAQ submit failed", error);
@@ -98,27 +107,21 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
 
   const handleQuestionSubmit = (e) => {
     e.preventDefault();
-
-    // ❌ Not logged in → block + open modal
     if (!user) {
       setPendingSubmit(true);
       setShowLoginModal(true);
       return;
     }
-
-    // ✅ Logged in → proceed
     submitQuestion();
   };
 
   const handleLoginSuccess = async () => {
     setShowLoginModal(false);
-
     if (pendingSubmit) {
       setPendingSubmit(false);
       submitQuestion();
     }
   };
-
 
   const handleReset = () => {
     setStage('initial');
@@ -134,257 +137,239 @@ function InteractiveSearchSection({ darkMode, isInView, faqData }) {
         initial={{ opacity: 0, y: 30 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className={`mt-12 sm:mt-16 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 ${darkMode
-          ? 'bg-gradient-to-br from-zinc-800 to-zinc-800/50 border-zinc-700/50'
-          : 'bg-gradient-to-br from-teal-50 to-emerald-50 border-teal-100'
-          } border relative overflow-hidden`}
+        className={`mt-12 sm:mt-16 rounded-3xl p-8 sm:p-12 ${darkMode
+          ? 'bg-[#0a0f0d] border-emerald-500/20 shadow-[0_0_50px_-12px_rgba(16,185,129,0.15)]'
+          : 'bg-white border-teal-100 shadow-2xl shadow-teal-500/10'
+          } border relative overflow-hidden group/container`}
       >
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-emerald-500/20 to-teal-500/10 rounded-full blur-[100px] -mr-40 -mt-40 transition-all group-hover/container:scale-110"></div>
+        <div className="absolute bottom-0 left-0 w-60 h-60 bg-emerald-500/5 rounded-full blur-[80px] -ml-30 -mb-30"></div>
 
         <div className="relative z-10">
           <AnimatePresence mode="wait">
-            {/* Initial Search Stage */}
             {stage === 'initial' && (
               <motion.div
                 key="initial"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
                 className="text-center"
               >
-                <h3 className={`text-2xl sm:text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-black uppercase tracking-widest mb-8 border border-emerald-500/20">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  Smart AI Search
+                </div>
+                <h3 className={`text-4xl sm:text-5xl font-black mb-6 tracking-tight ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
                   Still Have Questions?
                 </h3>
-                <p className={`text-base sm:text-lg mb-8 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                  Search for answers or ask us directly
+                <p className={`text-lg mb-12 max-w-xl mx-auto font-medium leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                  Find the answers you need in seconds. Type keywords below or click "Ask Your Question" to file a query.
                 </p>
 
-                <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Type your question here..."
-                      className={`w-full px-6 py-4 pr-14 rounded-xl text-base ${darkMode
-                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                        } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
-                    />
+                <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative group/input">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Try 'medical aid', '80G tax benefit', or 'zakat'..."
+                    className={`w-full px-8 py-6 pr-20 rounded-2xl text-lg shadow-2xl ${darkMode
+                      ? 'bg-[#121815] text-white placeholder-zinc-500 border-emerald-500/30 focus:border-emerald-500 focus:bg-[#161d19]'
+                      : 'bg-white text-zinc-900 placeholder-zinc-400 border-zinc-200 focus:border-teal-500'
+                      } border-2 focus:outline-none focus:ring-8 focus:ring-emerald-500/10 transition-all duration-500`}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <button
                       type="submit"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:shadow-lg transition-all duration-300"
+                      className="p-3.5 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl shadow-emerald-500/20"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                      </svg>
+                      <Search className="w-6 h-6" />
                     </button>
                   </div>
                 </form>
+              </motion.div>
+            )}
 
-                <div className="mt-8">
-                  <a
-                    href="https://tpf-aid.vercel.app/contactus"
-                    className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl ${darkMode ? 'bg-zinc-700/30 hover:bg-zinc-700/50 text-zinc-300' : 'bg-white/60 hover:bg-white text-zinc-700'
-                      } transition-all duration-300 group`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                    </svg>
-                    <span className="font-medium">Contact Us</span>
-                  </a>
+            {stage === 'result' && searchResult && (
+              <motion.div
+                key="result-found"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className={`p-8 rounded-3xl border-2 ${darkMode
+                  ? 'bg-[#0d1310]/80 border-emerald-500/40 shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)]'
+                  : 'bg-white border-teal-500/20 shadow-2xl'
+                  } backdrop-blur-xl relative`}
+              >
+                <div className="absolute -top-4 -left-4 px-4 py-1.5 rounded-lg bg-teal-500 text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-teal-500/20">
+                  Best Match Found
+                </div>
+
+                <h3 className={`text-2xl font-bold mb-6 pt-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  {searchResult.q}
+                </h3>
+                <div className={`text-lg leading-relaxed mb-10 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                  {searchResult.a}
+                </div>
+
+                <div className={`pt-8 border-t ${darkMode ? 'border-zinc-800' : 'border-zinc-100'} flex flex-col sm:flex-row items-center justify-between gap-6`}>
+                  <div className="text-center sm:text-left">
+                    <p className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                      Was this helpful?
+                    </p>
+                    <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                      Your feedback helps us improve our search.
+                    </p>
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => handleFeedback(true)}
+                      className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-sm hover:scale-[1.04] active:scale-[0.99] transition-all shadow-xl shadow-teal-500/20"
+                    >
+                      Yes, very!
+                    </button>
+                    <button
+                      onClick={() => handleFeedback(false)}
+                      className={`px-8 py-3 rounded-xl font-black text-sm transition-all ${darkMode
+                        ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                        : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                        }`}
+                    >
+                      Not what I needed
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
 
-            {/* Search Result Stage */}
-            {stage === 'result' && (
+            {stage === 'result' && !searchResult && (
               <motion.div
-                key="result"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
+                key="result-none"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className={`p-10 sm:p-16 rounded-3xl text-center border-2 border-dashed ${darkMode
+                  ? 'bg-emerald-950/20 border-emerald-500/30 shadow-[0_0_30px_-5px_rgba(16,185,129,0.1)]'
+                  : 'bg-white border-zinc-200 shadow-lg'
+                  }`}
               >
-                {searchResult ? (
-                  <div className="max-w-3xl mx-auto">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                        Found an Answer
-                      </h3>
-                      <button
-                        onClick={handleReset}
-                        className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
-                          } transition-all duration-300`}
-                      >
-                        <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-700/30' : 'bg-white/60'
-                      } mb-8`}>
-                      <h4 className={`text-lg font-semibold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                        {searchResult.q}
-                      </h4>
-                      <p className={`text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                        {searchResult.a}
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <p className={`text-lg mb-4 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                        Was this helpful?
-                      </p>
-                      <div className="flex gap-4 justify-center">
-                        <button
-                          onClick={() => handleFeedback(true)}
-                          className="px-8 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
-                        >
-                          Yes, thank you!
-                        </button>
-                        <button
-                          onClick={() => handleFeedback(false)}
-                          className={`px-8 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
-                            ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
-                            : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
-                            }`}
-                        >
-                          No, I need more help
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="max-w-3xl mx-auto text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500/20 to-emerald-500/20 flex items-center justify-center">
-                      <svg className={`w-8 h-8 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-                      </svg>
-                    </div>
-                    <h3 className={`text-xl sm:text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                      No Match Found
-                    </h3>
-                    <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                      We couldn't find an answer to your question in our FAQ.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button
-                        onClick={handleReset}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${darkMode
-                          ? 'bg-zinc-700/50 text-zinc-300 hover:bg-zinc-700'
-                          : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'
-                          }`}
-                      >
-                        Try Another Search
-                      </button>
-                      <button
-                        onClick={() => setStage('question')}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
-                      >
-                        Ask Your Question
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <div className="w-24 h-24 bg-teal-500/10 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+                  <HelpCircle className="w-12 h-12 text-teal-500" />
+                </div>
+                <h3 className={`text-3xl font-black mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  No Exact Match Found
+                </h3>
+                <p className={`text-zinc-500 max-w-sm mx-auto mb-10 text-lg leading-relaxed`}>
+                  We couldn't find an answer to your specific keywords. Our team is ready to help!
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                  <button
+                    onClick={() => setStage('initial')}
+                    className={`px-10 py-4 rounded-xl font-black transition-all ${darkMode
+                      ? 'bg-zinc-800 text-white hover:bg-zinc-700'
+                      : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                      }`}
+                  >
+                    Try Again
+                  </button>
+                  <button
+                    onClick={() => setStage('question')}
+                    className="px-10 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black hover:scale-[1.05] active:scale-[0.99] transition-all shadow-xl shadow-teal-500/30"
+                  >
+                    Ask Your Question
+                  </button>
+                </div>
               </motion.div>
             )}
 
-            {/* Thank You Stage */}
             {stage === 'thankYou' && (
               <motion.div
-                key="thankYou"
+                key="thank-you"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-                className="text-center py-8"
+                className="text-center py-12"
               >
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-teal-500 flex items-center justify-center shadow-2xl shadow-teal-500/30">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                  Great! We're Happy to Help
+                <h3 className={`text-3xl font-black ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  Happy to Help!
                 </h3>
+                <p className="text-teal-500 font-bold mt-2 italic">Returning you to search...</p>
               </motion.div>
             )}
 
-            {/* Question Form Stage */}
             {stage === 'question' && (
               <motion.div
-                key="question"
+                key="ask-question"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-                className="max-w-2xl mx-auto"
+                className="max-w-3xl mx-auto"
               >
                 {!submitted ? (
                   <>
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                    <div className="flex items-center justify-between mb-8 text-emerald-400">
+                      <h3 className={`text-3xl font-black ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
                         Ask Your Question
                       </h3>
                       <button
                         onClick={handleReset}
-                        className={`p-2 rounded-lg ${darkMode ? 'hover:bg-zinc-700/50' : 'hover:bg-white/60'
-                          } transition-all duration-300`}
+                        className={`p-3 rounded-xl ${darkMode ? 'hover:bg-emerald-900/30' : 'hover:bg-zinc-100'
+                          } transition-all`}
                       >
-                        <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X className={`w-6 h-6 ${darkMode ? 'text-emerald-400' : 'text-zinc-500'}`} />
                       </button>
                     </div>
 
-                    <p className={`text-base mb-6 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                      Please describe your question in detail, and we'll get back to you as soon as possible.
-                    </p>
-
-                    <form onSubmit={handleQuestionSubmit}>
-                      <textarea
-                        value={userQuestion}
-                        onChange={(e) => setUserQuestion(e.target.value)}
-                        placeholder="Type your question here..."
-                        rows="6"
-                        required
-                        className={`w-full px-6 py-4 rounded-xl text-base resize-none ${darkMode
-                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                          } border focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300`}
-                      />
+                    <form onSubmit={handleQuestionSubmit} className="space-y-6">
+                      <div className="relative">
+                        <textarea
+                          value={userQuestion}
+                          onChange={(e) => setUserQuestion(e.target.value)}
+                          placeholder="Please describe your question here. Our team will get back to you personally."
+                          rows="6"
+                          required
+                          className={`w-full px-8 py-6 rounded-2xl text-lg shadow-inner ${darkMode
+                            ? 'bg-[#121815] text-white placeholder-zinc-500 border-emerald-500/30 focus:border-emerald-500'
+                            : 'bg-white text-zinc-900 placeholder-zinc-400 border-zinc-200 focus:shadow-lg'
+                            } border-2 focus:outline-none focus:ring-8 focus:ring-emerald-500/5 transition-all duration-300 resize-none`}
+                        />
+                      </div>
                       <button
                         type="submit"
-                        className="w-full mt-4 px-6 py-4 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-medium hover:shadow-lg transition-all duration-300"
+                        disabled={isLoading}
+                        className="w-full py-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black text-lg hover:scale-[1.01] active:scale-[0.99] transition-all shadow-2xl shadow-emerald-500/20 flex items-center justify-center gap-3"
                       >
-                        Submit Question
+                        {isLoading ? 'Submitting...' : 'Submit Your Question'}
+                        <Send className="w-5 h-5" />
                       </button>
                     </form>
                   </>
                 ) : (
-                  <div className="text-center py-8">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <div className="text-center py-12">
+                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-teal-500 flex items-center justify-center shadow-2xl shadow-teal-500/30">
+                      <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    <h3 className={`text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                      Question Submitted!
+                    <h3 className={`text-3xl font-black mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                      Question Received!
                     </h3>
-                    <p className={`text-base ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                      We'll review your question and get back to you soon.
+                    <p className={`text-lg ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                      We've received your query. Our team will review it and notify you via email when an answer is ready.
                     </p>
                   </div>
                 )}
               </motion.div>
             )}
           </AnimatePresence>
-
         </div>
       </motion.div>
+
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => {
@@ -403,6 +388,27 @@ export default function FAQSection({ darkMode }) {
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const [openCategory, setOpenCategory] = useState('general');
   const [openQuestion, setOpenQuestion] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 5;
+
+  // Active category FAQs (paginated)
+  const { data: dynamicData, isLoading: isFetching } = useGetAnsweredFAQsQuery({
+    category: openCategory,
+    page: currentPage,
+    limit: limit
+  });
+
+  // Global answered FAQs for search
+  const { data: globalData } = useGetAnsweredFAQsQuery({
+    limit: 100 // Fetch enough for search
+  });
+
+  const globalDynamicFAQs = globalData?.faqs?.map(faq => ({
+    q: faq.question,
+    a: faq.answer,
+    id: faq._id,
+    category: faq.category
+  })) || [];
 
   const categories = [
     {
@@ -605,9 +611,17 @@ export default function FAQSection({ darkMode }) {
     ]
   };
 
-  const toggleQuestion = (index) => {
-    setOpenQuestion(openQuestion === index ? null : index);
+  const toggleQuestion = (id) => {
+    setOpenQuestion(openQuestion === id ? null : id);
   };
+
+  const dynamicFAQs = dynamicData?.faqs?.map(faq => ({
+    q: faq.question,
+    a: faq.answer,
+    id: faq._id
+  })) || [];
+
+  const combinedFAQs = [...faqData[openCategory], ...dynamicFAQs];
 
   return (
     <section
@@ -616,11 +630,13 @@ export default function FAQSection({ darkMode }) {
         } relative overflow-hidden`}
     >
       {/* Background decoration */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 30% 40%, ${darkMode ? '#10b981' : '#14b8a6'} 2px, transparent 2px)`,
-          backgroundSize: '60px 60px'
+          backgroundImage: `radial-gradient(circle at 30% 40%, ${darkMode ? '#059669' : '#10b981'} 1.5px, transparent 1.5px)`,
+          backgroundSize: '40px 40px'
         }}></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 blur-[120px] rounded-full -mr-64 -mt-64"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-teal-500/10 blur-[120px] rounded-full -ml-64 -mb-64"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -636,13 +652,13 @@ export default function FAQSection({ darkMode }) {
             <div className="w-2 h-2 rounded-full bg-teal-500"></div>
             <div className="h-1 w-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
           </div>
-          <h2 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+          <h2 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 tracking-tight ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
             Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-emerald-600 via-emerald-300 to-emerald-400 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 text-transparent bg-clip-text drop-shadow-sm">
               Questions
             </span>
           </h2>
-          <p className={`text-base sm:text-lg max-w-3xl mx-auto ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+          <p className={`text-base sm:text-lg max-w-3xl mx-auto font-medium ${darkMode ? 'text-emerald-400/80' : 'text-zinc-600'}`}>
             Your Doubts Are Valid — And We're Here to Answer Them
           </p>
         </motion.div>
@@ -661,10 +677,10 @@ export default function FAQSection({ darkMode }) {
                 setOpenCategory(cat.id);
                 setOpenQuestion(null);
               }}
-              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-300 inline-flex items-center gap-2 ${openCategory === cat.id
-                ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg scale-105'
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all duration-300 inline-flex items-center gap-2 ${openCategory === cat.id
+                ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl shadow-emerald-500/20 scale-105 border-2 border-white/10'
                 : darkMode
-                  ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                  ? 'bg-emerald-950/20 text-emerald-400/60 border border-emerald-500/10 hover:bg-emerald-900/30 hover:text-emerald-300'
                   : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
                 }`}
             >
@@ -682,64 +698,106 @@ export default function FAQSection({ darkMode }) {
           className="max-w-4xl mx-auto"
         >
           <div className="space-y-3 sm:space-y-4">
-            {faqData[openCategory].map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className={`rounded-xl sm:rounded-2xl overflow-hidden border ${darkMode
-                  ? 'bg-zinc-800/50 border-zinc-700/50 backdrop-blur-sm'
-                  : 'bg-white border-zinc-200'
-                  } shadow-sm hover:shadow-md transition-all duration-300`}
-              >
-                <button
-                  onClick={() => toggleQuestion(index)}
-                  className={`w-full px-5 sm:px-6 py-4 sm:py-5 flex items-start justify-between gap-4 text-left transition-colors duration-200 ${darkMode ? 'hover:bg-zinc-700/30' : 'hover:bg-zinc-50'
-                    }`}
-                >
-                  <div className="flex-1">
-                    <h3 className={`text-base sm:text-lg font-semibold ${darkMode ? 'text-white' : 'text-zinc-900'
-                      }`}>
-                      {faq.q}
-                    </h3>
-                  </div>
-                  <div className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300 ${openQuestion === index
-                    ? 'bg-gradient-to-r from-teal-500 to-emerald-500 rotate-180'
-                    : darkMode
-                      ? 'bg-zinc-700'
-                      : 'bg-zinc-100'
-                    }`}>
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </button>
-
+            {combinedFAQs.map((faq, index) => {
+              const faqId = faq.id || `static-${index}`;
+              return (
                 <motion.div
-                  initial={false}
-                  animate={{
-                    height: openQuestion === index ? 'auto' : 0,
-                    opacity: openQuestion === index ? 1 : 0
-                  }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="overflow-hidden"
+                  key={faqId}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  className={`rounded-xl sm:rounded-2xl overflow-hidden border ${darkMode
+                    ? 'bg-emerald-950/10 border-emerald-500/10 backdrop-blur-sm'
+                    : 'bg-white border-zinc-200'
+                    } shadow-sm hover:shadow-xl hover:border-emerald-500/30 transition-all duration-500 group`}
                 >
-                  <div className={`px-5 sm:px-6 pb-4 sm:pb-5 pt-2 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'
-                    }`}>
-                    <div className={`pl-4 border-l-2 ${darkMode ? 'border-teal-500/50' : 'border-emerald-500/50'
-                      }`}>
-                      <p className="text-sm sm:text-base leading-relaxed">{faq.a}</p>
+                  <button
+                    onClick={() => toggleQuestion(faqId)}
+                    className={`w-full px-5 sm:px-6 py-4 sm:py-5 flex items-start justify-between gap-4 text-left transition-colors duration-200 ${darkMode ? 'hover:bg-emerald-900/10' : 'hover:bg-zinc-50'
+                      }`}
+                  >
+                    <div className="flex-1">
+                      <h3 className={`text-base sm:text-lg font-semibold ${darkMode ? 'text-white' : 'text-zinc-900'
+                        }`}>
+                        {faq.q}
+                      </h3>
                     </div>
-                  </div>
+                    <div className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-500 ${openQuestion === faqId
+                      ? 'bg-emerald-500 shadow-lg shadow-emerald-500/40 rotate-180'
+                      : darkMode
+                        ? 'bg-emerald-950/40 text-emerald-400/50'
+                        : 'bg-zinc-100 text-zinc-400'
+                      }`}>
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                  </button>
+
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: openQuestion === faqId ? 'auto' : 0,
+                      opacity: openQuestion === faqId ? 1 : 0
+                    }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    className="overflow-hidden"
+                  >
+                    <div className={`px-5 sm:px-6 pb-4 sm:pb-5 pt-2 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'
+                      }`}>
+                      <div className={`pl-4 border-l-2 ${darkMode ? 'border-teal-500/50' : 'border-emerald-500/50'
+                        }`}>
+                        <p className="text-sm sm:text-base leading-relaxed">{faq.a}</p>
+                      </div>
+                    </div>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
+
+          {/* Pagination for Dynamic FAQs */}
+          {dynamicData?.pagination?.totalPages > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-50' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50'
+                  }`}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex gap-2">
+                {[...Array(dynamicData.pagination.totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${currentPage === i + 1
+                      ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white'
+                      : darkMode ? 'bg-zinc-800 text-zinc-400 hover:text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+              <button
+                disabled={currentPage === dynamicData.pagination.totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(dynamicData.pagination.totalPages, prev + 1))}
+                className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-50' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50'
+                  }`}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* Interactive Search Section */}
-        <InteractiveSearchSection darkMode={darkMode} isInView={isInView} faqData={faqData} />
+        <InteractiveSearchSection
+          darkMode={darkMode}
+          isInView={isInView}
+          faqData={faqData}
+          dynamicFAQs={globalDynamicFAQs}
+        />
       </div>
     </section>
   );

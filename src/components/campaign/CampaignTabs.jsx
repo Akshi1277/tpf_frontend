@@ -73,8 +73,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
   // Helper to get social media icon and color
   const getSocialConfig = (platform) => {
     const configs = {
-      instagram: { 
-        icon: Instagram, 
+      instagram: {
+        icon: Instagram,
         color: 'from-purple-500 to-pink-500',
         hoverColor: 'hover:border-purple-500/50',
         darkHoverColor: 'hover:border-purple-400/50',
@@ -87,8 +87,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
         textLight: 'text-purple-600',
         textDark: 'text-purple-400'
       },
-      facebook: { 
-        icon: Facebook, 
+      facebook: {
+        icon: Facebook,
         color: 'from-blue-600 to-blue-700',
         hoverColor: 'hover:border-blue-500/50',
         darkHoverColor: 'hover:border-blue-400/50',
@@ -101,8 +101,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
         textLight: 'text-blue-600',
         textDark: 'text-blue-400'
       },
-      youtube: { 
-        icon: Youtube, 
+      youtube: {
+        icon: Youtube,
         color: 'from-red-500 to-red-600',
         hoverColor: 'hover:border-red-500/50',
         darkHoverColor: 'hover:border-red-400/50',
@@ -115,8 +115,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
         textLight: 'text-red-600',
         textDark: 'text-red-400'
       },
-      twitter: { 
-        icon: Twitter, 
+      twitter: {
+        icon: Twitter,
         color: 'from-sky-400 to-sky-500',
         hoverColor: 'hover:border-sky-500/50',
         darkHoverColor: 'hover:border-sky-400/50',
@@ -129,8 +129,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
         textLight: 'text-sky-600',
         textDark: 'text-sky-400'
       },
-      linkedin: { 
-        icon: Linkedin, 
+      linkedin: {
+        icon: Linkedin,
         color: 'from-blue-600 to-blue-700',
         hoverColor: 'hover:border-blue-600/50',
         darkHoverColor: 'hover:border-blue-500/50',
@@ -143,8 +143,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
         textLight: 'text-blue-700',
         textDark: 'text-blue-400'
       },
-      other: { 
-        icon: ExternalLink, 
+      other: {
+        icon: ExternalLink,
         color: 'from-gray-500 to-gray-600',
         hoverColor: 'hover:border-gray-500/50',
         darkHoverColor: 'hover:border-gray-400/50',
@@ -246,14 +246,14 @@ export default function CampaignTabs({ darkMode, campaign }) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-2 py-4 px-4 font-medium relative transition-colors
+            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-4 font-medium relative transition-colors
               ${activeTab === tab.id
                 ? darkMode ? 'text-emerald-400' : 'text-emerald-600'
                 : darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-900'
               }`}
           >
             <tab.icon className="w-5 h-5" />
-            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="text-[10px] sm:text-sm">{tab.label}</span>
 
             {tab.badge > 0 && (
               <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-xs font-semibold">
@@ -279,7 +279,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
-          className={`p-6 md:p-8 ${(activeTab === 'documents' || activeTab === 'comments') ? 'min-h-[400px]' : ''}`}
+          className={`p-4 sm:p-6 md:p-8 ${(activeTab === 'documents' || activeTab === 'comments') ? 'min-h-[300px] sm:min-h-[400px]' : ''}`}
         >
           {/* ================= ABOUT TAB ================= */}
           {activeTab === 'about' && (
@@ -289,18 +289,18 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   About This Campaign
                 </h3>
-                
+
                 {/* Beneficiary & Campaigner Info Boxes */}
                 {campaign?.beneficiaryName && (
                   <div className="space-y-4 mb-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Campaigner Box */}
                       <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-blue-500/50' : 'bg-blue-50/30 border-blue-100 hover:border-blue-300'}`}>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-blue-500/10 group-hover:bg-blue-500/20' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
-                            <User className="w-5 h-5 text-blue-500" />
+                        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                          <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${darkMode ? 'bg-blue-500/10 group-hover:bg-blue-500/20' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
+                            <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
                           </div>
-                          <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                          <h4 className={`font-bold text-[10px] sm:text-xs uppercase tracking-widest ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
                             Campaigner
                           </h4>
                         </div>
@@ -314,11 +314,11 @@ export default function CampaignTabs({ darkMode, campaign }) {
 
                       {/* Beneficiary Box */}
                       <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50' : 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-300'}`}>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}>
-                            <Heart className="w-5 h-5 text-emerald-500" />
+                        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                          <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${darkMode ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}>
+                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
                           </div>
-                          <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                          <h4 className={`font-bold text-[10px] sm:text-xs uppercase tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
                             Beneficiary
                           </h4>
                         </div>
@@ -347,38 +347,35 @@ export default function CampaignTabs({ darkMode, campaign }) {
                             Follow Campaign Updates
                           </h4>
                         </div>
-                        
+
                         <div className="flex flex-wrap gap-2">
                           {Object.entries(socialMediaLinks).map(([platform, url]) => {
                             if (!url || url.trim() === '') return null;
                             const config = getSocialConfig(platform);
                             const Icon = config.icon;
-                            
+
                             return (
                               <a
                                 key={platform}
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`group/link flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-md ${
-                                  darkMode 
-                                    ? `${config.bgDark} border-zinc-700 ${config.darkHoverColor}` 
+                                className={`group/link flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-md ${darkMode
+                                    ? `${config.bgDark} border-zinc-700 ${config.darkHoverColor}`
                                     : `${config.bgLight} border-gray-200 ${config.hoverColor}`
-                                }`}
+                                  }`}
                               >
-                                <div className={`p-1.5 rounded-md transition-colors ${
-                                  darkMode 
-                                    ? `${config.iconBgDark} ${config.iconHoverDark}` 
+                                <div className={`p-1.5 rounded-md transition-colors ${darkMode
+                                    ? `${config.iconBgDark} ${config.iconHoverDark}`
                                     : `${config.iconBgLight} ${config.iconHoverLight}`
-                                }`}>
+                                  }`}>
                                   <Icon className={`w-4 h-4 ${darkMode ? config.textDark : config.textLight}`} />
                                 </div>
                                 <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                   {getPlatformName(platform)}
                                 </span>
-                                <ExternalLink className={`w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity ${
-                                  darkMode ? 'text-gray-400' : 'text-gray-500'
-                                }`} />
+                                <ExternalLink className={`w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity ${darkMode ? 'text-gray-400' : 'text-gray-500'
+                                  }`} />
                               </a>
                             );
                           })}
@@ -447,8 +444,8 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           ${darkMode ? 'border-zinc-700 hover:border-emerald-500/50' : 'border-gray-200 hover:border-emerald-400'}`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                            <FileText className="w-5 h-5 text-white" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                           </div>
                           <div>
                             <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
