@@ -1,15 +1,23 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Heart, Lock, Info, Check } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import PayUForm from '../payments/PayUForm';
 import LoginModal from '../login/LoginModal';
 
-export default function DonationCard({ darkMode, campaignId, zakatVerified, taxEligible, ribaEligible, allowedDonationTypes = [] }) {
+export default function DonationCard({
+  darkMode,
+  campaignId,
+  zakatVerified,
+  taxEligible,
+  ribaEligible,
+  allowedDonationTypes = [],
+}) {
   const [selectedAmount, setSelectedAmount] = useState(null);
   const [customAmount, setCustomAmount] = useState('');
   const [tipAmount, setTipAmount] = useState(0);
   const [tipPercentage, setTipPercentage] = useState(18);
-  const [payuData, setPayuData] = useState(null);
+  const [cashfreeData, setCashfreeData] = useState(null);
   const [donationType, setDonationType] = useState('SADAQAH');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [claim80G, setClaim80G] = useState(false);
@@ -31,21 +39,58 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified, taxE
     { id: 'IMDAD', label: 'Imdad', desc: 'Emergency relief' },
   ];
 
-  const filteredDonationTypes = allowedDonationTypes?.length > 0
-    ? allDonationTypes.filter(t => allowedDonationTypes.some(at => at.toUpperCase() === t.id.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')))
-    : allDonationTypes;
+  const filteredDonationTypes =
+    allowedDonationTypes?.length > 0
+      ? allDonationTypes.filter((t) =>
+          allowedDonationTypes.some(
+            (at) =>
+              at.toUpperCase() === t.id.toUpperCase() ||
+              (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
+          )
+        )
+      : allDonationTypes;
 
-  // Set default donation type if restricted
+  /* ------------------------------
+     Ensure valid default donation type
+  ------------------------------ */
   useEffect(() => {
-    if (allowedDonationTypes?.length > 0 && !allowedDonationTypes.some(at => at.toUpperCase() === donationType.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && donationType === 'ZAKAAT'))) {
+    if (
+      allowedDonationTypes?.length > 0 &&
+      !allowedDonationTypes.some(
+        (at) =>
+          at.toUpperCase() === donationType.toUpperCase() ||
+          (at.toUpperCase() === 'ZAKAT' && donationType === 'ZAKAAT')
+      )
+    ) {
       setDonationType(filteredDonationTypes[0]?.id || 'SADAQAH');
     }
-  }, [allowedDonationTypes, filteredDonationTypes]);
+  }, [allowedDonationTypes, filteredDonationTypes, donationType]);
 
+  /* ------------------------------
+     Tip calculation
+  ------------------------------ */
+  useEffect(() => {
+    const baseAmount =
+      selectedAmount || (customAmount ? parseInt(customAmount, 10) : 0);
+
+    if (baseAmount > 0 && tipPercentage !== null) {
+      setTipAmount(Math.round(baseAmount * (tipPercentage / 100)));
+    } else if (baseAmount === 0) {
+      setTipAmount(0);
+    }
+  }, [selectedAmount, customAmount, tipPercentage]);
+
+  const handleTipPercentageClick = (percentage) => {
+    setTipPercentage(percentage);
+  };
+
+  /* ------------------------------
+     Donate handler
+  ------------------------------ */
   const handleDonate = async () => {
     if (isDonating) return;
 
-    const amount = selectedAmount || parseInt(customAmount);
+    const amount = selectedAmount || parseInt(customAmount, 10);
     if (!amount) return;
 
     if (!userInfo) {
@@ -59,16 +104,16 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified, taxE
 
     try {
       if (donationType === 'ZAKAAT' && !zakatVerified) {
-        alert("This campaign is not verified for Zakaat.");
+        alert('This campaign is not verified for Zakaat.');
         return;
       }
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/donations/initiate`,
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             amount,
             tipAmount,
@@ -81,33 +126,58 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified, taxE
       );
 
       const data = await res.json();
-      setPayuData(data.payu);
+      setCashfreeData(data.cashfree);
     } catch (err) {
-      console.error("Donation initiate failed", err);
+      console.error('Donation initiate failed', err);
     } finally {
       setIsDonating(false);
     }
   };
 
+  /* ------------------------------
+     Resume donation after login
+  ------------------------------ */
   useEffect(() => {
     if (userInfo && pendingDonate) {
       handleDonate();
     }
   }, [userInfo, pendingDonate]);
 
-  // Calculate tip based on percentage
-  useEffect(() => {
-    const baseAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
-    if (baseAmount > 0) {
-      setTipAmount(Math.round(baseAmount * (tipPercentage / 100)));
-    } else {
-      setTipAmount(0);
-    }
-  }, [selectedAmount, customAmount, tipPercentage]);
+  /* ------------------------------
+     Cashfree Redirect
+  ------------------------------ */
+ useEffect(() => {
+  if (!cashfreeData?.paymentSessionId) return;
 
-  const handleTipPercentageClick = (percentage) => {
-    setTipPercentage(percentage);
+  const loadCashfree = () => {
+    const cashfree = new window.Cashfree({
+      mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || "sandbox", 
+      // use "production" in prod
+    });
+
+    cashfree.checkout({
+      paymentSessionId: cashfreeData.paymentSessionId,
+      redirectTarget: "_self",
+    });
   };
+
+  if (window.Cashfree) {
+    loadCashfree();
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+  script.async = true;
+  script.onload = loadCashfree;
+
+  document.body.appendChild(script);
+
+  return () => {
+    document.body.removeChild(script);
+  };
+}, [cashfreeData]);
+
 
   return (
     <>
@@ -393,12 +463,7 @@ export default function DonationCard({ darkMode, campaignId, zakatVerified, taxE
           </p>
         </div>
 
-        {payuData && (
-          <PayUForm
-            action={payuData.action}
-            payload={payuData.payload}
-          />
-        )}
+        
       </div>
       <LoginModal
         isOpen={showLoginModal}

@@ -1,8 +1,9 @@
+'use client'
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Lock, Info, Check, X, Sparkles } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import PayUForm from '../payments/PayUForm';
+import { useRef } from 'react';
 import LoginModal from '../login/LoginModal';
 
 export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId, ribaEligible, zakatVerified, taxEligible, allowedDonationTypes = [] }) {
@@ -10,7 +11,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
   const [customAmount, setCustomAmount] = useState('');
   const [tipAmount, setTipAmount] = useState(0);
   const [tipPercentage, setTipPercentage] = useState(18);
-  const [payuData, setPayuData] = useState(null);
+  const [cashfreeData, setCashfreeData] = useState(null);
   const [donationType, setDonationType] = useState('SADAQAH');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [claim80G, setClaim80G] = useState(false);
@@ -18,6 +19,8 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingDonate, setPendingDonate] = useState(false);
   const [isDonating, setIsDonating] = useState(false);
+
+  const checkoutStartedRef = useRef(false);
 
   const userInfo = useSelector((state) => state.auth.userInfo);
 
@@ -94,7 +97,13 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
       );
 
       const data = await res.json();
-      setPayuData(data.payu);
+
+      if (!res.ok || !data?.cashfree?.paymentSessionId) {
+        throw new Error(data?.message || "Unable to initiate payment");
+      }
+
+      setCashfreeData(data.cashfree);
+
     } catch (err) {
       console.error("Donation initiate failed", err);
     } finally {
@@ -116,6 +125,42 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
       setTipAmount(0);
     }
   }, [selectedAmount, customAmount, tipPercentage]);
+
+  useEffect(() => {
+    if (!cashfreeData?.paymentSessionId) return;
+    if (checkoutStartedRef.current) return;
+
+    checkoutStartedRef.current = true;
+
+    const startCheckout = () => {
+      const cashfree = new window.Cashfree({
+        mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || "sandbox",
+      });
+
+      cashfree.checkout({
+        paymentSessionId: cashfreeData.paymentSessionId,
+        redirectTarget: "_self",
+      });
+    };
+
+    if (window.Cashfree) {
+      startCheckout();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    script.async = true;
+    script.onload = startCheckout;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [cashfreeData]);
+
+
 
   const handleTipPercentageClick = (percentage) => {
     setTipPercentage(percentage);
@@ -489,12 +534,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
               </motion.div>
             </div>
 
-            {payuData && (
-              <PayUForm
-                action={payuData.action}
-                payload={payuData.payload}
-              />
-            )}
+
           </>
         )}
       </AnimatePresence>
