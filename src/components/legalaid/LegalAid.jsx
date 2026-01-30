@@ -239,13 +239,11 @@ export default function LegalAidPage({ darkMode = false }) {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="tel:+919411565185"
                 className="px-8 py-4 rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300 hover:scale-105"
               >
                 Request Legal Help
               </a>
-              <a
-                href="mailto:legal@truepathfoundation.org"
+              <a  
                 className={`px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 ${
                   darkMode 
                     ? 'bg-zinc-700 text-white hover:bg-zinc-600' 
