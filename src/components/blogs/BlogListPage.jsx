@@ -5,26 +5,14 @@ import Link from "next/link";
 import { useFetchBlogsQuery } from "@/utils/slices/blogApiSlice";
 import { Calendar, User, ArrowRight, BookOpen, Sparkles } from "lucide-react";
 import { getMediaUrl } from "@/utils/media";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import GlobalLoader from "@/components/GlobalLoader";
 
-export default function BlogListPage() {
-  const [darkMode, setDarkMode] = useState(false);
+export default function BlogListPage({darkMode}) {
   const [scrolled, setScrolled] = useState(true);
   const [page, setPage] = useState(1);
   const [allBlogs, setAllBlogs] = useState([]);
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("darkMode");
-      if (saved !== null) setDarkMode(JSON.parse(saved));
-    } catch { }
-  }, []);
 
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(darkMode));
-  }, [darkMode]);
 
   const { data, isLoading, error } = useFetchBlogsQuery({
     status: "PUBLISHED",
@@ -68,11 +56,7 @@ export default function BlogListPage() {
       className={`min-h-screen flex flex-col relative overflow-hidden ${darkMode ? "bg-zinc-950" : "bg-[#FDFDFD]"
         }`}
     >
-      <Navbar
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        scrolled={scrolled}
-      />
+   
 
       {/* Premium Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -359,7 +343,6 @@ export default function BlogListPage() {
       </main>
 
       {/* Footer - Sticks to Bottom */}
-      <Footer darkMode={darkMode} />
     </div>
   );
 }
