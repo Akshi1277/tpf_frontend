@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import HijriDate from "hijri-date";
 import { hijriMonths } from '@/lib/constants';
 import Link from 'next/link';
+import { useAppToast } from '@/app/AppToastContext';
 
 import { useGetHijriDateQuery } from '@/utils/slices/apiSlice';
 
 export default function Footer({ darkMode }) {
+  const { showToast } = useAppToast();
   const today = new Date();
   const dateStr = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
   const { data: hijriData } = useGetHijriDateQuery(dateStr);
@@ -37,6 +39,17 @@ export default function Footer({ darkMode }) {
     }
   }
 
+  const handleComingSoon = (feature) => {
+    if (showToast) {
+      showToast({
+        type: "info",
+        title: "Coming Soon",
+        message: `${feature} will be available soon!`,
+        duration: 2000,
+      });
+    }
+  };
+
   return (
     <footer className={`py-12 border-t z-30 ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-neutral-100 border-zinc-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -64,21 +77,31 @@ export default function Footer({ darkMode }) {
 
             <ul className="space-y-1.5 text-sm">
               {[
-                { name: 'Daily Giver', path: '/permanent-donor/daily' },
-                { name: 'Donate Weekly (Friday)', path: '/permanent-donor/weekly' },
-                { name: 'Donate Monthly', path: '/permanent-donor/monthly' },
+                { name: 'Daily Giver', path: '/permanent-donor/daily', comingSoon: true },
+                { name: 'Donate Weekly (Friday)', path: '/permanent-donor/weekly', comingSoon: true },
+                { name: 'Donate Monthly', path: '/permanent-donor/monthly', comingSoon: true },
                 { name: 'Donate Your Zakat', path: '/zakat-calculator' },
                 { name: 'Discover Fundraiser', path: '/' },
-                { name: 'Donate in Emergency Funds', path: '/' }
+                { name: 'Donate in Emergency Funds', path: '/', comingSoon: true }
               ].map((item, idx) => (
                 <li key={idx}>
-                  <Link
-                    href={item.path || '#'}
-                    className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
-                      } transition-colors`}
-                  >
-                    {item.name}
-                  </Link>
+                  {item.comingSoon ? (
+                    <button
+                      onClick={() => handleComingSoon(item.name)}
+                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                        } transition-colors text-left bg-transparent border-none p-0 cursor-pointer`}
+                    >
+                      {item.name}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.path || '#'}
+                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                        } transition-colors`}
+                    >
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -120,41 +143,34 @@ export default function Footer({ darkMode }) {
             <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Get Involve</div>
             <ul className="space-y-1.5 text-sm">
               {[
-                'Careers',
-                'Join TPF Aid',
-                'Volunteer Now',
-                'TPF Aid in News',
-                'Blogs',
-                'Notices'
+                { name: 'Careers', comingSoon: true },
+                { name: 'Join TPF Aid', comingSoon: false },
+                { name: 'Volunteer Now', path: '/volunteer/register' },
+                { name: 'TPF Aid in News', comingSoon: true },
+                { name: 'Blogs', path: '/blogs' },
+                { name: 'Notices', path: '/notices' }
               ].map(item => (
-                <li key={item}>
-                  {item === 'Volunteer Now' ? (
+                <li key={item.name}>
+                  {item.comingSoon ? (
+                    <button
+                      onClick={() => handleComingSoon(item.name)}
+                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors text-left bg-transparent border-none p-0 cursor-pointer`}
+                    >
+                      {item.name}
+                    </button>
+                  ) : item.path ? (
                     <Link
-                      href="/volunteer/register"
+                      href={item.path}
                       className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
                     >
-                      {item}
-                    </Link>
-                  ) : item === 'Blogs' ? (
-                    <Link
-                      href="/blogs"
-                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
-                    >
-                      {item}
-                    </Link>
-                  ) : item === 'Notices' ? (
-                    <Link
-                      href="/notices"
-                      className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
-                    >
-                      {item}
+                      {item.name}
                     </Link>
                   ) : (
                     <a
                       href="#"
                       className={`${darkMode ? 'text-zinc-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'} transition-colors`}
                     >
-                      {item}
+                      {item.name}
                     </a>
                   )}
                 </li>
@@ -240,7 +256,10 @@ export default function Footer({ darkMode }) {
                     : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                     }`}
                 />
-                <button className="px-6 ml-2 py-3 bg-black hover:bg-gray-900 text-white rounded-lg transition-colors flex items-center justify-center cursor-pointer">
+                <button
+                  onClick={() => handleComingSoon('Newsletter subscription')}
+                  className="px-6 ml-2 py-3 bg-black hover:bg-gray-900 text-white rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+                >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
