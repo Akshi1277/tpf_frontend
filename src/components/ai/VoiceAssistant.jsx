@@ -595,9 +595,12 @@ export default function VoiceAssistant() {
                                 onClick={(e) => { e.stopPropagation(); setShowLauncherGreeting(false); }}
                                 className={`absolute bottom-full right-0 mb-3 px-3 py-2 rounded-2xl rounded-br-none shadow-lg border whitespace-normal sm:whitespace-nowrap max-w-[150px] sm:max-w-none text-[10px] sm:text-xs font-bold leading-tight cursor-pointer ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-100' : 'bg-white border-emerald-100 text-emerald-900'}`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                    Salam! I am your assistant.
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                        <span>Salam! I am your assistant.</span>
+                                    </div>
+                                    <X size={12} className="opacity-50 hover:opacity-100 transition-opacity shrink-0" />
                                 </div>
                                 <motion.div
                                     className="absolute -bottom-2 right-4 w-4 h-4 rotate-45 border-r border-b"
