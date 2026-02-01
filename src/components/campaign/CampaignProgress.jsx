@@ -97,7 +97,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className={`${darkMode ? "bg-zinc-800" : "bg-white"
-          } rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6`}
+          } rounded-xl sm:rounded-2xl shadow-lg p-3.5 sm:p-6 lg:p-8 mb-4 sm:mb-6`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* LEFT: PROGRESS */}
@@ -260,7 +260,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
             </motion.button>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-3 gap-1 sm:gap-3">
               <StatCard
                 darkMode={darkMode}
                 icon={<Users className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -388,7 +388,7 @@ function StatCard({ darkMode, icon, value, label, color }) {
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className={`p-3 sm:p-4 rounded-xl border transition-all ${darkMode ? "bg-zinc-900/50 border-zinc-700 hover:border-zinc-600" : "bg-white border-gray-200 hover:border-gray-300 shadow-sm"
+      className={`p-2 sm:p-4 rounded-xl border transition-all overflow-hidden ${darkMode ? "bg-zinc-900/50 border-zinc-700 hover:border-zinc-600" : "bg-white border-gray-200 hover:border-gray-300 shadow-sm"
         }`}
     >
       <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${bgClasses[color]} flex items-center justify-center mb-2 sm:mb-3`}>
@@ -397,13 +397,13 @@ function StatCard({ darkMode, icon, value, label, color }) {
         </div>
       </div>
       <div
-        className={`text-sm sm:text-lg md:text-xl font-bold mb-0.5 sm:mb-1 ${darkMode ? "text-white" : "text-gray-900"
+        className={`text-[10px] min-[360px]:text-xs sm:text-lg md:text-xl font-bold tracking-tight sm:tracking-normal mb-0.5 sm:mb-1 truncate ${darkMode ? "text-white" : "text-gray-900"
           }`}
       >
         {value}
       </div>
       <p
-        className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
+        className={`text-[10px] sm:text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-600"
           }`}
       >
         {label}
