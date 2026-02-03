@@ -71,7 +71,7 @@ export default function CampaignCard({ campaign, darkMode }) {
     return (
       <div
         onClick={() => router.push(`/campaign/${campaign.slug}`)}
-        className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300 relative cursor-pointer
+        className={`group/card flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl overflow-hidden transition-all duration-300 relative cursor-pointer
           ${darkMode ? 'bg-zinc-800' : 'bg-white'}
           shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
       >
@@ -192,8 +192,25 @@ export default function CampaignCard({ campaign, darkMode }) {
                     e.stopPropagation();
                     setOpenShare(true);
                   }}
-                  className="flex items-center gap-1 text-zinc-300 hover:text-emerald-400 transition-colors cursor-pointer">
-                    <FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                  className="relative group flex items-center gap-1 text-zinc-300 hover:text-emerald-400 transition-colors cursor-pointer">
+                  <FiShare2 className="peer w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="
+  absolute -top-9 left-1/2 -translate-x-1/2
+  whitespace-nowrap rounded-md bg-zinc-900 text-white
+  text-[11px] px-2 py-1
+  opacity-0 scale-95
+
+  peer-hover:opacity-100
+  peer-hover:scale-100
+
+  transition-all duration-200
+  pointer-events-none
+">
+                    Share this Campaign
+                  </span>
+
+
+
                 </button>
               </div>
               <div className="flex items-center gap-1 text-[10px] sm:text-xs bg-emerald-900/40 px-2 sm:px-3 py-1 rounded-full">
@@ -323,8 +340,25 @@ export default function CampaignCard({ campaign, darkMode }) {
                 e.stopPropagation();
                 setOpenShare(true);
               }}
-              className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'}`}>
-                <FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />
+              className={`relative group flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'}`}>
+              <FiShare2 className="peer w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="
+  absolute -top-9 left-1/2 -translate-x-1/2
+  whitespace-nowrap rounded-md bg-zinc-900 text-white
+  text-[11px] px-2 py-1
+  opacity-0 scale-95
+
+  peer-hover:opacity-100
+  peer-hover:scale-100
+
+  transition-all duration-200
+  pointer-events-none
+">
+                Share this Campaign
+              </span>
+
+
+
             </button>
           </div>
           {campaign.zakatVerified && (
