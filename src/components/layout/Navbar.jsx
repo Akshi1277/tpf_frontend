@@ -733,7 +733,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
                   {/* Support */}
                   <a
-                    href="#"
+                    href="/contactus"
                     className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors border-t pt-3 border-zinc-200 dark:border-zinc-700
                    ${darkMode
                         ? 'text-zinc-300 hover:bg-zinc-800'

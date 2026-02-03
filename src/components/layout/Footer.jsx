@@ -81,7 +81,7 @@ export default function Footer({ darkMode }) {
                 { name: 'Donate Weekly (Friday)', path: '/permanent-donor/weekly', comingSoon: true },
                 { name: 'Donate Monthly', path: '/permanent-donor/monthly', comingSoon: true },
                 { name: 'Donate Your Zakat', path: '/zakat-calculator' },
-                { name: 'Discover Fundraiser', path: '/' },
+                { name: 'Discover Fundraiser', path: '/all-campaigns' },
                 { name: 'Donate in Emergency Funds', path: '/', comingSoon: true }
               ].map((item, idx) => (
                 <li key={idx}>
@@ -144,7 +144,7 @@ export default function Footer({ darkMode }) {
             <ul className="space-y-1.5 text-sm">
               {[
                 { name: 'Careers', comingSoon: true },
-                { name: 'Join TPF Aid', comingSoon: false },
+                { name: 'Join TPF Aid', comingSoon: true },
                 { name: 'Volunteer Now', path: '/volunteer/register' },
                 { name: 'TPF Aid in News', comingSoon: true },
                 { name: 'Blogs', path: '/blogs' },

@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight,ArrowLeft, Check } from "lucide-react"
+import { ArrowRight, ArrowLeft, Check } from "lucide-react"
 import { useSendOtpMutation, useVerifyOtpMutation } from "@/utils/slices/authApiSlice"
 import { useDispatch } from "react-redux"
 import { ToastContainer, toast } from "react-toastify"
@@ -15,69 +15,69 @@ export default function LoginPage({ darkMode }) {
   const dispatch = useDispatch()
   const [mobile, setMobile] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
-  const {showToast} = useAppToast()
-const [step, setStep] = useState(1);
-const [otp, setOtp] = useState('');
-const [sendOtp, {isLoading:sendingOtp}]= useSendOtpMutation()
-const [verifyOtp, {isLoading:verifyingOtp}]= useVerifyOtpMutation()
+  const { showToast } = useAppToast()
+  const [step, setStep] = useState(1);
+  const [otp, setOtp] = useState('');
+  const [sendOtp, { isLoading: sendingOtp }] = useSendOtpMutation()
+  const [verifyOtp, { isLoading: verifyingOtp }] = useVerifyOtpMutation()
 
-  const handleLogin = async() => {
-    
+  const handleLogin = async () => {
+
     if (mobile.length !== 10) return
-       try{
-      const res = await sendOtp({ mobileNo: mobile, type:"login" }).unwrap();
-      
+    try {
+      const res = await sendOtp({ mobileNo: mobile, type: "login" }).unwrap();
+
 
       // show OTP only for development
-      
-       
+
+
       setStep(2)
-     }
-   catch(error){
-       showToast({
+    }
+    catch (error) {
+      showToast({
         type: "error",
         title: "Login Failed",
         message: error?.data?.message || error?.data?.data?.message,
         duration: 2000,
       });
       console.error(error)
-   }
+    }
   }
 
- 
 
-const handleOtpSubmit = async () => {
-  if (otp.length !== 4) return;
 
-  try {
-    const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
-    // Save user in Redux + localStorage
-    dispatch(setCredentials(res.user));
-    showToast({
+  const handleOtpSubmit = async () => {
+    if (otp.length !== 4) return;
+
+    try {
+      const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
+      // Save user in Redux + localStorage
+      dispatch(setCredentials(res.user));
+      showToast({
         type: "success",
         title: "Welcome Back!",
         message: `Salam ${res.user.fullName} ! from TPF`,
         duration: 2000,
       });
-    
-    //setShowSuccess(true);
-    setTimeout(() => router.push('/profile/userprofile'), 2500);
-  } catch (err) {
-    console.error("OTP verification failed:", err);
-     showToast({
+
+      //setShowSuccess(true);
+      setTimeout(() => router.push('/profile/userprofile'), 2500);
+    } catch (err) {
+      console.error("OTP verification failed:", err);
+      showToast({
         type: "error",
         title: "Invalid Otp",
         message: 'Please try again!',
         duration: 2000,
       });
-  }
-};
+    }
+  };
 
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${darkMode
-        ? "bg-zinc-950"
-        : "bg-white"
+      ? "bg-zinc-950"
+      : "bg-white"
       }`}>
 
       {/* Sophisticated Background Pattern */}
@@ -85,20 +85,20 @@ const handleOtpSubmit = async () => {
         {/* Grid Pattern */}
         <div
           className={`absolute inset-0 ${darkMode
-              ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
-              : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
+            ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
+            : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
             }`}
           style={{ backgroundSize: '64px 64px' }}
         />
 
         {/* Gradient Orbs */}
         <div className={`absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[120px] ${darkMode
-            ? "bg-emerald-950/20"
-            : "bg-emerald-50"
+          ? "bg-emerald-950/20"
+          : "bg-emerald-50"
           }`} />
         <div className={`absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[100px] ${darkMode
-            ? "bg-teal-950/20"
-            : "bg-teal-50"
+          ? "bg-teal-950/20"
+          : "bg-teal-50"
           }`} />
 
         {/* Noise Texture Overlay */}
@@ -117,11 +117,10 @@ const handleOtpSubmit = async () => {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`fixed top-4 sm:top-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3 ${
-              darkMode
+            className={`fixed top-4 sm:top-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3 ${darkMode
                 ? "bg-zinc-900 border border-emerald-500/20"
                 : "bg-white border border-emerald-200"
-            }`}
+              }`}
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
               <Check className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={3} />
@@ -139,7 +138,7 @@ const handleOtpSubmit = async () => {
       </AnimatePresence>
 
       {/* Main Content */}
-     <div className="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-8 pt-24 lg:pt-20">
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-8 pt-24 lg:pt-20">
         <div className="w-full max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 items-center">
 
@@ -152,31 +151,31 @@ const handleOtpSubmit = async () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-             <h1 className={`text-5xl lg:text-6xl font-bold leading-tight ${darkMode ? "text-white" : "text-gray-900"
-  }`}>
-  Continue your
-  <br />
-  <span className="relative inline-block mt-2">
-    <span className="relative z-10 bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
-      journey
-    </span>
-    <motion.span
-      animate={{ 
-        x: ["-100%", "100%", "-100%"]
-      }}
-      transition={{
-        repeat: Infinity,
-        duration: 5.5,
-        ease: "linear",
-      }}
-      className="absolute bottom-2 left-10 w-1/2 h-3 rounded-full blur-sm"
-      style={{
-        background:
-          "linear-gradient(90deg, transparent, rgba(16,185,129,1), transparent)",
-      }}
-    />
-  </span>
-</h1>
+                <h1 className={`text-5xl lg:text-6xl font-bold leading-tight ${darkMode ? "text-white" : "text-gray-900"
+                  }`}>
+                  Continue your
+                  <br />
+                  <span className="relative inline-block mt-2">
+                    <span className="relative z-10 bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
+                      journey
+                    </span>
+                    <motion.span
+                      animate={{
+                        x: ["-100%", "100%", "-100%"]
+                      }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 5.5,
+                        ease: "linear",
+                      }}
+                      className="absolute bottom-2 left-10 w-1/2 h-3 rounded-full blur-sm"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent, rgba(16,185,129,1), transparent)",
+                      }}
+                    />
+                  </span>
+                </h1>
               </motion.div>
 
               {/* Mission Statement */}
@@ -185,8 +184,8 @@ const handleOtpSubmit = async () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className={`p-6 rounded-2xl border ${darkMode
-                    ? "bg-emerald-500/10 border-emerald-500/20"
-                    : "bg-emerald-50 border-emerald-100"
+                  ? "bg-emerald-500/10 border-emerald-500/20"
+                  : "bg-emerald-50 border-emerald-100"
                   }`}
               >
                 <h3 className={`text-lg font-bold mb-3 ${darkMode ? "text-white" : "text-gray-900"
@@ -237,163 +236,194 @@ const handleOtpSubmit = async () => {
               className="lg:col-span-3"
             >
               <div className={`rounded-2xl mt-24 sm:mt-5 lg:mt-5 sm:rounded-3xl py-10 px-2 sm:p-8 lg:p-12 border-2 border-emerald-500 ${darkMode
-                  ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
-                  : "bg-white/80 backdrop-blur-xl border border-gray-100 shadow-2xl shadow-gray-200/50"
+                ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
+                : "bg-white/80 backdrop-blur-xl border border-gray-100 shadow-2xl shadow-gray-200/50"
                 }`}>
 
-             <div className="space-y-6 sm:space-y-8">
-  <div className="max-w-md mx-auto space-y-12 sm:space-y-8">
-    <AnimatePresence mode="wait">
-      {step === 1 && (
-        <motion.div
-          key="mobile"
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -10 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-6 sm:space-y-8"
-        >
-          <div>
-            <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
-              Log in to your account
-            </h2>
-            <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-              Enter your mobile number to continue
-            </p>
-          </div>
+                <div className="space-y-6 sm:space-y-8">
+                  <div className="max-w-md mx-auto space-y-12 sm:space-y-8">
+                    <AnimatePresence mode="wait">
+                      {step === 1 && (
+                        <motion.div
+                          key="mobile"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.3 }}
+                          className="space-y-6 sm:space-y-8"
+                        >
+                          <div>
+                            <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                              Log in to your account
+                            </h2>
+                            <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                              Enter your mobile number to continue
+                            </p>
+                          </div>
 
-          <div className="space-y-3">
-            <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-              Mobile Number
-            </label>
-            <div className="relative group">
-              <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur transition-opacity`} />
-              <div className={`relative flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all ${darkMode
-                  ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500"
-                  : "bg-white border-gray-200 group-focus-within:border-emerald-500"
-                }`}>
-                {/* flag / +91 / input exactly as you had */}
-                <div className="flex items-center gap-2 sm:gap-2.5">
-                  <svg className="w-6 h-4 sm:w-7 sm:h-5" viewBox="0 0 30 20">
-                    <rect width="30" height="6.67" fill="#FF9933" />
-                    <rect y="6.67" width="30" height="6.67" fill="#FFFFFF" />
-                    <rect y="13.33" width="30" height="6.67" fill="#138808" />
-                    <circle cx="15" cy="10" r="2.5" fill="#000080" />
-                  </svg>
-                  <span className={`text-base sm:text-lg font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>+91</span>
-                  <div className={`w-px h-5 sm:h-6 ${darkMode ? "bg-zinc-700" : "bg-gray-300"}`} />
+                          <div className="space-y-3">
+                            <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                              Mobile Number
+                            </label>
+                            <div className="relative group">
+                              <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur transition-opacity`} />
+                              <div className={`relative flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all ${darkMode
+                                ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500"
+                                : "bg-white border-gray-200 group-focus-within:border-emerald-500"
+                                }`}>
+                                {/* flag / +91 / input exactly as you had */}
+                                <div className="flex items-center gap-2 sm:gap-2.5">
+                                  <svg className="w-6 h-4 sm:w-7 sm:h-5" viewBox="0 0 30 20">
+                                    <rect width="30" height="6.67" fill="#FF9933" />
+                                    <rect y="6.67" width="30" height="6.67" fill="#FFFFFF" />
+                                    <rect y="13.33" width="30" height="6.67" fill="#138808" />
+                                    <circle cx="15" cy="10" r="2.5" fill="#000080" />
+                                  </svg>
+                                  <span className={`text-base sm:text-lg font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>+91</span>
+                                  <div className={`w-px h-5 sm:h-6 ${darkMode ? "bg-zinc-700" : "bg-gray-300"}`} />
+                                </div>
+                                <input
+                                  type="tel"
+                                  value={mobile}
+                                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                                  placeholder="10-digit number"
+                                  className={`flex-1 text-base sm:text-lg md:text-xl font-medium outline-none bg-transparent ${darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"}`}
+                                  autoFocus
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={handleLogin}
+                            disabled={mobile.length !== 10}
+                            className="w-full group cursor-pointer relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
+                            <div className="relative flex items-center justify-center gap-2 text-white">
+                              Continue
+                              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                            </div>
+                          </button>
+                        </motion.div>
+                      )}
+
+                      {step === 2 && (
+                        <motion.div
+                          key="otp"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.3 }}
+                          className="space-y-6 sm:space-y-8"
+                        >
+                          <div className="max-w-md mx-auto space-y-12 px-2 sm:space-y-8">
+                            <div>
+                              <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                Enter verification code
+                              </h2>
+                              <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                                Sent to <span className="font-semibold text-emerald-600">+91 {mobile}</span>
+                              </p>
+                            </div>
+
+                            <div className="space-y-3 relative">
+                              <label
+                                className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"
+                                  }`}
+                              >
+                                4-Digit Code
+                              </label>
+
+                              {/* 🔑 Hidden input — REQUIRED for OTP autofill */}
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
+                                pattern="[0-9]*"
+                                maxLength={4}
+                                value={otp}
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/\D/g, "").slice(0, 4);
+                                  setOtp(value);
+                                }}
+                                className="absolute opacity-0 pointer-events-none"
+                              />
+
+                              {/* Visible OTP boxes */}
+                              <div className="flex gap-2 sm:gap-3 md:gap-4">
+                                {[...Array(4)].map((_, index) => (
+                                  <input
+                                    key={index}
+                                    type="text"
+                                    inputMode="numeric"
+                                    maxLength={1}
+                                    value={otp[index] || ""}
+                                    onChange={(e) => {
+                                      const digit = e.target.value.replace(/\D/g, "");
+                                      const newOtp = otp.split("");
+
+                                      newOtp[index] = digit;
+                                      setOtp(newOtp.join(""));
+
+                                      if (digit && index < 3) {
+                                        e.target.nextElementSibling?.focus();
+                                      }
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Backspace" && !otp[index] && index > 0) {
+                                        e.target.previousElementSibling?.focus();
+                                      }
+                                    }}
+                                    className={`flex-1 h-14 sm:h-16 md:h-20 w-14 sm:w-16 md:w-20 text-center text-2xl sm:text-3xl font-bold rounded-xl sm:rounded-2xl border-2 outline-none transition-all ${darkMode
+                                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
+                                        : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
+                                      }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+
+
+                            <div className="flex flex-col gap-3">
+                              <button
+                                onClick={handleOtpSubmit}
+                                disabled={otp.length !== 4}
+                                className="w-full group relative cursor-pointer overflow-hidden py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
+                                <div className="relative flex items-center justify-center gap-2 text-white">
+                                  Verify & Log In
+                                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
+                                </div>
+                              </button>
+
+                              <button
+                                onClick={() => setStep(1)}
+                                className={`py-3 px-6 cursor-pointer rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
+                                  ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
+                                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+                              >
+                                <ArrowLeft className="w-4 h-4" />
+                                Change Number
+                              </button>
+                            </div>
+
+                            <p className={`text-center text-xs sm:text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
+                              Didn't receive? <button className="font-semibold cursor-pointer text-emerald-600 hover:text-emerald-700">Resend code</button>
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* always-visible footer link */}
+                    <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                      Don't have an account?{" "}
+                      <a href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-700">Sign up</a>
+                    </p>
+                  </div>
                 </div>
-                <input
-                  type="tel"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  placeholder="10-digit number"
-                  className={`flex-1 text-base sm:text-lg md:text-xl font-medium outline-none bg-transparent ${darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"}`}
-                  autoFocus
-                />
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={handleLogin}
-            disabled={mobile.length !== 10}
-            className="w-full group cursor-pointer relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
-            <div className="relative flex items-center justify-center gap-2 text-white">
-              Continue
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </div>
-          </button>
-        </motion.div>
-      )}
-
-      {step === 2 && (
-        <motion.div
-          key="otp"
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -10 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-6 sm:space-y-8"
-        >
-          <div className="max-w-md mx-auto space-y-12 px-2 sm:space-y-8">
-            <div>
-              <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                Enter verification code
-              </h2>
-              <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                Sent to <span className="font-semibold text-emerald-600">+91 {mobile}</span>
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>4-Digit Code</label>
-              <div className="flex gap-2 sm:gap-3 md:gap-4">
-                {[...Array(4)].map((_, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength="1"
-                    value={otp[index] || ''}
-                    onChange={(e) => {
-                      const newOtp = otp.split('');
-                      newOtp[index] = e.target.value;
-                      setOtp(newOtp.join(''));
-                      if (e.target.value && index < 3) e.target.nextElementSibling?.focus();
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Backspace' && !otp[index] && index > 0) e.target.previousElementSibling?.focus();
-                    }}
-                    className={`flex-1 h-14 sm:h-16 md:h-20 w-14 sm:w-16 md:w-20 text-center text-2xl sm:text-3xl font-bold rounded-xl sm:rounded-2xl border-2 outline-none transition-all ${darkMode
-                        ? 'bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500 focus:bg-zinc-800'
-                        : 'bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg'}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={handleOtpSubmit}
-                disabled={otp.length !== 4}
-                className="w-full group relative cursor-pointer overflow-hidden py-3.5 sm:py-4 px-6 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
-                <div className="relative flex items-center justify-center gap-2 text-white">
-                  Verify & Log In
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
-                </div>
-              </button>
-
-              <button
-                onClick={() => setStep(1)}
-                className={`py-3 px-6 cursor-pointer rounded-xl sm:rounded-2xl font-medium text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${darkMode
-                    ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Change Number
-              </button>
-            </div>
-
-            <p className={`text-center text-xs sm:text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
-              Didn't receive? <button className="font-semibold cursor-pointer text-emerald-600 hover:text-emerald-700">Resend code</button>
-            </p>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-
-    {/* always-visible footer link */}
-    <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-      Don't have an account?{" "}
-      <a href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-700">Sign up</a>
-    </p>
-  </div>
-</div>
 
               </div>
             </motion.div>
