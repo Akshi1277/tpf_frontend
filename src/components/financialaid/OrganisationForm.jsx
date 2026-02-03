@@ -76,6 +76,10 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     volunteerStrength: "",
     organizeEvents: "",
 
+    // Corporate Documents (for non-NGOs)
+    registrationDoc: null,
+    panCardDoc: null,
+
     termsAccepted: false,
   })
 
@@ -111,13 +115,18 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const requiredFields = {
     1: ["nonProfit", "organizationName", "city", "termsAccepted"],
     2: ["contactName", "contactNumber", "contactEmail", "designation"],
-    3: ["has80G", "hasFCRA"],
+    3: [], // Dynamic validation in validateStep
     4: ["budget", "donorDatabase", "fullTimeFundraising", "crowdfundedBefore", "employeeStrength"],
     5: ["termsAccepted"]
   };
 
   const validateStep = (step) => {
-    if (formData.nonProfit === "no" && step === 3) return true;
+    if (step === 3) {
+      if (formData.nonProfit === "no") {
+        return formData.registrationDoc !== null && formData.panCardDoc !== null;
+      }
+      return formData.has80G !== "" && formData.hasFCRA !== "";
+    }
 
     const fields = requiredFields[step];
     if (!fields) return true;
@@ -137,11 +146,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const handleNext = (nextStep) => {
     let targetStep = nextStep;
 
-    // Skip Step 3 if not non-profit
-    if (formData.nonProfit === "no") {
-      if (currentStep === 2 && nextStep === 3) targetStep = 4;
-      if (currentStep === 4 && nextStep === 3) targetStep = 2;
-    }
+    // We no longer skip Step 3, as corporate entities need to upload docs too.
 
     window.scrollTo({ top: 0, behavior: "smooth" });
     setCurrentStep(targetStep);
@@ -208,6 +213,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
       }
       if (formData.panCardImage) {
         formDataToSend.append('panCardImage', formData.panCardImage)
+      }
+      if (formData.registrationDoc) {
+        formDataToSend.append('registrationDoc', formData.registrationDoc)
+      }
+      if (formData.panCardDoc) {
+        formDataToSend.append('panCardDoc', formData.panCardDoc)
       }
 
       // Submit the form
@@ -292,11 +303,11 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
             className="mb-6"
           >
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/financial-aid')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${darkMode ? "text-zinc-400 hover:text-white hover:bg-zinc-800" : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"}`}
             >
               <ChevronLeft size={20} />
-              <span className="font-medium">Back to Home</span>
+              <span className="font-medium">Back to Financial Aid</span>
             </button>
           </motion.div>
 
@@ -372,7 +383,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
               <div className="space-y-4 sm:space-y-6">
                 <div className="border-l-4 border-emerald-500 pl-3 sm:pl-4 mb-4 sm:mb-6">
                   <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
-                    NGO Registration Form
+                    Organization Registration Form
                   </h2>
                   <p className={`text-xs sm:text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
                     Please provide your organization details
@@ -492,10 +503,10 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                   </div>
                 </div>
 
-                {/* Question 4: Cause Supported */}
+                {/* Question 4: Field of Work / Cause Supported */}
                 <div>
                   <label className={`block text-xs sm:text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                    4. Cause Supported (Choose your main area of work) <span className="text-red-500">*</span>
+                    4. {formData.nonProfit === "no" ? "Field of Work (Choose your primary sector of operation)" : "Cause Supported (Choose your main area of work)"} <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
                     {causes.map((cause) => (
@@ -822,95 +833,143 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
               <div className="space-y-4 sm:space-y-6">
                 <div className="border-l-4 border-emerald-500 pl-3 sm:pl-4 mb-4 sm:mb-6">
                   <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-white" : "text-zinc-900"}`}>
-                    Certifications
+                    Certifications & Documents
                   </h2>
                   <p className={`text-xs sm:text-sm mt-1 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
-                    Please provide certification details
+                    {formData.nonProfit === "no" ? "Please upload your registration documents" : "Please provide certification details"}
                   </p>
                 </div>
 
-                {/* Question 14: 80G Certification */}
-                <div className={formData.nonProfit === "no" ? "opacity-50 pointer-events-none" : ""}>
-                  <label className={`block text-xs sm:text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                    14. Does your organization have 80G certification? <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex gap-4 sm:gap-6">
-                    {["yes", "no"].map((option) => (
-                      <label key={option} className="flex items-center cursor-pointer group select-none">
-                        <input
-                          type="radio"
-                          name="has80G"
-                          value={option}
-                          checked={formData.has80G === option}
-                          onChange={handleInputChange}
-                          className="sr-only peer"
-                          required={formData.nonProfit !== "no"}
-                          disabled={formData.nonProfit === "no"}
-                        />
-                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.has80G === option
-                          ? "border-emerald-600 bg-emerald-600"
-                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
-                          }`}>
-                          <Check
-                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.has80G === option ? "opacity-100" : "opacity-0"}`}
-                            strokeWidth={3}
-                          />
-                        </div>
-                        <span className={`ml-2 sm:ml-3 font-medium text-sm sm:text-base ${formData.has80G === option ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                          {option === "yes" ? "Yes" : "No"}
-                        </span>
+                {formData.nonProfit === "no" ? (
+                  /* Corporate Document Submission */
+                  <div className="space-y-6">
+                    <div>
+                      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        Business Registration / Incorporation Document <span className="text-red-500">*</span>
                       </label>
-                    ))}
-                  </div>
-                </div>
+                      <div className={`relative border-2 border-dashed rounded-lg p-4 sm:p-6 transition-all ${darkMode ? "border-zinc-600 bg-zinc-700" : "border-zinc-300 bg-zinc-50"} hover:border-emerald-500`}>
+                        <input
+                          type="file"
+                          name="registrationDoc"
+                          onChange={handleInputChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Upload className={`w-8 h-8 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+                          <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                            {formData.registrationDoc ? formData.registrationDoc.name : "Click to upload or drag & drop"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
 
-                {/* Conditional fields for 80G = Yes */}
-                {formData.has80G === "yes" && (
-                  <div className={formData.nonProfit === "no" ? "opacity-50 pointer-events-none" : ""}>
-                    {/* All the 14.1, 14.2, 14.3, 14.4 fields remain exactly as they are */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                      {/* Keep all existing code for these fields */}
+                    <div>
+                      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        Company PAN Card <span className="text-red-500">*</span>
+                      </label>
+                      <div className={`relative border-2 border-dashed rounded-lg p-4 sm:p-6 transition-all ${darkMode ? "border-zinc-600 bg-zinc-700" : "border-zinc-300 bg-zinc-50"} hover:border-emerald-500`}>
+                        <input
+                          type="file"
+                          name="panCardDoc"
+                          onChange={handleInputChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Upload className={`w-8 h-8 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+                          <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                            {formData.panCardDoc ? formData.panCardDoc.name : "Click to upload or drag & drop"}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                ) : (
+                  /* NGO Certifications (Existing Logic) */
+                  <>
+                    {/* Question 14: 80G Certification */}
+                    <div>
+                      <label className={`block text-xs sm:text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        14. Does your organization have 80G certification? <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4 sm:gap-6">
+                        {["yes", "no"].map((option) => (
+                          <label key={option} className="flex items-center cursor-pointer group select-none">
+                            <input
+                              type="radio"
+                              name="has80G"
+                              value={option}
+                              checked={formData.has80G === option}
+                              onChange={handleInputChange}
+                              className="sr-only peer"
+                              required={formData.nonProfit !== "no"}
+                              disabled={formData.nonProfit === "no"}
+                            />
+                            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.has80G === option
+                              ? "border-emerald-600 bg-emerald-600"
+                              : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                              }`}>
+                              <Check
+                                className={`w-3.5 h-3.5 text-white transition-opacity ${formData.has80G === option ? "opacity-100" : "opacity-0"}`}
+                                strokeWidth={3}
+                              />
+                            </div>
+                            <span className={`ml-2 sm:ml-3 font-medium text-sm sm:text-base ${formData.has80G === option ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                              {option === "yes" ? "Yes" : "No"}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Conditional fields for 80G = Yes */}
+                    {formData.has80G === "yes" && (
+                      <div className={formData.nonProfit === "no" ? "opacity-50 pointer-events-none" : ""}>
+                        {/* All the 14.1, 14.2, 14.3, 14.4 fields remain exactly as they are */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                          {/* Keep all existing code for these fields */}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Question 15: FCRA Certification */}
+                    <div className={formData.nonProfit === "no" ? "opacity-50 pointer-events-none" : ""}>
+                      <label className={`block text-xs sm:text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        15. Does your organization have FCRA certification? <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4 sm:gap-6">
+                        {["yes", "no"].map((option) => (
+                          <label key={option} className="flex items-center cursor-pointer group">
+                            <input
+                              type="radio"
+                              name="hasFCRA"
+                              value={option}
+                              checked={formData.hasFCRA === option}
+                              onChange={handleInputChange}
+                              className="sr-only peer"
+                              required={formData.nonProfit !== "no"}
+                              disabled={formData.nonProfit === "no"}
+                            />
+                            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.hasFCRA === option
+                              ? "border-emerald-600 bg-emerald-600"
+                              : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                              }`}>
+                              <Check
+                                className={`w-3.5 h-3.5 text-white transition-opacity ${formData.hasFCRA === option ? "opacity-100" : "opacity-0"}`}
+                                strokeWidth={3}
+                              />
+                            </div>
+                            <span className={`ml-2 sm:ml-3 font-medium text-sm sm:text-base ${formData.hasFCRA === option ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                              {option === "yes" ? "Yes" : "No"}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
 
-                {/* Question 15: FCRA Certification */}
-                <div className={formData.nonProfit === "no" ? "opacity-50 pointer-events-none" : ""}>
-                  <label className={`block text-xs sm:text-sm font-medium mb-3 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                    15. Does your organization have FCRA certification? <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex gap-4 sm:gap-6">
-                    {["yes", "no"].map((option) => (
-                      <label key={option} className="flex items-center cursor-pointer group">
-                        <input
-                          type="radio"
-                          name="hasFCRA"
-                          value={option}
-                          checked={formData.hasFCRA === option}
-                          onChange={handleInputChange}
-                          className="sr-only peer"
-                          required={formData.nonProfit !== "no"}
-                          disabled={formData.nonProfit === "no"}
-                        />
-                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.hasFCRA === option
-                          ? "border-emerald-600 bg-emerald-600"
-                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
-                          }`}>
-                          <Check
-                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.hasFCRA === option ? "opacity-100" : "opacity-0"}`}
-                            strokeWidth={3}
-                          />
-                        </div>
-                        <span className={`ml-2 sm:ml-3 font-medium text-sm sm:text-base ${formData.hasFCRA === option ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                          {option === "yes" ? "Yes" : "No"}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Navigation Buttons - NOT DISABLED */}
-                <div className="flex justify-between pt-4">
+                {/* Navigation Buttons for Step 3 - Global */}
+                <div className="flex justify-between pt-8">
                   <button
                     onClick={() => handleNext(2)}
                     className={`px-6 sm:px-8 py-2.5 sm:py-3 font-semibold rounded-lg transition-all text-sm sm:text-base ${darkMode
@@ -1269,44 +1328,67 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                     </div>
                   </div>
 
-                  <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Certifications</h3>
+                  <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Certifications & Documents</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-                    <div>
-                      <p className="text-xs text-zinc-500">80G Certification</p>
-                      <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.has80G || "—"}</p>
-                    </div>
-                    {formData.has80G === "yes" && (
+                    {formData.nonProfit === "no" ? (
                       <>
                         <div>
-                          <p className="text-xs text-zinc-500">Expiry Date</p>
-                          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.expiryDate || "—"}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-500">PAN Card</p>
-                          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.panCard || "—"}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-zinc-500 mb-1">Certification Document</p>
-                          {formData.certification80G ? (
-                            <FilePreview file={formData.certification80G} darkMode={darkMode} />
+                          <p className="text-xs text-zinc-500 mb-1">Registration Document</p>
+                          {formData.registrationDoc ? (
+                            <FilePreview file={formData.registrationDoc} darkMode={darkMode} />
                           ) : (
                             <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>No file</p>
                           )}
                         </div>
                         <div>
-                          <p className="text-xs text-zinc-500 mb-1">PAN Card Document</p>
-                          {formData.panCardImage ? (
-                            <FilePreview file={formData.panCardImage} darkMode={darkMode} />
+                          <p className="text-xs text-zinc-500 mb-1">Company PAN Card</p>
+                          {formData.panCardDoc ? (
+                            <FilePreview file={formData.panCardDoc} darkMode={darkMode} />
                           ) : (
                             <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>No file</p>
                           )}
                         </div>
                       </>
+                    ) : (
+                      <>
+                        <div>
+                          <p className="text-xs text-zinc-500">80G Certification</p>
+                          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.has80G || "—"}</p>
+                        </div>
+                        {formData.has80G === "yes" && (
+                          <>
+                            <div>
+                              <p className="text-xs text-zinc-500">Expiry Date</p>
+                              <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.expiryDate || "—"}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-zinc-500">PAN Card</p>
+                              <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.panCard || "—"}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-zinc-500 mb-1">Certification Document</p>
+                              {formData.certification80G ? (
+                                <FilePreview file={formData.certification80G} darkMode={darkMode} />
+                              ) : (
+                                <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>No file</p>
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-xs text-zinc-500 mb-1">PAN Card Document</p>
+                              {formData.panCardImage ? (
+                                <FilePreview file={formData.panCardImage} darkMode={darkMode} />
+                              ) : (
+                                <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>No file</p>
+                              )}
+                            </div>
+                          </>
+                        )}
+                        <div>
+                          <p className="text-xs text-zinc-500">FCRA Certification</p>
+                          <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.hasFCRA || "—"}</p>
+                        </div>
+                      </>
                     )}
-                    <div>
-                      <p className="text-xs text-zinc-500">FCRA Certification</p>
-                      <p className={`font-medium ${darkMode ? "text-white" : "text-zinc-900"}`}>{formData.hasFCRA || "—"}</p>
-                    </div>
                   </div>
 
                   <h3 className={`font-semibold mb-3 ${darkMode ? "text-white" : "text-zinc-900"}`}>Organization Profile</h3>

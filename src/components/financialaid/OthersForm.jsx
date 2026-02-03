@@ -266,11 +266,11 @@ export default function OtherForm({ darkModeFromParent }) {
             className="mb-6"
           >
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/financial-aid')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${darkMode ? "text-zinc-400 hover:text-white hover:bg-zinc-800" : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"}`}
             >
               <ChevronLeft size={20} />
-              <span className="font-medium">Back to Home</span>
+              <span className="font-medium">Back to Financial Aid</span>
             </button>
           </motion.div>
 

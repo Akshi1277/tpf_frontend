@@ -5,18 +5,19 @@ import { setCredentials } from "@/utils/slices/authSlice"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { use, useState } from "react"
-import { useRouter } from "next/navigation"
 import { ArrowRight, ArrowLeft, Check } from "lucide-react"
 import { useAppToast } from "@/app/AppToastContext"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect } from "react"
 export default function SignUpPage({ darkMode }) {
   const router = useRouter()
   const dispatch = useDispatch()
+  const searchParams = useSearchParams()
 
   const [sendOtp, { isLoading: sendingOtp }] = useSendOtpMutation()
   const [verifyOtp, { isLoading: verifyingOtp }] = useVerifyOtpMutation()
   const [updateProfile, { isLoading: updatingProfile }] = useUpdateProfileMutation()
   const { showToast } = useAppToast()
-
   const [step, setStep] = useState(1)
   const [mobile, setMobile] = useState('')
   const [otp, setOtp] = useState('')
@@ -24,13 +25,24 @@ export default function SignUpPage({ darkMode }) {
   const [fullName, setFullName] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
 
+  // Pre-fill from query params (e.g. from AI assistant)
+  useEffect(() => {
+    const qName = searchParams.get('fullName')
+    const qEmail = searchParams.get('email')
+    const qPhone = searchParams.get('phone')
+
+    if (qName) setFullName(qName)
+    if (qEmail) setEmail(qEmail)
+    if (qPhone) setMobile(qPhone.replace(/\D/g, "").slice(-10))
+  }, [searchParams])
+
   const handleMobileSubmit = async () => {
     try {
       if (mobile.length !== 10) return;
       const res = await sendOtp({ mobileNo: mobile, type: "signup" }).unwrap();
 
       // show OTP only for development
-     
+
       setStep(2);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {

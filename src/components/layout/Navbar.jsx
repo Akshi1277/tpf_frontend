@@ -651,8 +651,11 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                     <div className={`p-1 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
                       <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
                     </div>
-                    <span className="font-bold tracking-tight bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-300 bg-clip-text text-transparent">
-                      {userInfo?.role === 'volunteer' ? 'Proud TPF Service Hero' : 'Join as a Volunteer'}
+                    <span className={`font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${userInfo?.role === 'volunteer'
+                        ? 'from-[#FFE7A3] via-[#D4AF37] to-[#FFE7A3]'
+                        : 'from-emerald-400 via-emerald-500 to-emerald-300'
+                      }`}>
+                      {userInfo?.role === 'volunteer' ? 'TPF Service Hero' : 'Join as a Volunteer'}
                     </span>
                   </Link>
 
