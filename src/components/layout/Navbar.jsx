@@ -641,18 +641,18 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
                   <Link
                     href={userInfo?.role === 'volunteer' ? "/profile/vouchers" : "/volunteer/register"}
-                    className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
+                    className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-all duration-300
                    ${darkMode
-                        ? 'text-emerald-400 hover:bg-zinc-800'
-                        : 'text-emerald-600 hover:bg-zinc-50'
+                        ? 'hover:bg-zinc-800'
+                        : 'hover:bg-emerald-50'
                       }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <div className={`p-1 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
                       <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
                     </div>
-                    <span className="font-semibold tracking-wide">
-                      {userInfo?.role === 'volunteer' ? 'Already a Volunteer' : 'Join as a Volunteer'}
+                    <span className="font-bold tracking-tight bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-300 bg-clip-text text-transparent">
+                      {userInfo?.role === 'volunteer' ? 'Proud TPF Service Hero' : 'Join as a Volunteer'}
                     </span>
                   </Link>
 
