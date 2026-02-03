@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, X, Volume2, VolumeX, Loader2, Bot, Trash2, User, Sparkles, Calculator, UserPlus, AlertCircle, Settings2, Send } from "lucide-react";
+import { Mic, X, Volume2, VolumeX, Loader2, Bot, Trash2, User, Sparkles, Calculator, UserPlus, AlertCircle, Settings2, Send, Minimize2 } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
@@ -117,6 +117,8 @@ export default function VoiceAssistant() {
     const [history, setHistory] = useState([]);
     const [interimTranscript, setInterimTranscript] = useState("");
     const [error, setError] = useState(null);
+    const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [textInput, setTextInput] = useState("");
     const router = useRouter();
@@ -179,8 +181,8 @@ export default function VoiceAssistant() {
     useEffect(() => {
         if (history.length === 0) {
             const greeting = userContext?.fullName
-                ? `Assalamu Alaikum, ${userContext.fullName}! ${userContext.peopleHelped > 0 ? `Your support has helped ${userContext.peopleHelped} ${userContext.peopleHelped === 1 ? 'family' : 'families'} so far.` : ''} How can I help you today?`
-                : "Assalamu Alaikum! I am your True Path Foundation Assistant. How can I help you today?";
+                ? `Assalamu Alaikum, ${userContext.fullName}! I am Aquib. ${userContext.peopleHelped > 0 ? `Your support has helped ${userContext.peopleHelped} ${userContext.peopleHelped === 1 ? 'family' : 'families'} so far.` : ''} How can I help you today?`
+                : "Assalamu Alaikum! I am Aquib, your assistant from True Path Foundation. How can I help you today?";
 
             setHistory([
                 { role: "assistant", text: greeting }
@@ -260,11 +262,35 @@ export default function VoiceAssistant() {
 
     const toggleAssistant = () => {
         setIsExpanded(!isExpanded);
+        setIsMinimized(false);
         if (isRecording) stopRecording();
         if (isSpeaking) {
             synthesisRef.current.cancel();
             setIsSpeaking(false);
         }
+    };
+
+    const handleMinimize = (e) => {
+        e.stopPropagation();
+        setIsMinimized(true);
+        setIsExpanded(false);
+    };
+
+    const handleCloseClick = (e) => {
+        e.stopPropagation();
+        setShowCloseConfirm(true);
+    };
+
+    const confirmClose = () => {
+        const byeMessage = "Assalamu Alaikum! It was a pleasure assisting you. Have a blessed day! Good bye.";
+        setHistory(prev => [...prev, { role: "assistant", text: byeMessage }]);
+        speak(byeMessage);
+
+        setTimeout(() => {
+            clearHistory();
+            setIsExpanded(false);
+            setShowCloseConfirm(false);
+        }, 3000);
     };
 
     const startRecording = async () => {
@@ -451,7 +477,7 @@ export default function VoiceAssistant() {
                 fullName: userContext?.fullName || "Anonymous User",
                 email: userContext?.email || "support@tpfaid.org",
                 queryType: ticketData.category || "General Query",
-                message: ticketData.summary || "User requested support via AI assistant.",
+                message: ticketData.summary || "User requested support via Aquib.",
                 status: "Unresolved"
             };
 
@@ -583,6 +609,7 @@ export default function VoiceAssistant() {
                     className="flex flex-col items-end gap-2 pointer-events-auto cursor-pointer relative"
                     onClick={() => {
                         setIsExpanded(true);
+                        setIsMinimized(false);
                         setShowLauncherGreeting(false);
                     }}
                 >
@@ -598,7 +625,7 @@ export default function VoiceAssistant() {
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                        <span>Salam! I am your assistant.</span>
+                                        <span>Salam! I am Aquib, your assistant.</span>
                                     </div>
                                     <X size={12} className="opacity-50 hover:opacity-100 transition-opacity shrink-0" />
                                 </div>
@@ -645,22 +672,67 @@ export default function VoiceAssistant() {
                                     />
                                 </div>
                                 <div>
-                                    <h3 className="text-white font-bold text-sm tracking-tight">Support Assistant</h3>
+                                    <h3 className="text-white font-bold text-sm tracking-tight">Aquib</h3>
                                     <div className="flex items-center gap-2 mt-0.5">
                                         <WaveformVisualizer isSpeaking={isSpeaking} />
                                     </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
-
-                                <button onClick={clearHistory} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-                                    <Trash2 size={18} />
+                                <button
+                                    onClick={clearHistory}
+                                    className="px-3 py-1.5 text-[10px] font-bold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-all flex items-center gap-1.5"
+                                >
+                                    <Trash2 size={14} />
+                                    <span>CLEAR CHAT</span>
                                 </button>
-                                <button onClick={toggleAssistant} className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+                                <button
+                                    onClick={handleMinimize}
+                                    className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                                    title="Minimize"
+                                >
+                                    <Minimize2 size={18} />
+                                </button>
+                                <button
+                                    onClick={handleCloseClick}
+                                    className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                                    title="Close"
+                                >
                                     <X size={20} />
                                 </button>
                             </div>
                         </div>
+
+                        <AnimatePresence>
+                            {showCloseConfirm && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    className="absolute inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6"
+                                >
+                                    <div className={`${isDarkMode ? 'bg-zinc-900' : 'bg-white'} p-6 rounded-3xl shadow-2xl border ${isDarkMode ? 'border-zinc-800' : 'border-gray-100'} text-center max-w-[280px]`}>
+                                        <AlertCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+                                        <h4 className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>Leave Chat?</h4>
+                                        <p className={`text-sm mb-6 ${isDarkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Do you really want to leave the chat?</p>
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => setShowCloseConfirm(false)}
+                                                className={`flex-1 py-2.5 rounded-xl font-bold text-sm border ${isDarkMode ? 'border-zinc-700 text-zinc-300 hover:bg-zinc-800' : 'border-gray-200 text-gray-600 hover:bg-gray-50'} transition-all`}
+                                            >
+                                                NO
+                                            </button>
+                                            <button
+                                                onClick={confirmClose}
+                                                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-900/10 transition-all"
+                                            >
+                                                YES
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
                         {/* Settings Panel */}
 
@@ -738,7 +810,7 @@ export default function VoiceAssistant() {
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
                                     <div className={`p-3 rounded-2xl rounded-tl-none flex items-center gap-3 shadow-sm border ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'}`}>
                                         <Loader2 className="w-3 h-3 text-emerald-500 animate-spin" />
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Support assistant is Thinking</span>
+                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Aquib is Thinking</span>
                                     </div>
                                 </motion.div>
                             )}

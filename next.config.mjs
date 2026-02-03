@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    unoptimized: process.env.NODE_ENV !== "production",
     remotePatterns: [
       {
         protocol: "https",
@@ -25,6 +26,15 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "cdn.builder.io",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "7000",
+      },
+      {
+        protocol: "https",
+        hostname: "s3.ap-southeast-1.wasabisys.com",
       },
       {
         protocol: "https",

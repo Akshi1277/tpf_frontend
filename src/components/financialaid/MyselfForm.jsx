@@ -4,9 +4,11 @@ import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSlice"
-import { User, Calendar, MapPin, Phone, Mail, CreditCard } from "lucide-react"
+import { User, Calendar, MapPin, Phone, Mail, CreditCard, Check, ChevronLeft } from "lucide-react"
 import LoginModal from "../login/LoginModal"
 import { useSelector } from "react-redux"
+
+import Link from "next/link"
 
 
 export default function MyselfForm({ darkModeFromParent }) {
@@ -33,7 +35,7 @@ export default function MyselfForm({ darkModeFromParent }) {
     dateOfBirth: '',
     maritalStatus: '',
     gender: '',
-    declarationConsent: false,
+    termsAccepted: false,
     permanentAddress: '',
     currentAddress: '',
     sameAddress: false,
@@ -94,7 +96,7 @@ export default function MyselfForm({ darkModeFromParent }) {
 
 
   const requiredFields = {
-    1: ["fullName", "dateOfBirth", "maritalStatus", "gender", "declarationConsent"],
+    1: ["fullName", "dateOfBirth", "maritalStatus", "gender", "termsAccepted"],
     2: ["permanentAddress", "currentAddress", "contactNumber", "email", "idType", "govIdNumber", "govIdDocument"],
     3: ["occupation", "monthlyIncome", "bankNameBranch", "accountNumber", "ifscCode", "numberOfDependents", "bankStatement"],
     4: ["aidType", "hardshipDescription"],
@@ -107,7 +109,7 @@ export default function MyselfForm({ darkModeFromParent }) {
       const value = formData[field];
 
       // Checkbox fields should be true
-      if (field === "declarationConsent" && value !== true) {
+      if ((field === "termsAccepted") && value !== true) {
         return false;
       }
 
@@ -156,7 +158,6 @@ export default function MyselfForm({ darkModeFromParent }) {
       formDataToSend.append('dateOfBirth', formData.dateOfBirth)
       formDataToSend.append('maritalStatus', formData.maritalStatus)
       formDataToSend.append('gender', formData.gender)
-      formDataToSend.append('declarationConsent', formData.declarationConsent)
       formDataToSend.append('permanentAddress', formData.permanentAddress)
       formDataToSend.append('currentAddress', formData.currentAddress)
       formDataToSend.append('sameAddress', formData.sameAddress)
@@ -257,6 +258,21 @@ export default function MyselfForm({ darkModeFromParent }) {
 
       <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-12 sm:py-20`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-2 pb-12 sm:pb-24">
+          {/* Back Button */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-6"
+          >
+            <button
+              onClick={() => router.push('/financial-aid')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${darkMode ? "text-zinc-400 hover:text-white hover:bg-zinc-800" : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"}`}
+            >
+              <ChevronLeft size={20} />
+              <span className="font-medium">Back to Financial Aid</span>
+            </button>
+          </motion.div>
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -420,9 +436,14 @@ export default function MyselfForm({ darkModeFromParent }) {
                         className="sr-only peer"
                         required
                       />
-                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${darkMode ? "border-zinc-500" : "border-zinc-400"
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.gender === 'male'
+                        ? "border-emerald-600 bg-emerald-600"
+                        : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                         }`}>
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                        <Check
+                          className={`w-3.5 h-3.5 text-white transition-opacity ${formData.gender === 'male' ? "opacity-100" : "opacity-0"}`}
+                          strokeWidth={3}
+                        />
                       </div>
                       <span className={`ml-2 sm:ml-3 font-medium text-sm sm:text-base ${formData.gender === 'male' ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
                         Male
@@ -439,9 +460,14 @@ export default function MyselfForm({ darkModeFromParent }) {
                         className="sr-only peer"
                         required
                       />
-                      <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 flex items-center justify-center transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${darkMode ? "border-zinc-500" : "border-zinc-400"
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.gender === 'female'
+                        ? "border-emerald-600 bg-emerald-600"
+                        : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                         }`}>
-                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                        <Check
+                          className={`w-3.5 h-3.5 text-white transition-opacity ${formData.gender === 'female' ? "opacity-100" : "opacity-0"}`}
+                          strokeWidth={3}
+                        />
                       </div>
                       <span className={`ml-2 sm:ml-3 font-medium text-sm sm:text-base ${formData.gender === 'female' ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
                         Female
@@ -449,8 +475,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                     </label>
                   </div>
                   {/* Declaration & Consent */}
-                  <div className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-lg border ${darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"
-                    }`}>
+                  <div className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-lg border ${darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"}`}>
                     <h3 className={`font-bold text-base sm:text-lg mb-3 sm:mb-4 ${darkMode ? "text-white" : "text-zinc-900"}`}>
                       Declaration & Consent
                     </h3>
@@ -460,30 +485,34 @@ export default function MyselfForm({ darkModeFromParent }) {
                       </p>
                     </div>
 
-                    <label className="flex items-start cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        name="declarationConsent"
-                        checked={formData.declarationConsent}
-                        onChange={(e) => setFormData(prev => ({ ...prev, declarationConsent: e.target.checked }))}
-                        className="sr-only peer"
-                        required
-                      />
-                      <div className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
-                        }`}>
-                        <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${formData.declarationConsent
-                        ? 'text-emerald-600'
-                        : darkMode ? "text-zinc-300" : "text-zinc-700"
-                        }`}>
-                        I agree to the declaration and consent terms stated above <span className="text-red-500">*</span>
-                      </span>
-                    </label>
-                  </div>
 
+
+                    {/* Terms and Policies Acceptance */}
+                    <div className={`pt-4 border-t ${darkMode ? 'border-zinc-600' : 'border-zinc-200'}`}>
+                      <label className="flex items-start cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          name="termsAccepted"
+                          checked={formData.termsAccepted}
+                          onChange={(e) => setFormData(prev => ({ ...prev, termsAccepted: e.target.checked }))}
+                          className="sr-only peer"
+                          required
+                        />
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.termsAccepted
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                          }`}>
+                          <Check
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.termsAccepted ? "opacity-100" : "opacity-0"}`}
+                            strokeWidth={3}
+                          />
+                        </div>
+                        <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${formData.termsAccepted ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                          I agree to the <Link href="/policies" className="underline hover:text-emerald-500">Terms and Policies</Link> of True Path Foundation <span className="text-red-500">*</span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Next Button */}
@@ -566,29 +595,34 @@ export default function MyselfForm({ darkModeFromParent }) {
                   </div>
                 </div>
 
-                {/* Checkbox: Same as Current Address */}
                 <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="sameAddress"
-                    checked={formData.sameAddress || false}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-
-                      setFormData((prev) => ({
-                        ...prev,
-                        sameAddress: checked,
-                        permanentAddress: checked ? prev.currentAddress : ""
-                      }));
-                    }}
-                    className="w-4 h-4 cursor-pointer"
-                  />
-                  <label
-                    htmlFor="sameAddress"
-                    className={`text-xs sm:text-sm cursor-pointer ${darkMode ? "text-zinc-300" : "text-zinc-700"
-                      }`}
-                  >
-                    Same as Current Address
+                  <label className="flex items-center cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      id="sameAddress"
+                      checked={formData.sameAddress || false}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData((prev) => ({
+                          ...prev,
+                          sameAddress: checked,
+                          permanentAddress: checked ? prev.currentAddress : ""
+                        }));
+                      }}
+                      className="sr-only peer"
+                    />
+                    <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.sameAddress
+                      ? "border-emerald-600 bg-emerald-600"
+                      : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                      }`}>
+                      <Check
+                        className={`w-3.5 h-3.5 text-white transition-opacity ${formData.sameAddress ? "opacity-100" : "opacity-0"}`}
+                        strokeWidth={3}
+                      />
+                    </div>
+                    <span className={`ml-2 text-xs sm:text-sm font-medium ${formData.sameAddress ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                      Same as Current Address
+                    </span>
                   </label>
                 </div>
 
@@ -671,10 +705,8 @@ export default function MyselfForm({ darkModeFromParent }) {
                             </div>
                           </div>
                           {formData.idType === 'pan' && (
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                              </svg>
+                            <div className="w-5 h-5 rounded-md bg-emerald-600 flex items-center justify-center flex-shrink-0 transition-all">
+                              <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
                           )}
                         </div>
@@ -704,10 +736,8 @@ export default function MyselfForm({ darkModeFromParent }) {
                             </div>
                           </div>
                           {formData.idType === 'aadhar' && (
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-600 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                              </svg>
+                            <div className="w-5 h-5 rounded-md bg-emerald-600 flex items-center justify-center flex-shrink-0 transition-all">
+                              <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
                             </div>
                           )}
                         </div>
@@ -1368,7 +1398,7 @@ export default function MyselfForm({ darkModeFromParent }) {
 
                     <button
                       onClick={handleSubmit}
-                      disabled={!formData.declarationConsent || isLoading}
+                      disabled={!formData.declarationConsent || !formData.termsAccepted || isLoading}
                       className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
                     >
                       {isLoading ? (

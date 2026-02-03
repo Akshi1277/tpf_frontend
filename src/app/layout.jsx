@@ -62,9 +62,6 @@ export default async function RootLayout({ children }) {
         </Providers>
 
 
-        <Script id="disable-right-click" strategy="afterInteractive">
-          {`document.addEventListener('contextmenu', event => event.preventDefault());`}
-        </Script>
       </body>
     </html>
   )
