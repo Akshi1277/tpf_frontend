@@ -639,9 +639,8 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                     <span>Discover inspiring campaigns →</span>
                   </Link>
 
-                  {/* Join as Volunteer link */}
                   <Link
-                    href="/volunteer/register"
+                    href={userInfo?.role === 'volunteer' ? "/profile/vouchers" : "/volunteer/register"}
                     className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-colors
                    ${darkMode
                         ? 'text-emerald-400 hover:bg-zinc-800'
@@ -652,7 +651,9 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                     <div className={`p-1 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
                       <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
                     </div>
-                    <span className="font-semibold tracking-wide">Join as a Volunteer</span>
+                    <span className="font-semibold tracking-wide">
+                      {userInfo?.role === 'volunteer' ? 'Already a Volunteer' : 'Join as a Volunteer'}
+                    </span>
                   </Link>
 
                   {/* Main menu items with icons */}

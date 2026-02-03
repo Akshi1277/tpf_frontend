@@ -279,7 +279,7 @@ export default function Footer({ darkMode }) {
           <div className="flex items-center gap-3 mt-3 mr-6">
             {/* Facebook */}
             <a
-              href="#"
+              href="https://www.facebook.com/share/17zgwH9Ma2/"
               className="social-icon-link group"
               aria-label="Visit our Facebook page"
             >
@@ -301,33 +301,26 @@ export default function Footer({ darkMode }) {
               </svg>
             </a>
 
-            {/* Twitter/X */}
-            <a
-              href="#"
-              className="social-icon-link group"
-              aria-label="Visit our Twitter page"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="transition-all duration-300"
-              >
-                <path
-                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                  fill={darkMode ? "#b8b8b8" : "#4a4a4a"}
-                  className="group-hover:fill-[#6a6a6a] dark:group-hover:fill-[#e8e8e8] transition-colors duration-300"
-                  strokeWidth={darkMode ? "0" : "0.5"}
-                  stroke={darkMode ? "none" : "#4a4a4a"}
-                />
-              </svg>
-            </a>
+            {/* Threads */}
+          <a
+  href="https://www.threads.net/@yourhandle"
+  className="social-icon-link group"
+  aria-label="Visit our Threads page"
+>
+  <Image
+    src="Threads.png"
+    alt="Threads"
+    width={24}
+    height={24}
+    className={`transition-all duration-300 
+      ${darkMode ? "invert opacity-80 group-hover:opacity-100" : "opacity-80 group-hover:opacity-100"}`}
+  />
+</a>
+
 
             {/* YouTube */}
             <a
-              href="#"
+              href="https://youtube.com/@tpfaid?si=P1WQRtDiBftO0uc3"
               className="social-icon-link group"
               aria-label="Visit our YouTube channel"
             >

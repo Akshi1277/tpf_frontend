@@ -13,8 +13,12 @@ import {
   CheckCircle2,
   Check,
   X,
-  Upload
+  Upload,
+  ChevronLeft
 } from "lucide-react"
+
+import Link from "next/link"
+
 import FilePreview from "./FilePreview"
 import { useAppToast } from "@/app/AppToastContext"
 
@@ -24,7 +28,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
   const [showErrorMessage, setShowErrorMessage] = useState(false)
   const [submitFinancialAid, { isLoading }] = useSubmitFinancialAidMutation()
   const [darkMode, setDarkMode] = useState(false)
-  const {showToast} =useAppToast()
+  const { showToast } = useAppToast()
 
 
   useEffect(() => {
@@ -72,7 +76,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     volunteerStrength: "",
     organizeEvents: "",
 
-    declarationConsent: false,
+    termsAccepted: false,
   })
 
   const handleInputChange = (e) => {
@@ -104,10 +108,44 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     setFormData(prev => ({ ...prev, [name]: null }))
   }
 
+  const requiredFields = {
+    1: ["nonProfit", "organizationName", "city", "termsAccepted"],
+    2: ["contactName", "contactNumber", "contactEmail", "designation"],
+    3: ["has80G", "hasFCRA"],
+    4: ["budget", "donorDatabase", "fullTimeFundraising", "crowdfundedBefore", "employeeStrength"],
+    5: ["termsAccepted"]
+  };
+
+  const validateStep = (step) => {
+    if (formData.nonProfit === "no" && step === 3) return true;
+
+    const fields = requiredFields[step];
+    if (!fields) return true;
+
+    for (const field of fields) {
+      const value = formData[field];
+      if ((field === "termsAccepted") && value !== true) {
+        return false;
+      }
+      if (value === "" || value === null || value === undefined) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleNext = (nextStep) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    setCurrentStep(nextStep)
-  }
+    let targetStep = nextStep;
+
+    // Skip Step 3 if not non-profit
+    if (formData.nonProfit === "no") {
+      if (currentStep === 2 && nextStep === 3) targetStep = 4;
+      if (currentStep === 4 && nextStep === 3) targetStep = 2;
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setCurrentStep(targetStep);
+  };
 
   const handleSubmit = async (e) => {
     // allow calling handleSubmit from onClick (no event) or from a form submit event
@@ -115,10 +153,10 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
       e.preventDefault()
     }
 
-    if (!formData.declarationConsent) {
-       showToast({
+    if (!formData.termsAccepted) {
+      showToast({
         type: "error",
-        title: "Please accept the declaration and consent",
+        title: "Please accept the terms and policies",
         message: ' ',
         duration: 2000,
       });
@@ -163,9 +201,6 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
       formDataToSend.append('employeeStrength', formData.employeeStrength || '')
       formDataToSend.append('volunteerStrength', formData.volunteerStrength || '')
       formDataToSend.append('organizeEvents', formData.organizeEvents || '')
-
-      // Declaration
-      formDataToSend.append('declarationConsent', formData.declarationConsent)
 
       // File uploads
       if (formData.certification80G) {
@@ -250,6 +285,21 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
 
       <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-neutral-50"} py-12 sm:py-20`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-2 pb-12 sm:pb-24">
+          {/* Back Button */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-6"
+          >
+            <button
+              onClick={() => router.push('/')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${darkMode ? "text-zinc-400 hover:text-white hover:bg-zinc-800" : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"}`}
+            >
+              <ChevronLeft size={20} />
+              <span className="font-medium">Back to Home</span>
+            </button>
+          </motion.div>
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -352,15 +402,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        {/* Circle Container with Border */}
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.nonProfit === option.value
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.nonProfit === option.value
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
-                          {/* Tick Icon */}
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.nonProfit === option.value ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.nonProfit === option.value ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -382,20 +429,22 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                       >
                         <div className="mt-4 pl-1">
                           <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                            What type of organization are you? (e.g. Private Company, Corporate, etc.) <span className="text-red-500">*</span>
+                            What type of organization are you? <span className="text-red-500">*</span>
                           </label>
-                          <input
-                            type="text"
+                          <select
                             name="organizationTypeDescription"
                             value={formData.organizationTypeDescription}
                             onChange={handleInputChange}
-                            placeholder="Enter organization type"
-                            className={`w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode
-                              ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-                              : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-                              }`}
+                            className={`w-full px-4 py-2.5 sm:py-3 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-800 border-zinc-600 text-white" : "bg-white border-zinc-300 text-zinc-900"}`}
                             required={formData.nonProfit === "no"}
-                          />
+                          >
+                            <option value="">Select type</option>
+                            <option value="Private Limited">Private Limited</option>
+                            <option value="Partnership">Partnership</option>
+                            <option value="Proprietorship">Proprietorship</option>
+                            <option value="Corporate">Corporate</option>
+                            <option value="Other">Other</option>
+                          </select>
                         </div>
                       </motion.div>
                     )}
@@ -457,14 +506,13 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           onChange={() => handleCheckboxChange("causeSupported", cause)}
                           className="sr-only peer"
                         />
-                        {/* Circle Container with Border - Matching Radio Style */}
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.causeSupported.includes(cause)
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.causeSupported.includes(cause)
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           {/* Tick Icon */}
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.causeSupported.includes(cause) ? "opacity-100" : "opacity-0"
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.causeSupported.includes(cause) ? "opacity-100" : "opacity-0"
                               }`}
                             strokeWidth={3}
                           />
@@ -536,55 +584,53 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                     />
                   </div>
 
-                  {/* Question 8: NGO Website URL */}
-                  <div>
-                    <label className={`block text-xs sm:text-sm font-medium mb-2 ${formData.nonProfit === "no"
-                      ? "text-zinc-500"
-                      : darkMode ? "text-zinc-300" : "text-zinc-700"
-                      }`}>
-                      8. NGO Website URL
-                    </label>
-                    <input
-                      type="url"
-                      name="ngoWebsite"
-                      value={formData.ngoWebsite}
-                      onChange={handleInputChange}
-                      placeholder="eg: rahmanfoundation.org"
-                      disabled={formData.nonProfit === "no"}
-                      className={`w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${formData.nonProfit === "no"
-                        ? "bg-zinc-300 border-zinc-400 text-zinc-500 cursor-not-allowed"
-                        : darkMode
-                          ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-                          : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-                        }`}
-                    />
-                  </div>
+                  <AnimatePresence>
+                    {formData.nonProfit !== "no" && formData.nonProfit !== "" && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden mb-6"
+                      >
+                        <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                          8. NGO Website URL
+                        </label>
+                        <input
+                          type="url"
+                          name="ngoWebsite"
+                          value={formData.ngoWebsite}
+                          onChange={handleInputChange}
+                          placeholder="eg: rahmanfoundation.org"
+                          className={`w-full px-4 py-2.5 sm:py-3 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white" : "bg-white border-zinc-300 text-zinc-900"}`}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* Question 9: Tell Us About Your NGO */}
-                {/* Question 9: Tell Us About Your NGO */}
-                <div>
-                  <label className={`block text-xs sm:text-sm font-medium mb-2 ${formData.nonProfit === "no"
-                    ? "text-zinc-500"
-                    : darkMode ? "text-zinc-300" : "text-zinc-700"
-                    }`}>
-                    9. Tell Us About Your NGO/Founder
-                  </label>
-                  <textarea
-                    name="aboutNGO"
-                    value={formData.aboutNGO}
-                    onChange={handleInputChange}
-                    rows={5}
-                    placeholder="Describe your organization and its mission"
-                    disabled={formData.nonProfit === "no"}
-                    className={`w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 ${formData.nonProfit === "no"
-                      ? "bg-zinc-300 border-zinc-400 text-zinc-500 cursor-not-allowed"
-                      : darkMode
-                        ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-                        : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-                      }`}
-                  />
-                </div>
+                <AnimatePresence>
+                  {formData.nonProfit !== "no" && formData.nonProfit !== "" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        9. Tell Us About Your NGO/Founder
+                      </label>
+                      <textarea
+                        name="aboutNGO"
+                        value={formData.aboutNGO}
+                        onChange={handleInputChange}
+                        rows={5}
+                        placeholder="Describe your organization and its mission"
+                        className={`w-full px-4 py-2.5 sm:py-3 text-sm rounded-lg border transition-all resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white" : "bg-white border-zinc-300 text-zinc-900"}`}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Declaration & Consent */}
                 <div className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-lg border ${darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"
@@ -598,35 +644,39 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                     </p>
                   </div>
 
-                  <label className="flex items-start cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      name="declarationConsent"
-                      checked={formData.declarationConsent}
-                      onChange={(e) => setFormData(prev => ({ ...prev, declarationConsent: e.target.checked }))}
-                      className="sr-only peer"
-                      required
-                    />
-                    <div className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all peer-checked:border-emerald-600 peer-checked:bg-emerald-600 ${darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
-                      }`}>
-                      <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${formData.declarationConsent
-                      ? 'text-emerald-600'
-                      : darkMode ? "text-zinc-300" : "text-zinc-700"
-                      }`}>
-                      I agree to the declaration and consent terms stated above <span className="text-red-500">*</span>
-                    </span>
-                  </label>
+                  {/* Terms and Policies Acceptance */}
+                  <div className={`pt-4 border-t ${darkMode ? 'border-zinc-600' : 'border-zinc-200'}`}>
+                    <label className="flex items-start cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        name="termsAccepted"
+                        checked={formData.termsAccepted}
+                        onChange={(e) => setFormData(prev => ({ ...prev, termsAccepted: e.target.checked }))}
+                        className="sr-only peer"
+                        required
+                      />
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.termsAccepted
+                        ? "border-emerald-600 bg-emerald-600"
+                        : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                        }`}>
+                        <Check
+                          className={`w-3.5 h-3.5 text-white transition-opacity ${formData.termsAccepted ? "opacity-100" : "opacity-0"}`}
+                          strokeWidth={3}
+                        />
+                      </div>
+                      <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${formData.termsAccepted ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        I agree to the <Link href="/policies" className="underline hover:text-emerald-500">Terms and Policies</Link> of True Path Foundation <span className="text-red-500">*</span>
+                      </span>
+                    </label>
+                  </div>
                 </div>
 
                 {/* Navigation Button */}
                 <div className="flex justify-end pt-4">
                   <button
+                    disabled={!validateStep(currentStep)}
                     onClick={() => handleNext(2)}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg text-sm sm:text-base"
+                    className={`px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg transition-all shadow-lg text-sm sm:text-base ${!validateStep(currentStep) ? "opacity-50 cursor-not-allowed grayscale" : "hover:from-emerald-700 hover:to-teal-700"}`}
                   >
                     Continue
                   </button>
@@ -726,15 +776,14 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        {/* Circle Container with Border */}
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.designation === role
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        {/* Square Container with Border */}
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.designation === role
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           {/* Tick Icon */}
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.designation === role ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.designation === role ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -758,8 +807,9 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                     Back
                   </button>
                   <button
+                    disabled={!validateStep(currentStep)}
                     onClick={() => handleNext(3)}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg text-sm sm:text-base"
+                    className={`px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg text-sm sm:text-base ${!validateStep(currentStep) ? "opacity-50 cursor-not-allowed grayscale" : ""}`}
                   >
                     Continue
                   </button>
@@ -797,13 +847,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           required={formData.nonProfit !== "no"}
                           disabled={formData.nonProfit === "no"}
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.has80G === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.has80G === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.has80G === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.has80G === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -843,13 +892,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           required={formData.nonProfit !== "no"}
                           disabled={formData.nonProfit === "no"}
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.hasFCRA === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.hasFCRA === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.hasFCRA === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.hasFCRA === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -873,8 +921,9 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                     Back
                   </button>
                   <button
+                    disabled={!validateStep(currentStep)}
                     onClick={() => handleNext(4)}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg text-sm sm:text-base"
+                    className={`px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg text-sm sm:text-base ${!validateStep(currentStep) ? "opacity-50 cursor-not-allowed grayscale" : ""}`}
                   >
                     Continue
                   </button>
@@ -911,13 +960,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.budget === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.budget === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.budget === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.budget === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -946,13 +994,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.donorDatabase === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.donorDatabase === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.donorDatabase === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.donorDatabase === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -981,13 +1028,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.fullTimeFundraising === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.fullTimeFundraising === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.fullTimeFundraising === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.fullTimeFundraising === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -1016,13 +1062,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.crowdfundedBefore === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.crowdfundedBefore === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.crowdfundedBefore === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.crowdfundedBefore === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -1051,13 +1096,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.employeeStrength === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.employeeStrength === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.employeeStrength === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.employeeStrength === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -1086,13 +1130,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.volunteerStrength === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.volunteerStrength === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.volunteerStrength === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.volunteerStrength === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -1121,13 +1164,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.organizeEvents === option
-                          ? "border-emerald-600"
-                          : darkMode ? "border-zinc-500" : "border-zinc-400"
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.organizeEvents === option
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
                           <Check
-                            className={`w-3.5 h-3.5 text-emerald-600 transition-opacity ${formData.organizeEvents === option ? "opacity-100" : "opacity-0"
-                              }`}
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.organizeEvents === option ? "opacity-100" : "opacity-0"}`}
                             strokeWidth={3}
                           />
                         </div>
@@ -1308,7 +1350,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                     </button>
                     <button
                       onClick={handleSubmit}
-                      disabled={!formData.declarationConsent || isLoading}
+                      disabled={!formData.termsAccepted || isLoading}
                       className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
                     >
                       {isLoading ? 'Submitting...' : 'Submit'}
