@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { currency } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { Heart } from 'lucide-react';
+import { FiShare2 } from "react-icons/fi";
 import ShareModal from "./ShareModal"
 import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
 import { useSelector } from 'react-redux';
@@ -192,13 +193,7 @@ export default function CampaignCard({ campaign, darkMode }) {
                     setOpenShare(true);
                   }}
                   className="flex items-center gap-1 text-zinc-300 hover:text-emerald-400 transition-colors cursor-pointer">
-                  <Image
-                    src="/share.svg"
-                    alt="Share"
-                    width={20}
-                    height={20}
-                    className="w-4 h-4 sm:w-5 sm:h-5 rotate-45"
-                  />
+                    <FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
               <div className="flex items-center gap-1 text-[10px] sm:text-xs bg-emerald-900/40 px-2 sm:px-3 py-1 rounded-full">
@@ -329,13 +324,7 @@ export default function CampaignCard({ campaign, darkMode }) {
                 setOpenShare(true);
               }}
               className={`flex items-center gap-1 transition-colors cursor-pointer ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'}`}>
-              <Image
-                src="/share.svg"
-                alt="Share"
-                width={20}
-                height={20}
-                className="w-4 h-4 sm:w-5 sm:h-5 rotate-45"
-              />
+                <FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
           {campaign.zakatVerified && (
