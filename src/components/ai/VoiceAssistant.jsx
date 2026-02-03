@@ -194,7 +194,7 @@ export default function VoiceAssistant() {
         if (!isExpanded) {
             timer = setTimeout(() => {
                 setShowLauncherGreeting(true);
-            }, 3000);
+            }, 3500);
         } else {
             setShowLauncherGreeting(false);
         }
@@ -556,7 +556,7 @@ export default function VoiceAssistant() {
 
 
     return (
-        <div className={`fixed bottom-6 right-6 z-[1000000] flex flex-col items-end gap-3 pointer-events-none`}>
+        <div className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[1000000] flex flex-col items-end gap-3 pointer-events-none transition-all duration-300`}>
             {/* Custom Scrollbar Styles */}
             <style jsx>{`
                 .custom-scrollbar::-webkit-scrollbar {
@@ -592,11 +592,15 @@ export default function VoiceAssistant() {
                                 initial={{ opacity: 0, x: 20, y: 10, scale: 0.5 }}
                                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, x: 20, scale: 0.5 }}
-                                className={`absolute bottom-full right-0 mb-4 px-4 py-2 rounded-2xl rounded-br-none shadow-lg border whitespace-nowrap text-xs font-bold ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-100' : 'bg-white border-emerald-100 text-emerald-900'}`}
+                                onClick={(e) => { e.stopPropagation(); setShowLauncherGreeting(false); }}
+                                className={`absolute bottom-full right-0 mb-3 px-3 py-2 rounded-2xl rounded-br-none shadow-lg border whitespace-normal sm:whitespace-nowrap max-w-[150px] sm:max-w-none text-[10px] sm:text-xs font-bold leading-tight cursor-pointer ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-100' : 'bg-white border-emerald-100 text-emerald-900'}`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                    Salam! I am your assistant.
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                        <span>Salam! I am your assistant.</span>
+                                    </div>
+                                    <X size={12} className="opacity-50 hover:opacity-100 transition-opacity shrink-0" />
                                 </div>
                                 <motion.div
                                     className="absolute -bottom-2 right-4 w-4 h-4 rotate-45 border-r border-b"

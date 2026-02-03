@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Heart, Lock, Info, Check, AlertCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import LoginModal from '../login/LoginModal';
@@ -157,37 +157,39 @@ export default function DonationCard({
   /* ------------------------------
      Cashfree Redirect
   ------------------------------ */
-  useEffect(() => {
-    if (!cashfreeData?.paymentSessionId) return;
+const checkoutStartedRef = useRef(false);
 
-    const loadCashfree = () => {
-      const cashfree = new window.Cashfree({
-        mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || "sandbox",
-        // use "production" in prod
-      });
+useEffect(() => {
+  if (!cashfreeData?.paymentSessionId) return;
+  if (checkoutStartedRef.current) return;
 
-      cashfree.checkout({
-        paymentSessionId: cashfreeData.paymentSessionId,
-        redirectTarget: "_self",
-      });
-    };
+  checkoutStartedRef.current = true;
 
-    if (window.Cashfree) {
-      loadCashfree();
-      return;
-    }
+  const startCheckout = () => {
+    const cashfree = new window.Cashfree({
+      mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || "sandbox",
+    });
+    
+    cashfree.checkout({
+      paymentSessionId: cashfreeData.paymentSessionId,
+      redirectTarget: "_self",
+    });
+  };
 
-    const script = document.createElement("script");
-    script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
-    script.async = true;
-    script.onload = loadCashfree;
+  if (window.Cashfree) {
+    startCheckout();
+    return;
+  }
 
-    document.body.appendChild(script);
+  const script = document.createElement("script");
+  script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+  script.async = true;
+  script.onload = startCheckout;
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, [cashfreeData]);
+  document.body.appendChild(script);
+}, [cashfreeData]);
+
+
 
 
   return (
