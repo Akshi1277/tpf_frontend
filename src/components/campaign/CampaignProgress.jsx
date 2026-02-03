@@ -328,10 +328,12 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 />
                 <TrustItem
                   darkMode={darkMode}
-                  title="Multiple Payment Options"
-                  subtitle="UPI, Cards, Net Banking & Wallets"
+                  title="Payment Modes Accepted"
+                  subtitle="UPI, Credit & Debit Cards, Wallets, Net Banking, Pay Later & Cardless EMI via secure payment gateway"
                   icon={<CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />}
                 />
+
+
                 <TrustItem
                   darkMode={darkMode}
                   title="Platform Sustainability"

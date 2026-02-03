@@ -1,14 +1,10 @@
-// ============================================================================
-// LoginModal.jsx - Fixed responsive version
-// ============================================================================
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect, useState, useRef } from "react"
-import { ArrowRight, ArrowLeft, Check } from "lucide-react"
+import { ArrowRight, ArrowLeft, Check, X } from "lucide-react"
 import { useSendOtpMutation, useVerifyOtpMutation } from "@/utils/slices/authApiSlice"
 import { useDispatch } from "react-redux"
-import { toast } from "react-toastify"
 import { setCredentials } from "@/utils/slices/authSlice"
 import { useAppToast } from "@/app/AppToastContext"
 import SignupModal from "./SignupModal"
@@ -22,6 +18,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     const [showSuccess, setShowSuccess] = useState(false)
     const [showSignup, setShowSignup] = useState(false)
     const justOpenedRef = useRef(false)
+    const [resendCooldown, setResendCooldown] = useState(0)
 
     const otpInputs = useRef([])
     const mobileInputRef = useRef(null)
@@ -36,6 +33,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
             const res = await sendOtp({ mobileNo: mobile, type: "login" }).unwrap()
            
             setStep(2)
+            setResendCooldown(30)
             setTimeout(() => otpInputs.current[0]?.focus(), 300)
         } catch (error) {
             showToast({
@@ -59,7 +57,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
             showToast({
                 type: "success",
                 title: "Welcome Back!",
-                message: `Salam ${res.user.fullName} ! from TPF`,
+                message: `Salam ${res.user.fullName}! from TPF`,
                 duration: 2000,
             });
             setShowSuccess(true)
@@ -72,7 +70,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
             console.error("OTP verification failed:", err)
             showToast({
                 type: "error",
-                title: "Invalid Otp",
+                title: "Invalid OTP",
                 message: 'Please try again!',
                 duration: 2000,
             });
@@ -86,7 +84,8 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
         setOtp(['', '', '', ''])
         setStep(1)
         setShowSuccess(false)
-        window.lenis?.start();   // safety
+        setResendCooldown(0)
+        window.lenis?.start()
         onClose()
     }
 
@@ -128,22 +127,25 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     }
 
     const handleResendOtp = async () => {
+        if (resendCooldown > 0 || sendingOtp) return
+
         try {
-            const res = await sendOtp({ mobileNo: mobile, type: "login" }).unwrap()
+            await sendOtp({ mobileNo: mobile, type: "login" }).unwrap()
            
             showToast({
                 type: "success",
-                title: "Otp Resent Successfully!",
+                title: "OTP Resent Successfully!",
                 message: '',
                 duration: 2000,
             });
             setOtp(['', '', '', ''])
+            setResendCooldown(30)
             otpInputs.current[0]?.focus()
         } catch (error) {
             console.error(error)
             showToast({
                 type: "error",
-                title: "Failed to Resent Otp",
+                title: "Failed to Resend OTP",
                 message: 'Please try again!',
                 duration: 2000,
             });
@@ -168,44 +170,46 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
         onLoginSuccess?.(user)
     }
 
+    // Resend cooldown timer
     useEffect(() => {
-        if (!isOpen) return;
+        if (resendCooldown > 0) {
+            const timer = setTimeout(() => {
+                setResendCooldown(prev => prev - 1)
+            }, 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [resendCooldown])
 
-        // 1) Stop Lenis completely
-        window.lenis?.stop();
+    // Scroll lock
+    useEffect(() => {
+        if (!isOpen) return
 
-        // 2) Hard block wheel + touch
+        window.lenis?.stop()
+
         const blockScroll = (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            return false;
-        };
+            e.stopPropagation()
+            e.preventDefault()
+            return false
+        }
 
-        // 3) Apply listeners at capture phase
-        document.addEventListener("wheel", blockScroll, { passive: false, capture: true });
-        document.addEventListener("touchmove", blockScroll, { passive: false, capture: true });
-        document.addEventListener("scroll", blockScroll, { passive: false, capture: true });
+        document.addEventListener("wheel", blockScroll, { passive: false, capture: true })
+        document.addEventListener("touchmove", blockScroll, { passive: false, capture: true })
+        document.addEventListener("scroll", blockScroll, { passive: false, capture: true })
 
-        // 4) Also lock body as fallback
-        const original = document.body.style.overflow;
-        document.body.style.overflow = "hidden";
+        const original = document.body.style.overflow
+        document.body.style.overflow = "hidden"
 
         return () => {
-            document.removeEventListener("wheel", blockScroll, true);
-            document.removeEventListener("touchmove", blockScroll, true);
-            document.removeEventListener("scroll", blockScroll, true);
+            document.removeEventListener("wheel", blockScroll, true)
+            document.removeEventListener("touchmove", blockScroll, true)
+            document.removeEventListener("scroll", blockScroll, true)
 
-            document.body.style.overflow = original;
+            document.body.style.overflow = original
+            window.lenis?.start()
+        }
+    }, [isOpen])
 
-            // Restart Lenis
-            window.lenis?.start();
-        };
-    }, [isOpen]);
-
-
-
-
-
+    // Track modal just opened
     useEffect(() => {
         if (isOpen) {
             justOpenedRef.current = true
@@ -215,18 +219,20 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
         }
     }, [isOpen])
 
+    // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!isOpen) return
             if (justOpenedRef.current) return
-            if (e.key === 'Enter') {
+            
+            if (e.key === 'Escape' && !showSuccess) {
+                handleClose()
+            } else if (e.key === 'Enter') {
                 if (step === 1 && mobile.length === 10) {
                     handleLogin()
                 } else if (step === 2 && otp.join('').length === 4) {
                     handleOtpSubmit()
                 }
-            } else if (e.key === 'Escape' && !showSuccess) {
-                handleClose()
             }
         }
 
@@ -247,26 +253,42 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
                         />
 
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 pointer-events-none">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto">
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                                 transition={{ duration: 0.2, ease: "easeOut" }}
-                                className={`relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden rounded-2xl sm:rounded-3xl border-2 shadow-2xl pointer-events-auto ${darkMode ? "bg-zinc-900 border-emerald-500/30" : "bg-white border-emerald-200"
-                                    }`}
+                                className={`relative w-full max-w-4xl my-auto rounded-2xl sm:rounded-3xl border-2 shadow-2xl pointer-events-auto ${
+                                    darkMode ? "bg-zinc-900 border-emerald-500/30" : "bg-white border-emerald-200"
+                                }`}
                             >
+                                {/* Close button */}
+                                <button
+                                    onClick={handleClose}
+                                    disabled={showSuccess}
+                                    className={`absolute top-3 right-3 sm:top-4 sm:right-4 z-30 p-2 rounded-full transition-all ${
+                                        darkMode 
+                                            ? "hover:bg-zinc-800 text-zinc-400 hover:text-white" 
+                                            : "hover:bg-gray-100 text-gray-400 hover:text-gray-900"
+                                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                >
+                                    <X className="w-5 h-5" strokeWidth={2} />
+                                </button>
+
                                 {/* Background decorations */}
                                 <div className="absolute inset-0 overflow-hidden rounded-2xl sm:rounded-3xl pointer-events-none">
                                     <div
-                                        className={`absolute inset-0 ${darkMode
-                                            ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
-                                            : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
-                                            }`}
+                                        className={`absolute inset-0 ${
+                                            darkMode
+                                                ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
+                                                : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
+                                        }`}
                                         style={{ backgroundSize: '48px 48px' }}
                                     />
-                                    <div className={`absolute top-0 right-0 w-64 h-64 sm:w-[400px] sm:h-[400px] rounded-full blur-[100px] ${darkMode ? "bg-emerald-950/30" : "bg-emerald-50"
-                                        }`} />
+                                    <div className={`absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 rounded-full blur-[80px] sm:blur-[100px] ${
+                                        darkMode ? "bg-emerald-950/30" : "bg-emerald-50"
+                                    }`} />
                                 </div>
 
                                 {/* Success overlay */}
@@ -307,22 +329,12 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                     )}
                                 </AnimatePresence>
 
-                                {/* Main content - Hide scrollbar */}
-                                <div className="relative z-10 grid md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8 md:p-12 overflow-y-auto max-h-[95vh] sm:max-h-[90vh] scrollbar-hide">
-                                    <style jsx>{`
-                                        .scrollbar-hide::-webkit-scrollbar {
-                                            display: none;
-                                        }
-                                        .scrollbar-hide {
-                                            -ms-overflow-style: none;
-                                            scrollbar-width: none;
-                                        }
-                                    `}</style>
-
+                                {/* Main content */}
+                                <div className="relative z-10 grid md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8 md:p-10 lg:p-12">
                                     {/* Left side - Hidden on mobile */}
                                     <div className="hidden md:flex flex-col justify-center space-y-6 lg:space-y-8">
                                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-                                            <h2 className={`text-3xl lg:text-4xl xl:text-5xl font-bold leading-tight ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                            <h2 className={`text-2xl lg:text-3xl xl:text-4xl font-bold leading-tight ${darkMode ? "text-white" : "text-gray-900"}`}>
                                                 Welcome to<br />
                                                 <span className="relative inline-block mt-2">
                                                     <span className="relative z-10 bg-gradient-to-r from-emerald-600 to-teal-600 text-transparent bg-clip-text">
@@ -377,8 +389,9 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                         </label>
                                                         <div className="relative group">
                                                             <div className={`absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition-opacity duration-300`} />
-                                                            <div className={`relative flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl border-2 transition-all ${darkMode ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500" : "bg-white border-gray-200 group-focus-within:border-emerald-500"
-                                                                }`}>
+                                                            <div className={`relative flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl border-2 transition-all ${
+                                                                darkMode ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500" : "bg-white border-gray-200 group-focus-within:border-emerald-500"
+                                                            }`}>
                                                                 <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                                                                     <svg className="w-5 h-3 sm:w-6 sm:h-4" viewBox="0 0 30 20">
                                                                         <rect width="30" height="6.67" fill="#FF9933" />
@@ -395,8 +408,9 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                                     value={mobile}
                                                                     onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
                                                                     placeholder="10-digit number"
-                                                                    className={`flex-1 text-base md:text-lg font-medium outline-none bg-transparent ${darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"
-                                                                        }`}
+                                                                    className={`flex-1 text-base md:text-lg font-medium outline-none bg-transparent ${
+                                                                        darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"
+                                                                    }`}
                                                                 />
                                                             </div>
                                                         </div>
@@ -455,8 +469,9 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                                     onChange={(e) => handleOtpChange(index, e.target.value)}
                                                                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
                                                                     onPaste={handleOtpPaste}
-                                                                    className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-center text-xl sm:text-2xl font-bold rounded-xl border-2 outline-none transition-all ${darkMode ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500" : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
-                                                                        } ${digit ? 'border-emerald-500' : ''}`}
+                                                                    className={`w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 text-center text-lg sm:text-xl md:text-2xl font-bold rounded-xl border-2 outline-none transition-all ${
+                                                                        darkMode ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500" : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
+                                                                    } ${digit ? 'border-emerald-500' : ''}`}
                                                                 />
                                                             ))}
                                                         </div>
@@ -478,9 +493,10 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
 
                                                         <button
                                                             type="button"
-                                                            onClick={() => { setStep(1); setOtp(['', '', '', '']) }}
-                                                            className={`py-2.5 sm:py-3 px-6 rounded-xl font-medium text-xs sm:text-sm transition-all flex items-center justify-center gap-2 ${darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                                                                }`}
+                                                            onClick={() => { setStep(1); setOtp(['', '', '', '']); setResendCooldown(0) }}
+                                                            className={`py-2.5 sm:py-3 px-6 rounded-xl font-medium text-xs sm:text-sm transition-all flex items-center justify-center gap-2 ${
+                                                                darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                                            }`}
                                                         >
                                                             <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />
                                                             Change Number
@@ -492,10 +508,10 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                                                         <button
                                                             type="button"
                                                             onClick={handleResendOtp}
-                                                            disabled={sendingOtp}
-                                                            className="font-semibold text-emerald-600 hover:text-emerald-700 disabled:opacity-50 transition-colors"
+                                                            disabled={sendingOtp || resendCooldown > 0}
+                                                            className="font-semibold text-emerald-600 hover:text-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                                         >
-                                                            Resend code
+                                                            {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
                                                         </button>
                                                     </p>
                                                 </motion.div>
@@ -509,7 +525,7 @@ function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
                 )}
             </AnimatePresence>
 
-            {/* Signup Modal with smooth transition */}
+            {/* Signup Modal */}
             <SignupModal
                 isOpen={showSignup}
                 onClose={() => setShowSignup(false)}
