@@ -19,6 +19,7 @@ import ShareModal from "../ui/ShareModal";
 import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
+import { FiShare2 } from "react-icons/fi";
 
 export default function CampaignProgress({ darkMode, campaign }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -125,7 +126,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
                       ? "text-zinc-400 hover:text-red-400"
                       : "text-zinc-600 hover:text-red-600"
                     }`}
-                  title={saved ? "Remove from wishlist" : "Add to wishlist"}
+                  title={saved ? "Remove from Wishlist" : "Add to Wishlist"}
                 >
                   <Heart
                     className="w-5 h-5 sm:w-6 sm:h-6"
@@ -133,23 +134,38 @@ export default function CampaignProgress({ darkMode, campaign }) {
                   />
                 </button>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpenShare(true);
-                  }}
-                  className={`flex items-center gap-1 transition-all duration-200 hover:scale-110 ${darkMode ? 'text-zinc-400 hover:text-emerald-400' : 'text-zinc-600 hover:text-emerald-600'
-                    }`}
-                  title="Share campaign"
-                >
-                  <Image
-                    src="/share.svg"
-                    alt="Share"
-                    width={24}
-                    height={24}
-                    className="w-5 h-5 sm:w-6 sm:h-6 rotate-45"
-                  />
-                </button>
+
+                <div className="relative inline-block">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenShare(true);
+                    }}
+                    className={`peer flex items-center gap-1 transition-all duration-200 hover:scale-110 ${darkMode
+                        ? "text-zinc-400 hover:text-emerald-400"
+                        : "text-zinc-600 hover:text-emerald-600"
+                      }`}
+                  >
+                    <FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </button>
+
+                  <span
+                    className="
+      absolute -top-9 left-1/2 -translate-x-1/2
+      whitespace-nowrap rounded-md bg-zinc-900 text-white
+      text-[11px] px-2 py-1
+      opacity-0 scale-95
+      peer-hover:opacity-100
+      peer-hover:scale-100
+      transition-all duration-200
+      pointer-events-none
+      z-50
+    "
+                  >
+                    Share this Campaign
+                  </span>
+                </div>
+
               </div>
             </div>
 
