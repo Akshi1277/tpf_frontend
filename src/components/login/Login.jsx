@@ -13,6 +13,8 @@ import { useAppToast } from "@/app/AppToastContext"
 export default function LoginPage({ darkMode }) {
   const router = useRouter()
   const dispatch = useDispatch()
+  const [loginMethod, setLoginMethod] = useState("email"); // "email" | "mobile"
+  const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
   const { showToast } = useAppToast()
@@ -22,27 +24,47 @@ export default function LoginPage({ darkMode }) {
   const [verifyOtp, { isLoading: verifyingOtp }] = useVerifyOtpMutation()
 
   const handleLogin = async () => {
-
-    if (mobile.length !== 10) return
     try {
-      const res = await sendOtp({ mobileNo: mobile, type: "login" }).unwrap();
+      if (loginMethod === "email") {
+        if (!email || !email.includes("@")) {
+          showToast({
+            type: "error",
+            title: "Invalid Email",
+            message: "Please enter a valid email address",
+            duration: 2000,
+          });
+          return;
+        }
 
+        await sendOtp({
+          email,
+          loginMethod: "email",
+          purpose: "login",
+          type:"login",
+        }).unwrap();
+      }
 
-      // show OTP only for development
+      if (loginMethod === "mobile") {
+        if (mobile.length !== 10) return;
 
+        await sendOtp({
+          mobileNo: mobile,
+          loginMethod: "mobile",
+          purpose: "login",
+          type: "login",
+        }).unwrap();
+      }
 
-      setStep(2)
-    }
-    catch (error) {
+      setStep(2);
+    } catch (error) {
       showToast({
         type: "error",
         title: "Login Failed",
-        message: error?.data?.message || error?.data?.data?.message,
+        message: error?.data?.message || "Something went wrong",
         duration: 2000,
       });
-      console.error(error)
     }
-  }
+  };
 
 
 
@@ -50,28 +72,33 @@ export default function LoginPage({ darkMode }) {
     if (otp.length !== 4) return;
 
     try {
-      const res = await verifyOtp({ mobileNo: mobile, otp }).unwrap();
-      // Save user in Redux + localStorage
+      const payload =
+        loginMethod === "email"
+          ? { email, otp }
+          : { mobileNo: mobile, otp };
+
+      const res = await verifyOtp(payload).unwrap();
+
       dispatch(setCredentials(res.user));
+
       showToast({
         type: "success",
         title: "Welcome Back!",
-        message: `Salam ${res.user.fullName} ! from TPF`,
+        message: `Salam ${res.user.fullName}!`,
         duration: 2000,
       });
 
-      //setShowSuccess(true);
-      setTimeout(() => router.push('/profile/userprofile'), 2500);
-    } catch (err) {
-      console.error("OTP verification failed:", err);
+      setTimeout(() => router.push("/profile/userprofile"), 2500);
+    } catch {
       showToast({
         type: "error",
-        title: "Invalid Otp",
-        message: 'Please try again!',
+        title: "Invalid OTP",
+        message: "Please try again!",
         duration: 2000,
       });
     }
   };
+
 
 
   return (
@@ -118,8 +145,8 @@ export default function LoginPage({ darkMode }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             className={`fixed top-4 sm:top-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3 ${darkMode
-                ? "bg-zinc-900 border border-emerald-500/20"
-                : "bg-white border border-emerald-200"
+              ? "bg-zinc-900 border border-emerald-500/20"
+              : "bg-white border border-emerald-200"
               }`}
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -243,9 +270,30 @@ export default function LoginPage({ darkMode }) {
                 <div className="space-y-6 sm:space-y-8">
                   <div className="max-w-md mx-auto space-y-12 sm:space-y-8">
                     <AnimatePresence mode="wait">
+                      <div className="flex bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl mb-6">
+                        <button
+                          onClick={() => setLoginMethod("email")}
+                          className={`flex-1 py-2 rounded-lg font-semibold transition-all ${loginMethod === "email"
+                            ? "bg-white dark:bg-zinc-900 text-emerald-600 shadow"
+                            : "text-gray-500"
+                            }`}
+                        >
+                          Email
+                        </button>
+
+                        <button
+                          onClick={() => setLoginMethod("mobile")}
+                          className={`flex-1 py-2 rounded-lg font-semibold transition-all ${loginMethod === "mobile"
+                            ? "bg-white dark:bg-zinc-900 text-emerald-600 shadow"
+                            : "text-gray-500"
+                            }`}
+                        >
+                          Mobile
+                        </button>
+                      </div>
                       {step === 1 && (
                         <motion.div
-                          key="mobile"
+                          key="login-step"
                           initial={{ opacity: 0, x: 10 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -10 }}
@@ -257,46 +305,80 @@ export default function LoginPage({ darkMode }) {
                               Log in to your account
                             </h2>
                             <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                              Enter your mobile number to continue
+                              {loginMethod === "email"
+                                ? "Enter your email address to continue"
+                                : "Enter your mobile number to continue"}
                             </p>
                           </div>
 
-                          <div className="space-y-3">
-                            <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
-                              Mobile Number
-                            </label>
-                            <div className="relative group">
-                              <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur transition-opacity`} />
-                              <div className={`relative flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all ${darkMode
-                                ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500"
-                                : "bg-white border-gray-200 group-focus-within:border-emerald-500"
-                                }`}>
-                                {/* flag / +91 / input exactly as you had */}
-                                <div className="flex items-center gap-2 sm:gap-2.5">
-                                  <svg className="w-6 h-4 sm:w-7 sm:h-5" viewBox="0 0 30 20">
-                                    <rect width="30" height="6.67" fill="#FF9933" />
-                                    <rect y="6.67" width="30" height="6.67" fill="#FFFFFF" />
-                                    <rect y="13.33" width="30" height="6.67" fill="#138808" />
-                                    <circle cx="15" cy="10" r="2.5" fill="#000080" />
-                                  </svg>
-                                  <span className={`text-base sm:text-lg font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>+91</span>
-                                  <div className={`w-px h-5 sm:h-6 ${darkMode ? "bg-zinc-700" : "bg-gray-300"}`} />
+                          {/* EMAIL LOGIN */}
+                          {loginMethod === "email" && (
+                            <div className="space-y-3">
+                              <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                Email Address
+                              </label>
+                              <div className="relative group">
+                                <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur transition-opacity`} />
+                                <div className="relative">
+                                  <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="you@example.com"
+                                    className={`w-full px-4 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 outline-none text-base sm:text-lg transition-all ${darkMode
+                                      ? "bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-emerald-500"
+                                      : "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500"
+                                      }`}
+                                  />
                                 </div>
-                                <input
-                                  type="tel"
-                                  value={mobile}
-                                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                                  placeholder="10-digit number"
-                                  className={`flex-1 text-base sm:text-lg md:text-xl font-medium outline-none bg-transparent ${darkMode ? "text-white placeholder-zinc-600" : "text-gray-900 placeholder-gray-400"}`}
-                                  autoFocus
-                                />
                               </div>
                             </div>
-                          </div>
+                          )}
+
+                          {/* MOBILE LOGIN */}
+                          {loginMethod === "mobile" && (
+                            <div className="space-y-3">
+                              <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                Mobile Number
+                              </label>
+                              <div className="relative group">
+                                <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur transition-opacity`} />
+                                <div className={`relative flex items-center gap-2 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl border-2 transition-all ${darkMode
+                                  ? "bg-zinc-800 border-zinc-700 group-focus-within:border-emerald-500"
+                                  : "bg-white border-gray-200 group-focus-within:border-emerald-500"
+                                  }`}>
+                                  <div className="flex items-center gap-2 sm:gap-2.5">
+                                    <svg className="w-6 h-4 sm:w-7 sm:h-5" viewBox="0 0 30 20">
+                                      <rect width="30" height="6.67" fill="#FF9933" />
+                                      <rect y="6.67" width="30" height="6.67" fill="#FFFFFF" />
+                                      <rect y="13.33" width="30" height="6.67" fill="#138808" />
+                                      <circle cx="15" cy="10" r="2.5" fill="#000080" />
+                                    </svg>
+                                    <span className={`text-base sm:text-lg font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>+91</span>
+                                    <div className={`w-px h-5 sm:h-6 ${darkMode ? "bg-zinc-700" : "bg-gray-300"}`} />
+                                  </div>
+                                  <input
+                                    type="tel"
+                                    value={mobile}
+                                    onChange={(e) =>
+                                      setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
+                                    }
+                                    placeholder="10-digit number"
+                                    className={`flex-1 bg-transparent outline-none text-base sm:text-lg ${darkMode ? "text-white placeholder:text-zinc-500" : "text-gray-900 placeholder:text-gray-400"
+                                      }`}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
 
                           <button
                             onClick={handleLogin}
-                            disabled={mobile.length !== 10}
+                            disabled={
+                              loginMethod === "email"
+                                ? !email.includes("@")
+                                : mobile.length !== 10
+                            }
                             className="w-full group cursor-pointer relative overflow-hidden py-4 px-6 rounded-2xl font-semibold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 transition-transform group-hover:scale-105 group-disabled:scale-100" />
@@ -323,7 +405,11 @@ export default function LoginPage({ darkMode }) {
                                 Enter verification code
                               </h2>
                               <p className={`text-base sm:text-lg ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
-                                Sent to <span className="font-semibold text-emerald-600">+91 {mobile}</span>
+                                Sent to{" "}
+                                <span className="font-semibold text-emerald-600">
+                                  {loginMethod === "email" ? email : `+91 ${mobile}`}
+                                </span>
+
                               </p>
                             </div>
 
@@ -376,8 +462,8 @@ export default function LoginPage({ darkMode }) {
                                       }
                                     }}
                                     className={`flex-1 h-14 sm:h-16 md:h-20 w-14 sm:w-16 md:w-20 text-center text-2xl sm:text-3xl font-bold rounded-xl sm:rounded-2xl border-2 outline-none transition-all ${darkMode
-                                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
-                                        : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
+                                      ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
+                                      : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
                                       }`}
                                   />
                                 ))}
@@ -405,7 +491,7 @@ export default function LoginPage({ darkMode }) {
                                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
                               >
                                 <ArrowLeft className="w-4 h-4" />
-                                Change Number
+                                Change {loginMethod === "email" ? "Email" : "Number"}
                               </button>
                             </div>
 

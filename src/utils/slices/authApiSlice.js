@@ -4,18 +4,18 @@ export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
 
     sendOtp: builder.mutation({
-      query: ({ mobileNo, type }) => ({
+      query: ({ mobileNo, email,type }) => ({
         url: "/user/send-otp",
         method: "POST",
-        body: { mobileNo, type },
+        body: { mobileNo, email,type },
       }),
     }),
 
     verifyOtp: builder.mutation({
-      query: ({ mobileNo, otp }) => ({
+      query: ({ mobileNo, email,otp }) => ({
         url: "/user/verify-otp",
         method: "POST",
-        body: { mobileNo, otp },
+        body: { mobileNo,email, otp },
       }),
     }),
 
