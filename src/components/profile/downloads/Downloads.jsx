@@ -445,10 +445,10 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
     currentY += 8;
     const socialIcons = [
-      { name: 'Instagram', icon: '/instagram.png', url: 'https://www.instagram.com/tpf_aid' },
-      { name: 'Facebook', icon: '/facebook.png', url: 'https://facebook.com/tpfaid' },
-      { name: 'Twitter', icon: '/twitter.png', url: 'https://twitter.com/tpfaid' },
-      { name: 'YouTube', icon: '/youtube.png', url: 'https://youtube.com/@tpfaid' }
+      { name: 'Instagram', icon: '/instagram.png', url: 'https://www.instagram.com/tpf_aid?igsh=MTgyZG8weHdncmI1Yw==' },
+      { name: 'Facebook', icon: '/facebook.png', url: 'https://www.facebook.com/share/17zgwH9Ma2/' },
+      { name: 'Threads', icon: '/Threads.png', url: 'https://www.threads.net/@truepathfoundation' },
+      { name: 'YouTube', icon: '/youtube.png', url: 'https://youtube.com/@tpfaid?si=P1WQRtDiBftO0uc3' }
     ];
 
     const iconSize = 8;
@@ -614,47 +614,143 @@ export default function DownloadsPage({ darkModeFromParent }) {
       });
       const data = await response.json();
 
-      if (data.success) {
-        // Simple CSV escape function
-        const escapeCSV = (str) => {
-          if (str === null || str === undefined) return "";
-          str = String(str);
-          if (str.includes(",") || str.includes("\"") || str.includes("\n")) {
-            return `"${str.replace(/"/g, '""')}"`;
-          }
-          return str;
+      if (data.success && data.donations.length > 0) {
+        const doc = new jsPDF();
+        const donorName = userInfo?.fullName || "Valued Donor";
+        const totalAmount = data.donations.reduce((sum, d) => sum + d.amount, 0);
+
+        // Find date range
+        const dates = data.donations.map(d => new Date(d.date).getTime());
+        const minDate = new Date(Math.min(...dates)).toLocaleDateString('en-IN');
+        const maxDate = new Date(Math.max(...dates)).toLocaleDateString('en-IN');
+        const dateRange = `${minDate} to ${maxDate}`;
+
+        // 1. Logo (Top Left)
+        const logoData = await getLogoDataUrl('/TPFAid-Logo.png');
+        if (logoData) {
+          doc.addImage(logoData.dataUrl, 'PNG', 15, 15, 50, 15);
+        } else {
+          doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(16, 185, 129);
+          doc.text("TPF Aid", 15, 25);
+        }
+
+        // 2. Company Address (Top Right)
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(80, 80, 80);
+        const addressLines = ["True Path Foundation", "123, Charity Lane, Main Street,", "Mumbai - 400001, Maharashtra. https://www.tpfaid.org", "| info@tpfaid.org | (+91) 9876543210"];
+        doc.text(addressLines, 200, 18, { align: "right" });
+
+        // 3. Header: "Acknowledgement of Payment" with Orange Underline
+        doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(40, 40, 40);
+        doc.text("Acknowledgement of Payment (Consolidated)", 15, 50);
+        doc.setDrawColor(245, 158, 11); doc.setLineWidth(1); doc.line(15, 52, 130, 52);
+
+        // 4. Receipt Details Section
+        let currentY = 65;
+        const lineHeight = 8;
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+
+        const addField = (label, value, y, valX = 55) => {
+          doc.setFont("helvetica", "bold"); doc.text(label, 15, y);
+          doc.setFont("helvetica", "normal"); doc.text(value, valX, y);
         };
 
-        const headers = ["Transaction ID", "Recipient", "Cause", "Amount", "Date", "Donation Type", "Tax Eligible", "Payment Mode"];
-        const rows = data.donations.map(d => [
-          d.id,
-          d.recipient,
-          d.cause,
-          d.amount,
-          new Date(d.date).toLocaleDateString('en-IN'),
-          d.donationType,
-          d.taxEligible ? "Yes" : "No",
-          d.paymentMode
-        ]);
+        addField("Receipt Number:", `CONS-${Date.now().toString(36).toUpperCase()}`, currentY);
+        addField("Donor Name:", donorName, currentY + lineHeight);
+        addField("Date Range:", dateRange, currentY + lineHeight * 2);
+        addField("Total Contributions:", `${data.donations.length} Donations`, currentY + lineHeight * 3);
 
-        const csvContent = [
-          headers.join(","),
-          ...rows.map(r => r.map(escapeCSV).join(","))
-        ].join("\n");
+        currentY += lineHeight * 5;
+        doc.setFontSize(11);
+        addField("Total Amount Paid:", `INR ${totalAmount.toLocaleString('en-IN')}`, currentY, 65);
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `TPF_Donations_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Helper for professional buttons
+        const drawProfessionalButton = (x, y, w, h, text, rgb, url) => {
+          doc.setFillColor(220, 220, 220); doc.roundedRect(x + 0.4, y + 0.4, w, h, 1, 1, 'F');
+          doc.setFillColor(rgb[0], rgb[1], rgb[2]); doc.roundedRect(x, y, w, h, 1, 1, 'F');
+          doc.setTextColor(255, 255, 255); doc.setFontSize(8); doc.setFont("helvetica", "bold");
+          doc.text(text, x + (w / 2), y + (h / 2) + 1, { align: "center" });
+          if (url) doc.link(x, y, w, h, { url });
+        };
+
+        // 5. Note Section
+        currentY += 15;
+        doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(40, 40, 40);
+        const noteText = "Note: You can download your 80G Receipt from the TPF portal. ";
+        doc.text(noteText, 15, currentY);
+
+        const noteWidth = doc.getTextWidth(noteText);
+        drawProfessionalButton(15 + noteWidth + 1, currentY - 5.5, 28, 8, "Click Here", [16, 185, 129], "https://www.tpfaid.org/profile/downloads");
+
+        currentY += 8;
+        doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.5); doc.line(15, currentY, 195, currentY);
+
+        currentY += 12;
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(60, 60, 60);
+        const queryText = "For any further queries about your contribution, click ";
+        doc.text(queryText, 15, currentY);
+
+        const queryWidth = doc.getTextWidth(queryText);
+        drawProfessionalButton(15 + queryWidth + 1, currentY - 5.5, 32, 8, "Raise a Query", [59, 130, 246], "https://www.tpfaid.org/contactus");
+
+        // 6. Impact Banner
+        try {
+          const bannerImgPath = '/funding.jpg';
+          const campaignImageData = await getLogoDataUrl(bannerImgPath);
+          if (campaignImageData) {
+            let bannerY = currentY + 15;
+            if (bannerY + 60 > 290) { doc.addPage(); bannerY = 20; }
+            doc.setFillColor(248, 250, 252); doc.roundedRect(15, bannerY, 180, 50, 2, 2, 'F');
+            doc.setTextColor(30, 41, 59); doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+            doc.text("Support the Cause", 25, bannerY + 15);
+            doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(71, 85, 105);
+            doc.text("Your contribution makes a world of difference.", 25, bannerY + 22);
+            doc.text("Share this story to help us reach our goal faster!", 25, bannerY + 27);
+            const ctaX = 25, ctaY = bannerY + 34, ctaW = 45, ctaH = 10;
+            doc.setFillColor(220, 220, 220); doc.roundedRect(ctaX + 0.4, ctaY + 0.4, ctaW, ctaH, 1, 1, 'F');
+            doc.setFillColor(16, 185, 129); doc.roundedRect(ctaX, ctaY, ctaW, ctaH, 1, 1, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+            doc.text("Spread the Word", ctaX + (ctaW / 2), ctaY + 6.5, { align: "center" });
+            doc.link(ctaX, ctaY, ctaW, ctaH, { url: 'https://www.tpfaid.org' });
+            doc.setFillColor(255, 255, 255); doc.rect(130, bannerY + 5, 55, 40, 'F');
+            doc.addImage(campaignImageData.dataUrl, 'JPEG', 131, bannerY + 6, 53, 38, undefined, 'FAST');
+            currentY = bannerY + 50;
+          }
+        } catch (err) { console.error("Banner failed:", err); }
+
+        // 7. Social Media Section
+        currentY += 10;
+        if (currentY + 25 > 290) { doc.addPage(); currentY = 20; }
+        doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(80, 80, 80);
+        doc.text("Connect With Us", 105, currentY, { align: "center" });
+        currentY += 8;
+        const socialIcons = [
+          { name: 'Instagram', icon: '/instagram.png', url: 'https://www.instagram.com/tpf_aid?igsh=MTgyZG8weHdncmI1Yw==' },
+          { name: 'Facebook', icon: '/facebook.png', url: 'https://www.facebook.com/share/17zgwH9Ma2/' },
+          { name: 'Threads', icon: '/Threads.png', url: 'https://www.threads.net/@truepathfoundation' },
+          { name: 'YouTube', icon: '/youtube.png', url: 'https://youtube.com/@tpfaid?si=P1WQRtDiBftO0uc3' }
+        ];
+        const iSize = 8, iSpacing = 12;
+        let sX = (210 - (socialIcons.length * iSize + (socialIcons.length - 1) * iSpacing)) / 2;
+        for (const soc of socialIcons) {
+          const sData = await getLogoDataUrl(soc.icon);
+          if (sData) {
+            doc.addImage(sData.dataUrl, 'PNG', sX, currentY, iSize, iSize);
+            doc.link(sX, currentY, iSize, iSize, { url: soc.url });
+          }
+          sX += iSize + iSpacing;
+        }
+
+        doc.setFontSize(8); doc.setTextColor(150, 150, 150); doc.setFont("helvetica", "italic");
+        doc.text("This is a computer-generated acknowledgement. No signature is required.", 105, 285, { align: "center" });
+
+        doc.save(`Donation_Summary_${donorName.replace(/\s+/g, '_')}.pdf`);
+      } else {
+        alert("No donations found to download.");
       }
     } catch (error) {
-      console.error("CSV Download failed:", error);
-      alert("Failed to download CSV. Please try again.");
+      console.error("PDF Download failed:", error);
+      alert("Failed to generate PDF. Please try again.");
     }
   }
 

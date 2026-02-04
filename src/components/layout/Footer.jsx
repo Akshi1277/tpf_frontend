@@ -302,20 +302,20 @@ export default function Footer({ darkMode }) {
             </a>
 
             {/* Threads */}
-          <a
-  href="https://www.threads.net/@yourhandle"
-  className="social-icon-link group"
-  aria-label="Visit our Threads page"
->
-  <Image
-    src="Threads.png"
-    alt="Threads"
-    width={24}
-    height={24}
-    className={`transition-all duration-300 
+            <a
+              href="https://www.threads.net/@yourhandle"
+              className="social-icon-link group"
+              aria-label="Visit our Threads page"
+            >
+              <Image
+                src="/Threads.png"
+                alt="Threads"
+                width={24}
+                height={24}
+                className={`transition-all duration-300 
       ${darkMode ? "invert opacity-80 group-hover:opacity-100" : "opacity-80 group-hover:opacity-100"}`}
-  />
-</a>
+              />
+            </a>
 
 
             {/* YouTube */}

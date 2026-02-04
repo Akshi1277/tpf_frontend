@@ -845,7 +845,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                   <div className="space-y-6">
                     <div>
                       <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                        Business Registration / Incorporation Document <span className="text-red-500">*</span>
+                        GST / Certificate of Incorporation <span className="text-red-500">*</span>
                       </label>
                       <div className={`relative border-2 border-dashed rounded-lg p-4 sm:p-6 transition-all ${darkMode ? "border-zinc-600 bg-zinc-700" : "border-zinc-300 bg-zinc-50"} hover:border-emerald-500`}>
                         <input
@@ -865,7 +865,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
 
                     <div>
                       <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                        Company PAN Card <span className="text-red-500">*</span>
+                        Business Registration / PAN Card <span className="text-red-500">*</span>
                       </label>
                       <div className={`relative border-2 border-dashed rounded-lg p-4 sm:p-6 transition-all ${darkMode ? "border-zinc-600 bg-zinc-700" : "border-zinc-300 bg-zinc-50"} hover:border-emerald-500`}>
                         <input
@@ -1341,7 +1341,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                           )}
                         </div>
                         <div>
-                          <p className="text-xs text-zinc-500 mb-1">Company PAN Card</p>
+                          <p className="text-xs text-zinc-500 mb-1">Business Registration / PAN Card</p>
                           {formData.panCardDoc ? (
                             <FilePreview file={formData.panCardDoc} darkMode={darkMode} />
                           ) : (

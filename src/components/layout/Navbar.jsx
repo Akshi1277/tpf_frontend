@@ -653,7 +653,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                       <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
                     </div>
                     <span className={`font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${userInfo?.role === 'volunteer'
-                      ? 'from-[#FFE7A3] via-[#D4AF37] to-[#FFE7A3]'
+                      ? (darkMode ? 'from-[#FFE088] via-[#BF953F] to-[#FCF6BA]' : 'from-[#BF953F] via-[#8A6E2F] to-[#BF953F]')
                       : 'from-emerald-400 via-emerald-500 to-emerald-300'
                       }`}>
                       {userInfo?.role === 'volunteer' ? 'TPF Service Hero' : 'Join as a Volunteer'}

@@ -63,42 +63,38 @@ export default function ProcessFlowSection({ darkMode }) {
           >
             {/* Icon */}
             <div className="mb-3 lg:mb-4">
-              <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-xl ${
-                isGradientBg 
-                  ? 'bg-white/20 backdrop-blur-sm' 
-                  : darkMode 
-                    ? 'bg-gradient-to-br from-emerald-600 to-teal-600' 
+              <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-xl ${isGradientBg
+                  ? 'bg-white/20 backdrop-blur-sm'
+                  : darkMode
+                    ? 'bg-gradient-to-br from-emerald-600 to-teal-600'
                     : 'bg-gradient-to-br from-emerald-600 to-teal-600'
-              } flex items-center justify-center relative`}>
+                } flex items-center justify-center relative`}>
                 <Icon className={`w-6 h-6 lg:w-7 lg:h-7 ${isGradientBg ? 'text-white' : 'text-white'}`} strokeWidth={2} />
                 {/* Step number badge */}
-                <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full ${
-                  isGradientBg 
-                    ? 'bg-white text-emerald-600' 
+                <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full ${isGradientBg
+                    ? 'bg-white text-emerald-600'
                     : 'bg-emerald-600 text-white'
-                } flex items-center justify-center text-xs font-bold`}>
+                  } flex items-center justify-center text-xs font-bold`}>
                   {index + 1}
                 </div>
               </div>
             </div>
 
             {/* Content */}
-            <h3 className={`text-sm lg:text-base font-semibold mb-1.5 lg:mb-2 ${
-              isGradientBg 
-                ? 'text-white' 
-                : darkMode 
-                  ? 'text-white' 
+            <h3 className={`text-sm lg:text-base font-semibold mb-1.5 lg:mb-2 ${isGradientBg
+                ? 'text-white'
+                : darkMode
+                  ? 'text-white'
                   : 'text-gray-900'
-            }`}>
+              }`}>
               {step.title}
             </h3>
-            <p className={`text-xs lg:text-sm leading-relaxed ${
-              isGradientBg 
-                ? 'text-white/80' 
-                : darkMode 
-                  ? 'text-zinc-400' 
+            <p className={`text-xs lg:text-sm leading-relaxed ${isGradientBg
+                ? 'text-white/80'
+                : darkMode
+                  ? 'text-zinc-400'
                   : 'text-gray-600'
-            }`}>
+              }`}>
               {step.description}
             </p>
           </motion.div>
@@ -110,11 +106,10 @@ export default function ProcessFlowSection({ darkMode }) {
   return (
     <div>
       {/* For Beneficiaries - White/Dark Background */}
-      <section className={`py-8 lg:py-10 border-b ${
-        darkMode 
-          ? 'bg-zinc-900 border-zinc-800' 
+      <section className={`py-8 lg:py-10 border-b ${darkMode
+          ? 'bg-zinc-900 border-zinc-800'
           : 'bg-white border-gray-200'
-      }`}>
+        }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -123,14 +118,12 @@ export default function ProcessFlowSection({ darkMode }) {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="mb-6 lg:mb-8"
           >
-            <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 lg:mb-2 ${
-              darkMode ? 'text-white' : 'text-gray-900'
-            }`}>
+            <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 lg:mb-2 ${darkMode ? 'text-white' : 'text-gray-900'
+              }`}>
               For Beneficiaries
             </h2>
-            <p className={`text-sm lg:text-base ${
-              darkMode ? 'text-zinc-400' : 'text-gray-600'
-            }`}>
+            <p className={`text-sm lg:text-base ${darkMode ? 'text-zinc-400' : 'text-gray-600'
+              }`}>
               A journey of dignity, trust, and support
             </p>
           </motion.div>
@@ -139,12 +132,15 @@ export default function ProcessFlowSection({ darkMode }) {
         </div>
       </section>
 
-      {/* For Donors - Emerald Gradient Background */}
-      <section className="py-8 lg:py-10 bg-gradient-to-br from-emerald-600 to-teal-600 relative overflow-hidden">
+      {/* For Donors - Subtle Premium Tint */}
+      <section className={`py-12 lg:py-16 relative overflow-hidden ${darkMode
+          ? 'bg-[#0A1A17]'
+          : 'bg-emerald-50/50'
+        }`}>
         {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-10">
+        <div className={`absolute inset-0 opacity-[0.03] ${darkMode ? 'invert' : ''}`}>
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+            backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
             backgroundSize: '32px 32px'
           }} />
         </div>
@@ -155,17 +151,23 @@ export default function ProcessFlowSection({ darkMode }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="mb-6 lg:mb-8"
+            className="mb-8 lg:mb-12"
           >
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 lg:mb-2 text-white">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Contributor Journey</span>
+            </div>
+            <h2 className={`text-2xl md:text-3xl lg:text-4xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'
+              }`}>
               For Donors
             </h2>
-            <p className="text-sm lg:text-base text-white/80">
-              Giving with intention, trust, and accountability
+            <p className={`text-sm lg:text-lg max-w-2xl ${darkMode ? 'text-emerald-100/60' : 'text-zinc-600'
+              }`}>
+              Giving with intention, trust, and accountability. Every contribution is a seed of change.
             </p>
           </motion.div>
 
-          {renderSteps(donorSteps, true)}
+          {renderSteps(donorSteps, false)}
         </div>
       </section>
     </div>
