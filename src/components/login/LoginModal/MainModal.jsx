@@ -7,7 +7,7 @@ import { useSendOtpMutation, useVerifyOtpMutation } from "@/utils/slices/authApi
 import { useDispatch } from "react-redux"
 import { setCredentials } from "@/utils/slices/authSlice"
 import { useAppToast } from "@/app/AppToastContext"
-import SignupModal from "../SignupModal"
+import SignupModal from "../../signup/SignupModal"
 import DesktopLoginModal from "./DesktopModal"
 import MobileLoginModal from "./MobileModal"
 

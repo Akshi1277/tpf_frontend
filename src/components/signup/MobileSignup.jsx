@@ -1,0 +1,484 @@
+"use client"
+
+import { motion, AnimatePresence } from "framer-motion"
+import { ArrowRight, ArrowLeft, Phone, Check, User, Mail, Shield, Zap, Users } from "lucide-react"
+
+export default function MobileSignup({
+    darkMode,
+    step,
+    mobile,
+    setMobile,
+    otp,
+    setOtp,
+    email,
+    setEmail,
+    fullName,
+    setFullName,
+    handleMobileSubmit,
+    handleOtpSubmit,
+    handleFinalSubmit,
+    setStep,
+    sendingOtp,
+    verifyingOtp,
+    updatingProfile
+}) {
+    return (
+        <div className="lg:hidden min-h-screen flex flex-col">
+            {/* Top Section - Branding & Visual */}
+            <div className="relative px-4 pt-24 pb-8">
+                {/* Decorative Background */}
+                <div className="absolute inset-0 overflow-hidden">
+                    <div className={`absolute top-0 left-0 w-72 h-72 rounded-full blur-3xl opacity-20 ${darkMode ? "bg-emerald-500/30" : "bg-emerald-400/40"
+                        }`} />
+                    <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20 ${darkMode ? "bg-teal-500/30" : "bg-teal-400/40"
+                        }`} />
+                </div>
+
+                {/* Content */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="relative z-10 text-center space-y-6"
+                >
+                    {/* Logo/Brand */}
+                    <div>
+                        <h1 className={`text-3xl sm:text-4xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                            {step === 1 ? "Join Us Today" : step === 2 ? "Verify Number" : "Almost Done!"}
+                        </h1>
+                        <p className={`text-sm sm:text-base ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                            {step === 1 ? "Start your journey to make an impact" : step === 2 ? "Enter the code we sent" : "Complete your profile"}
+                        </p>
+                    </div>
+
+                    {/* Feature Pills */}
+                    <div className="flex justify-center gap-2 flex-wrap">
+                        {[
+                            { icon: Shield, text: "Secure", color: "emerald" },
+                            { icon: Zap, text: "Quick", color: "blue" },
+                            { icon: Users, text: "Community", color: "pink" }
+                        ].map(({ icon: Icon, text, color }, i) => (
+                            <motion.div
+                                key={text}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.2 + i * 0.1 }}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${color === "emerald"
+                                        ? darkMode
+                                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                            : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                        : color === "blue"
+                                            ? darkMode
+                                                ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                                : "bg-blue-50 text-blue-700 border border-blue-200"
+                                            : darkMode
+                                                ? "bg-pink-500/20 text-pink-300 border border-pink-500/30"
+                                                : "bg-pink-50 text-pink-700 border border-pink-200"
+                                    }`}
+                            >
+                                <Icon className="w-3.5 h-3.5" />
+                                {text}
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* Form Section */}
+            <div className="flex-1 px-4 pb-8">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className={`rounded-3xl p-6 sm:p-8 relative overflow-hidden ${darkMode
+                            ? "bg-zinc-900/80 backdrop-blur-xl border-2 border-zinc-800"
+                            : "bg-white/90 backdrop-blur-xl border-2 border-gray-100 shadow-xl"
+                        }`}
+                >
+                    {/* Subtle gradient */}
+                    <div className="absolute inset-0 opacity-40">
+                        <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl ${darkMode ? "bg-emerald-500/20" : "bg-emerald-100"
+                            }`} />
+                        <div className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-3xl ${darkMode ? "bg-teal-500/20" : "bg-teal-100"
+                            }`} />
+                    </div>
+
+                    <div className="relative z-10 space-y-6">
+                        <AnimatePresence mode="wait">
+                            {/* STEP 1: Mobile Number */}
+                            {step === 1 && (
+                                <motion.div
+                                    key="mobile-step"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.4 }}
+                                    className="space-y-6"
+                                >
+                                    <div className="text-center sm:text-left">
+                                        <h2 className={`text-2xl sm:text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                            Let's get started
+                                        </h2>
+                                        <p className={`text-sm sm:text-base ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                                            Enter your mobile number to continue
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2.5">
+                                        <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                            Mobile Number
+                                        </label>
+                                        <div className="relative group">
+                                            {/* Glow Effect */}
+                                            <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl opacity-0 group-focus-within:opacity-20 blur transition-opacity duration-300" />
+
+                                            <div
+                                                className={`relative flex items-center gap-3 px-4 py-3.5 sm:py-4 rounded-xl border-2 transition-all ${darkMode
+                                                        ? "bg-zinc-800 border-zinc-700 focus-within:border-emerald-500"
+                                                        : "bg-white border-gray-200 focus-within:border-emerald-500 focus-within:shadow-lg"
+                                                    }`}
+                                            >
+                                                {/* 🇮🇳 Flag + Code */}
+                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                    <svg className="w-6 h-4" viewBox="0 0 30 20">
+                                                        <rect width="30" height="6.67" fill="#FF9933" />
+                                                        <rect y="6.67" width="30" height="6.67" fill="#FFFFFF" />
+                                                        <rect y="13.33" width="30" height="6.67" fill="#138808" />
+                                                        <circle cx="15" cy="10" r="2.5" fill="#000080" />
+                                                    </svg>
+                                                    <span
+                                                        className={`text-base font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"
+                                                            }`}
+                                                    >
+                                                        +91
+                                                    </span>
+                                                    <div
+                                                        className={`w-px h-5 ${darkMode ? "bg-zinc-700" : "bg-gray-300"
+                                                            }`}
+                                                    />
+                                                </div>
+
+                                                {/* Input */}
+                                                <input
+                                                    type="tel"
+                                                    inputMode="numeric"
+                                                    maxLength="10"
+                                                    value={mobile}
+                                                    onChange={(e) =>
+                                                        setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
+                                                    }
+                                                    placeholder="10-digit number"
+                                                    className={`flex-1 bg-transparent text-base sm:text-lg font-medium outline-none ${darkMode
+                                                            ? "text-white placeholder-zinc-500"
+                                                            : "text-gray-900 placeholder-gray-400"
+                                                        }`}
+                                                    autoFocus
+                                                />
+
+                                                {/* Check icon */}
+                                                {mobile.length === 10 && (
+                                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                                                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                                                            <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white" strokeWidth={3} />
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <motion.button
+                                        onClick={handleMobileSubmit}
+                                        disabled={mobile.length !== 10}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="w-full group relative overflow-hidden py-3.5 px-6 rounded-xl font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600" />
+                                        <motion.div
+                                            className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-0"
+                                            whileHover={{ opacity: 1 }}
+                                            transition={{ duration: 0.3 }}
+                                        />
+                                        <div className="relative flex items-center justify-center gap-2 text-white">
+                                            {sendingOtp ? (
+                                                <>
+                                                    <motion.div
+                                                        animate={{ rotate: 360 }}
+                                                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                                                    />
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Continue
+                                                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                                                </>
+                                            )}
+                                        </div>
+                                    </motion.button>
+
+                                    <p className={`text-center text-xs sm:text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                        By continuing, you agree to our{" "}
+                                        <a href="/policies" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                                            Policies
+                                        </a>{" "}
+                                       
+                                    </p>
+                                </motion.div>
+                            )}
+
+                            {/* STEP 2: OTP Verification */}
+                            {step === 2 && (
+                                <motion.div
+                                    key="otp-step"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.4 }}
+                                    className="space-y-6"
+                                >
+                                    <div className="text-center sm:text-left">
+                                        <h2 className={`text-2xl sm:text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                            Enter verification code
+                                        </h2>
+                                        <p className={`text-sm sm:text-base ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                                            Code sent to{" "}
+                                            <span className="font-semibold text-emerald-600">
+                                                +91 {mobile}
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2.5">
+                                        <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                            4-Digit Code
+                                        </label>
+
+                                        {/* Hidden autofill input */}
+                                        <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            autoComplete="one-time-code"
+                                            pattern="[0-9]*"
+                                            maxLength={4}
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                                            className="absolute opacity-0 pointer-events-none"
+                                        />
+
+                                        {/* Visible OTP boxes */}
+                                        <div className="grid grid-cols-4 gap-2.5 sm:gap-3">
+                                            {[...Array(4)].map((_, index) => (
+                                                <motion.input
+                                                    key={index}
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    maxLength={1}
+                                                    value={otp[index] || ""}
+                                                    onChange={(e) => {
+                                                        const digit = e.target.value.replace(/\D/g, "");
+                                                        const newOtp = otp.split("");
+                                                        newOtp[index] = digit;
+                                                        setOtp(newOtp.join(""));
+                                                        if (digit && index < 3) {
+                                                            e.target.nextElementSibling?.focus();
+                                                        }
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Backspace" && !otp[index] && index > 0) {
+                                                            e.target.previousElementSibling?.focus();
+                                                        }
+                                                    }}
+                                                    whileFocus={{ scale: 1.05 }}
+                                                    className={`w-full aspect-square text-center text-2xl sm:text-3xl font-bold rounded-xl border-2 outline-none transition-all ${darkMode
+                                                            ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
+                                                            : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
+                                                        }`}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2.5">
+                                        <motion.button
+                                            onClick={handleOtpSubmit}
+                                            disabled={otp.length !== 4}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            className="w-full group relative overflow-hidden py-3.5 px-6 rounded-xl font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600" />
+                                            <motion.div
+                                                className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-0"
+                                                whileHover={{ opacity: 1 }}
+                                                transition={{ duration: 0.3 }}
+                                            />
+                                            <div className="relative flex items-center justify-center gap-2 text-white">
+                                                {verifyingOtp ? (
+                                                    <>
+                                                        <motion.div
+                                                            animate={{ rotate: 360 }}
+                                                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                                                        />
+                                                        Verifying...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Verify & Continue
+                                                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                                                    </>
+                                                )}
+                                            </div>
+                                        </motion.button>
+
+                                        <motion.button
+                                            onClick={() => setStep(1)}
+                                            whileHover={{ scale: 1.01 }}
+                                            whileTap={{ scale: 0.99 }}
+                                            className={`py-3 px-6 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                                }`}
+                                        >
+                                            <ArrowLeft className="w-3.5 h-3.5" />
+                                            Change Number
+                                        </motion.button>
+                                    </div>
+
+                                    <p className={`text-center text-xs sm:text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                                        Didn't receive?{" "}
+                                        <button className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                                            Resend code
+                                        </button>
+                                    </p>
+                                </motion.div>
+                            )}
+
+                            {/* STEP 3: Profile Details */}
+                            {step === 3 && (
+                                <motion.div
+                                    key="details-step"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.4 }}
+                                    className="space-y-6"
+                                >
+                                    <div className="text-center sm:text-left">
+                                        <h2 className={`text-2xl sm:text-3xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                                            Tell us about yourself
+                                        </h2>
+                                        <p className={`text-sm sm:text-base ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                                            We'll use this to personalize your experience
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-5">
+                                        <div className="space-y-2.5">
+                                            <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                                Full Name
+                                            </label>
+                                            <div className="relative">
+                                                <div className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                                                    }`}>
+                                                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    value={fullName}
+                                                    onChange={(e) => setFullName(e.target.value)}
+                                                    placeholder="John Doe"
+                                                    className={`w-full pl-11 sm:pl-14 pr-4 sm:pr-5 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl border-2 outline-none transition-all ${darkMode
+                                                            ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
+                                                            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
+                                                        }`}
+                                                    autoFocus
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2.5">
+                                            <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                                Email Address
+                                            </label>
+                                            <div className="relative">
+                                                <div className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 ${darkMode ? "text-zinc-500" : "text-gray-400"
+                                                    }`}>
+                                                    <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                </div>
+                                                <input
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    placeholder="john@example.com"
+                                                    className={`w-full pl-11 sm:pl-14 pr-4 sm:pr-5 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl border-2 outline-none transition-all ${darkMode
+                                                            ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
+                                                            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
+                                                        }`}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2.5">
+                                        <motion.button
+                                            onClick={handleFinalSubmit}
+                                            disabled={!email || !fullName}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            className="w-full group relative overflow-hidden py-3.5 px-6 rounded-xl font-semibold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600" />
+                                            <motion.div
+                                                className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 opacity-0"
+                                                whileHover={{ opacity: 1 }}
+                                                transition={{ duration: 0.3 }}
+                                            />
+                                            <div className="relative flex items-center justify-center gap-2 text-white">
+                                                {updatingProfile ? (
+                                                    <>
+                                                        <motion.div
+                                                            animate={{ rotate: 360 }}
+                                                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                                                        />
+                                                        Creating...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Check className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={3} />
+                                                        Complete Sign Up
+                                                    </>
+                                                )}
+                                            </div>
+                                        </motion.button>
+
+                                        <motion.button
+                                            onClick={() => setStep(2)}
+                                            whileHover={{ scale: 1.01 }}
+                                            whileTap={{ scale: 0.99 }}
+                                            className={`py-3 px-6 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                                }`}
+                                        >
+                                            <ArrowLeft className="w-3.5 h-3.5" />
+                                            Back
+                                        </motion.button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                            Already have an account?{" "}
+                            <a href="/login" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                                Sign in
+                            </a>
+                        </p>
+                    </div>
+                </motion.div>
+            </div>
+        </div>
+    )
+}

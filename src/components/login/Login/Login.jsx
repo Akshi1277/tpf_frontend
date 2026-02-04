@@ -160,7 +160,8 @@ export default function LoginPage({ darkMode }) {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4 lg:p-8 pt-4 lg:pt-20">
+     <div className="relative z-10 min-h-screen flex lg:items-center justify-center p-4 lg:p-8 pt-24 lg:pt-20">
+
         <div className="w-full max-w-7xl mx-auto">
           {/* Desktop Login */}
           <DesktopLogin
