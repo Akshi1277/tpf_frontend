@@ -323,7 +323,7 @@ export default function CampaignCard({ campaign, darkMode }) {
           <div className="flex items-center gap-3 sm:gap-4">
             <button
               onClick={handleToggleWishlist}
-              className={`transition-colors cursor-pointer ${saved
+              className={`relative group transition-colors cursor-pointer ${saved
                 ? "text-red-500"
                 : darkMode
                   ? "text-zinc-400 hover:text-red-400"
@@ -331,9 +331,26 @@ export default function CampaignCard({ campaign, darkMode }) {
                 }`}
             >
               <Heart
-                className="w-4 h-4 sm:w-5 sm:h-5"
+                className="peer w-4 h-4 sm:w-5 sm:h-5"
                 fill={saved ? "currentColor" : "none"}
               />
+
+              {/* <span
+                className="
+      absolute -top-9 left-1/2 -translate-x-1/2
+      whitespace-nowrap rounded-md bg-zinc-900 text-white
+      text-[11px] px-2 py-1
+      opacity-0 scale-95
+
+      peer-hover:opacity-100
+      peer-hover:scale-100
+
+      transition-all duration-200
+      pointer-events-none
+    "
+              >
+                Add to Wishlist
+              </span> */}
             </button>
             <button
               onClick={(e) => {

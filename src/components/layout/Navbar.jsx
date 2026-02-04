@@ -23,6 +23,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const [isFocused, setIsFocused] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { showToast } = useAppToast();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const { data: campaignData, isLoading } = useFetchCampaignsQuery();
   const campaigns = campaignData?.campaigns || [];
@@ -652,8 +653,8 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                       <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
                     </div>
                     <span className={`font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${userInfo?.role === 'volunteer'
-                        ? 'from-[#FFE7A3] via-[#D4AF37] to-[#FFE7A3]'
-                        : 'from-emerald-400 via-emerald-500 to-emerald-300'
+                      ? 'from-[#FFE7A3] via-[#D4AF37] to-[#FFE7A3]'
+                      : 'from-emerald-400 via-emerald-500 to-emerald-300'
                       }`}>
                       {userInfo?.role === 'volunteer' ? 'TPF Service Hero' : 'Join as a Volunteer'}
                     </span>
@@ -754,7 +755,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
                     {userInfo ? (
                       <button
-                        onClick={handleLogout}
+                        onClick={() => setShowLogoutModal(true)}
                         disabled={isLoggingOut}
                         className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-all duration-300
     ${isLoggingOut
@@ -831,6 +832,72 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
           </>
         )}
       </header>
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowLogoutModal(false)}
+          />
+
+          {/* Modal */}
+          <div
+            className={`relative w-full max-w-md rounded-2xl p-6 transition-all duration-300 scale-100
+        ${darkMode
+                ? 'bg-zinc-900 border border-zinc-800 text-white'
+                : 'bg-white border border-zinc-200 text-zinc-900'
+              }`}
+          >
+            {/* Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
+                <Heart className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-lg font-semibold text-center mb-2">
+              Are you sure you want to leave?
+            </h3>
+
+            {/* Motivation Text */}
+            <p className={`text-sm text-center mb-6 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'
+              }`}>
+              Staying logged in helps us reduce operational costs and
+              lets your support reach those who need it faster 🤍
+            </p>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              {/* Stay */}
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className={`flex-1 py-2.5 rounded-lg font-medium transition-all
+            ${darkMode
+                    ? 'bg-zinc-800 hover:bg-zinc-700'
+                    : 'bg-zinc-100 hover:bg-zinc-200'
+                  }`}
+              >
+                Stay Logged In
+              </button>
+
+              {/* Logout */}
+              <button
+                onClick={async () => {
+                  setShowLogoutModal(false);
+                  setMobileMenuOpen(false);
+                  await handleLogout();
+                }}
+                className="flex-1 py-2.5 rounded-lg font-medium bg-red-600 hover:bg-red-700 text-white transition-all"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }

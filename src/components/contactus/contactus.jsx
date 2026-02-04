@@ -11,7 +11,7 @@ function HelpCentreSection({ darkMode, isInView }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const [expandedStage, setExpandedStage] = useState(null);
 
-  
+
   const reportableIssues = [
     'Delay or non-receipt of aid or donation receipt',
     'Fraudulent campaigns or suspected misuse',
@@ -265,7 +265,60 @@ function HelpCentreSection({ darkMode, isInView }) {
           ))}
         </div>
       )
+    },
+    {
+      id: 'official',
+      title: 'Official Contact & Legal Information',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 11.25c1.518 0 2.75-1.232 2.75-2.75S13.518 5.75 12 5.75 9.25 6.982 9.25 8.5 10.482 11.25 12 11.25z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25c0 7.5-7.5 11.25-7.5 11.25S4.5 15.75 4.5 8.25a7.5 7.5 0 1115 0z" />
+        </svg>
+      ),
+      content: (
+        <div className="space-y-5 text-sm sm:text-base">
+          <p className={`${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+            The following details are provided in the interest of transparency, regulatory compliance,
+            and public trust.
+          </p>
+
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4`}>
+            <div>
+              <p className="font-semibold">Registered Name</p>
+              <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                True Path Foundation
+              </p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Official Email</p>
+              <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                support@tpfaid.org
+              </p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Contact Number</p>
+              <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                +91-987654321
+              </p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Registered Office Address</p>
+              <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                Legal Address Over here
+              </p>
+            </div>
+          </div>
+
+          <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+            For official correspondence, legal notices, or regulatory matters, please use the details above.
+          </p>
+        </div>
+      )
     }
+
   ];
 
   return (
@@ -334,14 +387,14 @@ export default function ContactPage({ darkMode }) {
   const [createTicket, { isLoading }] = useCreateTicketMutation();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
-  const {showToast} = useAppToast()
+  const { showToast } = useAppToast()
 
   const submitTicket = async () => {
     try {
       // Add await to properly handle the promise
       const result = await createTicket(formData).unwrap();
 
-       showToast({
+      showToast({
         type: "success",
         title: "Message Sent",
         message: 'Our Team will discuss and get back to you soo!',
@@ -366,7 +419,7 @@ export default function ContactPage({ darkMode }) {
       return result; // Return the result
     } catch (error) {
       // toast.error("Failed to submit ticket. Please try again.");
-       showToast({
+      showToast({
         type: "error",
         title: "Failed to submit Ticket",
         message: 'Please try again!',
@@ -508,7 +561,7 @@ export default function ContactPage({ darkMode }) {
 
     // ❌ no API call here
     if (!user) {
-       showToast({
+      showToast({
         type: "error",
         title: "Please login to continue.",
         message: ' ',
@@ -593,427 +646,427 @@ export default function ContactPage({ darkMode }) {
 
   return (
     <>
-    <section
-    ref={ref}
-    className={`py-16 sm:py-20 md:py-24 ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
-        } relative overflow-hidden`}
-    >
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500 rounded-full blur-3xl"></div>
-      </div>
+      <section
+        ref={ref}
+        className={`py-16 sm:py-20 md:py-24 ${darkMode ? 'bg-zinc-900' : 'bg-gray-50'
+          } relative overflow-hidden`}
+      >
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500 rounded-full blur-3xl"></div>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8 sm:mb-10"
-        >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-1 w-12 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"></div>
-            <div className="w-2 h-2 rounded-full bg-teal-500"></div>
-            <div className="h-1 w-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
-          </div>
-
-          <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-            Get In{' '}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 text-transparent bg-clip-text">
-              Touch
-            </span>
-          </h1>
-
-          <p className={`text-base sm:text-lg max-w-2xl mx-auto mb-6 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-            Have a question or need assistance? We're here to help you every step of the way.
-          </p>
-
-          {/* Quote */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className={`inline-block p-4 sm:p-5 rounded-2xl border backdrop-blur-sm ${darkMode
-              ? 'bg-zinc-800/30 border-zinc-700/50'
-              : 'bg-white/60 border-zinc-200'
-              }`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-8 sm:mb-10"
           >
-            <p className={`text-sm sm:text-base italic ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              "And lower your wing in humility to the believers." — Surah Al-Hijr (15:88)
-            </p>
-          </motion.div>
-        </motion.div>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="h-1 w-12 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"></div>
+              <div className="w-2 h-2 rounded-full bg-teal-500"></div>
+              <div className="h-1 w-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
+            </div>
 
-        {/* Features */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10"
-        >
-          {features.map((feature, index) => (
+            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+              Get In{' '}
+              <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 text-transparent bg-clip-text">
+                Touch
+              </span>
+            </h1>
+
+            <p className={`text-base sm:text-lg max-w-2xl mx-auto mb-6 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              Have a question or need assistance? We're here to help you every step of the way.
+            </p>
+
+            {/* Quote */}
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-              className={`p-5 rounded-xl text-center backdrop-blur-sm ${darkMode
-                ? 'bg-zinc-800/30 border border-zinc-700/50'
-                : 'bg-white/60 border border-zinc-200'
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className={`inline-block p-4 sm:p-5 rounded-2xl border backdrop-blur-sm ${darkMode
+                ? 'bg-zinc-800/30 border-zinc-700/50'
+                : 'bg-white/60 border-zinc-200'
                 }`}
             >
-              <div className={`w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center ${darkMode ? 'text-white' : 'text-white'
-                }`}>
-                {feature.icon}
-              </div>
-              <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                {feature.title}
-              </h3>
-              <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                {feature.description}
+              <p className={`text-sm sm:text-base italic ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                "And lower your wing in humility to the believers." — Surah Al-Hijr (15:88)
               </p>
             </motion.div>
-          ))}
-        </motion.div>
+          </motion.div>
 
-        {/* Contact Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="max-w-3xl mx-auto mb-12"
-        >
-          {!submitted ? (
-            <div className={`p-6 sm:p-8 rounded-2xl backdrop-blur-sm border ${darkMode
-              ? 'bg-zinc-800/30 border-zinc-700/50'
-              : 'bg-white/80 border-zinc-200'
-              } shadow-2xl`}>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Full Name */}
-                <div>
-                  <label
-                    htmlFor="fullName"
-                    className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                    </svg>
-                    Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('fullName')}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="Enter your full name"
-                      className={`w-full px-4 py-3 rounded-xl text-base transition-all duration-300 ${darkMode
-                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                        } border-2 ${errors.fullName
-                          ? 'border-red-500'
-                          : focusedField === 'fullName'
-                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                            : ''
-                        } focus:outline-none`}
-                    />
-                  </div>
-                  {errors.fullName && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-sm mt-2 flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                      {errors.fullName}
-                    </motion.p>
-                  )}
+          {/* Features */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10"
+          >
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                className={`p-5 rounded-xl text-center backdrop-blur-sm ${darkMode
+                  ? 'bg-zinc-800/30 border border-zinc-700/50'
+                  : 'bg-white/60 border border-zinc-200'
+                  }`}
+              >
+                <div className={`w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center ${darkMode ? 'text-white' : 'text-white'
+                  }`}>
+                  {feature.icon}
                 </div>
+                <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                  {feature.title}
+                </h3>
+                <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
 
-                {/* Email */}
-                <div>
-                  <label
-                    htmlFor="email"
-                    className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                    </svg>
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('email')}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="your.email@example.com"
-                      className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 ${darkMode
-                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                        } border-2 ${errors.email
-                          ? 'border-red-500'
-                          : focusedField === 'email'
-                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                            : ''
-                        } focus:outline-none`}
-                    />
-                  </div>
-                  {errors.email && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-sm mt-2 flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                      {errors.email}
-                    </motion.p>
-                  )}
-                </div>
-
-                {/* Query Type */}
-                <div>
-                  <label
-                    htmlFor="queryType"
-                    className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
-                    </svg>
-                    Category <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="queryType"
-                      name="queryType"
-                      value={formData.queryType}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('queryType')}
-                      onBlur={() => setFocusedField(null)}
-                      className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 appearance-none cursor-pointer ${darkMode
-                        ? 'bg-zinc-700/50 text-white border-zinc-600'
-                        : 'bg-white text-zinc-900 border-zinc-300'
-                        } border-2 ${errors.queryType
-                          ? 'border-red-500'
-                          : focusedField === 'queryType'
-                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                            : ''
-                        } focus:outline-none`}
-                    >
-                      {queryTypes.map((type) => (
-                        <option
-                          key={type.value}
-                          value={type.value}
-                          className={darkMode ? 'bg-zinc-800' : 'bg-white'}
-                        >
-                          {type.label}
-                        </option>
-                      ))}
-                    </select>
-                    {/* Other Category (Dynamic) */}
-                    {formData.queryType === 'other' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-4"
-                      >
-                        <label
-                          htmlFor="otherCategory"
-                          className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'
-                            }`}
-                        >
-                          Please specify <span className="text-red-500">*</span>
-                        </label>
-
-                        <input
-                          type="text"
-                          id="otherCategory"
-                          name="otherCategory"
-                          value={formData.otherCategory}
-                          onChange={handleChange}
-                          placeholder="Describe your issue briefly"
-                          className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 border-2 ${darkMode
-                            ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                            : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                            } ${errors.otherCategory
-                              ? 'border-red-500'
-                              : 'focus:border-teal-500 focus:shadow-lg focus:shadow-teal-500/20'
-                            } focus:outline-none`}
-                        />
-
-                        {errors.otherCategory && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-red-500 text-sm mt-2"
-                          >
-                            {errors.otherCategory}
-                          </motion.p>
-                        )}
-                      </motion.div>
-                    )}
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                      </svg>
-                    </div>
-                  </div>
-                  {errors.queryType && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-sm mt-2 flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                      {errors.queryType}
-                    </motion.p>
-                  )}
-                </div>
-
-                {/* Message */}
-                <div>
-                  <label
-                    htmlFor="message"
-                    className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-                    </svg>
-                    Your Message <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('message')}
-                      onBlur={() => setFocusedField(null)}
-                      rows="5"
-                      placeholder="Please provide details about your query..."
-                      className={`w-full px-5 py-4 rounded-xl text-base resize-none transition-all duration-300 ${darkMode
-                        ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
-                        : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
-                        } border-2 ${errors.message
-                          ? 'border-red-500'
-                          : focusedField === 'message'
-                            ? 'border-teal-500 shadow-lg shadow-teal-500/20'
-                            : ''
-                        } focus:outline-none`}
-                    />
-                    <div className={`absolute bottom-4 right-4 text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                      {formData.message.length} characters
-                    </div>
-                  </div>
-                  {errors.message && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-500 text-sm mt-2 flex items-center gap-1"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                      {errors.message}
-                    </motion.p>
-                  )}
-                </div>
-
-                {/* Submit Button */}
-                <motion.button
-                  type="submit"
-                  disabled={isLoading}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-500 text-white font-semibold shadow-lg"
-                >
-                  {isLoading ? "Sending..." : "Send Message"}
-                </motion.button>
-
-              </form>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className={`p-10 sm:p-12 rounded-2xl text-center backdrop-blur-sm border ${darkMode
+          {/* Contact Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="max-w-3xl mx-auto mb-12"
+          >
+            {!submitted ? (
+              <div className={`p-6 sm:p-8 rounded-2xl backdrop-blur-sm border ${darkMode
                 ? 'bg-zinc-800/30 border-zinc-700/50'
                 : 'bg-white/80 border-zinc-200'
-                } shadow-2xl`}
-            >
+                } shadow-2xl`}>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Full Name */}
+                  <div>
+                    <label
+                      htmlFor="fullName"
+                      className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      </svg>
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField('fullName')}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder="Enter your full name"
+                        className={`w-full px-4 py-3 rounded-xl text-base transition-all duration-300 ${darkMode
+                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                          } border-2 ${errors.fullName
+                            ? 'border-red-500'
+                            : focusedField === 'fullName'
+                              ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                              : ''
+                          } focus:outline-none`}
+                      />
+                    </div>
+                    {errors.fullName && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-2 flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        {errors.fullName}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                      </svg>
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder="your.email@example.com"
+                        className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 ${darkMode
+                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                          } border-2 ${errors.email
+                            ? 'border-red-500'
+                            : focusedField === 'email'
+                              ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                              : ''
+                          } focus:outline-none`}
+                      />
+                    </div>
+                    {errors.email && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-2 flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        {errors.email}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Query Type */}
+                  <div>
+                    <label
+                      htmlFor="queryType"
+                      className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
+                      </svg>
+                      Category <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="queryType"
+                        name="queryType"
+                        value={formData.queryType}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField('queryType')}
+                        onBlur={() => setFocusedField(null)}
+                        className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 appearance-none cursor-pointer ${darkMode
+                          ? 'bg-zinc-700/50 text-white border-zinc-600'
+                          : 'bg-white text-zinc-900 border-zinc-300'
+                          } border-2 ${errors.queryType
+                            ? 'border-red-500'
+                            : focusedField === 'queryType'
+                              ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                              : ''
+                          } focus:outline-none`}
+                      >
+                        {queryTypes.map((type) => (
+                          <option
+                            key={type.value}
+                            value={type.value}
+                            className={darkMode ? 'bg-zinc-800' : 'bg-white'}
+                          >
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
+                      {/* Other Category (Dynamic) */}
+                      {formData.queryType === 'other' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4"
+                        >
+                          <label
+                            htmlFor="otherCategory"
+                            className={`block text-sm font-semibold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'
+                              }`}
+                          >
+                            Please specify <span className="text-red-500">*</span>
+                          </label>
+
+                          <input
+                            type="text"
+                            id="otherCategory"
+                            name="otherCategory"
+                            value={formData.otherCategory}
+                            onChange={handleChange}
+                            placeholder="Describe your issue briefly"
+                            className={`w-full px-5 py-4 rounded-xl text-base transition-all duration-300 border-2 ${darkMode
+                              ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                              : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                              } ${errors.otherCategory
+                                ? 'border-red-500'
+                                : 'focus:border-teal-500 focus:shadow-lg focus:shadow-teal-500/20'
+                              } focus:outline-none`}
+                          />
+
+                          {errors.otherCategory && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="text-red-500 text-sm mt-2"
+                            >
+                              {errors.otherCategory}
+                            </motion.p>
+                          )}
+                        </motion.div>
+                      )}
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <svg className={`w-5 h-5 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                      </div>
+                    </div>
+                    {errors.queryType && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-2 flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        {errors.queryType}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label
+                      htmlFor="message"
+                      className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                      </svg>
+                      Your Message <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField('message')}
+                        onBlur={() => setFocusedField(null)}
+                        rows="5"
+                        placeholder="Please provide details about your query..."
+                        className={`w-full px-5 py-4 rounded-xl text-base resize-none transition-all duration-300 ${darkMode
+                          ? 'bg-zinc-700/50 text-white placeholder-zinc-400 border-zinc-600'
+                          : 'bg-white text-zinc-900 placeholder-zinc-500 border-zinc-300'
+                          } border-2 ${errors.message
+                            ? 'border-red-500'
+                            : focusedField === 'message'
+                              ? 'border-teal-500 shadow-lg shadow-teal-500/20'
+                              : ''
+                          } focus:outline-none`}
+                      />
+                      <div className={`absolute bottom-4 right-4 text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                        {formData.message.length} characters
+                      </div>
+                    </div>
+                    {errors.message && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-500 text-sm mt-2 flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        {errors.message}
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Submit Button */}
+                  <motion.button
+                    type="submit"
+                    disabled={isLoading}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-500 text-white font-semibold shadow-lg"
+                  >
+                    {isLoading ? "Sending..." : "Send Message"}
+                  </motion.button>
+
+                </form>
+              </div>
+            ) : (
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2, type: "spring" }}
-                className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className={`p-10 sm:p-12 rounded-2xl text-center backdrop-blur-sm border ${darkMode
+                  ? 'bg-zinc-800/30 border-zinc-700/50'
+                  : 'bg-white/80 border-zinc-200'
+                  } shadow-2xl`}
               >
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2, type: "spring" }}
+                  className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center"
+                >
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </motion.div>
+                <motion.h3
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className={`text-2xl sm:text-3xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
+                >
+                  Message Sent Successfully!
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className={`text-base sm:text-lg mb-5 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
+                >
+                  Thank you for reaching out to us.
+                </motion.p>
               </motion.div>
-              <motion.h3
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className={`text-2xl sm:text-3xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}
-              >
-                Message Sent Successfully!
-              </motion.h3>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className={`text-base sm:text-lg mb-5 ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
-              >
-                Thank you for reaching out to us.
-              </motion.p>
-            </motion.div>
-          )}
-        </motion.div>
+            )}
+          </motion.div>
 
-        {/* Help Centre Content - Collapsed Sections */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="max-w-5xl mx-auto mt-12"
-        >
-          <div className={`text-center mb-8 p-6 sm:p-8 rounded-xl ${darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
-            }`}>
-            <h2 className={`text-lg sm:text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-              Raise Your Concerns — We're Here to Listen, Solve, and Support
-            </h2>
-            <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              At TPF Aid, we see every concern as an opportunity to improve — and every question as a responsibility before Allah and humanity.
-              <span className="font-semibold"> You will never be ignored. You will never be alone.</span> If something goes wrong — we'll make it right.
-            </p>
-          </div>
+          {/* Help Centre Content - Collapsed Sections */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="max-w-5xl mx-auto mt-12"
+          >
+            <div className={`text-center mb-8 p-6 sm:p-8 rounded-xl ${darkMode ? 'bg-zinc-800/50' : 'bg-gray-50'
+              }`}>
+              <h2 className={`text-lg sm:text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                Raise Your Concerns — We're Here to Listen, Solve, and Support
+              </h2>
+              <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                At TPF Aid, we see every concern as an opportunity to improve — and every question as a responsibility before Allah and humanity.
+                <span className="font-semibold"> You will never be ignored. You will never be alone.</span> If something goes wrong — we'll make it right.
+              </p>
+            </div>
 
-          <HelpCentreSection darkMode={darkMode} isInView={isInView} />
-        </motion.div>
-      </div>
-    </section>
-        <LoginModal
-          isOpen={showLoginModal}
-          onClose={() => setShowLoginModal(false)}
-          darkMode={darkMode}
-          onLoginSuccess={handleLoginSuccess}
-        />
-          </>
+            <HelpCentreSection darkMode={darkMode} isInView={isInView} />
+          </motion.div>
+        </div>
+      </section>
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        darkMode={darkMode}
+        onLoginSuccess={handleLoginSuccess}
+      />
+    </>
   );
 }
