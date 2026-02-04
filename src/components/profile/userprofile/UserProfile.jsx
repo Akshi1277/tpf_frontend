@@ -40,6 +40,8 @@ export default function ProfilePage({ darkModeFromParent }) {
   const [showDobModal, setShowDobModal] = useState(false)
   const [showOtherProfession, setShowOtherProfession] = useState(false)
   const [otherProfession, setOtherProfession] = useState("")
+  const [showError, setShowError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
 
   const [tempData, setTempData] = useState({})
@@ -144,8 +146,15 @@ export default function ProfilePage({ darkModeFromParent }) {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 2000);
     } catch (err) {
-      alert(err?.data?.message || "Failed to update profile");
+      setErrorMessage(err?.data?.message || "Failed to update profile");
+      setShowError(true);
+
+      setTimeout(() => {
+        setShowError(false);
+        setErrorMessage("");
+      }, 3000);
     }
+
   };
 
 
@@ -327,6 +336,32 @@ export default function ProfilePage({ darkModeFromParent }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {showError && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className={`fixed top-6 right-4 sm:right-6 z-50 px-4 sm:px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 ${darkMode
+                ? "bg-zinc-900 border border-red-500/30"
+                : "bg-white border border-red-200"
+              }`}
+          >
+            <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+              <X className="w-5 h-5 text-white" strokeWidth={3} />
+            </div>
+
+            <p
+              className={`font-semibold text-sm ${darkMode ? "text-white" : "text-gray-900"
+                }`}
+            >
+              {errorMessage}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
       {/* Profession Modal */}
       <AnimatePresence>
@@ -773,9 +808,24 @@ export default function ProfilePage({ darkModeFromParent }) {
                       Email Address
                     </p>
 
-                    <p className={`text-sm font-bold break-all ${darkMode ? "text-white" : "text-gray-900"}`}>
-                      {profileData.email}
-                    </p>
+                    {isEditMode ? (
+                      <input
+                        type="email"
+                        value={tempData.email}
+                        onChange={(e) =>
+                          setTempData(prev => ({ ...prev, email: e.target.value }))
+                        }
+                        className={`w-full text-sm font-bold px-2 py-1 rounded-md border outline-none ${darkMode
+                          ? "bg-zinc-900 border-zinc-700 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                          }`}
+                      />
+                    ) : (
+                      <p className={`text-sm font-bold break-all ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        {profileData.email}
+                      </p>
+                    )}
+
 
                   </div>
                 </div>
