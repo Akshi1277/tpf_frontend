@@ -13,7 +13,7 @@ import MobileLoginModal from "./MobileModal"
 
 function LoginModal({ isOpen, onClose, darkMode = false, onLoginSuccess }) {
     const dispatch = useDispatch()
-    const [loginMethod, setLoginMethod] = useState("mobile") // "email" or "mobile"
+    const [loginMethod, setLoginMethod] = useState("email") // "email" or "mobile"
     const [email, setEmail] = useState('')
     const [mobile, setMobile] = useState('')
     const [step, setStep] = useState(1)
