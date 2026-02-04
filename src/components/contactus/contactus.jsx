@@ -5,7 +5,7 @@ import { useCreateTicketMutation } from '@/utils/slices/tickets-queriesApiSlice'
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { useAppToast } from '@/app/AppToastContext';
-import LoginModal from "@/components/login/LoginModal"
+import LoginModal from '../login/LoginModal/MainModal';
 // Help Centre Section Component
 function HelpCentreSection({ darkMode, isInView }) {
   const [expandedSection, setExpandedSection] = useState(null);

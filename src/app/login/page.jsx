@@ -1,7 +1,7 @@
 "use client"
 
 import Navbar from '@/components/layout/Navbar';
-import LoginPage from '@/components/login/Login';
+import LoginPage from '@/components/login/Login/Login';
 import React from 'react'
 import { useEffect, useState } from 'react';
 

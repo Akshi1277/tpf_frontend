@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import LoginModal from '../login/LoginModal';
+import LoginModal from '../login/LoginModal/MainModal';
 import {
   Info,
   MessageCircle,

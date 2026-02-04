@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSlice"
 import { User, Calendar, MapPin, Phone, Mail, CreditCard, Check, ChevronLeft } from "lucide-react"
-import LoginModal from "../login/LoginModal"
+import LoginModal from "../login/LoginModal/MainModal"
 import { useSelector } from "react-redux"
 
 import Link from "next/link"

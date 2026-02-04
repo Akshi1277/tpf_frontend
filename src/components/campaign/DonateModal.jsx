@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Lock, Info, Check, X, Sparkles, AlertCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useRef } from 'react';
-import LoginModal from '../login/LoginModal';
+import LoginModal from '../login/LoginModal/MainModal';
 import { useAppToast } from '@/app/AppToastContext';
 
 export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId, ribaEligible, zakatVerified, taxEligible, allowedDonationTypes = [] }) {

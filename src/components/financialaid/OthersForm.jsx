@@ -7,7 +7,7 @@ import { User, Calendar, MapPin, Phone, Mail, CreditCard, Upload, Check, Chevron
 import FilePreview from "./FilePreview"
 import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSlice"
 import { useAppToast } from "@/app/AppToastContext"
-import LoginModal from "../login/LoginModal"
+import LoginModal from "../login/LoginModal/MainModal"
 import { useSelector } from "react-redux"
 
 import Link from "next/link"

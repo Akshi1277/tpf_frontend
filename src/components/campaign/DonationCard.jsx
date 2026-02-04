@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Heart, Lock, Info, Check, AlertCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import LoginModal from '../login/LoginModal';
+import LoginModal from '../login/LoginModal/MainModal';
 import { useAppToast } from '@/app/AppToastContext';
 
 export default function DonationCard({

@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useCMS } from './CMSContext';
 import { useFetchImpactStatsQuery } from '@/utils/slices/campaignApiSlice';
+import ProcessFlowSection from '@/components/home/ProcessFlow';
 
 export default function Page() {
   const cms = useCMS()
@@ -59,8 +60,11 @@ export default function Page() {
       </section>
 
       <section id="impact-stats">
-        <ImpactStatsBar darkMode={darkMode} />
+        <ProcessFlowSection darkMode={darkMode} />
       </section>
+      {/* <section id="impact-stats">
+        <ImpactStatsBar darkMode={darkMode} />
+      </section> */}
 
       <section id="stories">
         <StoriesSection darkMode={darkMode} />

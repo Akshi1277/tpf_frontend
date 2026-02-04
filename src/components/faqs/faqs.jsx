@@ -2,7 +2,7 @@
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import LoginModal from "../login/LoginModal"
+import LoginModal from '../login/LoginModal/MainModal';
 import { useAskFAQQuestionMutation, useGetAnsweredFAQsQuery } from '@/utils/slices/faqApiSlice';
 import { ChevronLeft, ChevronRight, HelpCircle, X, Send, Search, ChevronDown } from 'lucide-react';
 // Interactive Search Component
