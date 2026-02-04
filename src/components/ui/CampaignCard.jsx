@@ -335,7 +335,7 @@ export default function CampaignCard({ campaign, darkMode }) {
                 fill={saved ? "currentColor" : "none"}
               />
 
-              {/* <span
+              <span
                 className="
       absolute -top-9 left-1/2 -translate-x-1/2
       whitespace-nowrap rounded-md bg-zinc-900 text-white
@@ -349,8 +349,8 @@ export default function CampaignCard({ campaign, darkMode }) {
       pointer-events-none
     "
               >
-                Add to Wishlist
-              </span> */}
+                Wishlist
+              </span>
             </button>
             <button
               onClick={(e) => {
