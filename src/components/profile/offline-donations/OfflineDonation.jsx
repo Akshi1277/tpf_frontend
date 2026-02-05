@@ -101,10 +101,10 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
   const handleSubmit = async () => {
     try {
       const amount = Number(formData.amount);
-      if (!amount || amount < 100) {
+      if (!amount || amount < 50) {
         showToast({
           title: "Minimum Amount",
-          message: "The minimum donation amount is ₹100.",
+          message: "The minimum donation amount is ₹50.",
           type: "error"
         });
         return;
@@ -625,19 +625,19 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                                 onChange={handleInputChange}
                                 placeholder="Enter amount in ₹"
                                 className={`w-full h-15 pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                  ? formData.amount && formData.amount < 100 ? "bg-red-500/5 border-red-500 text-white focus:border-red-500" : "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : formData.amount && formData.amount < 100 ? "bg-red-50 border-red-500 text-gray-900 focus:border-red-500" : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+                                  ? formData.amount && formData.amount < 50 ? "bg-red-500/5 border-red-500 text-white focus:border-red-500" : "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                                  : formData.amount && formData.amount < 50 ? "bg-red-50 border-red-500 text-gray-900 focus:border-red-500" : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
                                   }`}
                               />
                             </div>
-                            {formData.amount && formData.amount < 100 && (
+                            {formData.amount && formData.amount < 50 && (
                               <p className="mt-2 text-xs font-semibold text-red-500 flex items-center gap-1">
-                                <AlertCircle className="w-3 h-3" /> Minimum donation is ₹100
+                                <AlertCircle className="w-3 h-3" /> Minimum donation is ₹50
                               </p>
                             )}
                             {!formData.amount && (
                               <p className={`mt-2 text-xs font-medium ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                Min. ₹100 contribution required
+                                Min. ₹50 contribution required
                               </p>
                             )}
                           </div>

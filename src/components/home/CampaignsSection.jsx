@@ -112,18 +112,18 @@ export default function CampaignsSection({ darkMode }) {
 
         {/* Carousel */}
         <div className="relative group">
-          {/* Left Arrow - Subtle & Elegant */}
+          {/* Left Arrow - Responsive & Emerald Highlighted */}
           {showArrows && (
             <button
               onClick={() => scroll('left')}
               aria-label="Scroll left"
-              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${darkMode
-                ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg'
-                : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
-                } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
+              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 left-2 lg:left-0 lg:-translate-x-1/2 z-20 w-8 h-8 lg:w-9 lg:h-9 items-center justify-center rounded-full transition-all duration-300 ${darkMode
+                ? 'bg-zinc-700/95 hover:bg-zinc-600 text-emerald-400 shadow-lg shadow-emerald-500/20'
+                : 'bg-white/95 hover:bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/15'
+                } backdrop-blur-sm border-2 ${darkMode ? 'border-emerald-500/40 hover:border-emerald-400/60' : 'border-emerald-400/40 hover:border-emerald-500/60'}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
           )}
@@ -145,18 +145,18 @@ export default function CampaignsSection({ darkMode }) {
             </div>
           </div>
 
-          {/* Right Arrow - Subtle & Elegant */}
+          {/* Right Arrow - Responsive & Emerald Highlighted */}
           {showArrows && (
             <button
               onClick={() => scroll('right')}
               aria-label="Scroll right"
-              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 z-20 w-9 h-9 items-center justify-center rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 ${darkMode
-                ? 'bg-zinc-700/90 hover:bg-zinc-600 text-white shadow-lg'
-                : 'bg-white/90 hover:bg-white text-zinc-700 shadow-md'
-                } backdrop-blur-sm border ${darkMode ? 'border-zinc-600/50' : 'border-gray-200/50'}`}
+              className={`hidden md:flex absolute top-1/2 -translate-y-1/2 right-2 lg:right-0 lg:translate-x-1/2 z-20 w-8 h-8 lg:w-9 lg:h-9 items-center justify-center rounded-full transition-all duration-300 ${darkMode
+                ? 'bg-zinc-700/95 hover:bg-zinc-600 text-emerald-400 shadow-lg shadow-emerald-500/20'
+                : 'bg-white/95 hover:bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/15'
+                } backdrop-blur-sm border-2 ${darkMode ? 'border-emerald-500/40 hover:border-emerald-400/60' : 'border-emerald-400/40 hover:border-emerald-500/60'}`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           )}

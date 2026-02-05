@@ -21,7 +21,8 @@ export default function HeroSection({ darkMode }) {
   }
 
   return (
-    <section className="relative h-[500px] md:h-[600px] lg:h-[650px] overflow-hidden">
+    <section className="relative min-h-[560px] md:h-[600px] lg:h-[650px] overflow-hidden">
+
       {/* Background Image */}
       <div className="absolute inset-0">
         <img

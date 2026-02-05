@@ -95,10 +95,10 @@ export default function DonationCard({
     const amount = selectedAmount || parseInt(customAmount, 10);
     if (!amount) return;
 
-    if (amount < 100) {
+    if (amount < 50) {
       showToast({
         title: "Minimum Amount",
-        message: "The minimum donation amount is ₹100.",
+        message: "The minimum donation amount is ₹50.",
         type: "error"
       });
       return;
@@ -305,22 +305,22 @@ useEffect(() => {
               w-full h-14 pl-10 pr-4 text-base rounded-lg border-2 transition-colors
               ${customAmount
                   ? darkMode
-                    ? customAmount < 100 ? 'border-red-500 bg-red-500/5 text-white' : 'border-emerald-500 bg-emerald-950/30 text-white'
-                    : customAmount < 100 ? 'border-red-500 bg-red-50 text-gray-900' : 'border-emerald-600 bg-emerald-50 text-gray-900'
+                    ? customAmount < 50 ? 'border-red-500 bg-red-500/5 text-white' : 'border-emerald-500 bg-emerald-950/30 text-white'
+                    : customAmount < 50 ? 'border-red-500 bg-red-50 text-gray-900' : 'border-emerald-600 bg-emerald-50 text-gray-900'
                   : darkMode
                     ? 'border-zinc-800 bg-zinc-900 text-white placeholder-gray-600'
                     : 'border-gray-200 bg-white text-gray-900 placeholder-gray-400'}
               focus:outline-none focus:ring-0
             `}
             />
-            {customAmount && customAmount < 100 && (
+            {customAmount && customAmount < 50 && (
               <p className="mt-2 text-xs font-semibold text-red-500 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" /> Minimum donation is ₹100
+                <AlertCircle className="w-3 h-3" /> Minimum donation is ₹50
               </p>
             )}
             {!customAmount && !selectedAmount && (
               <p className={`mt-2 text-xs font-medium ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                Min. ₹100 contribution required
+                Min. ₹50 contribution required
               </p>
             )}
           </div>

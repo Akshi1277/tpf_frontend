@@ -66,10 +66,10 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
     const amount = selectedAmount || parseInt(customAmount);
     if (!amount) return;
 
-    if (amount < 100) {
+    if (amount < 50) {
       showToast({
         title: "Minimum Amount",
-        message: "The minimum donation amount is ₹100.",
+        message: "The minimum donation amount is ₹50.",
         type: "error"
       });
       return;
@@ -333,22 +333,22 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                               w-full h-10 md:h-12 pl-9 md:pl-11 pr-4 text-sm md:text-base rounded-lg border-2 transition-all
                               ${customAmount
                                 ? darkMode
-                                  ? customAmount < 100 ? 'border-red-500 bg-red-500/5 text-white' : 'border-emerald-500 bg-emerald-950/50 text-white shadow-lg shadow-emerald-500/20'
-                                  : customAmount < 100 ? 'border-red-500 bg-red-50 text-gray-900' : 'border-emerald-600 bg-emerald-50 text-gray-900 shadow-lg shadow-emerald-600/20'
+                                  ? customAmount < 50 ? 'border-red-500 bg-red-500/5 text-white' : 'border-emerald-500 bg-emerald-950/50 text-white shadow-lg shadow-emerald-500/20'
+                                  : customAmount < 50 ? 'border-red-500 bg-red-50 text-gray-900' : 'border-emerald-600 bg-emerald-50 text-gray-900 shadow-lg shadow-emerald-600/20'
                                 : darkMode
                                   ? 'border-zinc-800 bg-zinc-900 text-white placeholder-gray-600'
                                   : 'border-gray-200 bg-white text-gray-900 placeholder-gray-400'}
                               focus:outline-none focus:ring-0
                             `}
                           />
-                          {customAmount && customAmount < 100 && (
+                          {customAmount && customAmount < 50 && (
                             <p className="mt-2 text-[10px] md:text-xs font-semibold text-red-500 flex items-center gap-1 leading-none">
-                              <AlertCircle className="w-3 h-3" /> Min. ₹100 required
+                              <AlertCircle className="w-3 h-3" /> Min. ₹50 required
                             </p>
                           )}
                           {!customAmount && !selectedAmount && (
                             <p className={`mt-2 text-[10px] md:text-xs font-medium leading-none ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                              Minimum contribution ₹100
+                              Minimum contribution ₹50
                             </p>
                           )}
                         </div>
@@ -541,7 +541,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                             {(() => {
                               const amount = selectedAmount || Number(customAmount) || 0;
                               if (amount === 0) return 'Select Amount';
-                              if (amount < 100) return 'Min. ₹100 Required';
+                              if (amount < 50) return 'Min. ₹50 Required';
                               return `Donate ₹${(amount + (tipAmount || 0)).toLocaleString()}`;
                             })()}
                           </>

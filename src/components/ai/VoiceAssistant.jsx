@@ -181,8 +181,8 @@ export default function VoiceAssistant() {
     useEffect(() => {
         if (history.length === 0) {
             const greeting = userContext?.fullName
-                ? `Assalamu Alaikum, ${userContext.fullName}! I am Aquib. ${userContext.peopleHelped > 0 ? `Your support has helped ${userContext.peopleHelped} ${userContext.peopleHelped === 1 ? 'family' : 'families'} so far.` : ''} How can I help you today?`
-                : "Assalamu Alaikum! I am Aquib, your assistant from True Path Foundation. How can I help you today?";
+                ? `Assalamu Alaikum, ${userContext.fullName}! I am Abeer. ${userContext.peopleHelped > 0 ? `Your support has helped ${userContext.peopleHelped} ${userContext.peopleHelped === 1 ? 'family' : 'families'} so far.` : ''} How can I help you today?`
+                : "Assalamu Alaikum! I am Abeer, your assistant from True Path Foundation. How can I help you today?";
 
             setHistory([
                 { role: "assistant", text: greeting }
@@ -477,7 +477,7 @@ export default function VoiceAssistant() {
                 fullName: userContext?.fullName || "Anonymous User",
                 email: userContext?.email || "support@tpfaid.org",
                 queryType: ticketData.category || "General Query",
-                message: ticketData.summary || "User requested support via Aquib.",
+                message: ticketData.summary || "User requested support via Abeer.",
                 status: "Unresolved"
             };
 
@@ -613,7 +613,7 @@ export default function VoiceAssistant() {
                         setShowLauncherGreeting(false);
                     }}
                 >
-                    <AnimatePresence>
+                    {/* <AnimatePresence>
                         {showLauncherGreeting && (
                             <motion.div
                                 initial={{ opacity: 0, x: 20, y: 10, scale: 0.5 }}
@@ -625,7 +625,7 @@ export default function VoiceAssistant() {
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                        <span>Salam! I am Aquib, your assistant.</span>
+                                        <span>Salam! I am Abeer, your assistant.</span>
                                     </div>
                                     <X size={12} className="opacity-50 hover:opacity-100 transition-opacity shrink-0" />
                                 </div>
@@ -638,7 +638,7 @@ export default function VoiceAssistant() {
                                 />
                             </motion.div>
                         )}
-                    </AnimatePresence>
+                    </AnimatePresence> */}
 
                     <div className="relative group">
                         {!isDarkMode && <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-500"></div>}
@@ -672,7 +672,7 @@ export default function VoiceAssistant() {
                                     />
                                 </div>
                                 <div>
-                                    <h3 className="text-white font-bold text-sm tracking-tight">Aquib</h3>
+                                    <h3 className="text-white font-bold text-sm tracking-tight">Abeer</h3>
                                     <div className="flex items-center gap-2 mt-0.5">
                                         <WaveformVisualizer isSpeaking={isSpeaking} />
                                     </div>
@@ -810,7 +810,7 @@ export default function VoiceAssistant() {
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
                                     <div className={`p-3 rounded-2xl rounded-tl-none flex items-center gap-3 shadow-sm border ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'}`}>
                                         <Loader2 className="w-3 h-3 text-emerald-500 animate-spin" />
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Aquib is Thinking</span>
+                                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Abeer is Thinking</span>
                                     </div>
                                 </motion.div>
                             )}
