@@ -476,7 +476,7 @@ useEffect(() => {
             (() => {
               const amount = selectedAmount || Number(customAmount) || 0;
               if (amount === 0) return 'Enter Amount to Continue';
-              if (amount < 100) return 'Amount must be ≥ ₹100';
+              if (amount < 50) return 'Minimum Amount should be ₹50';
               return `Donate ₹${(amount + (tipAmount || 0)).toLocaleString()}`;
             })()
           )}
