@@ -145,25 +145,13 @@ export default function CampaignProgress({ darkMode, campaign }) {
                         ? "text-zinc-400 hover:text-emerald-400"
                         : "text-zinc-600 hover:text-emerald-600"
                       }`}
+
+                      title="Share this Campaign"
                   >
                     <FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
 
-                  <span
-                    className="
-      absolute -top-9 left-1/2 -translate-x-1/2
-      whitespace-nowrap rounded-md bg-zinc-900 text-white
-      text-[11px] px-2 py-1
-      opacity-0 scale-95
-      peer-hover:opacity-100
-      peer-hover:scale-100
-      transition-all duration-200
-      pointer-events-none
-      z-50
-    "
-                  >
-                    Share this Campaign
-                  </span>
+           
                 </div>
 
               </div>
