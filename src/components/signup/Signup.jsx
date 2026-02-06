@@ -1,7 +1,7 @@
 "use client"
 
 import { useSendOtpMutation, useUpdateProfileMutation, useVerifyOtpMutation } from "@/utils/slices/authApiSlice"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { setCredentials } from "@/utils/slices/authSlice"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
@@ -20,11 +20,20 @@ export default function SignUpPage({ darkMode }) {
   const [updateProfile, { isLoading: updatingProfile }] = useUpdateProfileMutation()
   const { showToast } = useAppToast()
   const [step, setStep] = useState(1)
+  const userInfo = useSelector((state) => state.auth.userInfo) // Get user info from Redux
   const [mobile, setMobile] = useState('')
   const [otp, setOtp] = useState('')
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
+
+  // Auto-resume step 3 if user is already logged in but incomplete
+  useEffect(() => {
+    if (userInfo && (!userInfo.fullName || !userInfo.email)) {
+      setStep(3);
+      if (userInfo.mobileNo) setMobile(userInfo.mobileNo.replace(/\D/g, "").slice(-10));
+    }
+  }, [userInfo]);
 
   // Pre-fill from query params (e.g. from AI assistant)
   useEffect(() => {
@@ -118,28 +127,24 @@ export default function SignUpPage({ darkMode }) {
   }
 
   return (
-    <div className={`min-h-screen relative overflow-hidden ${
-      darkMode ? "bg-zinc-950" : "bg-white"
-    }`}>
+    <div className={`min-h-screen relative overflow-hidden ${darkMode ? "bg-zinc-950" : "bg-white"
+      }`}>
       {/* Sophisticated Background Pattern */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Grid Pattern */}
         <div
-          className={`absolute inset-0 ${
-            darkMode
-              ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
-              : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
-          }`}
+          className={`absolute inset-0 ${darkMode
+            ? "bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)]"
+            : "bg-[linear-gradient(rgba(16,185,129,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.05)_1px,transparent_1px)]"
+            }`}
           style={{ backgroundSize: '64px 64px' }}
         />
 
         {/* Gradient Orbs */}
-        <div className={`absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[120px] ${
-          darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
-        }`} />
-        <div className={`absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[100px] ${
-          darkMode ? "bg-teal-950/20" : "bg-teal-50"
-        }`} />
+        <div className={`absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+          }`} />
+        <div className={`absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
+          }`} />
 
         {/* Noise Texture Overlay */}
         <div
@@ -157,11 +162,10 @@ export default function SignUpPage({ darkMode }) {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`fixed top-4 sm:top-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3 ${
-              darkMode
-                ? "bg-zinc-900 border border-emerald-500/20"
-                : "bg-white border border-emerald-200"
-            }`}
+            className={`fixed top-4 sm:top-6 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-md z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3 ${darkMode
+              ? "bg-zinc-900 border border-emerald-500/20"
+              : "bg-white border border-emerald-200"
+              }`}
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
               <Check className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={3} />
@@ -203,7 +207,7 @@ export default function SignUpPage({ darkMode }) {
           />
 
           {/* Mobile Signup */}
-                   <MobileSignup
+          <MobileSignup
             darkMode={darkMode}
             step={step}
             mobile={mobile}
