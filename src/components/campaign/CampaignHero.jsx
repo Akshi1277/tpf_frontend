@@ -32,6 +32,13 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
     return () => clearInterval(interval);
   }, [orderedImages.length]);
 
+  useEffect(() => {
+    if (!sessionStorage.getItem("donate_popup_seen")) {
+      setIsModalOpen(true);
+      sessionStorage.setItem("donate_popup_seen", "1");
+    }
+  }, []);
+
   return (
     <>
       <motion.div
