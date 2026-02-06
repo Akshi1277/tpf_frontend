@@ -79,7 +79,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
       showToast({
         type: "success",
         title: "Logged out",
-        message: "See you again soon 👋",
+        message: "See you again soon..",
         duration: 2000,
       });
     } catch (err) {

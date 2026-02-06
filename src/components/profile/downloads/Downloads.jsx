@@ -846,7 +846,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
         </motion.div>
 
         {/* Form 10BE Section */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
@@ -958,7 +958,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
               </div>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Transaction Invoices Section */}
         <motion.div
