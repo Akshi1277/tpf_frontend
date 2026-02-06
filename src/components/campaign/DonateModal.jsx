@@ -331,10 +331,10 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                         {/* Tip Selection */}
                         <div>
                           <label className={`flex items-center gap-1.5 text-[10px] md:text-xs font-semibold mb-1 md:mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            Platform Tip
+                            Platform Tip (optional)
                             <div className="group relative">
                               <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center cursor-help transition-colors ${
-                                darkMode ? 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-emerald-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-emerald-600'
+                                 darkMode ? 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-emerald-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-emerald-600'
                               }`}>
                                 <span className="text-[8px] md:text-[10px] font-bold">i</span>
                               </div>
