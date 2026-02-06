@@ -8,10 +8,12 @@ import LoginModal from '../login/LoginModal/MainModal';
 import { useAppToast } from '@/app/AppToastContext';
 
 export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId, ribaEligible, zakatVerified, taxEligible, allowedDonationTypes = [] }) {
-  const [selectedAmount, setSelectedAmount] = useState(1000); // Prefilled default
+  const [selectedAmount, setSelectedAmount] = useState(100); // Prefilled default
   const [customAmount, setCustomAmount] = useState('');
+  const [showCustomAmountInput, setShowCustomAmountInput] = useState(false);
   const [tipPercentage, setTipPercentage] = useState(10); // Prefilled default
   const [customTip, setCustomTip] = useState(''); // Custom tip amount
+  const [showCustomTipInput, setShowCustomTipInput] = useState(false);
   const [cashfreeData, setCashfreeData] = useState(null);
   const [donationType, setDonationType] = useState('SADAQAH'); // Prefilled default
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -27,10 +29,10 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
   const { showToast } = useAppToast();
 
   const presetAmounts = [
-    { value: 500, label: '500' },
-    { value: 1000, label: '1k' },
-    { value: 5000, label: '5k' },
-    { value: 10000, label: '10k' }
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+    { value: 200, label: '200' },
+    { value: 500, label: '500' }
   ];
   const tipPercentages = [0, 5, 10, 15]; // Added 0%
 
@@ -198,55 +200,55 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
             />
 
             {/* Modal Container - Fixed center, no scroll */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-3 md:p-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-4xl"
+                className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl"
               >
-                <div className={`${darkMode ? 'bg-zinc-900' : 'bg-white'} rounded-2xl shadow-2xl relative overflow-hidden`}>
+                <div className={`${darkMode ? 'bg-zinc-900' : 'bg-white'} rounded-xl sm:rounded-2xl shadow-2xl relative`}>
                   {/* Gradient Background */}
                   <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none" />
                   
                   {/* Close Button */}
                   <button
                     onClick={onClose}
-                    className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors z-10 ${
+                    className={`absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors z-10 ${
                       darkMode ? 'bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
 
                   {/* Content - Horizontal Layout */}
-                  <div className="relative p-4 md:p-5">
+                  <div className="relative p-3 sm:p-4 md:p-5">
                     {/* Header */}
-                    <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4 pb-2 md:pb-3 border-b border-emerald-500/20">
-                      <div className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 shadow-lg">
-                        <Heart className="w-4 h-4 md:w-5 md:h-5 text-white" fill="currentColor" />
+                    <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 mb-2.5 sm:mb-3 md:mb-4 pb-2 sm:pb-2.5 md:pb-3 border-b border-emerald-500/20">
+                      <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 shadow-lg flex-shrink-0">
+                        <Heart className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" fill="currentColor" />
                       </div>
-                      <div>
-                        <h2 className={`text-base md:text-xl font-bold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="min-w-0 flex-1">
+                        <h2 className={`text-sm sm:text-base md:text-xl font-bold leading-tight truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           Make a Difference
                         </h2>
-                        <p className={`text-[10px] md:text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <p className={`text-[9px] sm:text-[10px] md:text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                           Your generosity transforms lives
                         </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-3 md:gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-2.5 sm:gap-3 md:gap-4">
                       {/* Left Section */}
-                      <div className="space-y-2.5 md:space-y-3">
+                      <div className="space-y-2 sm:space-y-2.5 md:space-y-3">
                         {/* Donation Type - Horizontal Pills */}
                         <div>
-                          <label className={`block text-[10px] md:text-xs font-semibold mb-1 md:mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          <label className={`block text-[9px] sm:text-[10px] md:text-xs font-semibold mb-1 sm:mb-1 md:mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             Donation Type
                           </label>
-                          <div className="flex flex-wrap gap-1 md:gap-1.5">
+                          <div className="flex flex-wrap gap-1 sm:gap-1 md:gap-1.5">
                             {filteredDonationTypes.map((type) => {
                               const IconComponent = type.Icon;
                               return (
@@ -257,7 +259,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                                   onClick={() => !type.disabled && setDonationType(type.id)}
                                   disabled={type.disabled}
                                   className={`
-                                    px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-semibold transition-all flex items-center gap-1 md:gap-1.5 whitespace-nowrap
+                                    px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 md:py-1.5 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] md:text-xs font-semibold transition-all flex items-center gap-1 sm:gap-1 md:gap-1.5 whitespace-nowrap
                                     ${donationType === type.id
                                       ? 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
                                       : darkMode
@@ -266,9 +268,9 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                                     ${type.disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                                   `}
                                 >
-                                  <IconComponent className="w-3 h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
+                                  <IconComponent className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-3.5 md:h-3.5 flex-shrink-0" />
                                   <span>{type.label}</span>
-                                  {type.disabled && <Lock className="w-2.5 h-2.5 md:w-3 md:h-3 flex-shrink-0" />}
+                                  {type.disabled && <Lock className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 flex-shrink-0" />}
                                 </motion.button>
                               );
                             })}
@@ -277,10 +279,10 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
 
                         {/* Amount Selection */}
                         <div>
-                          <label className={`block text-[10px] md:text-xs font-semibold mb-1 md:mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          <label className={`block text-[9px] sm:text-[10px] md:text-xs font-semibold mb-1 sm:mb-1 md:mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             Select Amount
                           </label>
-                          <div className="grid grid-cols-5 gap-1.5 md:gap-2">
+                          <div className="grid grid-cols-5 gap-1 sm:gap-1.5 md:gap-2">
                             {presetAmounts.map((amount) => (
                               <motion.button
                                 key={amount.value}
@@ -289,10 +291,11 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                                 onClick={() => {
                                   setSelectedAmount(amount.value);
                                   setCustomAmount('');
+                                  setShowCustomAmountInput(false);
                                 }}
                                 className={`
-                                  h-10 md:h-11 rounded-lg font-bold text-xs md:text-sm transition-all
-                                  ${selectedAmount === amount.value
+                                  h-9 sm:h-10 md:h-11 rounded-md sm:rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all
+                                  ${selectedAmount === amount.value && !customAmount
                                     ? 'bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
                                     : darkMode
                                       ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
@@ -302,39 +305,63 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                                 ₹{amount.label}
                               </motion.button>
                             ))}
-                            {/* Custom Amount in Grid */}
-                            <div className="relative">
-                              <input
-                                type="number"
-                                placeholder="Custom"
-                                value={customAmount}
-                                onChange={(e) => {
-                                  setCustomAmount(e.target.value);
-                                  setSelectedAmount(null);
-                                }}
+                            {/* Custom Amount Button/Input */}
+                            {!showCustomAmountInput ? (
+                              <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => setShowCustomAmountInput(true)}
                                 className={`
-                                  w-full h-10 md:h-11 px-1 text-[10px] md:text-xs text-center rounded-lg font-semibold transition-all
+                                  h-9 sm:h-10 md:h-11 rounded-md sm:rounded-lg font-bold text-[10px] sm:text-xs md:text-sm transition-all
                                   ${customAmount
-                                    ? darkMode
-                                      ? 'bg-zinc-800 border-2 border-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                                      : 'bg-emerald-50 border-2 border-emerald-500 text-gray-900 shadow-lg shadow-emerald-500/20'
+                                    ? 'bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
                                     : darkMode
-                                      ? 'bg-zinc-800 border-2 border-zinc-700 text-white placeholder-gray-600'
-                                      : 'bg-gray-100 border-2 border-gray-200 text-gray-900 placeholder-gray-400'}
-                                  focus:outline-none focus:ring-0
+                                      ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
+                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
                                 `}
-                              />
-                            </div>
+                              >
+                                {customAmount ? `₹${customAmount}` : 'Custom'}
+                              </motion.button>
+                            ) : (
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  placeholder="Amount"
+                                  value={customAmount}
+                                  autoFocus
+                                  onChange={(e) => {
+                                    setCustomAmount(e.target.value);
+                                    setSelectedAmount(null);
+                                  }}
+                                  onBlur={() => {
+                                    if (!customAmount) {
+                                      setShowCustomAmountInput(false);
+                                    }
+                                  }}
+                                  className={`
+                                    w-full h-9 sm:h-10 md:h-11 px-0.5 sm:px-1 text-[9px] sm:text-[10px] md:text-xs text-center rounded-md sm:rounded-lg font-semibold transition-all
+                                    ${customAmount
+                                      ? darkMode
+                                        ? 'bg-zinc-800 border-2 border-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                                        : 'bg-emerald-50 border-2 border-emerald-500 text-gray-900 shadow-lg shadow-emerald-500/20'
+                                      : darkMode
+                                        ? 'bg-zinc-800 border-2 border-zinc-700 text-white placeholder-gray-600'
+                                        : 'bg-gray-100 border-2 border-gray-200 text-gray-900 placeholder-gray-400'}
+                                    focus:outline-none focus:ring-0
+                                  `}
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
 
                         {/* Tip Selection */}
                         <div>
                           <label className={`flex items-center gap-1.5 text-[10px] md:text-xs font-semibold mb-1 md:mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            Platform Tip (optional)
+                            Platform Tip
                             <div className="group relative">
                               <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center cursor-help transition-colors ${
-                                 darkMode ? 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-emerald-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-emerald-600'
+                                darkMode ? 'bg-zinc-800 text-gray-400 hover:bg-zinc-700 hover:text-emerald-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-emerald-600'
                               }`}>
                                 <span className="text-[8px] md:text-[10px] font-bold">i</span>
                               </div>
@@ -357,6 +384,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                                 onClick={() => {
                                   setTipPercentage(percentage);
                                   setCustomTip('');
+                                  setShowCustomTipInput(false);
                                 }}
                                 className={`
                                   h-8 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-all
@@ -370,69 +398,93 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                                 {percentage}%
                               </motion.button>
                             ))}
-                            {/* Custom Tip Input */}
-                            <div className="relative">
-                              <input
-                                type="number"
-                                placeholder="Custom"
-                                value={customTip}
-                                onChange={(e) => {
-                                  setCustomTip(e.target.value);
-                                  setTipPercentage(null);
-                                }}
+                            {/* Custom Tip Button/Input */}
+                            {!showCustomTipInput ? (
+                              <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => setShowCustomTipInput(true)}
                                 className={`
-                                  w-full h-8 md:h-9 px-1 text-[10px] md:text-xs text-center rounded-lg font-semibold transition-all
+                                  h-8 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-all
                                   ${customTip
-                                    ? darkMode
-                                      ? 'bg-zinc-800 border-2 border-amber-500 text-white shadow-lg shadow-amber-500/20'
-                                      : 'bg-amber-50 border-2 border-amber-500 text-gray-900 shadow-lg shadow-amber-500/20'
+                                    ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 text-white shadow-lg shadow-amber-500/30'
                                     : darkMode
-                                      ? 'bg-zinc-800 border-2 border-zinc-700 text-white placeholder-gray-600'
-                                      : 'bg-gray-100 border-2 border-gray-200 text-gray-900 placeholder-gray-400'}
-                                  focus:outline-none focus:ring-0
+                                      ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
+                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
                                 `}
-                              />
-                            </div>
+                              >
+                                {customTip ? `₹${customTip}` : 'Custom'}
+                              </motion.button>
+                            ) : (
+                              <div className="relative">
+                                <input
+                                  type="number"
+                                  placeholder="Tip"
+                                  value={customTip}
+                                  autoFocus
+                                  onChange={(e) => {
+                                    setCustomTip(e.target.value);
+                                    setTipPercentage(null);
+                                  }}
+                                  onBlur={() => {
+                                    if (!customTip) {
+                                      setShowCustomTipInput(false);
+                                    }
+                                  }}
+                                  className={`
+                                    w-full h-8 md:h-9 px-1 text-[10px] md:text-xs text-center rounded-lg font-semibold transition-all
+                                    ${customTip
+                                      ? darkMode
+                                        ? 'bg-zinc-800 border-2 border-amber-500 text-white shadow-lg shadow-amber-500/20'
+                                        : 'bg-amber-50 border-2 border-amber-500 text-gray-900 shadow-lg shadow-amber-500/20'
+                                      : darkMode
+                                        ? 'bg-zinc-800 border-2 border-zinc-700 text-white placeholder-gray-600'
+                                        : 'bg-gray-100 border-2 border-gray-200 text-gray-900 placeholder-gray-400'}
+                                    focus:outline-none focus:ring-0
+                                  `}
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
 
                         {/* Anonymous Toggle */}
-                        <label className={`flex items-center gap-2 cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <label className={`flex items-center gap-1.5 sm:gap-2 cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                           <input
                             type="checkbox"
                             checked={isAnonymous}
                             onChange={(e) => setIsAnonymous(e.target.checked)}
-                            className="w-3.5 h-3.5 md:w-4 md:h-4 rounded accent-emerald-500"
+                            className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 rounded accent-emerald-500"
                           />
-                          <span className="text-[10px] md:text-xs font-medium">Make my donation anonymous</span>
+                          <span className="text-[9px] sm:text-[10px] md:text-xs font-medium">Make my donation anonymous</span>
                         </label>
                       </div>
 
                       {/* Right Section - Total & CTA */}
-                      <div className="lg:w-64 flex flex-col gap-2 md:gap-3">
+                      <div className="lg:w-56 xl:w-64 flex flex-col gap-2 sm:gap-2 md:gap-3">
                         {/* Total Display */}
                         {baseAmount > 0 && (
                           <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className={`p-3 md:p-4 rounded-xl ${
+                            className={`p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl ${
                               darkMode ? 'bg-gradient-to-br from-emerald-950/40 via-emerald-950/30 to-teal-950/40 border border-emerald-500/30' : 'bg-gradient-to-br from-emerald-50 via-emerald-50/80 to-teal-50 border border-emerald-200'
                             }`}
                           >
-                            <div className="space-y-1.5 md:space-y-2">
-                              <div className={`text-[10px] md:text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <div className="space-y-1 sm:space-y-1.5 md:space-y-2">
+                              <div className={`text-[9px] sm:text-[10px] md:text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Donation: ₹{baseAmount.toLocaleString()}
                               </div>
                               {tipAmount > 0 && (
-                                <div className={`text-[10px] md:text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                <div className={`text-[9px] sm:text-[10px] md:text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                   Platform Tip: ₹{tipAmount.toLocaleString()}
                                 </div>
                               )}
-                              <div className={`pt-1.5 md:pt-2 border-t ${darkMode ? 'border-emerald-500/30' : 'border-emerald-200'}`}>
-                                <div className={`text-[10px] md:text-xs font-medium mb-0.5 md:mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                              <div className={`pt-1 sm:pt-1.5 md:pt-2 border-t ${darkMode ? 'border-emerald-500/30' : 'border-emerald-200'}`}>
+                                <div className={`text-[9px] sm:text-[10px] md:text-xs font-medium mb-0.5 sm:mb-0.5 md:mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                   Total Amount
                                 </div>
-                                <div className={`text-xl md:text-2xl font-bold bg-gradient-to-r ${darkMode ? 'from-emerald-400 via-emerald-300 to-teal-400' : 'from-emerald-700 via-emerald-600 to-teal-700'} bg-clip-text text-transparent`}>
+                                <div className={`text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r ${darkMode ? 'from-emerald-400 via-emerald-300 to-teal-400' : 'from-emerald-700 via-emerald-600 to-teal-700'} bg-clip-text text-transparent`}>
                                   ₹{totalAmount.toLocaleString()}
                                 </div>
                               </div>
@@ -447,8 +499,8 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                           onClick={handleDonate}
                           disabled={isDonating || baseAmount < 50}
                           className={`
-                            w-full h-11 md:h-12 rounded-xl font-bold text-sm md:text-base transition-all
-                            flex items-center justify-center gap-2
+                            w-full h-10 sm:h-11 md:h-12 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm md:text-base transition-all
+                            flex items-center justify-center gap-1.5 sm:gap-2
                             ${isDonating
                               ? 'bg-emerald-600 text-white cursor-wait'
                               : baseAmount >= 50
@@ -460,23 +512,23 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                         >
                           {isDonating ? (
                             <>
-                              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <svg className="animate-spin h-3.5 w-3.5 sm:h-4 sm:w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z" />
                               </svg>
-                              <span className="hidden sm:inline">Processing...</span>
-                              <span className="sm:hidden">Wait...</span>
+                              <span className="hidden xs:inline sm:inline">Processing...</span>
+                              <span className="xs:hidden sm:hidden">Wait...</span>
                             </>
                           ) : (
                             <>
-                              <Sparkles className="w-4 h-4" />
+                              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               {baseAmount < 50 ? 'Min. ₹50' : 'Donate Now'}
                             </>
                           )}
                         </motion.button>
 
                         {/* Footer Note */}
-                        <p className={`text-[9px] md:text-xs text-center leading-relaxed ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                        <p className={`text-[8px] sm:text-[9px] md:text-xs text-center leading-relaxed ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
                           Secure payment • Receipt via email
                         </p>
                       </div>
