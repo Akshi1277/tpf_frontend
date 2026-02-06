@@ -122,6 +122,24 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
 
+  const checkNavigation = (path, callback = null) => {
+    if (userInfo && (!userInfo.fullName || !userInfo.email)) {
+      showToast({
+        type: "info",
+        title: "Profile Incomplete",
+        message: "Please complete your profile to continue.",
+        duration: 3000,
+      });
+      return false;
+    }
+    if (callback) {
+      callback();
+    } else if (path) {
+      router.push(path);
+    }
+    return true;
+  };
+
   return (
     <>
 
@@ -147,7 +165,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                 height={40}
                 priority
                 className="h-8 md:h-9 w-auto cursor-pointer object-contain"
-                onClick={() => router.push('/')}
+                onClick={() => checkNavigation('/')}
               />
             </div>
 
@@ -232,9 +250,11 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             <div
                               key={campaign._id}
                               onClick={() => {
-                                router.push(`/campaign/${campaign.slug}`);
-                                setShowDropdown(false);
-                                setSearchQuery('');
+                                checkNavigation(null, () => {
+                                  router.push(`/campaign/${campaign.slug}`);
+                                  setShowDropdown(false);
+                                  setSearchQuery('');
+                                });
                               }}
                               className={`group flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all duration-200
                                 ${darkMode ? 'hover:bg-zinc-800/80' : 'hover:bg-emerald-50/50'}`}
@@ -303,14 +323,14 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
               {/* Start Fundraising – desktop only */}
               <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer whitespace-nowrap"
-                onClick={() => router.push('/financial-aid')} >
+                onClick={() => checkNavigation('/financial-aid')} >
                 Start fundraising
               </button>
               <div className="tooltip-container">
                 <button
                   className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'
                     }`}
-                  onClick={() => router.push('/zakat-calculator')}
+                  onClick={() => checkNavigation('/zakat-calculator')}
                 >
                   <Image
                     src="/TPFAid-Icon-Zakat-1.svg"
@@ -633,6 +653,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                         ? 'text-zinc-300 hover:bg-zinc-800'
                         : 'text-zinc-700 hover:bg-zinc-100'
                       }`}
+                    onClick={(e) => {
+                      if (!checkNavigation()) e.preventDefault();
+                      setMobileMenuOpen(false);
+                    }}
                   >
                     <svg className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -647,7 +671,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                         ? 'hover:bg-zinc-800'
                         : 'hover:bg-emerald-50'
                       }`}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={(e) => {
+                      if (!checkNavigation()) e.preventDefault();
+                      setMobileMenuOpen(false);
+                    }}
                   >
                     <div className={`p-1 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
                       <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
@@ -677,7 +704,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             ? 'text-zinc-300 hover:bg-zinc-800'
                             : 'text-zinc-700 hover:bg-zinc-100'
                           }`}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={(e) => {
+                          if (!checkNavigation()) e.preventDefault();
+                          setMobileMenuOpen(false);
+                        }}
                       >
                         {item.isLucide ? (
                           <item.icon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
@@ -714,7 +744,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             ? "text-zinc-300 hover:bg-zinc-800"
                             : "text-zinc-700 hover:bg-zinc-100"
                           }`}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={(e) => {
+                          if (!checkNavigation()) e.preventDefault();
+                          setMobileMenuOpen(false);
+                        }}
                       >
                         <div className="flex items-center gap-2">
                           <Image
@@ -744,7 +777,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                         ? 'text-zinc-300 hover:bg-zinc-800'
                         : 'text-zinc-700 hover:bg-zinc-100'
                       }`}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={(e) => {
+                      if (!checkNavigation()) e.preventDefault();
+                      setMobileMenuOpen(false);
+                    }}
                   >
                     <span>🎧</span>
                     <span>Support</span>
