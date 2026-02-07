@@ -9,8 +9,11 @@ import CampaignHero from "@/components/campaign/CampaignHero";
 import CampaignProgress from "@/components/campaign/CampaignProgress";
 import CampaignTabs from "@/components/campaign/CampaignTabs";
 import DonationCard from "@/components/campaign/DonationCard";
+import DonatePopUpModal from "@/components/campaign/DonateModal";
 import RelatedCampaigns from "@/components/campaign/RelatedCampaigns";
 import FooterCTA from "@/components/campaign/FooterCTA";
+import TrustSafety from "@/components/campaign/TrustSafety";
+import FloatingDonateButton from "@/components/campaign/FloatingDonateButton";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import GlobalLoader from "@/components/GlobalLoader";
@@ -21,6 +24,7 @@ export default function CampaignPage() {
   const [darkMode, setDarkMode] = useState(false);
   const [scrolled, setScrolled] = useState(true);
   const donationCardRef = useRef(null);
+  const [isFloatingModalOpen, setIsFloatingModalOpen] = useState(false);
 
   const { data, isLoading, error } = useFetchCampaignBySlugQuery(slug, {
     skip: !slug,
@@ -81,7 +85,6 @@ export default function CampaignPage() {
           </button>
         </div>
 
-
         {/* HERO - Full width */}
         <CampaignHero
           campaign={campaign}
@@ -118,6 +121,11 @@ export default function CampaignPage() {
           </div>
         </div>
 
+        {/* TRUST & SAFETY - Only visible on mobile (below lg) */}
+        <div className="lg:hidden mt-6">
+          <TrustSafety darkMode={darkMode} />
+        </div>
+
         {/* RELATED */}
         <RelatedCampaigns
           category={campaign.category}
@@ -129,6 +137,25 @@ export default function CampaignPage() {
       </div>
 
       <Footer darkMode={darkMode} />
+
+      {/* Floating Donate Button - Only visible on mobile when scrolled */}
+      <FloatingDonateButton 
+        darkMode={darkMode} 
+        onClick={() => setIsFloatingModalOpen(true)}
+        isModalOpen={isFloatingModalOpen}
+      />
+
+      {/* Floating Button Donation Modal */}
+      <DonatePopUpModal
+        isOpen={isFloatingModalOpen}
+        onClose={() => setIsFloatingModalOpen(false)}
+        darkMode={darkMode}
+        campaignId={campaign._id}
+        zakatVerified={campaign.zakatVerified}
+        ribaEligible={campaign.ribaEligible}
+        taxEligible={campaign.taxBenefits}
+        allowedDonationTypes={campaign.allowedDonationTypes}
+      />
     </div>
   );
 }

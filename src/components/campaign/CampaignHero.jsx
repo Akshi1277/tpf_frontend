@@ -33,11 +33,18 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
   }, [orderedImages.length]);
 
   useEffect(() => {
-    if (!sessionStorage.getItem("donate_popup_seen")) {
+    const MAX_AUTO_OPENS = 3;
+    const storageKey = "donate_popup_count";
+
+    const rawCount = sessionStorage.getItem(storageKey);
+    const count = rawCount ? parseInt(rawCount, 10) : 0;
+
+    if (count < MAX_AUTO_OPENS) {
       setIsModalOpen(true);
-      sessionStorage.setItem("donate_popup_seen", "1");
+      sessionStorage.setItem(storageKey, String(count + 1));
     }
   }, []);
+
 
   return (
     <>
