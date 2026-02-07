@@ -490,7 +490,7 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
                             onChange={(e) => setIsAnonymous(e.target.checked)}
                             className="w-4 h-4 rounded accent-emerald-500"
                           />
-                          <span className="text-xs font-medium">Anonymous</span>
+                          <span className="text-xs font-medium">Make this Donation Anonymous</span>
                         </label>
                       </div>
 
