@@ -204,7 +204,7 @@ export default function PulseSection({ darkMode }) {
             </p>
           </div>
 
-          <div className="flex flex-col items-center mb-10">
+          <div className="flex flex-col items-center mb-10 ">
             <div className={`relative inline-block px-5 py-1 md:px-6 md:py-2 rounded-2xl ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'} shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}>
               <div className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
                 {currency(totalRaised)}
@@ -264,7 +264,7 @@ export default function PulseSection({ darkMode }) {
               </button>
 
               {/* HORIZONTAL TRACK */}
-              <div id="recent-track" className={`flex overflow-x-auto scrollbar-hide scroll-smooth w-full min-h-[112px] ${recentDonations.length < 6 ? 'justify-center' : 'justify-start'}`}>
+              <div id="recent-track" className={`flex overflow-x-auto scrollbar-hide py-5 scroll-smooth w-full min-h-[112px] ${recentDonations.length < 6 ? 'justify-center' : 'justify-start'}`}>
                 {isRecentLoading ? (
                   <div className="w-full text-center py-10 text-zinc-500">Loading live donations...</div>
                 ) : recentDonations.length === 0 ? (
