@@ -3,19 +3,31 @@ import { logout, setCredentials } from "./authSlice";
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
 
+    donationIdentify: builder.mutation({
+      query: ({ fullName, email, mobileNo }) => ({
+        url: "/user/identity",
+        method: "POST",
+        body: {
+          fullName,
+          email,
+          mobileNo,
+        },
+      }),
+    }),
+
     sendOtp: builder.mutation({
-      query: ({ mobileNo, email,type }) => ({
+      query: ({ mobileNo, email, type }) => ({
         url: "/user/send-otp",
         method: "POST",
-        body: { mobileNo, email,type },
+        body: { mobileNo, email, type },
       }),
     }),
 
     verifyOtp: builder.mutation({
-      query: ({ mobileNo, email,otp }) => ({
+      query: ({ mobileNo, email, otp }) => ({
         url: "/user/verify-otp",
         method: "POST",
-        body: { mobileNo,email, otp },
+        body: { mobileNo, email, otp },
       }),
     }),
 
@@ -137,6 +149,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
+  useDonationIdentifyMutation,
   useSendOtpMutation,
   useVerifyOtpMutation,
   useUpdateProfileMutation,

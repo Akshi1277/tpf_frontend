@@ -1,56 +1,72 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Lock, Info, Check, X, Sparkles, AlertCircle } from 'lucide-react';
+import { Heart, Lock, X, Sparkles, Moon, Coins, Gift, Star, HandHeart, User, Mail, Phone, HeartCrack, HeartHandshake } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { useRef } from 'react';
-import LoginModal from '../login/LoginModal/MainModal';
 import { useAppToast } from '@/app/AppToastContext';
+import { useDonationIdentifyMutation } from "@/utils/slices/authApiSlice";
 
 export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId, ribaEligible, zakatVerified, taxEligible, allowedDonationTypes = [] }) {
-  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [selectedAmount, setSelectedAmount] = useState(100);
   const [customAmount, setCustomAmount] = useState('');
-  const [tipAmount, setTipAmount] = useState(0);
-  const [tipPercentage, setTipPercentage] = useState(18);
+  const [showCustomAmountInput, setShowCustomAmountInput] = useState(false);
+  const [tipPercentage, setTipPercentage] = useState(0);
+  const [customTip, setCustomTip] = useState('');
+  const [showCustomTipInput, setShowCustomTipInput] = useState(false);
   const [cashfreeData, setCashfreeData] = useState(null);
   const [donationType, setDonationType] = useState('SADAQAH');
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [claim80G, setClaim80G] = useState(false);
-
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [pendingDonate, setPendingDonate] = useState(false);
+  
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobileNo, setMobileNo] = useState('');
+  const [userId, setUserId] = useState(null);
+  
   const [isDonating, setIsDonating] = useState(false);
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
 
   const checkoutStartedRef = useRef(false);
-
   const userInfo = useSelector((state) => state.auth.userInfo);
   const { showToast } = useAppToast();
+  const [donationIdentify] = useDonationIdentifyMutation();
 
-  const presetAmounts = [500, 1000, 5000, 10000];
-  const tipPercentages = [2, 5, 10, 15, 18];
+  const presetAmounts = [
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+    { value: 200, label: '200' },
+    { value: 500, label: '500' }
+  ];
+  const tipPercentages = [0, 5, 10, 15];
 
   const allDonationTypes = [
-    { id: 'ZAKAAT', label: 'Zakat', desc: 'Obligatory charity', disabled: !zakatVerified },
-    { id: 'RIBA', label: 'RIBA', desc: 'Interest Money', disabled: !ribaEligible },
-    { id: 'SADAQAH', label: 'Sadaqah', desc: 'Voluntary charity' },
-    { id: 'LILLAH', label: 'Lillah', desc: 'For sake of Allah' },
-    { id: 'IMDAD', label: 'Imdad', desc: 'Emergency relief' },
+    { id: 'ZAKAAT', label: 'Zakat', Icon: Moon, disabled: !zakatVerified },
+    { id: 'RIBA', label: 'RIBA', Icon: Coins, disabled: !ribaEligible },
+    { id: 'SADAQAH', label: 'Sadaqah', Icon: Gift },
+    { id: 'LILLAH', label: 'Lillah', Icon: Star },
+    { id: 'IMDAD', label: 'Imdad', Icon: HandHeart },
   ];
 
   const filteredDonationTypes = allowedDonationTypes?.length > 0
     ? allDonationTypes.filter(t => allowedDonationTypes.some(at => at.toUpperCase() === t.id.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')))
     : allDonationTypes;
 
-  // Set default donation type if restricted
   useEffect(() => {
     if (allowedDonationTypes?.length > 0 && !allowedDonationTypes.some(at => at.toUpperCase() === donationType.toUpperCase() || (at.toUpperCase() === 'ZAKAT' && donationType === 'ZAKAAT'))) {
       setDonationType(filteredDonationTypes[0]?.id || 'SADAQAH');
     }
-  }, [allowedDonationTypes, filteredDonationTypes]);
+  }, [allowedDonationTypes, filteredDonationTypes, donationType]);
 
-  // Lock body scroll when modal is open
   useEffect(() => {
-    if (isOpen) {
+    if (userInfo) {
+      setFullName(userInfo.fullName || '');
+      setEmail(userInfo.email || '');
+      setMobileNo(userInfo.mobileNo || '');
+      setUserId(userInfo._id || userInfo.userId);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (isOpen || showExitConfirmation) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -58,7 +74,25 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, showExitConfirmation]);
+
+  const handleIdentifyUser = async () => {
+    try {
+      const result = await donationIdentify({
+        fullName,
+        email,
+        mobileNo,
+      }).unwrap();
+
+      if (result?.data?.userId) {
+        return result.data.userId;
+      }
+      throw new Error("Unable to identify user");
+    } catch (err) {
+      console.error("User identification failed", err);
+      throw err;
+    }
+  };
 
   const handleDonate = async () => {
     if (isDonating) return;
@@ -75,20 +109,58 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
       return;
     }
 
-    if (!userInfo) {
-      setPendingDonate(true);
-      setShowLoginModal(true);
+    if (donationType === 'ZAKAAT' && !zakatVerified) {
+      showToast({
+        title: "Not Verified",
+        message: "This campaign is not verified for Zakaat.",
+        type: "error"
+      });
       return;
     }
 
-    setPendingDonate(false);
+    if (!userInfo) {
+      if (!fullName.trim()) {
+        showToast({
+          title: "Name Required",
+          message: "Please enter your full name.",
+          type: "error"
+        });
+        return;
+      }
+
+      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast({
+          title: "Valid Email Required",
+          message: "Please enter a valid email address.",
+          type: "error"
+        });
+        return;
+      }
+
+      if (!mobileNo.trim() || !/^\d{10}$/.test(mobileNo)) {
+        showToast({
+          title: "Valid Mobile Required",
+          message: "Please enter a valid 10-digit mobile number.",
+          type: "error"
+        });
+        return;
+      }
+    }
+
     setIsDonating(true);
 
     try {
-      if (donationType === 'ZAKAAT' && !zakatVerified) {
-        alert("This campaign is not verified for Zakaat.");
-        return;
+      let userIdToUse = userId;
+      if (!userIdToUse && !userInfo) {
+        userIdToUse = await handleIdentifyUser();
+        setUserId(userIdToUse);
       }
+
+      const calculatedTipAmount = customTip 
+        ? parseInt(customTip) 
+        : tipPercentage 
+          ? Math.round(amount * (tipPercentage / 100)) 
+          : 0;
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/donations/initiate`,
@@ -98,11 +170,12 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
           credentials: "include",
           body: JSON.stringify({
             amount,
-            tipAmount,
+            tipAmount: calculatedTipAmount,
             campaignId,
             donationType,
             isAnonymous,
-            isTaxEligible: claim80G,
+            isTaxEligible: false,
+            userId: userIdToUse,
           }),
         }
       );
@@ -117,25 +190,15 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
 
     } catch (err) {
       console.error("Donation initiate failed", err);
+      showToast({
+        title: "Error",
+        message: err.message || "Failed to initiate donation. Please try again.",
+        type: "error"
+      });
     } finally {
       setIsDonating(false);
     }
   };
-
-  useEffect(() => {
-    if (userInfo && pendingDonate) {
-      handleDonate();
-    }
-  }, [userInfo, pendingDonate]);
-
-  useEffect(() => {
-    const baseAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
-    if (baseAmount > 0) {
-      setTipAmount(Math.round(baseAmount * (tipPercentage / 100)));
-    } else {
-      setTipAmount(0);
-    }
-  }, [selectedAmount, customAmount, tipPercentage]);
 
   useEffect(() => {
     if (!cashfreeData?.paymentSessionId) return;
@@ -167,408 +230,441 @@ export default function DonatePopUpModal({ isOpen, onClose, darkMode, campaignId
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, [cashfreeData]);
 
-
-
-  const handleTipPercentageClick = (percentage) => {
-    setTipPercentage(percentage);
+  const handleCloseAttempt = () => {
+    const amount = selectedAmount || parseInt(customAmount);
+    if (amount >= 50 && !isDonating) {
+      setShowExitConfirmation(true);
+    } else {
+      onClose();
+    }
   };
+
+  const handleConfirmClose = () => {
+    setShowExitConfirmation(false);
+    onClose();
+  };
+
+  const handleCancelClose = () => {
+    setShowExitConfirmation(false);
+  };
+
+  const baseAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
+  const tipAmount = customTip 
+    ? parseInt(customTip) 
+    : tipPercentage 
+      ? Math.round(baseAmount * (tipPercentage / 100)) 
+      : 0;
+  const totalAmount = baseAmount + (tipAmount || 0);
 
   return (
     <>
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              onClick={onClose}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={handleCloseAttempt}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
             />
 
-            {/* Modal Container - Scrollable */}
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-4 overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-5xl my-auto"
+                className="w-full max-w-md md:max-w-2xl max-h-[96vh] overflow-auto"
               >
-                <div className={`${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'} border-2 rounded-xl md:rounded-2xl shadow-2xl relative max-h-[95vh] overflow-y-auto`}>
-                  {/* Close Button */}
+                <div className={`${darkMode ? 'bg-zinc-900' : 'bg-white'} rounded-2xl shadow-2xl relative`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5 pointer-events-none rounded-2xl" />
+                  
                   <button
-                    onClick={onClose}
-                    className={`sticky top-3 right-3 md:top-4 md:right-4 float-right w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors z-10 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
-                      }`}
+                    onClick={handleCloseAttempt}
+                    className={`absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center transition-colors z-10 ${
+                      darkMode ? 'bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+                    }`}
                   >
-                    <X className="w-4 h-4 md:w-5 md:h-5" />
+                    <X className="w-4 h-4" />
                   </button>
 
-                  {/* Header */}
-                  <div className={`relative overflow-hidden border-b-2 ${darkMode ? 'border-zinc-800' : 'border-gray-100'}`}>
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10" />
-                    <div className="relative px-4 py-3 md:px-6 md:py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg flex-shrink-0`}>
-                          <Heart className="w-5 h-5 md:w-6 md:h-6 text-white" fill="currentColor" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h2 className={`text-lg md:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            Make a Difference
-                          </h2>
-                          <p className={`text-xs md:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Your generosity transforms lives
-                          </p>
-                        </div>
+                  <div className="relative p-4">
+                    {/* Header */}
+                    <div className="flex items-center gap-2.5 mb-3 pb-2.5 border-b border-emerald-500/20">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md flex items-center justify-center flex-shrink-0">
+                        <Heart className="w-5 h-5 text-white" fill="currentColor" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h2 className={`text-base font-bold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          Make a Difference
+                        </h2>
+                        <p className={`text-[11px] ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Your generosity transforms lives
+                        </p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Content Grid */}
-                  <div className="grid lg:grid-cols-3 gap-4 md:gap-5 p-4 md:p-5">
-                    {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-3.5 md:space-y-4">
-                      {/* Donation Type */}
-                      <div>
-                        <label className={`block text-xs md:text-sm font-bold mb-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                          Type of Donation
-                        </label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {filteredDonationTypes.map((type) => (
-                            <motion.button
-                              key={type.id}
-                              whileHover={{ scale: type.disabled ? 1 : 1.02 }}
-                              whileTap={{ scale: type.disabled ? 1 : 0.98 }}
-                              onClick={() => !type.disabled && setDonationType(type.id)}
-                              disabled={type.disabled}
-                              className={`
-                                p-2 md:p-2.5 rounded-lg border-2 text-left transition-all
-                                ${donationType === type.id
-                                  ? darkMode
-                                    ? 'border-emerald-500 bg-emerald-950/50 shadow-lg shadow-emerald-500/20'
-                                    : 'border-emerald-600 bg-emerald-50 shadow-lg shadow-emerald-600/20'
-                                  : darkMode
-                                    ? 'border-zinc-800 hover:border-zinc-700'
-                                    : 'border-gray-200 hover:border-gray-300'}
-                                ${type.disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
-                              `}
-                            >
-                              <div className="flex items-start justify-between mb-0.5">
-                                <span className={`font-bold text-xs md:text-sm ${donationType === type.id
-                                  ? darkMode ? 'text-emerald-400' : 'text-emerald-700'
-                                  : darkMode ? 'text-gray-200' : 'text-gray-900'
-                                  }`}>
-                                  {type.label}
-                                </span>
-                                {type.id === 'ZAKAAT' && !zakatVerified && (
-                                  <Lock className="w-3 h-3 text-gray-400 flex-shrink-0" />
-                                )}
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {/* Left Column */}
+                      <div className="space-y-2.5">
+                        {/* Donation Type */}
+                        <div>
+                          <label className={`block text-xs font-semibold mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Type
+                          </label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {filteredDonationTypes.map((type) => {
+                              const IconComponent = type.Icon;
+                              return (
+                                <button
+                                  key={type.id}
+                                  onClick={() => !type.disabled && setDonationType(type.id)}
+                                  disabled={type.disabled}
+                                  className={`
+                                    px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 whitespace-nowrap
+                                    ${donationType === type.id
+                                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm'
+                                      : darkMode
+                                        ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                                    ${type.disabled ? 'opacity-40 cursor-not-allowed' : ''}
+                                  `}
+                                >
+                                  <IconComponent className="w-3 h-3" />
+                                  <span>{type.label}</span>
+                                  {type.disabled && <Lock className="w-2.5 h-2.5" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Amount */}
+                        <div>
+                          <label className={`block text-xs font-semibold mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Amount
+                          </label>
+                          <div className="grid grid-cols-5 gap-1.5">
+                            {presetAmounts.map((amount) => (
+                              <button
+                                key={amount.value}
+                                onClick={() => {
+                                  setSelectedAmount(amount.value);
+                                  setCustomAmount('');
+                                  setShowCustomAmountInput(false);
+                                }}
+                                className={`
+                                  h-9 rounded-lg font-bold text-xs transition-all
+                                  ${selectedAmount === amount.value && !customAmount
+                                    ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white'
+                                    : darkMode
+                                      ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
+                                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
+                                `}
+                              >
+                                ₹{amount.label}
+                              </button>
+                            ))}
+                            {!showCustomAmountInput ? (
+                              <button
+                                onClick={() => setShowCustomAmountInput(true)}
+                                className={`
+                                  h-9 rounded-lg font-bold text-xs
+                                  ${customAmount
+                                    ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white'
+                                    : darkMode
+                                      ? 'bg-zinc-800 text-gray-300'
+                                      : 'bg-gray-100 text-gray-700'}
+                                `}
+                              >
+                                {customAmount ? `₹${customAmount}` : 'Other'}
+                              </button>
+                            ) : (
+                              <input
+                                type="number"
+                                placeholder="₹"
+                                value={customAmount}
+                                autoFocus
+                                onChange={(e) => {
+                                  setCustomAmount(e.target.value);
+                                  setSelectedAmount(null);
+                                }}
+                                onBlur={() => !customAmount && setShowCustomAmountInput(false)}
+                                className={`
+                                  h-9 px-1 text-xs text-center rounded-lg font-semibold
+                                  ${customAmount
+                                    ? darkMode ? 'bg-zinc-800 border-2 border-emerald-500 text-white' : 'bg-emerald-50 border-2 border-emerald-500 text-gray-900'
+                                    : darkMode ? 'bg-zinc-800 border border-zinc-700 text-white' : 'bg-gray-100 border border-gray-200 text-gray-900'}
+                                  focus:outline-none
+                                `}
+                              />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Tip */}
+                        <div>
+                          <label className={`flex items-center gap-1.5 text-xs font-semibold mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Platform Tip
+                            <div className="group relative">
+                              <div className={`w-4 h-4 rounded-full flex items-center justify-center cursor-help ${darkMode ? 'bg-zinc-800 text-gray-400' : 'bg-gray-200 text-gray-600'}`}>
+                                <span className="text-[9px] font-bold">i</span>
                               </div>
-                              <p className={`text-xs leading-snug ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
-                                {type.desc}
-                              </p>
-                            </motion.button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Amount Selection */}
-                      <div>
-                        <label className={`block text-xs md:text-sm font-bold mb-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                          Choose Amount
-                        </label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {presetAmounts.map((amount) => (
-                            <motion.button
-                              key={amount}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => {
-                                setSelectedAmount(amount);
-                                setCustomAmount('');
-                              }}
-                              className={`
-                                h-10 md:h-12 rounded-lg font-bold text-sm md:text-base border-2 transition-all
-                                ${selectedAmount === amount
-                                  ? darkMode
-                                    ? 'border-emerald-500 bg-emerald-950/50 text-emerald-400 shadow-lg shadow-emerald-500/20'
-                                    : 'border-emerald-600 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-600/20'
-                                  : darkMode
-                                    ? 'border-zinc-800 text-gray-300 hover:border-zinc-700'
-                                    : 'border-gray-200 text-gray-700 hover:border-gray-300'}
-                              `}
-                            >
-                              ₹{amount.toLocaleString()}
-                            </motion.button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Custom Amount */}
-                      <div>
-                        <label className={`block text-xs md:text-sm font-bold mb-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                          Or Enter Custom Amount
-                        </label>
-                        <div className="relative">
-                          <span className={`absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-base md:text-lg font-bold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            ₹
-                          </span>
-                          <input
-                            type="number"
-                            placeholder="Enter any amount"
-                            value={customAmount}
-                            onChange={(e) => {
-                              setCustomAmount(e.target.value);
-                              setSelectedAmount(null);
-                            }}
-                            className={`
-                              w-full h-10 md:h-12 pl-9 md:pl-11 pr-4 text-sm md:text-base rounded-lg border-2 transition-all
-                              ${customAmount
-                                ? darkMode
-                                  ? customAmount < 50 ? 'border-red-500 bg-red-500/5 text-white' : 'border-emerald-500 bg-emerald-950/50 text-white shadow-lg shadow-emerald-500/20'
-                                  : customAmount < 50 ? 'border-red-500 bg-red-50 text-gray-900' : 'border-emerald-600 bg-emerald-50 text-gray-900 shadow-lg shadow-emerald-600/20'
-                                : darkMode
-                                  ? 'border-zinc-800 bg-zinc-900 text-white placeholder-gray-600'
-                                  : 'border-gray-200 bg-white text-gray-900 placeholder-gray-400'}
-                              focus:outline-none focus:ring-0
-                            `}
-                          />
-                          {customAmount && customAmount < 50 && (
-                            <p className="mt-2 text-[10px] md:text-xs font-semibold text-red-500 flex items-center gap-1 leading-none">
-                              <AlertCircle className="w-3 h-3" /> Min. ₹50 required
-                            </p>
-                          )}
-                          {!customAmount && !selectedAmount && (
-                            <p className={`mt-2 text-[10px] md:text-xs font-medium leading-none ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                              Minimum contribution ₹50
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Column */}
-                    <div className="space-y-3">
-                      {/* Tip Section */}
-                      <div className={`p-3 rounded-lg border-2 ${darkMode ? 'border-zinc-800 bg-zinc-900/50' : 'border-gray-200 bg-gray-50'}`}>
-                        <label className={`block text-xs md:text-sm font-bold mb-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'} flex items-center gap-2`}>
-                          Support TPF
-                          <div className="group relative">
-                            <Info className="w-3.5 h-3.5 text-emerald-500 cursor-help" />
-                            <div className={`
-                              absolute bottom-full right-0 mb-2 w-56 p-3 rounded-lg text-xs leading-relaxed
-                              ${darkMode ? 'bg-zinc-800 text-gray-200 border border-zinc-700' : 'bg-gray-900 text-white'}
-                              opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl
-                            `}>
-                              We rely on your generosity to run this platform and connect donors with worthy causes.
+                              <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 w-40 p-2 rounded-lg text-[10px] leading-snug z-20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl ${darkMode ? 'bg-zinc-800 text-gray-200 border border-zinc-700' : 'bg-gray-900 text-white'}`}>
+                                Helps run platform
+                                <div className={`absolute top-full left-1/2 -translate-x-1/2 -mt-0.5 w-1.5 h-1.5 rotate-45 ${darkMode ? 'bg-zinc-800' : 'bg-gray-900'}`}></div>
+                              </div>
                             </div>
+                          </label>
+                          <div className="grid grid-cols-5 gap-1.5">
+                            {tipPercentages.map((percentage) => (
+                              <button
+                                key={percentage}
+                                onClick={() => {
+                                  setTipPercentage(percentage);
+                                  setCustomTip('');
+                                  setShowCustomTipInput(false);
+                                }}
+                                className={`
+                                  h-8 rounded-lg text-[11px] font-bold
+                                  ${tipPercentage === percentage && !customTip
+                                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                                    : darkMode
+                                      ? 'bg-zinc-800 text-gray-300'
+                                      : 'bg-gray-100 text-gray-700'}
+                                `}
+                              >
+                                {percentage}%
+                              </button>
+                            ))}
+                            {!showCustomTipInput ? (
+                              <button
+                                onClick={() => setShowCustomTipInput(true)}
+                                className={`
+                                  h-8 rounded-lg text-[11px] font-bold
+                                  ${customTip
+                                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                                    : darkMode
+                                      ? 'bg-zinc-800 text-gray-300'
+                                      : 'bg-gray-100 text-gray-700'}
+                                `}
+                              >
+                                {customTip ? `₹${customTip}` : 'Other'}
+                              </button>
+                            ) : (
+                              <input
+                                type="number"
+                                placeholder="₹"
+                                value={customTip}
+                                autoFocus
+                                onChange={(e) => {
+                                  setCustomTip(e.target.value);
+                                  setTipPercentage(null);
+                                }}
+                                onBlur={() => !customTip && setShowCustomTipInput(false)}
+                                className={`
+                                  h-8 px-1 text-xs text-center rounded-lg font-semibold focus:outline-none
+                                  ${customTip
+                                    ? darkMode ? 'bg-zinc-800 border-2 border-amber-500 text-white' : 'bg-amber-50 border-2 border-amber-500 text-gray-900'
+                                    : darkMode ? 'bg-zinc-800 border border-zinc-700 text-white' : 'bg-gray-100 border border-gray-200 text-gray-900'}
+                                `}
+                              />
+                            )}
                           </div>
-                        </label>
-
-                        <div className="grid grid-cols-5 gap-1.5 mb-2">
-                          {tipPercentages.map((percentage) => (
-                            <motion.button
-                              key={percentage}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleTipPercentageClick(percentage)}
-                              className={`
-                                py-1.5 rounded-md text-xs font-bold border-2 transition-all
-                                ${tipPercentage === percentage
-                                  ? darkMode
-                                    ? 'border-emerald-500 bg-emerald-950/50 text-emerald-400'
-                                    : 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                                  : darkMode
-                                    ? 'border-zinc-700 text-gray-400 hover:border-zinc-600'
-                                    : 'border-gray-300 text-gray-700 hover:border-gray-400'}
-                              `}
-                            >
-                              {percentage}%
-                            </motion.button>
-                          ))}
                         </div>
 
-                        <div className="relative">
-                          <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            ₹
-                          </span>
-                          <input
-                            type="number"
-                            placeholder="0"
-                            value={tipAmount}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value);
-                              setTipAmount(isNaN(val) ? 0 : val);
-                              setTipPercentage(null);
-                            }}
-                            className={`
-                              w-full h-10 pl-8 pr-3 text-sm rounded-lg border-2 transition-all
-                              ${tipAmount > 0
-                                ? darkMode
-                                  ? 'border-emerald-500 bg-emerald-950/50 text-white'
-                                  : 'border-emerald-600 bg-emerald-50 text-gray-900'
-                                : darkMode
-                                  ? 'border-zinc-700 bg-zinc-800 text-white placeholder-gray-600'
-                                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-400'}
-                              focus:outline-none focus:ring-0
-                            `}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Options */}
-                      <div className="space-y-2">
-                        <label className={`flex items-center gap-2.5 cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                          <div className={`w-4 h-4 md:w-5 md:h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${isAnonymous
-                            ? 'bg-emerald-500 border-emerald-500'
-                            : darkMode ? 'border-zinc-600' : 'border-gray-300'
-                            }`}>
-                            {isAnonymous && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />}
-                          </div>
+                        {/* Anonymous */}
+                        <label className={`flex items-center gap-2 cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                           <input
                             type="checkbox"
                             checked={isAnonymous}
                             onChange={(e) => setIsAnonymous(e.target.checked)}
-                            className="hidden"
+                            className="w-4 h-4 rounded accent-emerald-500"
                           />
-                          <span className={`text-xs md:text-sm font-medium`}>
-                            Make my donation anonymous
-                          </span>
+                          <span className="text-xs font-medium">Make this Donation Anonymous</span>
                         </label>
-
-                        {taxEligible && (
-                          <label className={`flex items-center gap-2.5 cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                            <div className={`w-4 h-4 md:w-5 md:h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${claim80G
-                              ? 'bg-emerald-500 border-emerald-500'
-                              : darkMode ? 'border-zinc-600' : 'border-gray-300'
-                              }`}>
-                              {claim80G && <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />}
-                            </div>
-                            <input
-                              type="checkbox"
-                              checked={claim80G}
-                              onChange={(e) => setClaim80G(e.target.checked)}
-                              className="hidden"
-                            />
-                            <span className={`text-xs md:text-sm font-medium`}>
-                              Claim 80G tax benefits
-                            </span>
-                          </label>
-                        )}
                       </div>
 
-                      {/* Total Summary */}
-                      {(selectedAmount || customAmount) && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className={`p-3 rounded-lg border-2 ${darkMode ? 'border-emerald-500/30 bg-emerald-950/30' : 'border-emerald-200 bg-emerald-50'}`}
-                        >
-                          <div className="space-y-1">
-                            <div className={`flex justify-between text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                              <span>Donation</span>
-                              <span className="font-semibold">₹{(selectedAmount || Number(customAmount) || 0).toLocaleString()}</span>
+                      {/* Right Column */}
+                      <div className="space-y-2.5">
+                        {/* User Details */}
+                        {!userInfo && (
+                          <div className="space-y-2">
+                            <label className={`block text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Your Details
+                            </label>
+                            
+                            <div className="relative">
+                              <User className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                              <input
+                                type="text"
+                                placeholder="Full Name"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                className={`w-full h-9 pl-9 pr-3 text-xs rounded-lg font-medium focus:outline-none ${darkMode ? 'bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:border-emerald-500' : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'}`}
+                              />
                             </div>
-                            {tipAmount > 0 && (
-                              <div className={`flex justify-between text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <span>Platform Tip</span>
-                                <span className="font-semibold">₹{tipAmount.toLocaleString()}</span>
-                              </div>
-                            )}
-                            <div className={`pt-1 border-t ${darkMode ? 'border-zinc-700' : 'border-gray-200'}`} />
-                            <div className={`flex justify-between text-base font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
-                              <span>Total</span>
-                              <span>₹{((selectedAmount || Number(customAmount) || 0) + (tipAmount || 0)).toLocaleString()}</span>
+
+                            <div className="relative">
+                              <Mail className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                              <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className={`w-full h-9 pl-9 pr-3 text-xs rounded-lg font-medium focus:outline-none ${darkMode ? 'bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:border-emerald-500' : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'}`}
+                              />
+                            </div>
+
+                            <div className="relative">
+                              <Phone className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                              <input
+                                type="tel"
+                                placeholder="Mobile"
+                                value={mobileNo}
+                                onChange={(e) => setMobileNo(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                maxLength={10}
+                                className={`w-full h-9 pl-9 pr-3 text-xs rounded-lg font-medium focus:outline-none ${darkMode ? 'bg-zinc-800 border border-zinc-700 text-white placeholder-gray-500 focus:border-emerald-500' : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'}`}
+                              />
                             </div>
                           </div>
-                        </motion.div>
-                      )}
-
-                      {/* Donate Button */}
-                      <motion.button
-                        whileHover={{ scale: (selectedAmount || customAmount) && !isDonating ? 1.02 : 1 }}
-                        whileTap={{ scale: (selectedAmount || customAmount) && !isDonating ? 0.98 : 1 }}
-                        onClick={handleDonate}
-                        disabled={isDonating || (!selectedAmount && !customAmount)}
-                        className={`
-                          w-full h-11 md:h-12 rounded-lg font-bold text-sm md:text-base transition-all
-                          flex items-center justify-center gap-2
-                          ${isDonating
-                            ? 'bg-emerald-600 text-white cursor-wait'
-                            : selectedAmount || customAmount
-                              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-600/30'
-                              : darkMode
-                                ? 'bg-zinc-800 text-gray-600 cursor-not-allowed'
-                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'}
-                        `}
-                      >
-                        {isDonating ? (
-                          <>
-                            <svg
-                              className="animate-spin h-4 w-4 text-white"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              />
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z"
-                              />
-                            </svg>
-                            <span className="hidden sm:inline">Processing Donation…</span>
-                            <span className="sm:hidden">Processing…</span>
-                          </>
-                        ) : (
-                          <>
-                            <Heart className="w-4 h-4" fill="currentColor" />
-                            {(() => {
-                              const amount = selectedAmount || Number(customAmount) || 0;
-                              if (amount === 0) return 'Select Amount';
-                              if (amount < 50) return 'Min. ₹50 Required';
-                              return `Donate ₹${(amount + (tipAmount || 0)).toLocaleString()}`;
-                            })()}
-                          </>
                         )}
-                      </motion.button>
 
-                      {/* Terms */}
-                      <p className={`text-xs text-center leading-relaxed ${darkMode ? 'text-gray-500' : 'text-gray-600'}`}>
-                        By donating, you agree to our terms. {taxEligible ? 'Donations are tax-deductible and a' : 'A'} receipt will be sent to your email.
-                      </p>
+                        {/* Total */}
+                        {baseAmount > 0 && (
+                          <div className={`p-3 rounded-lg ${darkMode ? 'bg-emerald-950/30 border border-emerald-500/30' : 'bg-emerald-50 border border-emerald-200'}`}>
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-xs">
+                                <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Donation</span>
+                                <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>₹{baseAmount.toLocaleString()}</span>
+                              </div>
+                              {tipAmount > 0 && (
+                                <div className="flex justify-between text-xs">
+                                  <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Tip</span>
+                                  <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>₹{tipAmount.toLocaleString()}</span>
+                                </div>
+                              )}
+                              <div className={`flex justify-between pt-1.5 mt-1.5 border-t ${darkMode ? 'border-emerald-500/30' : 'border-emerald-200'}`}>
+                                <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Total</span>
+                                <span className={`text-lg font-bold bg-gradient-to-r ${darkMode ? 'from-emerald-400 to-teal-400' : 'from-emerald-600 to-teal-600'} bg-clip-text text-transparent`}>
+                                  ₹{totalAmount.toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Donate Button */}
+                        <button
+                          onClick={handleDonate}
+                          disabled={isDonating || baseAmount < 50}
+                          className={`w-full h-10 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${isDonating ? 'bg-emerald-600 text-white' : baseAmount >= 50 ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-600/30' : darkMode ? 'bg-zinc-800 text-gray-600' : 'bg-gray-200 text-gray-400'}`}
+                        >
+                          {isDonating ? (
+                            <>
+                              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z" />
+                              </svg>
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4" />
+                              {baseAmount < 50 ? 'Min. ₹50' : 'Donate Now'}
+                            </>
+                          )}
+                        </button>
+
+                        <p className={`text-[10px] text-center ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                          Secure payment • Receipt via email
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </motion.div>
             </div>
-
-
           </>
         )}
       </AnimatePresence>
 
-      <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        darkMode={darkMode}
-        onLoginSuccess={() => setShowLoginModal(false)}
-      />
+      {/* Exit Confirmation */}
+      <AnimatePresence>
+        {showExitConfirmation && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleCancelClose}
+              className="fixed inset-0 bg-black/80 z-[60]"
+              style={{ backdropFilter: 'blur(8px)' }}
+            />
+
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-sm"
+              >
+                <div className={`${darkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white'} rounded-2xl shadow-2xl relative overflow-hidden`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 via-pink-500/10 to-purple-500/10" />
+                  
+                  <div className="relative p-6">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 via-pink-500 to-purple-500 flex items-center justify-center shadow-lg">
+                        <HeartCrack className="w-8 h-8 text-white" strokeWidth={2.5} />
+                      </div>
+                    </div>
+
+                    <div className="text-center mb-6">
+                      <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        You Can Change Lives Today
+                      </h3>
+                      <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Your donation of <span className="font-bold text-emerald-500">₹{totalAmount.toLocaleString()}</span> can make a real difference.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <button
+                        onClick={handleCancelClose}
+                        className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2"
+                      >
+                        <HeartHandshake className="w-5 h-5" />
+                        Change Lives Now
+                      </button>
+                      
+                      <button
+                        onClick={handleConfirmClose}
+                        className={`w-full h-12 rounded-xl font-semibold text-sm ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700 text-gray-300 border border-zinc-700' : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200'}`}
+                      >
+                        Maybe Next Time
+                      </button>
+                    </div>
+
+                    <p className={`text-center text-xs mt-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                      Every contribution matters
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
