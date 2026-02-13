@@ -303,7 +303,7 @@ export default function Footer({ darkMode }) {
 
             {/* Threads */}
             <a
-              href="https://www.threads.net/@yourhandle"
+              href="https://www.threads.com/@tpf_aid"
               className="social-icon-link group"
               aria-label="Visit our Threads page"
             >
