@@ -35,6 +35,7 @@ export default function MyselfForm({ darkModeFromParent }) {
     dateOfBirth: '',
     maritalStatus: '',
     gender: '',
+    declarationAccepted: false,
     termsAccepted: false,
     permanentAddress: '',
     currentAddress: '',
@@ -47,6 +48,7 @@ export default function MyselfForm({ darkModeFromParent }) {
     // Financial & Employment Details
     occupation: '',
     monthlyIncome: '',
+    noIncome: false,
     bankNameBranch: '',
     accountNumber: '',
     ifscCode: '',
@@ -56,7 +58,8 @@ export default function MyselfForm({ darkModeFromParent }) {
     // Reason for Aid Request
     aidType: '',
     hardshipDescription: '',
-    supportingDocuments: []
+    supportingDocuments: [],
+    supportingPictures: []
 
   })
 
@@ -71,8 +74,24 @@ export default function MyselfForm({ darkModeFromParent }) {
       return;
     }
 
+    // special handling for govIdNumber
+    if (name === "govIdNumber") {
+      let val = value;
+      if (formData.idType === "aadhar") {
+        val = value.replace(/\D/g, "").slice(0, 12);
+        val = val.replace(/(\d{4})(?=\d)/g, "$1-");
+      } else if (formData.idType === "pan") {
+        val = value.toUpperCase().slice(0, 10);
+      }
+      setFormData((prev) => ({
+        ...prev,
+        [name]: val,
+      }));
+      return;
+    }
+
     if (type === "file") {
-      if (name === "supportingDocuments") {
+      if (name === "supportingDocuments" || name === "supportingPictures") {
         setFormData((prev) => ({
           ...prev,
           [name]: Array.from(e.target.files),
@@ -96,9 +115,9 @@ export default function MyselfForm({ darkModeFromParent }) {
 
 
   const requiredFields = {
-    1: ["fullName", "dateOfBirth", "maritalStatus", "gender", "termsAccepted"],
-    2: ["permanentAddress", "currentAddress", "contactNumber", "email", "idType", "govIdNumber", "govIdDocument"],
-    3: ["occupation", "monthlyIncome", "bankNameBranch", "accountNumber", "ifscCode", "numberOfDependents", "bankStatement"],
+    1: ["fullName", "dateOfBirth", "maritalStatus", "gender", "numberOfDependents", "declarationAccepted", "termsAccepted"],
+    2: ["permanentAddress", "currentAddress", "contactNumber", "idType", "govIdNumber", "govIdDocument"],
+    3: ["occupation", "bankNameBranch", "accountNumber", "ifscCode", "bankStatement"],
     4: ["aidType", "hardshipDescription"],
   };
 
@@ -109,14 +128,25 @@ export default function MyselfForm({ darkModeFromParent }) {
       const value = formData[field];
 
       // Checkbox fields should be true
-      if ((field === "termsAccepted") && value !== true) {
+      if ((field === "termsAccepted" || field === "declarationAccepted") && value !== true) {
         return false;
       }
 
       // Normal fields should not be empty/null/undefined
       if (value === "" || value === null || value === undefined) {
-        return false;
+        // Special case for monthlyIncome: if noIncome is checked, it's optional
+        if (field === "monthlyIncome" && formData.noIncome) continue;
+
+        // If it's step 3 and we are checking monthlyIncome, but it's not in requiredFields it's fine
+        // Wait, I removed monthlyIncome from requiredFields? No, let's keep it but check noIncome.
+        if (field !== "monthlyIncome") return false;
+        else if (!formData.noIncome) return false;
       }
+    }
+
+    // Additional check for monthlyIncome if not in requiredFields but we want to validate it
+    if (step === 3 && !formData.noIncome && !formData.monthlyIncome) {
+      return false;
     }
 
     return true;
@@ -166,7 +196,8 @@ export default function MyselfForm({ darkModeFromParent }) {
       formDataToSend.append('idType', formData.idType)
       formDataToSend.append('govIdNumber', formData.govIdNumber)
       formDataToSend.append('occupation', formData.occupation)
-      formDataToSend.append('monthlyIncome', formData.monthlyIncome)
+      formDataToSend.append('monthlyIncome', formData.noIncome ? '0' : formData.monthlyIncome)
+      formDataToSend.append('noIncome', formData.noIncome)
       formDataToSend.append('bankNameBranch', formData.bankNameBranch)
       formDataToSend.append('accountNumber', formData.accountNumber)
       formDataToSend.append('ifscCode', formData.ifscCode)
@@ -184,6 +215,11 @@ export default function MyselfForm({ darkModeFromParent }) {
       if (formData.supportingDocuments && formData.supportingDocuments.length > 0) {
         formData.supportingDocuments.forEach((file) => {
           formDataToSend.append('supportingDocuments', file)
+        })
+      }
+      if (formData.supportingPictures && formData.supportingPictures.length > 0) {
+        formData.supportingPictures.forEach((file) => {
+          formDataToSend.append('supportingPictures', file)
         })
       }
 
@@ -473,6 +509,55 @@ export default function MyselfForm({ darkModeFromParent }) {
                         Female
                       </span>
                     </label>
+
+                    <label className="flex items-center cursor-pointer group">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="rather not say"
+                        checked={formData.gender === 'rather not say'}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                        required
+                      />
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${formData.gender === 'rather not say'
+                        ? "border-emerald-600 bg-emerald-600"
+                        : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                        }`}>
+                        <Check
+                          className={`w-3.5 h-3.5 text-white transition-opacity ${formData.gender === 'rather not say' ? "opacity-100" : "opacity-0"}`}
+                          strokeWidth={3}
+                        />
+                      </div>
+                      <span className={`ml-2 sm:ml-3 font-medium text-sm sm:text-base ${formData.gender === 'rather not say' ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        Rather not say
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Number of Dependents (Moved from Step 3) */}
+                  <div className="mt-6">
+                    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                      Number of Dependents <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      <input
+                        type="number"
+                        name="numberOfDependents"
+                        value={formData.numberOfDependents}
+                        onChange={handleInputChange}
+                        placeholder="Enter number of dependents"
+                        min="0"
+                        className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${darkMode
+                          ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+                          : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+                          }`}
+                        required
+                      />
+                    </div>
                   </div>
                   {/* Declaration & Consent */}
                   <div className={`mt-6 sm:mt-8 p-4 sm:p-6 rounded-lg border ${darkMode ? "bg-zinc-700/50 border-zinc-600" : "bg-zinc-50 border-zinc-200"}`}>
@@ -481,14 +566,36 @@ export default function MyselfForm({ darkModeFromParent }) {
                     </h3>
                     <div className={`text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
                       <p>
-                        I hereby declare that I am not getting assistance/provision from any other organization or entity in any form and the information provided above is true. Any misrepresentation may lead to disqualification. I authorize True Path Foundation to visit and contact me to verify the provided details. I understand that video verification, its online solicitation/circulation and an appeal are mandatory for funding campaigns. A copy of a document of identity proof and bank details (if available) must be attached. I/We provide free consent for this process and acknowledge full understanding of this form in vernacular.
+                        I, <span className="font-bold underline decoration-emerald-500 underline-offset-4">{formData.fullName || "{Full Name}"}</span>, hereby solemnly affirm that the particulars provided in this application are true and correct to the best of my knowledge and belief. I understand that any suppression of facts or provision of false information may lead to the disqualification of my application. I authorize True Path Foundation to conduct on-site visits and contact me directly for verification purposes. I am aware that video verification, online solicitation, and public appeals are mandatory procedures for campaign funding, and I give my full voluntary authorization for the same. I confirm that I am submitting my documents and details of my own accord, without any external pressure. I have fully understood all the terms of this declaration in a language I am proficient in.
                       </p>
                     </div>
 
-
-
-                    {/* Terms and Policies Acceptance */}
+                    {/* Declaration Acceptance Checkbox */}
                     <div className={`pt-4 border-t ${darkMode ? 'border-zinc-600' : 'border-zinc-200'}`}>
+                      <label className="flex items-start cursor-pointer group mb-3">
+                        <input
+                          type="checkbox"
+                          name="declarationAccepted"
+                          checked={formData.declarationAccepted}
+                          onChange={(e) => setFormData(prev => ({ ...prev, declarationAccepted: e.target.checked }))}
+                          className="sr-only peer"
+                          required
+                        />
+                        <div className={`w-5 h-5 mt-0.5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.declarationAccepted
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                          }`}>
+                          <Check
+                            className={`w-3.5 h-3.5 text-white transition-opacity ${formData.declarationAccepted ? "opacity-100" : "opacity-0"}`}
+                            strokeWidth={3}
+                          />
+                        </div>
+                        <span className={`ml-2 sm:ml-3 text-xs sm:text-sm font-medium ${formData.declarationAccepted ? 'text-emerald-600' : darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                          I agree I am not getting assistance/provision from any other organization or entity in any form <span className="text-red-500">*</span>
+                        </span>
+                      </label>
+
+                      {/* Terms and Policies Acceptance */}
                       <label className="flex items-start cursor-pointer group">
                         <input
                           type="checkbox"
@@ -498,7 +605,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                           className="sr-only peer"
                           required
                         />
-                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.termsAccepted
+                        <div className={`w-5 h-5 mt-0.5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${formData.termsAccepted
                           ? "border-emerald-600 bg-emerald-600"
                           : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
                           }`}>
@@ -573,28 +680,6 @@ export default function MyselfForm({ darkModeFromParent }) {
                   </div>
                 </div>
 
-                {/* Permanent Address */}
-                <div>
-                  <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                    Permanent Address <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <MapPin className={`absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
-                    <textarea
-                      name="permanentAddress"
-                      value={formData.permanentAddress}
-                      onChange={handleInputChange}
-                      placeholder="Enter your permanent address"
-                      rows="3"
-                      className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none ${darkMode
-                        ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
-                        : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
-                        }`}
-                      required
-                    />
-                  </div>
-                </div>
-
                 <div className="flex items-center gap-2">
                   <label className="flex items-center cursor-pointer group">
                     <input
@@ -625,6 +710,30 @@ export default function MyselfForm({ darkModeFromParent }) {
                     </span>
                   </label>
                 </div>
+
+                {/* Permanent Address */}
+                <div>
+                  <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                    Permanent Address <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <MapPin className={`absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+                    <textarea
+                      name="permanentAddress"
+                      value={formData.permanentAddress}
+                      onChange={handleInputChange}
+                      placeholder="Enter your permanent address"
+                      rows="3"
+                      className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none ${darkMode
+                        ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500"
+                        : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"
+                        }`}
+                      required
+                    />
+                  </div>
+                </div>
+
+
 
 
                 {/* Contact Number */}
@@ -700,7 +809,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                           <div className="flex items-center gap-2 sm:gap-3">
                             <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${formData.idType === 'pan' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
                             <div>
-                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-white" : "text-zinc-900"}`}>PAN Card</p>
+                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-black" : "text-zinc-900"}`}>PAN Card</p>
                               <p className={`text-[10px] sm:text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>10 characters</p>
                             </div>
                           </div>
@@ -731,7 +840,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                           <div className="flex items-center gap-2 sm:gap-3">
                             <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 ${formData.idType === 'aadhar' ? 'text-emerald-600' : darkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
                             <div>
-                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-white" : "text-zinc-900"}`}>Aadhar Card</p>
+                              <p className={`font-semibold text-sm sm:text-base ${darkMode ? "text-black" : "text-zinc-900"}`}>Aadhar Card</p>
                               <p className={`text-[10px] sm:text-xs ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>12 characters</p>
                             </div>
                           </div>
@@ -781,7 +890,9 @@ export default function MyselfForm({ darkModeFromParent }) {
                 {/* Government ID Document Upload */}
                 <div>
                   <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                    Upload Government ID Proof <span className="text-red-500">*</span>
+                    {formData.idType === "aadhar" ? "Upload Aadhar card ID proof" :
+                      formData.idType === "pan" ? "Upload Pan card ID proof" :
+                        "Upload Government ID proof"} <span className="text-red-500">*</span>
                   </label>
                   <div className={`relative border-2 border-dashed rounded-lg p-4 sm:p-6 transition-all ${darkMode
                     ? "border-zinc-600 bg-zinc-700 hover:border-emerald-500"
@@ -912,7 +1023,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                   {/* Monthly Income */}
                   <div>
                     <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                      Monthly Income <span className="text-red-500">*</span>
+                      Monthly Income {!formData.noIncome && <span className="text-red-500">*</span>}
                     </label>
                     <div className="relative">
                       <span className={`absolute left-3 top-1/2 -translate-y-1/2 font-semibold text-sm sm:text-base ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>
@@ -921,16 +1032,37 @@ export default function MyselfForm({ darkModeFromParent }) {
                       <input
                         type="number"
                         name="monthlyIncome"
-                        value={formData.monthlyIncome}
+                        value={formData.noIncome ? '' : formData.monthlyIncome}
                         onChange={handleInputChange}
-                        placeholder="Enter monthly income"
-                        className={`w-full pl-7 sm:pl-8 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
-                        required
+                        disabled={formData.noIncome}
+                        placeholder={formData.noIncome ? "Not Applicable" : "Enter monthly income"}
+                        className={`w-full pl-7 sm:pl-8 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"} ${formData.noIncome ? "opacity-50 cursor-not-allowed" : ""}`}
+                        required={!formData.noIncome}
                       />
                     </div>
-                    <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
-                      Amount in INR
-                    </p>
+                    <div className="mt-2">
+                      <label className="flex items-center cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          name="noIncome"
+                          checked={formData.noIncome}
+                          onChange={handleInputChange}
+                          className="sr-only peer"
+                        />
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${formData.noIncome
+                          ? "border-emerald-600 bg-emerald-600"
+                          : darkMode ? "border-zinc-500 bg-zinc-700" : "border-zinc-400 bg-white"
+                          }`}>
+                          <Check
+                            className={`w-3 h-3 text-white transition-opacity ${formData.noIncome ? "opacity-100" : "opacity-0"}`}
+                            strokeWidth={3}
+                          />
+                        </div>
+                        <span className={`ml-2 text-xs font-medium ${formData.noIncome ? 'text-emerald-600' : darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+                          Not Applicable
+                        </span>
+                      </label>
+                    </div>
                   </div>
 
                   {/* Bank Name & Branch */}
@@ -998,30 +1130,6 @@ export default function MyselfForm({ darkModeFromParent }) {
                     </p>
                   </div>
 
-                  {/* Number of Dependents */}
-                  <div>
-                    <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                      Number of Dependents <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      <input
-                        type="number"
-                        name="numberOfDependents"
-                        value={formData.numberOfDependents}
-                        onChange={handleInputChange}
-                        placeholder="Enter number of dependents"
-                        min="0"
-                        className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 rounded-lg border text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 ${darkMode ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-500" : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400"}`}
-                        required
-                      />
-                    </div>
-                    <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
-                      Family members dependent on your income
-                    </p>
-                  </div>
                   {/* Bank Statement Upload */}
                   <div className="sm:col-span-2">
                     <label
@@ -1242,13 +1350,60 @@ export default function MyselfForm({ darkModeFromParent }) {
                       ) : (
                         <div>
                           <p className={`font-medium text-sm sm:text-base ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                            Click to upload or drag and drop only one document
+                            Click to upload or drag and drop documents
                           </p>
                           <p className={`text-xs sm:text-sm mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
-                            Hospital Bills or Medical Reports or Prescriptions, etc.
+                            {formData.aidType === 'education' ? 'Fee receipts, marksheets, admission letter, etc.' :
+                              formData.aidType === 'medical' ? 'Hospital bills, medical reports, prescriptions, etc.' :
+                                formData.aidType === 'employment' ? 'Experience letter, resignation letter, etc.' :
+                                  'Relevant documents supporting your request'}
                           </p>
                           <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
                             PDF, JPG, JPEG or PNG (Multiple files allowed)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Supporting Pictures Upload */}
+                <div>
+                  <label className={`block text-xs sm:text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                    Supporting Pictures <span className={`text-[10px] sm:text-xs font-normal ml-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>(Optional)</span>
+                  </label>
+                  <div className={`relative border-2 border-dashed rounded-lg p-4 sm:p-6 transition-all ${darkMode
+                    ? "border-zinc-600 bg-zinc-700 hover:border-emerald-500"
+                    : "border-zinc-300 bg-zinc-50 hover:border-emerald-500"
+                    }`}>
+                    <input
+                      type="file"
+                      name="supportingPictures"
+                      onChange={handleInputChange}
+                      accept="image/*"
+                      multiple
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="text-center">
+                      <div className={`mx-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 ${darkMode ? "bg-zinc-600" : "bg-zinc-200"
+                        }`}>
+                        <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      {formData.supportingPictures && formData.supportingPictures.length > 0 ? (
+                        <div>
+                          <p className={`font-medium text-sm ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
+                            {formData.supportingPictures.length} image(s) selected
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className={`font-medium text-sm ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                            Click to upload proof of condition (Pictures)
+                          </p>
+                          <p className={`text-[10px] sm:text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-zinc-500"}`}>
+                            JPG, JPEG or PNG
                           </p>
                         </div>
                       )}
@@ -1398,7 +1553,7 @@ export default function MyselfForm({ darkModeFromParent }) {
 
                     <button
                       onClick={handleSubmit}
-                      disabled={!formData.declarationConsent || !formData.termsAccepted || isLoading}
+                      disabled={!formData.declarationAccepted || !formData.termsAccepted || isLoading}
                       className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg flex items-center gap-2"
                     >
                       {isLoading ? (
