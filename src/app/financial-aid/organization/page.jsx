@@ -1,10 +1,8 @@
 "use client"
-import MyselfForm from '@/components/financialaid/MyselfForm'
-import OrganizationRegistrationPage from '@/components/financialaid/OrganisationForm'
 import Footer from '@/components/layout/Footer'
 import Navbar from '@/components/layout/Navbar'
 import React, { useEffect, useState } from 'react'
-
+import OrganizationRegistrationPage from '@/components/financialaid/OrganizationForm/OrganizationForm'
 const Page = () => {
   const [darkMode, setDarkMode] = useState(false)
   const [isClient, setIsClient] = useState(false)
