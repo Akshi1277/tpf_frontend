@@ -222,13 +222,15 @@ export default function OtherForm({ darkModeFromParent }) {
       formDataToSend.append('idType', formData.idType)
       formDataToSend.append('govIdNumber', formData.govIdNumber)
       formDataToSend.append('occupation', formData.occupation)
-      formDataToSend.append('monthlyIncome', formData.monthlyIncome)
+      formDataToSend.append('monthlyIncome', formData.noIncome ? '0' : formData.monthlyIncome)
+      formDataToSend.append('noIncome', formData.noIncome)
       formDataToSend.append('bankNameBranch', formData.bankNameBranch)
       formDataToSend.append('accountNumber', formData.accountNumber)
       formDataToSend.append('ifscCode', formData.ifscCode)
       formDataToSend.append('numberOfDependents', formData.numberOfDependents)
       formDataToSend.append('aidType', formData.aidType)
       formDataToSend.append('hardshipDescription', formData.hardshipDescription)
+      formDataToSend.append('declarationConsent', formData.declarationAccepted)
 
       // Add file uploads
       if (formData.govIdDocument) {
@@ -240,6 +242,11 @@ export default function OtherForm({ darkModeFromParent }) {
       if (formData.supportingDocuments && formData.supportingDocuments.length > 0) {
         formData.supportingDocuments.forEach((file) => {
           formDataToSend.append('supportingDocuments', file)
+        })
+      }
+      if (formData.supportingPictures && formData.supportingPictures.length > 0) {
+        formData.supportingPictures.forEach((file) => {
+          formDataToSend.append('supportingPictures', file)
         })
       }
 
@@ -620,7 +627,7 @@ export default function OtherForm({ darkModeFromParent }) {
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                         required
                       />
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 pointer-events-none">
                         <div className={`p-2 rounded-lg ${darkMode ? "bg-zinc-600" : "bg-white border border-zinc-200"}`}>
                           <Upload className={`w-5 h-5 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`} />
                         </div>

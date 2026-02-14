@@ -204,6 +204,7 @@ export default function MyselfForm({ darkModeFromParent }) {
       formDataToSend.append('numberOfDependents', formData.numberOfDependents)
       formDataToSend.append('aidType', formData.aidType)
       formDataToSend.append('hardshipDescription', formData.hardshipDescription)
+      formDataToSend.append('declarationConsent', formData.declarationAccepted)
 
       // Add file uploads
       if (formData.govIdDocument) {
@@ -912,7 +913,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       required
                     />
-                    <div className="text-center">
+                    <div className="text-center pointer-events-none group-hover:scale-105 transition-transform duration-200">
                       <div className={`mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 sm:mb-3 ${darkMode ? "bg-zinc-600" : "bg-zinc-200"
                         }`}>
                         <svg className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1329,7 +1330,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       required
                     />
-                    <div className="text-center">
+                    <div className="text-center pointer-events-none">
                       <div className={`mx-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-2 sm:mb-3 ${darkMode ? "bg-zinc-600" : "bg-zinc-200"
                         }`}>
                         <svg className={`w-5 h-5 sm:w-6 sm:h-6 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1384,7 +1385,7 @@ export default function MyselfForm({ darkModeFromParent }) {
                       multiple
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <div className="text-center">
+                    <div className="text-center pointer-events-none">
                       <div className={`mx-auto w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 ${darkMode ? "bg-zinc-600" : "bg-zinc-200"
                         }`}>
                         <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
