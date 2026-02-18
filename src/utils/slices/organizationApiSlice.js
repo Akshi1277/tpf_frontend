@@ -1,4 +1,5 @@
 import { apiSlice } from "./apiSlice";
+import { setCredentials, logout } from "./authSlice";
 
 export const organizationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -14,6 +15,79 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Organization"],
     }),
+
+    // --------------------
+    // SEND OTP
+    // --------------------
+    sendOrganizationOtp: builder.mutation({
+      query: (email) => ({
+        url: "/organizations/send-otp",
+        method: "POST",
+        body: { email },
+      }),
+    }),
+
+    // --------------------
+    // VERIFY OTP
+    // --------------------
+    verifyOrganizationOtp: builder.mutation({
+      query: ({ email, otp }) => ({
+        url: "/organizations/verify-otp",
+        method: "POST",
+        body: { email, otp },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          // 🔥 Clear previous session (important)
+          dispatch(logout());
+
+          // 🔥 Normalize through authSlice
+          dispatch(
+            setCredentials({
+              ...data.organization,
+              type: "organization",
+            })
+          );
+
+        } catch (err) { }
+      },
+    }),
+
+
+    // --------------------
+    // GET ME
+    // --------------------
+    getOrganizationMe: builder.query({
+      query: () => "/organizations/me",
+      providesTags: ["Organization"],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setOrganizationCredentials(data.data));
+        } catch (err) { }
+      },
+    }),
+
+    // --------------------
+    // LOGOUT
+    // --------------------
+    logoutOrganization: builder.mutation({
+      query: () => ({
+        url: "/organizations/logout",
+        method: "POST",
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } finally {
+          dispatch(logoutOrganizationState());
+          dispatch(organizationApiSlice.util.resetApiState());
+        }
+      },
+    }),
+
 
     // ----------------------------------
     // GET ALL ORGANIZATIONS (ADMIN)
@@ -91,9 +165,13 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
 export const {
   useRegisterOrganizationMutation,
   useFetchOrganizationsQuery,
+  useGetOrganizationMeQuery,
   useFetchOrganizationStatsQuery,
   useFetchOrganizationByIdQuery,
   useUpdateOrganizationMutation,
   useUpdateVerificationStatusMutation,
   useDeleteOrganizationMutation,
+  useSendOrganizationOtpMutation,
+  useVerifyOrganizationOtpMutation,
+  useLogoutOrganizationMutation
 } = organizationApiSlice;

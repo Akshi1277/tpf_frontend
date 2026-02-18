@@ -21,13 +21,32 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       const identity = action.payload;
 
-      state.userInfo = identity;
+      const isOrg = identity.type === "organization";
+
+      const normalized = {
+        ...identity,
+
+        // 🔥 NORMALIZATION LAYER
+        fullName: isOrg
+          ? identity.organizationName
+          : identity.fullName,
+
+        email: isOrg
+          ? identity.organizationEmail
+          : identity.email,
+
+        mobileNo: isOrg
+          ? identity.contactDetails?.contactNumber ?? null
+          : identity.mobileNo ?? null,
+      };
+
+      state.userInfo = normalized;
       state.authChecked = true;
 
       const safePersist = {
-        fullName: identity.fullName ?? null,
-        email: identity.email ?? null,
-        mobileNo: identity.mobileNo ?? null,
+        fullName: normalized.fullName ?? null,
+        email: normalized.email ?? null,
+        mobileNo: normalized.mobileNo ?? null,
       };
 
       state.persistedUser = safePersist;
@@ -37,28 +56,29 @@ const authSlice = createSlice({
       }
     },
 
+
     // 🧩 PROFILE / KYC / PARTIAL UPDATES
-  updateUserPartial: (state, action) => {
-  if (!state.userInfo) return;
+    updateUserPartial: (state, action) => {
+      if (!state.userInfo) return;
 
-  state.userInfo = {
-    ...state.userInfo,
-    ...action.payload,
-  };
+      state.userInfo = {
+        ...state.userInfo,
+        ...action.payload,
+      };
 
-  // ✅ persist SAFE identity again
-  const safePersist = {
-    fullName: state.userInfo.fullName ?? null,
-    email: state.userInfo.email ?? null,
-    mobileNo: state.userInfo.mobileNo ?? null,
-  };
+      // ✅ persist SAFE identity again
+      const safePersist = {
+        fullName: state.userInfo.fullName ?? null,
+        email: state.userInfo.email ?? null,
+        mobileNo: state.userInfo.mobileNo ?? null,
+      };
 
-  state.persistedUser = safePersist;
+      state.persistedUser = safePersist;
 
-  if (typeof window !== "undefined") {
-    localStorage.setItem("userInfo", JSON.stringify(safePersist));
-  }
-},
+      if (typeof window !== "undefined") {
+        localStorage.setItem("userInfo", JSON.stringify(safePersist));
+      }
+    },
 
 
     setAuthChecked: (state) => {
@@ -77,5 +97,5 @@ const authSlice = createSlice({
 });
 
 
-export const { setCredentials, logout,setAuthChecked, updateUserPartial } = authSlice.actions;
+export const { setCredentials, logout, setAuthChecked, updateUserPartial } = authSlice.actions;
 export default authSlice.reducer;
