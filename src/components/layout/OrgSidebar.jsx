@@ -69,25 +69,21 @@ const SidebarContent = memo(({ onClose, darkMode, org }) => {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  const logoUrl = org?.organizationLogo
-    ? `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${org.organizationLogo}`
-    : null;
+  const logoUrl = getMediaUrl(org?.organizationLogo);
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div
-        className={`px-4 lg:px-5 py-4 border-b flex-shrink-0 ${
-          darkMode ? "border-zinc-800" : "border-gray-100"
-        }`}
+        className={`px-4 lg:px-5 py-4 border-b flex-shrink-0 ${darkMode ? "border-zinc-800" : "border-gray-100"
+          }`}
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             {/* Logo */}
             <div
-              className={`w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 border ${
-                darkMode ? "border-zinc-700" : "border-gray-200"
-              }`}
+              className={`w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 border ${darkMode ? "border-zinc-700" : "border-gray-200"
+                }`}
             >
               {logoUrl ? (
                 <img
@@ -103,9 +99,8 @@ const SidebarContent = memo(({ onClose, darkMode, org }) => {
             </div>
             <div className="min-w-0">
               <p
-                className={`text-sm font-bold truncate leading-tight ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-sm font-bold truncate leading-tight ${darkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 {org?.organizationName || "Organization"}
               </p>
@@ -119,11 +114,10 @@ const SidebarContent = memo(({ onClose, darkMode, org }) => {
           </div>
           <button
             onClick={onClose}
-            className={`lg:hidden p-1.5 rounded-lg transition-colors flex-shrink-0 ${
-              darkMode
+            className={`lg:hidden p-1.5 rounded-lg transition-colors flex-shrink-0 ${darkMode
                 ? "hover:bg-zinc-800 text-zinc-400"
                 : "hover:bg-gray-100 text-gray-500"
-            }`}
+              }`}
           >
             <X className="w-4 h-4" />
           </button>
@@ -132,9 +126,8 @@ const SidebarContent = memo(({ onClose, darkMode, org }) => {
         {/* Active path label */}
         {mounted && (
           <p
-            className={`text-[11px] font-medium truncate ${
-              darkMode ? "text-zinc-500" : "text-gray-400"
-            }`}
+            className={`text-[11px] font-medium truncate ${darkMode ? "text-zinc-500" : "text-gray-400"
+              }`}
           >
             {menuItems.find((i) => i.path === pathname)?.name || "Navigation"}
           </p>
@@ -153,15 +146,14 @@ const SidebarContent = memo(({ onClose, darkMode, org }) => {
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.04, duration: 0.3 }}
-                  className={`relative group rounded-xl transition-colors duration-200 ${
-                    isActive
+                  className={`relative group rounded-xl transition-colors duration-200 ${isActive
                       ? darkMode
                         ? "bg-zinc-800"
                         : "bg-gray-50 shadow-sm"
                       : darkMode
-                      ? "hover:bg-zinc-800/60"
-                      : "hover:bg-gray-50"
-                  }`}
+                        ? "hover:bg-zinc-800/60"
+                        : "hover:bg-gray-50"
+                    }`}
                 >
                   {isActive && (
                     <motion.div
@@ -172,54 +164,49 @@ const SidebarContent = memo(({ onClose, darkMode, org }) => {
 
                   <div className="flex items-center gap-2.5 px-3 py-2.5">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
-                        isActive
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${isActive
                           ? `bg-gradient-to-br ${item.gradient}`
                           : darkMode
-                          ? "bg-zinc-800"
-                          : "bg-gray-100"
-                      }`}
+                            ? "bg-zinc-800"
+                            : "bg-gray-100"
+                        }`}
                     >
                       <Icon
-                        className={`w-4 h-4 ${
-                          isActive
+                        className={`w-4 h-4 ${isActive
                             ? "text-white"
                             : darkMode
-                            ? "text-zinc-400"
-                            : "text-gray-500"
-                        }`}
+                              ? "text-zinc-400"
+                              : "text-gray-500"
+                          }`}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-semibold truncate ${
-                          isActive
+                        className={`text-sm font-semibold truncate ${isActive
                             ? darkMode
                               ? "text-white"
                               : "text-gray-900"
                             : darkMode
-                            ? "text-zinc-300"
-                            : "text-gray-700"
-                        }`}
+                              ? "text-zinc-300"
+                              : "text-gray-700"
+                          }`}
                       >
                         {item.name}
                       </p>
                       <p
-                        className={`text-[10px] truncate ${
-                          darkMode ? "text-zinc-500" : "text-gray-400"
-                        }`}
+                        className={`text-[10px] truncate ${darkMode ? "text-zinc-500" : "text-gray-400"
+                          }`}
                       >
                         {item.description}
                       </p>
                     </div>
                     <ChevronRight
-                      className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${
-                        isActive
+                      className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${isActive
                           ? darkMode
                             ? "text-white translate-x-0.5"
                             : "text-gray-700 translate-x-0.5"
                           : "text-gray-300 opacity-0 group-hover:opacity-100"
-                      }`}
+                        }`}
                     />
                   </div>
                 </motion.div>
@@ -231,14 +218,12 @@ const SidebarContent = memo(({ onClose, darkMode, org }) => {
 
       {/* Footer */}
       <div
-        className={`px-4 py-3 border-t flex-shrink-0 ${
-          darkMode ? "border-zinc-800" : "border-gray-100"
-        }`}
+        className={`px-4 py-3 border-t flex-shrink-0 ${darkMode ? "border-zinc-800" : "border-gray-100"
+          }`}
       >
         <p
-          className={`text-[10px] text-center ${
-            darkMode ? "text-zinc-600" : "text-gray-400"
-          }`}
+          className={`text-[10px] text-center ${darkMode ? "text-zinc-600" : "text-gray-400"
+            }`}
         >
           {org?.companyDetails?.businessDomain || "Organization"} ·{" "}
           {org?.city}, {org?.state}
@@ -264,9 +249,7 @@ function OrgSidebar({ darkMode }) {
     return () => { document.body.style.overflow = "unset"; };
   }, [isMobileOpen]);
 
-  const logoUrl = org?.organizationLogo
-    ? `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${org.organizationLogo}`
-    : null;
+  const logoUrl = getMediaUrl(org?.organizationLogo);
 
   return (
     <>
@@ -274,11 +257,10 @@ function OrgSidebar({ darkMode }) {
       <button
         onClick={toggleMobile}
         aria-label="Open organization menu"
-        className={`lg:hidden fixed left-5 bottom-5 z-40 p-3.5 rounded-2xl shadow-xl transition-all active:scale-95 border ${
-          darkMode
+        className={`lg:hidden fixed left-5 bottom-5 z-40 p-3.5 rounded-2xl shadow-xl transition-all active:scale-95 border ${darkMode
             ? "bg-zinc-900 border-zinc-700 text-white"
             : "bg-white border-gray-200 text-gray-700 shadow-gray-200"
-        }`}
+          }`}
       >
         {logoUrl ? (
           <img src={logoUrl} alt="" className="w-6 h-6 rounded-lg object-cover" />
@@ -308,9 +290,8 @@ function OrgSidebar({ darkMode }) {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: "spring", damping: 28, stiffness: 220 }}
-            className={`lg:hidden fixed top-0 left-0 bottom-0 w-[280px] sm:w-[300px] z-50 ${
-              darkMode ? "bg-zinc-900" : "bg-white"
-            }`}
+            className={`lg:hidden fixed top-0 left-0 bottom-0 w-[280px] sm:w-[300px] z-50 ${darkMode ? "bg-zinc-900" : "bg-white"
+              }`}
           >
             <SidebarContent onClose={closeMobile} darkMode={darkMode} org={org} />
           </motion.aside>
@@ -319,11 +300,10 @@ function OrgSidebar({ darkMode }) {
 
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:flex flex-col w-56 xl:w-64 border-r flex-shrink-0 overflow-y-auto ${
-          darkMode
+        className={`hidden lg:flex flex-col w-56 xl:w-64 border-r flex-shrink-0 overflow-y-auto ${darkMode
             ? "bg-zinc-900 border-zinc-800"
             : "bg-white border-gray-100"
-        }`}
+          }`}
       >
         <SidebarContent darkMode={darkMode} org={org} />
       </aside>

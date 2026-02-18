@@ -21,6 +21,7 @@ import {
   Handshake,
   ShieldCheck,
 } from "lucide-react";
+import { getMediaUrl } from "@/utils/media";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -85,11 +86,10 @@ function StatCard({ icon: Icon, label, value, gradient, darkMode }) {
   return (
     <motion.div
       {...fadeUp(0.05)}
-      className={`relative overflow-hidden rounded-2xl p-5 border ${
-        darkMode
+      className={`relative overflow-hidden rounded-2xl p-5 border ${darkMode
           ? "bg-zinc-900 border-zinc-800"
           : "bg-white border-gray-100 shadow-sm"
-      }`}
+        }`}
     >
       <div
         className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br ${gradient}`}
@@ -97,16 +97,14 @@ function StatCard({ icon: Icon, label, value, gradient, darkMode }) {
         <Icon className="w-5 h-5 text-white" />
       </div>
       <p
-        className={`text-xs font-semibold mb-1 ${
-          darkMode ? "text-zinc-500" : "text-gray-500"
-        }`}
+        className={`text-xs font-semibold mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"
+          }`}
       >
         {label}
       </p>
       <p
-        className={`text-sm font-bold leading-tight ${
-          darkMode ? "text-white" : "text-gray-900"
-        }`}
+        className={`text-sm font-bold leading-tight ${darkMode ? "text-white" : "text-gray-900"
+          }`}
       >
         {value || "—"}
       </p>
@@ -119,16 +117,14 @@ function InfoRow({ label, value, darkMode }) {
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <span
-        className={`text-xs font-semibold shrink-0 ${
-          darkMode ? "text-zinc-500" : "text-gray-500"
-        }`}
+        className={`text-xs font-semibold shrink-0 ${darkMode ? "text-zinc-500" : "text-gray-500"
+          }`}
       >
         {label}
       </span>
       <span
-        className={`text-sm font-medium text-right ${
-          darkMode ? "text-zinc-200" : "text-gray-800"
-        }`}
+        className={`text-sm font-medium text-right ${darkMode ? "text-zinc-200" : "text-gray-800"
+          }`}
       >
         {value}
       </span>
@@ -140,24 +136,21 @@ function SectionCard({ title, icon: Icon, children, darkMode, delay = 0 }) {
   return (
     <motion.div
       {...fadeUp(delay)}
-      className={`rounded-2xl border overflow-hidden ${
-        darkMode
+      className={`rounded-2xl border overflow-hidden ${darkMode
           ? "bg-zinc-900 border-zinc-800"
           : "bg-white border-gray-100 shadow-sm"
-      }`}
+        }`}
     >
       <div
-        className={`flex items-center gap-2.5 px-5 py-4 border-b ${
-          darkMode ? "border-zinc-800" : "border-gray-100"
-        }`}
+        className={`flex items-center gap-2.5 px-5 py-4 border-b ${darkMode ? "border-zinc-800" : "border-gray-100"
+          }`}
       >
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
           <Icon className="w-3.5 h-3.5 text-white" />
         </div>
         <h3
-          className={`text-sm font-bold ${
-            darkMode ? "text-white" : "text-gray-900"
-          }`}
+          className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"
+            }`}
         >
           {title}
         </h3>
@@ -178,12 +171,10 @@ export default function OrgDashboard({ darkModeFromParent }) {
     darkModeFromParent !== undefined
       ? darkModeFromParent
       : typeof window !== "undefined"
-      ? localStorage.getItem("darkMode") === "true"
-      : false;
+        ? localStorage.getItem("darkMode") === "true"
+        : false;
 
-  const logoUrl = org?.organizationLogo
-    ? `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${org.organizationLogo}`
-    : null;
+  const logoUrl = getMediaUrl(org?.organizationLogo);
 
   const cd = org?.companyDetails || {};
   const contact = org?.contactDetails || {};
@@ -192,8 +183,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
     org?.verificationStatus === "verified"
       ? "text-emerald-500"
       : org?.verificationStatus === "pending"
-      ? "text-amber-500"
-      : "text-red-500";
+        ? "text-amber-500"
+        : "text-red-500";
 
   const statusBg =
     org?.verificationStatus === "verified"
@@ -201,8 +192,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
         ? "bg-emerald-500/10 border-emerald-500/20"
         : "bg-emerald-50 border-emerald-200"
       : darkMode
-      ? "bg-amber-500/10 border-amber-500/20"
-      : "bg-amber-50 border-amber-200";
+        ? "bg-amber-500/10 border-amber-500/20"
+        : "bg-amber-50 border-amber-200";
 
   return (
     <div
@@ -213,11 +204,10 @@ export default function OrgDashboard({ darkModeFromParent }) {
         {/* ── Hero Card ────────────────────────────────────────────────── */}
         <motion.div
           {...fadeUp(0)}
-          className={`relative overflow-hidden rounded-2xl sm:rounded-3xl border ${
-            darkMode
+          className={`relative overflow-hidden rounded-2xl sm:rounded-3xl border ${darkMode
               ? "bg-zinc-900 border-zinc-800"
               : "bg-white border-gray-100 shadow-md"
-          }`}
+            }`}
         >
           {/* top gradient strip */}
           <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600" />
@@ -234,9 +224,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
               {/* Logo */}
               <div
-                className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 flex-shrink-0 ${
-                  darkMode ? "border-zinc-700" : "border-gray-200"
-                }`}
+                className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 flex-shrink-0 ${darkMode ? "border-zinc-700" : "border-gray-200"
+                  }`}
               >
                 {logoUrl ? (
                   <img
@@ -255,9 +244,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
                   <h1
-                    className={`text-xl sm:text-2xl font-bold truncate ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
+                    className={`text-xl sm:text-2xl font-bold truncate ${darkMode ? "text-white" : "text-gray-900"
+                      }`}
                   >
                     {org?.organizationName}
                   </h1>
@@ -267,7 +255,7 @@ export default function OrgDashboard({ darkModeFromParent }) {
                     <BadgeCheck className="w-3 h-3" />
                     {org?.verificationStatus
                       ? org.verificationStatus.charAt(0).toUpperCase() +
-                        org.verificationStatus.slice(1)
+                      org.verificationStatus.slice(1)
                       : "Pending"}
                   </span>
                 </div>
@@ -276,9 +264,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
                 <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2">
                   {org?.companyDetails?.businessDomain && (
                     <span
-                      className={`flex items-center gap-1.5 text-xs font-medium ${
-                        darkMode ? "text-zinc-400" : "text-gray-500"
-                      }`}
+                      className={`flex items-center gap-1.5 text-xs font-medium ${darkMode ? "text-zinc-400" : "text-gray-500"
+                        }`}
                     >
                       <Briefcase className="w-3.5 h-3.5" />
                       {org.companyDetails.businessDomain}
@@ -286,9 +273,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
                   )}
                   {org?.city && org?.state && (
                     <span
-                      className={`flex items-center gap-1.5 text-xs font-medium ${
-                        darkMode ? "text-zinc-400" : "text-gray-500"
-                      }`}
+                      className={`flex items-center gap-1.5 text-xs font-medium ${darkMode ? "text-zinc-400" : "text-gray-500"
+                        }`}
                     >
                       <MapPin className="w-3.5 h-3.5" />
                       {org.city}, {org.state}
@@ -303,11 +289,10 @@ export default function OrgDashboard({ darkModeFromParent }) {
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center gap-1.5 text-xs font-medium hover:underline ${
-                        darkMode
+                      className={`flex items-center gap-1.5 text-xs font-medium hover:underline ${darkMode
                           ? "text-emerald-400"
                           : "text-emerald-600"
-                      }`}
+                        }`}
                     >
                       <Globe className="w-3.5 h-3.5" />
                       {org.officialWebsite}
@@ -315,9 +300,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
                   )}
                   {org?.organizationEmail && (
                     <span
-                      className={`flex items-center gap-1.5 text-xs font-medium ${
-                        darkMode ? "text-zinc-400" : "text-gray-500"
-                      }`}
+                      className={`flex items-center gap-1.5 text-xs font-medium ${darkMode ? "text-zinc-400" : "text-gray-500"
+                        }`}
                     >
                       <Mail className="w-3.5 h-3.5" />
                       {org.organizationEmail}
@@ -328,9 +312,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
                 {/* Description */}
                 {org?.organizationDescription && (
                   <p
-                    className={`mt-3 text-sm leading-relaxed line-clamp-2 ${
-                      darkMode ? "text-zinc-400" : "text-gray-600"
-                    }`}
+                    className={`mt-3 text-sm leading-relaxed line-clamp-2 ${darkMode ? "text-zinc-400" : "text-gray-600"
+                      }`}
                   >
                     {org.organizationDescription}
                   </p>
@@ -341,11 +324,10 @@ export default function OrgDashboard({ darkModeFromParent }) {
             {/* NGO badge */}
             {org?.isNGO && (
               <div
-                className={`mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                  darkMode
+                className={`mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${darkMode
                     ? "bg-violet-500/10 border-violet-500/20 text-violet-400"
                     : "bg-violet-50 border-violet-200 text-violet-700"
-                }`}
+                  }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Registered NGO
@@ -463,9 +445,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
         {/* ── Quick Links ───────────────────────────────────────────────── */}
         <motion.div {...fadeUp(0.25)}>
           <h3
-            className={`text-xs font-bold uppercase tracking-wider mb-3 ${
-              darkMode ? "text-zinc-500" : "text-gray-400"
-            }`}
+            className={`text-xs font-bold uppercase tracking-wider mb-3 ${darkMode ? "text-zinc-500" : "text-gray-400"
+              }`}
           >
             Quick Actions
           </h3>
@@ -495,11 +476,10 @@ export default function OrgDashboard({ darkModeFromParent }) {
             ].map((q) => (
               <a key={q.href} href={q.href}>
                 <div
-                  className={`flex items-center gap-3.5 p-4 rounded-2xl border transition-colors duration-200 group ${
-                    darkMode
+                  className={`flex items-center gap-3.5 p-4 rounded-2xl border transition-colors duration-200 group ${darkMode
                       ? "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
                       : "bg-white border-gray-100 hover:border-gray-200 shadow-sm"
-                  }`}
+                    }`}
                 >
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${q.gradient}`}
@@ -508,24 +488,21 @@ export default function OrgDashboard({ darkModeFromParent }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-sm font-bold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {q.label}
                     </p>
                     <p
-                      className={`text-xs ${
-                        darkMode ? "text-zinc-500" : "text-gray-400"
-                      }`}
+                      className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-400"
+                        }`}
                     >
                       {q.sub}
                     </p>
                   </div>
                   <ChevronRight
-                    className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                      darkMode ? "text-zinc-600" : "text-gray-300"
-                    }`}
+                    className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:translate-x-0.5 ${darkMode ? "text-zinc-600" : "text-gray-300"
+                      }`}
                   />
                 </div>
               </a>
@@ -536,23 +513,20 @@ export default function OrgDashboard({ darkModeFromParent }) {
         {/* ── Footer quote ─────────────────────────────────────────────── */}
         <motion.div
           {...fadeUp(0.3)}
-          className={`rounded-2xl px-6 py-5 text-center border ${
-            darkMode
+          className={`rounded-2xl px-6 py-5 text-center border ${darkMode
               ? "bg-gradient-to-br from-emerald-900/30 to-teal-900/20 border-emerald-800/30"
               : "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100"
-          }`}
+            }`}
         >
           <p
-            className={`text-sm sm:text-base font-medium italic ${
-              darkMode ? "text-emerald-300/80" : "text-emerald-800/80"
-            }`}
+            className={`text-sm sm:text-base font-medium italic ${darkMode ? "text-emerald-300/80" : "text-emerald-800/80"
+              }`}
           >
             "The best of people are those who bring most benefit to the rest of mankind."
           </p>
           <p
-            className={`text-xs mt-1.5 font-semibold ${
-              darkMode ? "text-emerald-500" : "text-emerald-600"
-            }`}
+            className={`text-xs mt-1.5 font-semibold ${darkMode ? "text-emerald-500" : "text-emerald-600"
+              }`}
           >
             — Al-Daraqutni
           </p>
