@@ -418,12 +418,21 @@ export default function DesktopLogin({
               </motion.div>
             )}
 
-            <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-              Don't have an account?{" "}
-              <a href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
-                Sign up
-              </a>
-            </p>
+           <div className="text-center space-y-2">
+  <p className={`text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+    Don't have an account?{" "}
+    <a href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+      Sign up
+    </a>
+  </p>
+  <p className={`text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+    Are you an Organization?{" "}
+    <a href="/organization/login" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+      Login Here
+    </a>
+  </p>
+</div>
+
           </div>
         </div>
       </motion.div>

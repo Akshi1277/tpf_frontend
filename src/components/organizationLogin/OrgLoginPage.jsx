@@ -75,7 +75,7 @@ export default function OrgLoginPage({ darkMode }) {
         duration: 2500,
       })
 
-      setTimeout(() => router.push("/"), 2500)
+      setTimeout(() => router.push("/organization/profile/dashboard"), 2500)
     } catch (error) {
       const msg = error?.data?.message || "Invalid OTP"
       showToast({
@@ -106,7 +106,7 @@ export default function OrgLoginPage({ darkMode }) {
       />
 
       {/* Success Toast */}
-      <AnimatePresence>
+      {/* <AnimatePresence>
         {showSuccess && (
           <motion.div
             initial={{ opacity: 0, y: -16, scale: 0.96 }}
@@ -132,7 +132,7 @@ export default function OrgLoginPage({ darkMode }) {
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       {/* Render layout components */}
       <DesktopOrgLogin {...sharedProps} />

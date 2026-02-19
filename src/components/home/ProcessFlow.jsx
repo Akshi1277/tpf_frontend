@@ -1,175 +1,192 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, ShieldCheck, Users, Heart, CheckCircle, Lock, TrendingUp, HandHeart } from 'lucide-react';
 
+const TABS = [
+  {
+    key: 'beneficiary',
+    heading: 'Beneficiaries',
+    eyebrow: 'Your path to support',
+    steps: [
+      { icon: FileText,    num: '01', title: 'Share Your Need',       description: 'Tell your story with honesty and hope. Every case is treated with compassion and full confidentiality.' },
+      { icon: ShieldCheck, num: '02', title: 'Reviewed with Amanah',  description: 'Our team carefully verifies each request to uphold trust, fairness, and complete transparency.' },
+      { icon: Users,       num: '03', title: 'Community Rallies',     description: 'Your campaign reaches a community united by compassion, shared purpose, and responsibility.' },
+      { icon: Heart,       num: '04', title: 'Received with Dignity', description: 'Funds arrive securely and respectfully, ensuring support reaches you with absolute integrity.' },
+    ],
+  },
+  {
+    key: 'donor',
+    heading: 'Donors',
+    eyebrow: 'Your path to impact',
+    steps: [
+      { icon: CheckCircle, num: '01', title: 'Causes Verified',     description: 'Every campaign is reviewed thoroughly — your amanah is protected before a single dirham moves.' },
+      { icon: Lock,        num: '02', title: 'Secured End-to-End',  description: 'Your donation flows through bank-grade security and ethical care at every single touchpoint.' },
+      { icon: HandHeart,   num: '03', title: 'Reaches Directly',    description: 'Your sadaqah lands without unnecessary intermediaries — maximum impact, minimum friction.' },
+      { icon: TrendingUp,  num: '04', title: 'Tracked Openly',      description: 'Follow every step. See exactly how your generosity transforms lives in real time.' },
+    ],
+  },
+];
+
 export default function ProcessFlowSection({ darkMode }) {
-  const beneficiarySteps = [
-    {
-      icon: FileText,
-      title: 'Share Your Need with Sincerity',
-      description: 'Tell your story with honesty and hope. Every case is treated with compassion and confidentiality.'
-    },
-    {
-      icon: ShieldCheck,
-      title: 'Reviewed with Amanah',
-      description: 'Our team carefully verifies each request to uphold trust, fairness, and transparency.'
-    },
-    {
-      icon: Users,
-      title: 'Supported by the Community',
-      description: 'Your campaign is shared with a community united by compassion and responsibility.'
-    },
-    {
-      icon: Heart,
-      title: 'Receive Help with Dignity',
-      description: 'Funds are delivered securely and respectfully, ensuring your support reaches you with integrity.'
-    }
-  ];
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [prevIdx, setPrevIdx]     = useState(0);
 
-  const donorSteps = [
-    {
-      icon: CheckCircle,
-      title: 'Trusted & Verified Causes',
-      description: 'Every campaign is reviewed thoroughly to protect your amanah.'
-    },
-    {
-      icon: Lock,
-      title: 'Secure & Protected Giving',
-      description: 'Your donation is handled with bank-grade security and ethical care.'
-    },
-    {
-      icon: HandHeart,
-      title: 'Direct Impact',
-      description: 'Your sadaqah reaches those in need without unnecessary intermediaries.'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Transparent Accountability',
-      description: 'Track progress and see how your contribution changes lives.'
-    }
-  ];
+  const handleSwitch = (i) => { setPrevIdx(activeIdx); setActiveIdx(i); };
+  const dir = activeIdx >= prevIdx ? 1 : -1;
 
-  const renderSteps = (steps, isGradientBg = false) => (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-      {steps.map((step, index) => {
-        const Icon = step.icon;
-        return (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
-            className="flex flex-col items-start"
-          >
-            {/* Icon */}
-            <div className="mb-3 lg:mb-4">
-              <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-xl ${isGradientBg
-                  ? 'bg-white/20 backdrop-blur-sm'
-                  : darkMode
-                    ? 'bg-gradient-to-br from-emerald-600 to-teal-600'
-                    : 'bg-gradient-to-br from-emerald-600 to-teal-600'
-                } flex items-center justify-center relative`}>
-                <Icon className={`w-6 h-6 lg:w-7 lg:h-7 ${isGradientBg ? 'text-white' : 'text-white'}`} strokeWidth={2} />
-                {/* Step number badge */}
-                <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full ${isGradientBg
-                    ? 'bg-white text-emerald-600'
-                    : 'bg-emerald-600 text-white'
-                  } flex items-center justify-center text-xs font-bold`}>
-                  {index + 1}
-                </div>
-              </div>
-            </div>
+  const { eyebrow, steps } = TABS[activeIdx];
 
-            {/* Content */}
-            <h3 className={`text-sm lg:text-base font-semibold mb-1.5 lg:mb-2 ${isGradientBg
-                ? 'text-white'
-                : darkMode
-                  ? 'text-white'
-                  : 'text-gray-900'
-              }`}>
-              {step.title}
-            </h3>
-            <p className={`text-xs lg:text-sm leading-relaxed ${isGradientBg
-                ? 'text-white/80'
-                : darkMode
-                  ? 'text-zinc-400'
-                  : 'text-gray-600'
-              }`}>
-              {step.description}
-            </p>
-          </motion.div>
-        );
-      })}
-    </div>
-  );
+  // ── theme tokens ──────────────────────────────────────────────────────────
+  const bg      = darkMode ? '#0f1a15' : '#ffffff';
+  const surface = darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(16,185,129,0.03)';
+  const text     = darkMode ? '#f0fdf4' : '#111827';
+  const muted    = darkMode ? 'rgba(240,253,244,0.45)' : '#6b7280';
+  const rule     = darkMode ? 'rgba(255,255,255,0.07)' : '#e5e7eb';
+  const ghostCol = darkMode ? 'rgba(52,211,153,0.09)' : 'rgba(16,185,129,0.08)';
+  const iconCol  = darkMode ? 'rgba(110,231,183,0.7)'  : '#059669';
 
   return (
-    <div>
-      {/* For Beneficiaries - White/Dark Background */}
-      <section className={`py-8 lg:py-10 border-b ${darkMode
-          ? 'bg-zinc-900 border-zinc-800'
-          : 'bg-white border-gray-200'
-        }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="mb-6 lg:mb-8"
-          >
-            <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-1.5 lg:mb-2 ${darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
-              For Beneficiaries
-            </h2>
-            <p className={`text-sm lg:text-base ${darkMode ? 'text-zinc-400' : 'text-gray-600'
-              }`}>
-              A journey of dignity, trust, and support
-            </p>
-          </motion.div>
+    <section style={{ background: bg }} className="relative overflow-hidden py-8 lg:py-12">
 
-          {renderSteps(beneficiarySteps, false)}
-        </div>
-      </section>
+      {/* Top emerald rule */}
+      <div className="absolute top-0 left-0 right-0 h-px"
+        style={{ background: 'linear-gradient(90deg, transparent, #10b981 40%, #34d399 60%, transparent)' }} />
 
-      {/* For Donors - Subtle Premium Tint */}
-      <section className={`py-12 lg:py-16 relative overflow-hidden ${darkMode
-          ? 'bg-[#0A1A17]'
-          : 'bg-emerald-50/50'
-        }`}>
-        {/* Subtle pattern overlay */}
-        <div className={`absolute inset-0 opacity-[0.03] ${darkMode ? 'invert' : ''}`}>
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-            backgroundSize: '32px 32px'
-          }} />
-        </div>
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10">
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="mb-8 lg:mb-12"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Contributor Journey</span>
+        {/* ── HEADER ROW ─────────────────────────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-4 mb-7 lg:mb-9">
+
+          {/* Left: label + eyebrow */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
+                How It Works
+              </span>
             </div>
-            <h2 className={`text-2xl md:text-3xl lg:text-4xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'
-              }`}>
-              For Donors
-            </h2>
-            <p className={`text-sm lg:text-lg max-w-2xl ${darkMode ? 'text-emerald-100/60' : 'text-zinc-600'
-              }`}>
-              Giving with intention, trust, and accountability. Every contribution is a seed of change.
-            </p>
-          </motion.div>
+            <AnimatePresence mode="wait">
+              <motion.p key={eyebrow}
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -3 }}
+                transition={{ duration: 0.22 }}
+                style={{ color: muted }} className="text-sm">
+                {eyebrow}
+              </motion.p>
+            </AnimatePresence>
+          </div>
 
-          {renderSteps(donorSteps, false)}
+          {/* Right: tab switcher */}
+          <div className="flex items-baseline gap-6 sm:gap-8">
+            {TABS.map((tab, i) => (
+              <button key={tab.key} onClick={() => handleSwitch(i)}
+                className="relative pb-1.5 outline-none text-2xl sm:text-3xl font-bold tracking-tight transition-colors duration-200"
+                style={{ color: i === activeIdx ? text : muted }}>
+                {tab.heading}
+                {i === activeIdx && (
+                  <motion.span layoutId="tab-underline"
+                    className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-emerald-500"
+                    transition={{ type: 'spring', stiffness: 420, damping: 36 }} />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
-      </section>
-    </div>
+
+        {/* ── STEPS GRID ─────────────────────────────────────────────────── */}
+        <AnimatePresence mode="wait" custom={dir}>
+          <motion.div key={activeIdx}
+            className="grid grid-cols-2 lg:grid-cols-4"
+            style={{ border: `1px solid ${rule}`, borderRadius: 16, overflow: 'hidden', background: surface }}>
+            {steps.map((step, i) => {
+              const Icon = step.icon;
+              const isLastRow   = i >= 2;
+              const isLastCol   = i % 4 === 3 || (i === steps.length - 1);
+              return (
+                <motion.div key={i}
+                  custom={dir}
+                  variants={{
+                    hidden:  { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.45, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] } },
+                    exit:    { opacity: 0, transition: { duration: 0.12, delay: i * 0.02 } },
+                  }}
+                  initial="hidden" animate="visible" exit="exit"
+                  className="relative flex flex-col p-4 lg:p-5 overflow-hidden group cursor-default"
+                  style={{
+                    borderRight: i % 2 !== 1 ? `1px solid ${rule}` : 'none',      // mobile: 2 cols
+                    borderBottom: i < 2 ? `1px solid ${rule}` : 'none',
+                  }}>
+
+                  {/* Desktop: 4-col borders override */}
+                  <style>{`
+                    @media (min-width: 1024px) {
+                      .step-cell-${i} { 
+                        border-right: ${i < 3 ? `1px solid ${rule}` : 'none'} !important;
+                        border-bottom: none !important;
+                      }
+                    }
+                  `}</style>
+                  <div className={`step-cell-${i} contents`} />
+
+                  {/* Ghost numeral */}
+                  <span aria-hidden className="absolute -bottom-3 -right-1 select-none pointer-events-none leading-none"
+                    style={{ fontSize: 'clamp(80px, 10vw, 120px)', fontWeight: 800, color: ghostCol, lineHeight: 1, letterSpacing: '-0.04em' }}>
+                    {step.num}
+                  </span>
+
+                  {/* Top row: num + rule + icon */}
+                  <div className="relative z-10 flex items-center gap-3 mb-3">
+                    <span className="text-xs font-bold tracking-widest text-emerald-500">{step.num}</span>
+                    <div className="flex-1 h-px" style={{ background: rule }} />
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0
+                      ${darkMode ? 'bg-emerald-500/15' : 'bg-emerald-50'}`}>
+                      <Icon strokeWidth={1.75} className="w-3.5 h-3.5" style={{ color: iconCol }} />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="relative z-10 text-sm lg:text-[15px] font-semibold mb-2 leading-snug"
+                    style={{ color: text }}>
+                    {step.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="relative z-10 text-xs leading-relaxed font-normal"
+                    style={{ color: muted }}>
+                    {step.description}
+                  </p>
+
+                  {/* Hover: emerald bottom sweep */}
+                  <motion.div
+                    initial={{ scaleX: 0 }} whileHover={{ scaleX: 1 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute bottom-0 left-0 right-0 h-[2px] origin-left"
+                    style={{ background: 'linear-gradient(90deg, #10b981, #34d399)' }} />
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* ── BOTTOM ROW ─────────────────────────────────────────────────── */}
+        <div className="flex items-center justify-between mt-5 pt-4"
+          style={{ borderTop: `1px solid ${rule}` }}>
+          <div className="flex gap-1.5">
+            {TABS.map((_, i) => (
+              <button key={i} onClick={() => handleSwitch(i)}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === activeIdx ? 24 : 6,
+                  height: 6,
+                  background: i === activeIdx ? '#10b981' : (darkMode ? 'rgba(255,255,255,0.12)' : '#d1d5db'),
+                }} />
+            ))}
+          </div>
+          <span className="text-[11px] font-medium tracking-widest uppercase" style={{ color: muted }}>
+            {activeIdx + 1} / {TABS.length}
+          </span>
+        </div>
+
+      </div>
+    </section>
   );
 }

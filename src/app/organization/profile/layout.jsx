@@ -45,7 +45,7 @@ export default function OrgLayout({ children }) {
         message: "Please log in as an organization to continue.",
         duration: 2000,
       });
-      setTimeout(() => router.replace("organization/login"), 1000);
+      setTimeout(() => router.replace("/organization/login"), 1000);
     }
     return <GlobalLoader />;
   }

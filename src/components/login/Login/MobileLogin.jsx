@@ -420,6 +420,12 @@ export default function MobileLogin({
                 Sign up
               </a>
             </p>
+            <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+              Are you an Organization?{" "}
+              <a href="/organization/login" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                Login Here
+              </a>
+            </p>
           </div>
         </motion.div>
       </div>
