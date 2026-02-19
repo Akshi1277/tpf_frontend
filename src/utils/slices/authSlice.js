@@ -18,43 +18,52 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     // 🔐 LOGIN / AUTH ONLY
-    setCredentials: (state, action) => {
-      const identity = action.payload;
+   setCredentials: (state, action) => {
+  const identity = action.payload;
 
-      const isOrg = identity.type === "organization";
+  // ✅ AUTO-DETECT ENTITY CLASS
+  const resolvedType =
+    identity.type ||
+    (identity.organizationName || identity.organizationEmail
+      ? "organization"
+      : "user");
 
-      const normalized = {
-        ...identity,
+  const isOrg = resolvedType === "organization";
 
-        // 🔥 NORMALIZATION LAYER
-        fullName: isOrg
-          ? identity.organizationName
-          : identity.fullName,
+  const normalized = {
+    ...identity,
+    type: resolvedType,   // 🔥 FORCE CLASSIFICATION
 
-        email: isOrg
-          ? identity.organizationEmail
-          : identity.email,
+    fullName: isOrg
+      ? identity.organizationName
+      : identity.fullName,
 
-        mobileNo: isOrg
-          ? identity.contactDetails?.contactNumber ?? null
-          : identity.mobileNo ?? null,
-      };
+    email: isOrg
+      ? identity.organizationEmail
+      : identity.email,
 
-      state.userInfo = normalized;
-      state.authChecked = true;
+    mobileNo: isOrg
+      ? identity.contactDetails?.contactNumber ?? null
+      : identity.mobileNo ?? null,
+  };
 
-      const safePersist = {
-        fullName: normalized.fullName ?? null,
-        email: normalized.email ?? null,
-        mobileNo: normalized.mobileNo ?? null,
-      };
+  state.userInfo = normalized;
+  state.authChecked = true;
 
-      state.persistedUser = safePersist;
+  const safePersist = {
+    fullName: normalized.fullName ?? null,
+    email: normalized.email ?? null,
+    mobileNo: normalized.mobileNo ?? null,
+    type: normalized.type ?? null,
+  };
 
-      if (typeof window !== "undefined") {
-        localStorage.setItem("userInfo", JSON.stringify(safePersist));
-      }
-    },
+  state.persistedUser = safePersist;
+
+  if (typeof window !== "undefined") {
+    localStorage.setItem("userInfo", JSON.stringify(safePersist));
+  }
+},
+
 
 
     // 🧩 PROFILE / KYC / PARTIAL UPDATES
@@ -88,6 +97,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.userInfo = null;
       state.persistedUser = null;
+      state.authChecked = true;  // safer
 
       if (typeof window !== "undefined") {
         localStorage.removeItem("userInfo");

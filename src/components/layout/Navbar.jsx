@@ -8,12 +8,13 @@ import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useLogoutUserMutation } from '@/utils/slices/authApiSlice';
+import { useLogoutOrganizationMutation } from '@/utils/slices/organizationApiSlice';
 import { useFetchCampaignsQuery } from '@/utils/slices/campaignApiSlice';
 import { Search, MapPin, Building2, TrendingUp } from 'lucide-react';
 import { useAppToast } from '@/app/AppToastContext';
 import { getMediaUrl } from '@/utils/media';
 import { Award } from 'lucide-react';
-
+import { logout } from '@/utils/slices/authSlice';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -35,6 +36,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   ).slice(0, 5);
 
   const [logoutUser] = useLogoutUserMutation();
+  const [logoutOrganization] = useLogoutOrganizationMutation();
   useEffect(() => setHasMounted(true), []);
   const userInfo = useSelector((state) => state.auth.userInfo);
 
@@ -90,31 +92,17 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
     }
   };
 
-  const handleLogout = async () => {
-    if (isLoggingOut) return;
-    setIsLoggingOut(true);
-    try {
-      await logoutUser().unwrap();
-      showToast({
-        type: "success",
-        title: "Logged out",
-        message: "See you again soon..",
-        duration: 2000,
-      });
-    } catch (err) {
-      showToast({
-        type: "error",
-        title: "Logout Failed",
-        message: err,
-        duration: 1000
-      })
-      console.log(err)
-    } finally {
-      setTimeout(() => {
-        setIsLoggingOut(false);
-      }, 600);
-    }
-  };
+ const handleLogout = async () => {
+  if (userInfo?.type === "organization") {
+    await logoutOrganization().unwrap();
+  } else {
+    await logoutUser().unwrap();
+  }
+
+  router.replace("/");
+};
+
+
 
   const handleSearchCommit = (e) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
@@ -161,19 +149,19 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   // ── NEW: role-based menu items ───────────────────────────────────────────
   const regularMenuItems = [
-    { name: 'My Profile',   icon: User2Icon,     isLucide: true,  path: '/profile/userprofile' },
-    { name: 'My Donations', icon: Heart,          isLucide: true,  path: '/profile/mydonation' },
-    { name: 'My Wishlist',  icon: Plus,           isLucide: true,  path: '/profile/my-campaign' },
-    { name: 'Daily Givers', icon: Leaf,           isLucide: true,  path: '/permanent-donor/daily' },
-    { name: 'Zakat',        icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' },
+    { name: 'My Profile', icon: User2Icon, isLucide: true, path: '/profile/userprofile' },
+    { name: 'My Donations', icon: Heart, isLucide: true, path: '/profile/mydonation' },
+    { name: 'My Wishlist', icon: Plus, isLucide: true, path: '/profile/my-campaign' },
+    { name: 'Daily Givers', icon: Leaf, isLucide: true, path: '/permanent-donor/daily' },
+    { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' },
   ];
 
   const organizationMenuItems = [
     { name: 'Organization Dashboard', icon: LayoutDashboard, isLucide: true, path: '/organization/profile/dashboard' },
-    { name: 'My Donations',           icon: Heart,            isLucide: true, path: '/profile/mydonation' },
-    { name: 'Request a Fundraiser',     icon: PlusCircle,       isLucide: true, path: '/organization/profile/my-campaigns/create' },
-    { name: 'My Campaigns',           icon: OrgIcon,          isLucide: true, path: '/organization/profile/my-campaigns' },
-    { name: 'Zakat',                  icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' },
+    { name: 'My Donations', icon: Heart, isLucide: true, path: '/profile/mydonation' },
+    { name: 'Request a Fundraiser', icon: PlusCircle, isLucide: true, path: '/organization/profile/my-campaigns/create' },
+    { name: 'My Campaigns', icon: OrgIcon, isLucide: true, path: '/organization/profile/my-campaigns' },
+    { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' },
   ];
 
   const activeMenuItems = isOrganization ? organizationMenuItems : regularMenuItems;
@@ -522,11 +510,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                     <div className={`p-1 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
                       <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
                     </div>
-                    <span className={`font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${
-                      isVolunteer
-                        ? (darkMode ? 'from-[#FFE088] via-[#BF953F] to-[#FCF6BA]' : 'from-[#BF953F] via-[#8A6E2F] to-[#BF953F]')
-                        : 'from-emerald-400 via-emerald-500 to-emerald-300'
-                    }`}>
+                    <span className={`font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${isVolunteer
+                      ? (darkMode ? 'from-[#FFE088] via-[#BF953F] to-[#FCF6BA]' : 'from-[#BF953F] via-[#8A6E2F] to-[#BF953F]')
+                      : 'from-emerald-400 via-emerald-500 to-emerald-300'
+                      }`}>
                       {isVolunteer ? 'Proud Volunteer' : 'Join as a Volunteer'}
                     </span>
                   </Link>

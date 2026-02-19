@@ -82,7 +82,7 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
         try {
           await queryFulfilled;
         } finally {
-          dispatch(logoutOrganizationState());
+          dispatch(logout());
           dispatch(organizationApiSlice.util.resetApiState());
         }
       },

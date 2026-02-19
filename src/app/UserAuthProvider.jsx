@@ -24,13 +24,18 @@ export default function UserAuthProvider({ children }) {
     data: userData,
     error: userError,
     isFetching: userFetching,
-  } = useGetMeQuery();
+  } = useGetMeQuery(undefined, {
+    skip: userInfo?.type === "organization",
+  });
 
   const {
     data: orgData,
     error: orgError,
     isFetching: orgFetching,
-  } = useGetOrganizationMeQuery();
+  } = useGetOrganizationMeQuery(undefined, {
+    skip: userInfo?.type === "user",
+  });
+
 
 
   /* ---------------------------
