@@ -463,7 +463,7 @@ export default function OrgDashboard({ darkModeFromParent }) {
                 icon: FileText,
                 label: "My Campaigns",
                 sub: "Manage your fundraisers",
-                href: "/org/my-campaign",
+                href: "/organization/profile/my-campaigns",
                 gradient: "from-violet-500 to-purple-600",
               },
               {

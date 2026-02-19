@@ -159,6 +159,46 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["Organization"],
     }),
 
+    // ----------------------------------
+    // CAMPAIGN REQUESTS
+    // ----------------------------------
+    submitCampaignRequest: builder.mutation({
+      query: (formData) => ({
+        url: "/campaign-requests",
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["CampaignRequest"],
+    }),
+
+    updateCampaignRequest: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/campaign-requests/${id}`,
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: ["CampaignRequest"],
+    }),
+
+    getOrganizationCampaignRequests: builder.query({
+      query: () => "/campaign-requests/me",
+      providesTags: ["CampaignRequest"],
+    }),
+
+    getAllCampaignRequests: builder.query({
+      query: () => "/campaign-requests/all",
+      providesTags: ["CampaignRequest"],
+    }),
+
+    updateCampaignRequestStatus: builder.mutation({
+      query: ({ id, status, adminStatement }) => ({
+        url: `/campaign-requests/admin/${id}/status`,
+        method: "PATCH",
+        body: { status, adminStatement },
+      }),
+      invalidatesTags: ["CampaignRequest", "Campaign", "Fundraiser"],
+    }),
+
   }),
 });
 
@@ -173,5 +213,10 @@ export const {
   useDeleteOrganizationMutation,
   useSendOrganizationOtpMutation,
   useVerifyOrganizationOtpMutation,
-  useLogoutOrganizationMutation
+  useLogoutOrganizationMutation,
+  useSubmitCampaignRequestMutation,
+  useUpdateCampaignRequestMutation,
+  useGetOrganizationCampaignRequestsQuery,
+  useGetAllCampaignRequestsQuery,
+  useUpdateCampaignRequestStatusMutation,
 } = organizationApiSlice;

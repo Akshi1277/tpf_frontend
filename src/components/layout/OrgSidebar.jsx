@@ -43,7 +43,7 @@ const menuItems = [
   },
   {
     name: "My Campaigns",
-    path: "/org/my-campaign",
+    path: "/organization/profile/my-campaigns",
     icon: ClipboardList,
     gradient: "from-violet-500 to-purple-600",
     description: "Manage fundraisers",

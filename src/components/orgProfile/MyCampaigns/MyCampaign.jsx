@@ -18,15 +18,19 @@ import {
   Calendar,
   DollarSign,
   IndianRupee,
-  Upload
+  Upload,
+  Plus
 } from "lucide-react"
 import { useToggleWishlistMutation, useGetWishlistQuery, useGetMyApplicationsQuery, useUploadClarificationDocumentsMutation } from "@/utils/slices/authApiSlice"
+import { useGetOrganizationCampaignRequestsQuery } from "@/utils/slices/organizationApiSlice"
 import ShareModal from "../../ui/ShareModal"
 import { getMediaUrl } from "@/utils/media"
 
 
 export default function MyCampaignsPage({ darkModeFromParent }) {
   const userInfo = useSelector((state) => state.auth.userInfo)
+  const isOrganization = userInfo?.type === "organization"
+
   const [darkMode, setDarkMode] = useState(false)
   const [activeTab, setActiveTab] = useState("wishlist")
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,8 +38,20 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
 
   const router = useRouter();
   const { data: wishlistedCampaigns = [], isLoading } = useGetWishlistQuery();
-  const { data: applicationsData, isLoading: isLoadingApps } = useGetMyApplicationsQuery();
+
+  // Fetch based on user type
+  const { data: applicationsData, isLoading: isLoadingApps } = useGetMyApplicationsQuery(undefined, {
+    skip: isOrganization
+  });
+
+  const { data: orgRequestsData, isLoading: isLoadingOrg } = useGetOrganizationCampaignRequestsQuery(undefined, {
+    skip: !isOrganization
+  });
+
   const applications = applicationsData?.data || [];
+  const orgRequests = orgRequestsData?.requests || [];
+  const approvedCampaigns = orgRequestsData?.approvedCampaigns || [];
+
   const [toggleWishlist] = useToggleWishlistMutation();
   // Sync with parent dark mode
   useEffect(() => {
@@ -44,12 +60,19 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     }
   }, [darkModeFromParent])
 
-  const myItems = applications.map(app => {
-    if (app.status === 'approved' && app.campaignId && typeof app.campaignId === 'object') {
-      return { type: 'campaign', data: { ...app.campaignId, status: 'active' }, original: app };
-    }
-    return { type: 'application', data: app, status: app.status };
-  });
+  const myItems = isOrganization
+    ? [
+      ...orgRequests
+        .filter(req => req.status !== 'approved')
+        .map(req => ({ type: 'request', data: req, status: req.status })),
+      ...approvedCampaigns.map(camp => ({ type: 'campaign', data: { ...camp, status: 'active' } }))
+    ]
+    : applications.map(app => {
+      if (app.status === 'approved' && app.campaignId && typeof app.campaignId === 'object') {
+        return { type: 'campaign', data: { ...app.campaignId, status: 'active' }, original: app };
+      }
+      return { type: 'application', data: app, status: app.status };
+    });
 
   // Mock user data
   const currentUser = {
@@ -279,6 +302,72 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                 ? "Please upload the requested documents above."
                 : "Create a new application or contact support for help."}
           </p>
+        </div>
+      </motion.div>
+    );
+  };
+
+  const RequestCard = ({ request }) => {
+    const isClarification = request.status === 'clarification';
+    const isRejected = request.status === 'rejected';
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`rounded-xl sm:rounded-2xl overflow-hidden border flex flex-col h-full ${darkMode
+          ? "bg-zinc-800/50 border-zinc-700"
+          : "bg-white border-gray-200 shadow-lg"
+          }`}
+      >
+        {request.imageUrl && (
+          <div className="relative h-32 overflow-hidden bg-gray-100 dark:bg-zinc-800">
+            <img
+              src={getMediaUrl(request.imageUrl)}
+              alt={request.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/60 text-white backdrop-blur-sm">
+              REQUEST PREVIEW
+            </div>
+          </div>
+        )}
+        <div className="p-6 flex-1 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className={`text-lg font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+              {request.title}
+            </h3>
+            {getStatusBadge(request.status)}
+          </div>
+
+          <div className={`mb-4 text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+            <p className="mb-2 uppercase tracking-wider text-[10px] font-bold">Campaign Request</p>
+            <p><span className="font-semibold">Submitted:</span> {new Date(request.createdAt).toLocaleDateString()}</p>
+          </div>
+
+          {(isRejected || isClarification) && (
+            <div className={`p-4 rounded-lg text-sm mb-4 ${darkMode ? "bg-red-500/10 border border-red-500/20" : "bg-red-50 border border-red-100"
+              }`}>
+              <p className={`font-semibold mb-1 ${darkMode ? "text-red-400" : "text-red-700"}`}>
+                {isClarification ? "Action Required:" : "Admin Feedback:"}
+              </p>
+              <p className={darkMode ? "text-zinc-300" : "text-gray-600"}>
+                {request.adminStatement || "No feedback provided."}
+              </p>
+            </div>
+          )}
+
+          {isClarification && (
+            <button
+              onClick={() => router.push(`/organization/profile/my-campaigns/edit/${request._id}`)}
+              className={`w-full py-2 px-4 rounded-lg font-bold text-sm transition-all ${darkMode
+                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                : "bg-emerald-500 text-white hover:bg-emerald-600"
+                }`}
+            >
+              Edit & Resubmit
+            </button>
+          )}
         </div>
       </motion.div>
     );
@@ -534,7 +623,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   };
 
   return (
-    <div className={`relative ${darkMode ? "bg-zinc-900" : "bg-transparent"}`}>
+    <div className={`relative min-h-screen ${darkMode ? "bg-zinc-950" : "bg-gray-50"}`}>
 
       {/* Background Pattern */}
       <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
@@ -567,13 +656,24 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
 
           <div className="relative p-4 sm:p-6 md:p-8">
             <div className="flex flex-col gap-4">
-              <div className="flex-1">
-                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-white">
-                  My Campaigns
-                </h1>
-                <p className="text-xs sm:text-sm md:text-base text-white/90">
-                  Manage your campaigns and track your wishlisted causes
-                </p>
+              <div className="flex-1 flex justify-between items-start">
+                <div>
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 text-white">
+                    My Campaigns
+                  </h1>
+                  <p className="text-xs sm:text-sm md:text-base text-white/90">
+                    Manage your campaigns and track your {isOrganization ? "requests" : "applications"}
+                  </p>
+                </div>
+                {isOrganization && (
+                  <button
+                    onClick={() => router.push("/organization/profile/my-campaigns/create")}
+                    className={`hidden sm:flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${darkMode ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30" : "bg-white text-emerald-600 hover:bg-emerald-50"
+                      }`}>
+                    <Plus size={20} />
+                    Create Campaign
+                  </button>
+                )}
               </div>
 
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -584,10 +684,9 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                     {currentUser.totalCampaigns} Campaigns
                   </span>
                 </div>
-                <div className={`flex items-center gap-1.5 cursor-pointer sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${darkMode ? "bg-white/10" : "bg-white/20"
+                <div className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${darkMode ? "bg-white/10" : "bg-white/20"
                   } backdrop-blur-sm`}>
                   <Heart
-                    onClick={() => handleToggleWishlist(campaign._id)}
                     className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-300" />
                   <span className="font-semibold text-xs sm:text-sm text-white">
                     {currentUser.totalWishlisted} Wishlisted
@@ -603,7 +702,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-6 sm:mb-8 overflow-x-auto"
+          className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
         >
           <div className={`inline-flex w-full sm:w-auto rounded-lg sm:rounded-xl p-1 ${darkMode ? "bg-zinc-800/50" : "bg-white shadow-md"
             }`}>
@@ -631,20 +730,32 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                   : "text-gray-600 hover:text-gray-900"
                 }`}
             >
-              My Campaigns ({myItems.length})
+              {isOrganization ? "Organization Campaigns" : "My Applications"} ({myItems.length})
             </button>
-
           </div>
+
+          {isOrganization && (
+            <button
+              onClick={() => router.push("/organization/profile/my-campaigns/create")}
+              className={`sm:hidden w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold transition-all shadow-lg ${darkMode ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-500 text-white"
+                }`}
+            >
+              <Plus size={20} />
+              Create Campaign
+            </button>
+          )}
         </motion.div>
 
         {/* Content */}
         {activeTab === "my-campaigns" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-            {myItems.map((item) => (
+            {myItems.map((item, idx) => (
               item.type === 'campaign' ? (
-                <CampaignCard key={item.data._id} campaign={item.data} isMyCampaign={true} />
+                <CampaignCard key={item.data._id || idx} campaign={item.data} isMyCampaign={true} />
+              ) : item.type === 'request' ? (
+                <RequestCard key={item.data._id || idx} request={item.data} />
               ) : (
-                <ApplicationCard key={item.data._id} application={item.data} />
+                <ApplicationCard key={item.data._id || idx} application={item.data} />
               )
             ))}
           </div>
@@ -674,14 +785,18 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
               }`}>
               Start creating campaigns to make a difference
             </p>
-            <button className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all ${darkMode
-              ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-              : "bg-emerald-500 text-white hover:bg-emerald-600"
-              }`}>
+            <button
+              onClick={() => router.push("/organization/profile/my-campaigns/create")}
+              className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all ${darkMode
+                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                : "bg-emerald-500 text-white hover:bg-emerald-600"
+                }`}>
               Create Campaign
             </button>
           </motion.div>
         )}
+
+
 
         {activeTab === "wishlist" && wishlistedCampaigns.length === 0 && (
           <motion.div
