@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Menu, X, Moon, Sun, User2Icon } from 'lucide-react';
 import { Plus, Heart, Leaf, LayoutDashboard, PlusCircle, Building2 as OrgIcon } from 'lucide-react';
@@ -10,11 +10,14 @@ import { useDispatch } from 'react-redux';
 import { useLogoutUserMutation } from '@/utils/slices/authApiSlice';
 import { useLogoutOrganizationMutation } from '@/utils/slices/organizationApiSlice';
 import { useFetchCampaignsQuery } from '@/utils/slices/campaignApiSlice';
-import { Search, MapPin, Building2, TrendingUp } from 'lucide-react';
+import { useFetchMyDonationsQuery } from '@/utils/slices/donationApiSlice';
+import { Search, MapPin, Building2, TrendingUp, Globe, Send, Headphones } from 'lucide-react';
 import { useAppToast } from '@/app/AppToastContext';
 import { getMediaUrl } from '@/utils/media';
-import { Award } from 'lucide-react';
+import { Award, ChevronRight } from 'lucide-react';
 import { logout } from '@/utils/slices/authSlice';
+import { Drawer } from 'vaul';
+import { motion, AnimatePresence } from 'framer-motion';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const dispatch = useDispatch()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -25,6 +28,15 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { showToast } = useAppToast();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showBottomFade, setShowBottomFade] = useState(true);
+  const scrollRef = useRef(null);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+      setShowBottomFade(scrollTop + clientHeight < scrollHeight - 20);
+    }
+  };
 
   const { data: campaignData, isLoading } = useFetchCampaignsQuery();
   const campaigns = campaignData?.campaigns || [];
@@ -37,6 +49,16 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   const [logoutUser] = useLogoutUserMutation();
   const [logoutOrganization] = useLogoutOrganizationMutation();
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Subah Khair';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon';
+    if (hour >= 17 && hour < 22) return 'Good Evening';
+    return 'Salam';
+  };
+
+  const greeting = getGreeting();
   useEffect(() => setHasMounted(true), []);
   const userInfo = useSelector((state) => state.auth.userInfo);
 
@@ -44,20 +66,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const isOrganization = userInfo?.role === 'organization';
   const isVolunteer = userInfo?.role === 'volunteer';
 
-  // ── NEW: lock body scroll when menu is open ──────────────────────────────
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      window.lenis?.stop();
-    } else {
-      document.body.style.overflow = '';
-      window.lenis?.start();
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.lenis?.start();
-    };
-  }, [mobileMenuOpen]);
+  const { data: myDonationsData } = useFetchMyDonationsQuery({}, { skip: !userInfo });
+  const donationCount = myDonationsData?.donations?.length || 0;
+
+  // ── REMOVED: Vaul handles scroll locking and Lenis automatically ───────
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -92,15 +104,16 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
     }
   };
 
- const handleLogout = async () => {
-  if (userInfo?.type === "organization") {
-    await logoutOrganization().unwrap();
-  } else {
-    await logoutUser().unwrap();
-  }
+  const handleLogout = async () => {
+    if (userInfo?.type === "organization") {
+      await logoutOrganization().unwrap();
+    } else {
+      await logoutUser().unwrap();
+    }
 
-  router.replace("/");
-};
+    dispatch(logout());
+    router.replace("/");
+  };
 
 
 
@@ -166,6 +179,30 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   const activeMenuItems = isOrganization ? organizationMenuItems : regularMenuItems;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.06,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24
+      }
+    },
+  };
+
   return (
     <>
       <header
@@ -197,17 +234,15 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             {/* CENTER – Search (hidden on mobile) */}
             <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl md:mx-4 lg:mx-6 xl:mx-8 search-container">
               <div className="relative w-full group">
-                {/* Animated background gradient */}
                 <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
-           ${darkMode
+                  ${darkMode
                     ? 'bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-cyan-500/30'
                     : 'bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20'
                   } animate-[pulse_3s_ease-in-out_infinite]`}
                 />
-                {/* Shimmer effect on focus */}
                 <div className="absolute inset-0 rounded-full overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
                   <div className={`absolute inset-0 -translate-x-full group-focus-within:translate-x-full transition-transform duration-[2000ms] ease-in-out
-             ${darkMode
+                    ${darkMode
                       ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent'
                       : 'bg-gradient-to-r from-transparent via-white/40 to-transparent'
                     }`}
@@ -221,24 +256,18 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                   onKeyDown={handleSearchCommit}
                   placeholder="Find causes that matter"
                   className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
-             ${darkMode
+                    ${darkMode
                       ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
                       : 'bg-white/90 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-md focus:bg-white focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.15),inset_0_1px_2px_rgba(16,185,129,0.1)]'
                     } focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:scale-[1.02] hover:border-emerald-400/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)]`}
                 />
                 <svg
                   className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-all duration-500 group-focus-within:scale-110 group-focus-within:rotate-90 group-focus-within:text-emerald-500
-             ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
+                    ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-all duration-500 flex gap-1">
-                  <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0s' }} />
-                  <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.3s' }} />
-                  <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.6s' }} />
-                </div>
-                {/* Search Results Dropdown */}
                 {showDropdown && searchQuery && (
                   <div className={`absolute top-full left-0 right-0 mt-3 rounded-2xl overflow-hidden shadow-2xl border transition-all duration-300 z-[60]
                     ${darkMode ? 'bg-zinc-900/95 border-zinc-800 backdrop-blur-xl' : 'bg-white/95 border-zinc-100 backdrop-blur-xl'}`}>
@@ -261,7 +290,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                               className={`group flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all duration-200
                                 ${darkMode ? 'hover:bg-zinc-800/80' : 'hover:bg-emerald-50/50'}`}
                             >
-                              <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-200 dark:bg-zinc-800">
+                              <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                                 <Image src={campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : "/placeholder-campaign.jpg"} alt={campaign.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -276,22 +305,10 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                         </>
                       ) : (
                         <div className="p-8 text-center">
-                          <div className={`inline-flex p-3 rounded-full mb-3 ${darkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
-                            <Search className={`w-6 h-6 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`} />
-                          </div>
                           <p className={`text-sm font-medium ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>No causes found for "{searchQuery}"</p>
-                          <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>Try searching for something else</p>
                         </div>
                       )}
                     </div>
-                    {filteredCampaigns.length > 0 && (
-                      <div className={`p-2 border-t ${darkMode ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-100 bg-zinc-50/50'}`}>
-                        <button onClick={() => { router.push('/all-campaigns'); setShowDropdown(false); setSearchQuery(''); }}
-                          className={`w-full py-2 text-xs font-semibold text-center rounded-lg transition-colors ${darkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-zinc-500 hover:text-emerald-600 hover:bg-white'}`}>
-                          View all campaigns
-                        </button>
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
@@ -299,332 +316,352 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
             {/* RIGHT – Actions */}
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-              {/* Start Fundraising – desktop only, hidden for org */}
               {!isOrganization && (
-                <button className="hidden md:flex items-center justify-center gap-2 px-4 md:px-5 lg:px-6 xl:px-7 py-2 md:py-2.5 lg:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer whitespace-nowrap"
+                <button className="hidden md:flex items-center justify-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm transition-all duration-300 cursor-pointer whitespace-nowrap"
                   onClick={() => checkNavigation('/financial-aid')}>
                   Start fundraising
                 </button>
               )}
-              <div className="tooltip-container">
-                <button className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'}`}
-                  onClick={() => router.push('/zakat-calculator')}>
-                  <Image src="/TPFAid-Icon-Zakat-1.svg" alt="Zakat" width={28} height={28} className="w-7 h-7 scale-110" />
-                </button>
-                <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>Zakaat</span>
-              </div>
-              <div className="tooltip-container">
-                <button onClick={() => setDarkMode(!darkMode)}
-                  className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'}`}>
-                  {darkMode ? <Sun className="w-6 h-6 text-white" /> : <Moon className="w-6 h-6 text-zinc-900" />}
-                </button>
-                <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
-              </div>
+              <button className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'}`}
+                onClick={() => router.push('/zakat-calculator')}>
+                <Image src="/TPFAid-Icon-Zakat-1.svg" alt="Zakat" width={28} height={28} className="w-7 h-7" />
+              </button>
+              <button onClick={() => setDarkMode(!darkMode)}
+                className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'}`}>
+                {darkMode ? <Sun className="w-6 h-6 text-white" /> : <Moon className="w-6 h-6 text-zinc-900" />}
+              </button>
 
-              {/* Profile avatar or hamburger */}
-              {hasMounted && userInfo ? (
-                <button
-                  onClick={() => { setMobileMenuOpen(!mobileMenuOpen); }}
-                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold tracking-wide text-[14px] sm:text-[15px] cursor-pointer transition-all duration-300
-                    ring-2 ring-white/70 dark:ring-white/40
-                    bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:scale-[1.08]`}
-                >
-                  {initials}
-                </button>
-              ) : (
-                <div className="tooltip-container">
-                  <button
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    aria-label="Menu"
-                    className={`p-1.5 sm:p-2 rounded-full transition-colors cursor-pointer
-                      ${darkMode ? 'bg-zinc-800/80 text-white hover:bg-zinc-700 backdrop-blur-sm' : 'bg-white/80 text-zinc-700 hover:bg-zinc-200 backdrop-blur-sm'}`}
-                  >
-                    {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
-                  </button>
-                  <span className={`tooltip ${darkMode ? 'bg-zinc-700 text-white' : 'bg-zinc-800 text-white'}`}>Menu</span>
-                </div>
-              )}
-            </div>
-          </div>
+              <Drawer.Root open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} direction="right">
+                <Drawer.Trigger asChild>
+                  {hasMounted && userInfo ? (
+                    <button className="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg">
+                      {initials}
+                    </button>
+                  ) : (
+                    <button className={`p-2.5 rounded-full transition-all duration-300 ${darkMode ? 'bg-zinc-800 text-white' : 'bg-white text-zinc-900'}`}>
+                      <Menu className="w-6 h-6" />
+                    </button>
+                  )}
+                </Drawer.Trigger>
 
-          {/* Mobile search bar */}
-          <div className="md:hidden pb-3 search-container">
-            <div className="relative w-full group">
-              <div className={`absolute inset-0 rounded-full opacity-0 group-focus-within:opacity-100 transition-all duration-500 blur-xl -z-10
-                ${darkMode ? 'bg-gradient-to-r from-emerald-500/30 via-teal-500/30 to-cyan-500/30' : 'bg-gradient-to-r from-emerald-400/20 via-teal-400/20 to-cyan-400/20'} animate-[pulse_3s_ease-in-out_infinite]`} />
-              <div className="absolute inset-0 rounded-full overflow-hidden opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
-                <div className={`absolute inset-0 -translate-x-full group-focus-within:translate-x-full transition-transform duration-[2000ms] ease-in-out
-                  ${darkMode ? 'bg-gradient-to-r from-transparent via-white/10 to-transparent' : 'bg-gradient-to-r from-transparent via-white/40 to-transparent'}`} />
-              </div>
-              <input
-                type="text" value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setShowDropdown(true); }}
-                onFocus={() => { setShowDropdown(true); setIsFocused(true); }}
-                onKeyDown={handleSearchCommit}
-                placeholder="Find causes that matter"
-                className={`w-full px-4 py-2.5 pl-11 pr-4 rounded-full border transition-all duration-500
-                  ${darkMode
-                    ? 'bg-zinc-800/90 text-white placeholder-zinc-400 border-zinc-700/50 backdrop-blur-md focus:bg-zinc-900/95 focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.25),inset_0_1px_2px_rgba(255,255,255,0.05)]'
-                    : 'bg-white/90 text-zinc-900 placeholder-zinc-500 border-zinc-300/50 backdrop-blur-md focus:bg-white focus:border-emerald-500/60 focus:shadow-[0_0_30px_rgba(16,185,129,0.15),inset_0_1px_2px_rgba(16,185,129,0.1)]'
-                  } focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:scale-[1.02] hover:border-emerald-400/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)]`}
-              />
-              <svg className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 transition-all duration-500 group-focus-within:scale-110 group-focus-within:rotate-90 group-focus-within:text-emerald-500 ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-focus-within:opacity-100 transition-all duration-500 flex gap-1">
-                <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0s' }} />
-                <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-teal-400' : 'bg-teal-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.3s' }} />
-                <span className={`w-1 h-1 rounded-full ${darkMode ? 'bg-cyan-400' : 'bg-cyan-500'} animate-[ping_1.5s_ease-in-out_infinite]`} style={{ animationDelay: '0.6s' }} />
-              </div>
-              {/* Search Results Dropdown (Mobile) */}
-              {showDropdown && searchQuery && (
-                <div className={`absolute top-full left-0 right-0 mt-3 rounded-2xl overflow-hidden shadow-2xl border transition-all duration-300 z-[60]
-                  ${darkMode ? 'bg-zinc-900 border-zinc-800 backdrop-blur-xl' : 'bg-white border-zinc-100 backdrop-blur-xl'}`}>
-                  <div className="p-2">
-                    {filteredCampaigns.length > 0 ? (
-                      <>
-                        <div className={`px-3 py-2 text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>Causes</div>
-                        {filteredCampaigns.map((campaign) => (
-                          <div key={campaign._id}
-                            onClick={() => { router.push(`/campaign/${campaign.slug}`); setShowDropdown(false); setSearchQuery(''); }}
-                            className={`group flex items-center gap-3 p-2 rounded-xl cursor-pointer active:bg-emerald-500/10 transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-50'}`}>
-                            <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
-                              <Image src={campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : "/placeholder-campaign.jpg"} alt={campaign.title} fill className="object-cover" />
+                <Drawer.Portal>
+                  <Drawer.Overlay className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm" />
+                  <Drawer.Content className={`fixed right-0 top-0 h-full w-[85%] max-w-md z-[70] flex flex-col outline-none shadow-2xl
+                    ${darkMode ? 'bg-zinc-950 border-l border-zinc-800' : 'bg-white border-l border-zinc-200'}`}>
+
+                    {/* Accessibility Title */}
+                    <Drawer.Title className="sr-only">Mobile Navigation Menu</Drawer.Title>
+
+                    <div className="flex justify-end px-4 py-3">
+                      <button onClick={() => setMobileMenuOpen(false)} className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800 text-white' : 'hover:bg-zinc-100 text-zinc-900'}`}>
+                        <X className="w-6 h-6" />
+                      </button>
+                    </div>
+
+                    <div
+                      ref={scrollRef}
+                      onScroll={handleScroll}
+                      className="flex-1 overflow-y-auto scrollbar-hide flex flex-col px-6 pb-6 relative" data-lenis-prevent
+                    >
+                      <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate={mobileMenuOpen ? "show" : "hidden"}
+                        className="space-y-6"
+                      >
+                        {/* Impact Card */}
+                        <motion.div variants={itemVariants}>
+                          {userInfo ? (
+                            <div className={`p-5 rounded-2xl border backdrop-blur-xl overflow-hidden relative group transition-all duration-500
+                              ${darkMode
+                                ? 'bg-zinc-900/40 border-zinc-800/50 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
+                                : 'bg-emerald-50/40 border-emerald-100/50 shadow-[0_8px_32px_rgba(16,185,129,0.05)]'}`}>
+
+                              {/* Background Glow */}
+                              <div className={`absolute -right-10 -top-10 w-32 h-32 rounded-full blur-3xl opacity-20 transition-all duration-700 group-hover:scale-150
+                                ${darkMode ? 'bg-emerald-500' : 'bg-emerald-400'}`} />
+
+                              <div className="relative z-10">
+                                <span className={`text-[10px] font-bold tracking-[0.2em] uppercase mb-1 block
+                                  ${darkMode ? 'text-zinc-500' : 'text-emerald-600/70'}`}>
+                                  Your Impact
+                                </span>
+                                <h3 className={`text-xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                                  {greeting}, {userInfo.fullName?.split(' ')[0]}!
+                                </h3>
+                                <p className={`text-sm leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                  You've supported <span className="font-bold text-emerald-500">{donationCount}</span> {donationCount === 1 ? 'cause' : 'causes'} this month.
+                                </p>
+
+                                <div className="mt-4 flex items-center gap-2">
+                                  <div className="flex -space-x-2">
+                                    {[1, 2, 3].map((i) => (
+                                      <div key={i} className={`w-6 h-6 rounded-full border-2 ${darkMode ? 'border-zinc-900 bg-zinc-800' : 'border-white bg-emerald-100'} flex items-center justify-center`}>
+                                        <Heart className="w-3 h-3 text-emerald-500" fill="currentColor" />
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <span className={`text-[11px] font-medium ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                    Keep spreading kindness
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className={`text-xs font-semibold truncate ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{campaign.title}</h4>
-                              <p className={`text-[10px] ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>{campaign.organization}</p>
+                          ) : (
+                            <div className={`p-5 rounded-2xl border backdrop-blur-xl overflow-hidden relative group
+                              ${darkMode
+                                ? 'bg-zinc-900/40 border-zinc-800/50'
+                                : 'bg-zinc-50/40 border-zinc-200/50'}`}>
+                              <div className="relative z-10 text-center">
+                                <h3 className={`text-lg font-bold mb-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                                  Be the Change
+                                </h3>
+                                <p className={`text-sm mb-4 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                  Join thousands of donors making a real impact today.
+                                </p>
+                                <button
+                                  onClick={() => { handleAuthNavigation("/signup"); setMobileMenuOpen(false); }}
+                                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
+                                >
+                                  Create Impact
+                                </button>
+                              </div>
                             </div>
+                          )}
+                        </motion.div>
+
+                        {/* Search Section */}
+                        <motion.div variants={itemVariants} className="relative group">
+                          <input
+                            type="text" value={searchQuery}
+                            onChange={(e) => { setSearchQuery(e.target.value); setShowDropdown(true); }}
+                            onFocus={() => setShowDropdown(true)}
+                            onKeyDown={handleSearchCommit}
+                            placeholder="I want to support..."
+                            className={`w-full px-4 py-3 pl-12 rounded-xl border transition-all duration-300
+                              ${darkMode
+                                ? 'bg-transparent text-white placeholder-zinc-500 border-zinc-800 focus:border-emerald-500'
+                                : 'bg-zinc-50 text-zinc-900 placeholder-zinc-400 border-zinc-200 focus:border-emerald-500'
+                              } focus:outline-none`}
+                          />
+                          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`} />
+
+                          {searchQuery && (
+                            <div className={`absolute top-full left-0 right-0 mt-2 rounded-xl overflow-hidden border shadow-xl z-10 ${darkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-100'}`}>
+                              {filteredCampaigns.length > 0 ? filteredCampaigns.slice(0, 5).map((campaign) => (
+                                <div key={campaign._id}
+                                  onClick={() => { router.push(`/campaign/${campaign.slug}`); setMobileMenuOpen(false); setSearchQuery(''); }}
+                                  className={`flex items-center gap-3 p-3 cursor-pointer border-b last:border-0 transition-colors ${darkMode ? 'border-zinc-700 hover:bg-zinc-700' : 'border-zinc-50 hover:bg-emerald-50/30'}`}>
+                                  <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                                    <Image src={campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : "/placeholder-campaign.jpg"} alt={campaign.title} fill className="object-cover" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className={`text-xs font-bold truncate ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{campaign.title}</h4>
+                                    <p className={`text-[10px] ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>{campaign.organization}</p>
+                                  </div>
+                                </div>
+                              )) : (
+                                <div className="p-4 text-center text-zinc-400 text-xs">No causes found</div>
+                              )}
+                            </div>
+                          )}
+                        </motion.div>
+
+                        {/* Discover Link */}
+                        <motion.div variants={itemVariants}>
+                          <Link href="/#campaigns" className={`group flex items-center gap-3 text-[15px] font-medium transition-colors ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-emerald-600'}`} onClick={() => setMobileMenuOpen(false)}>
+                            <motion.div
+                              whileHover={{ rotate: 15, scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              <Globe className="w-5 h-5" />
+                            </motion.div>
+                            <span>Discover inspiring campaigns →</span>
+                          </Link>
+                        </motion.div>
+
+                        {/* Volunteer Link */}
+                        {!isOrganization && (
+                          <motion.div variants={itemVariants}>
+                            <Link href={isVolunteer ? "/profile/vouchers" : "/volunteer/register"} className="group flex items-center gap-3" onClick={() => setMobileMenuOpen(false)}>
+                              <motion.div
+                                whileHover={{ scale: 1.1, rotate: -10 }}
+                                whileTap={{ scale: 0.9 }}
+                                className={`p-1.5 rounded-lg ${darkMode ? 'bg-zinc-800' : 'bg-zinc-100'}`}
+                              >
+                                <Award className={`w-5 h-5 ${isVolunteer ? 'text-emerald-500' : 'text-zinc-400'}`} />
+                              </motion.div>
+                              <span className={`font-bold text-[15px] ${darkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>{isVolunteer ? 'Proud Service Hero' : 'Join as a Volunteer'}</span>
+                            </Link>
+                          </motion.div>
+                        )}
+
+                        <motion.div variants={itemVariants} className={`h-px ${darkMode ? 'bg-zinc-800' : 'bg-zinc-100'}`} />
+
+                        <nav className="space-y-4">
+                          {activeMenuItems.map(item => (
+                            <motion.div key={item.name} variants={itemVariants}>
+                              <Link href={item.path || '#'} className={`group flex items-center gap-4 transition-all ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-emerald-600'}`} onClick={() => setMobileMenuOpen(false)}>
+                                <motion.div
+                                  whileHover={{ scale: 1.2, rotate: 5 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  className="w-6 flex justify-center"
+                                >
+                                  {item.isLucide ? <item.icon className="w-5 h-5 transition-colors" /> : <Image src={item.icon} alt={item.name} width={20} height={20} className="w-5 h-5" />}
+                                </motion.div>
+                                <span className="font-medium text-[15px]">{item.name}</span>
+                              </Link>
+                            </motion.div>
+                          ))}
+                        </nav>
+
+                        <motion.div variants={itemVariants} className={`h-px ${darkMode ? 'bg-zinc-800' : 'bg-zinc-100'}`} />
+
+                        {!isOrganization && (
+                          <motion.div variants={itemVariants} className="space-y-4">
+                            <p className={`text-[11px] font-bold tracking-widest ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>START</p>
+                            <Link
+                              href="/financial-aid"
+                              onClick={() => setMobileMenuOpen(false)}
+                              className={`group relative flex flex-col gap-3 p-5 rounded-2xl border overflow-hidden transition-all duration-500
+                                ${darkMode
+                                  ? 'bg-zinc-900/40 border-emerald-500/20 hover:border-emerald-500/40'
+                                  : 'bg-emerald-50/30 border-emerald-200 hover:border-emerald-300'}`}
+                            >
+                              {/* Animated Shimmer Background */}
+                              <motion.div
+                                animate={{
+                                  x: ['-100%', '100%'],
+                                }}
+                                transition={{
+                                  duration: 3,
+                                  repeat: Infinity,
+                                  ease: "linear"
+                                }}
+                                className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/5 to-transparent skew-x-12 pointer-events-none"
+                              />
+
+                              <div className="flex items-center justify-between relative z-10">
+                                <div className="flex items-center gap-4">
+                                  <div className={`p-2 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-white shadow-sm'}`}>
+                                    <Send className="w-5 h-5 text-emerald-500" />
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className={`font-bold text-[15px] ${darkMode ? 'text-white' : 'text-zinc-900'}`}>Start fundraising</span>
+                                    <span className={`text-[11px] font-medium leading-none mt-0.5 ${darkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Take the first step</span>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                  <span className="text-[14px] text-emerald-600 font-bold">0%</span>
+                                  <span className="text-[9px] text-emerald-500/80 font-medium uppercase tracking-tighter">fee</span>
+                                </div>
+                              </div>
+
+
+                            </Link>
+                          </motion.div>
+                        )}
+
+                        <motion.div variants={itemVariants} className="space-y-4">
+                          {!userInfo && <p className={`text-[11px] font-bold tracking-widest ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>ORGANIZATIONS</p>}
+                          {!userInfo && (
+                            <Link href="/organization/login" className="group flex items-center gap-4 transition-all" onClick={() => setMobileMenuOpen(false)}>
+                              <motion.div whileHover={{ scale: 1.1, y: -2 }} whileTap={{ scale: 0.9 }}>
+                                <Building2 className={`w-5 h-5 ${darkMode ? 'text-zinc-300 group-hover:text-white' : 'text-zinc-700 group-hover:text-emerald-600'}`} />
+                              </motion.div>
+                              <span className={`font-medium text-[15px] ${darkMode ? 'text-zinc-300 group-hover:text-white' : 'text-zinc-700 group-hover:text-emerald-600'}`}>Organization Login</span>
+                            </Link>
+                          )}
+                          <Link href="/contactus" className={`group flex items-center gap-4 p-4 rounded-xl border transition-all ${darkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white' : 'bg-zinc-50 border-zinc-200 text-zinc-700 hover:text-emerald-600'}`} onClick={() => setMobileMenuOpen(false)}>
+                            <motion.div
+                              animate={{
+                                y: [0, -2, 0],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            >
+                              <Headphones className="w-5 h-5" />
+                            </motion.div>
+                            <span className="font-medium text-[15px]">Support</span>
+                          </Link>
+                        </motion.div>
+
+                        {/* Liquid Theme Toggle */}
+                        <motion.div variants={itemVariants} className="pt-4">
+                          <div className={`p-4 rounded-2xl border flex items-center justify-between transition-all duration-500
+                            ${darkMode ? 'bg-zinc-900/40 border-zinc-800/50' : 'bg-zinc-50 border-zinc-200'}`}>
+                            <div className="flex flex-col">
+                              <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>Appearance</span>
+                              <span className={`text-[11px] font-medium ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                {darkMode ? 'Dark Mode' : 'Light Mode'}
+                              </span>
+                            </div>
+
+                            <motion.button
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setDarkMode(!darkMode)}
+                              className={`relative w-16 h-8 rounded-full p-1 transition-colors duration-500 outline-none
+                                ${darkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`}
+                            >
+                              {/* Sliding Liquid Ball */}
+                              <motion.div
+                                className="absolute top-1 left-1 bottom-1 w-6 h-6 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/40 z-10 flex cursor-pointer items-center justify-center pt-[0px]"
+                                animate={{
+                                  x: darkMode ? 32 : 0,
+                                }}
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 400,
+                                  damping: 30
+                                }}
+                              >
+                                {darkMode ? (
+                                  <Moon className="w-3.5 h-3.5 text-white" fill="currentColor" />
+                                ) : (
+                                  <Sun className="w-3.5 h-3.5 text-white" fill="currentColor" />
+                                )}
+                              </motion.div>
+
+                              {/* Static Icons Background */}
+                              <div className="flex justify-between px-1.5 items-center h-full w-full opacity-30">
+                                <Sun className={`w-3.5 h-3.5 ${darkMode ? 'text-zinc-500' : 'text-zinc-900'}`} />
+                                <Moon className={`w-3.5 h-3.5 ${darkMode ? 'text-zinc-500' : 'text-zinc-900'}`} />
+                              </div>
+                            </motion.button>
                           </div>
-                        ))}
-                      </>
-                    ) : (
-                      <div className="p-4 text-center">
-                        <p className={`text-xs font-medium ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>No causes found</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                        </motion.div>
+
+                        <motion.div variants={itemVariants} className="pt-8 flex flex-col items-center gap-6">
+                          {userInfo ? (
+                            <button onClick={() => setShowLogoutModal(true)} disabled={isLoggingOut} className={`text-sm font-bold tracking-wide uppercase ${isLoggingOut ? 'text-zinc-500' : 'text-red-500 hover:text-red-400'}`}>
+                              {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
+                            </button>
+                          ) : (
+                            <>
+                              <button onClick={() => { handleAuthNavigation("/signup"); setMobileMenuOpen(false); }} className={`text-[15px] font-medium transition-colors ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-zinc-900'}`}>Sign up</button>
+                              <button onClick={() => { handleAuthNavigation("/login"); setMobileMenuOpen(false); }} className={`text-[15px] font-medium transition-colors ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-zinc-900'}`}>Log in</button>
+                            </>
+                          )}
+                        </motion.div>
+                      </motion.div>
+                    </div>
+
+                    {/* Gradient Fade Mask */}
+                    <div className={`absolute bottom-0 left-0 right-0 h-16 pointer-events-none z-[80] transition-opacity duration-300
+                      ${showBottomFade ? 'opacity-100' : 'opacity-0'}
+                      ${darkMode
+                        ? 'bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent'
+                        : 'bg-gradient-to-t from-white via-white/80 to-transparent'}`}
+                    />
+                  </Drawer.Content>
+                </Drawer.Portal>
+              </Drawer.Root>
             </div>
           </div>
         </div>
-
-        {/* ── Mobile menu ─────────────────────────────────────────────────────── */}
-        {mobileMenuOpen && (
-          <>
-            {/* ── NEW: backdrop blur sits at z-40, below the header z-50 ── */}
-            <div
-              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-md"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-
-            {/* Menu panel — z-[45] so it's above backdrop but below header */}
-            <div
-              data-lenis-prevent
-              className={`fixed right-0 top-0 h-full z-[45] w-full md:w-96 md:max-w-md md:rounded-l-2xl overflow-hidden flex flex-col
-                ${darkMode
-                  ? 'bg-zinc-900 shadow-[0_0_40px_rgba(0,0,0,0.9)] border-l border-zinc-800'
-                  : 'bg-white shadow-[0_4px_40px_rgba(0,0,0,0.25)] border-l border-zinc-200'
-                }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close button — always visible at top, never blurred out */}
-              <div className={`sticky top-0 z-10 flex justify-end px-4 py-3 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
-                >
-                  <X className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-zinc-900'}`} />
-                </button>
-              </div>
-
-              {/* Scrollable menu content */}
-              <div className="px-6 py-4 space-y-4 flex-1 overflow-y-auto scrollbar-hide pb-8" data-lenis-prevent>
-
-                {/* Greeting */}
-                <div>
-                  <p className={`text-xs font-semibold ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                    {isOrganization ? 'WELCOME BACK!' : 'SALAM!'}
-                  </p>
-                </div>
-
-                {/* Search */}
-                <div className="relative">
-                  <input
-                    type="text" value={searchQuery}
-                    onChange={(e) => { setSearchQuery(e.target.value); setShowDropdown(true); }}
-                    onFocus={() => setShowDropdown(true)}
-                    onKeyDown={handleSearchCommit}
-                    placeholder="I want to support..."
-                    className={`w-full px-4 py-3 pl-10 rounded-xl border
-                      ${darkMode
-                        ? 'bg-zinc-800 text-white placeholder-zinc-500 border-zinc-700'
-                        : 'bg-zinc-50 text-zinc-900 placeholder-zinc-400 border-zinc-200'
-                      } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-                  />
-                  <svg className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  {searchQuery && (
-                    <div className={`mt-2 rounded-xl overflow-hidden ${darkMode ? 'bg-zinc-800/50' : 'bg-zinc-50'}`}>
-                      {filteredCampaigns.length > 0 ? filteredCampaigns.map((campaign) => (
-                        <div key={campaign._id}
-                          onClick={() => { router.push(`/campaign/${campaign.slug}`); setMobileMenuOpen(false); setSearchQuery(''); }}
-                          className={`flex items-center gap-3 p-3 cursor-pointer border-b last:border-0 ${darkMode ? 'border-zinc-700 hover:bg-zinc-700/50' : 'border-zinc-100 hover:bg-white'}`}>
-                          <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                            <Image src={campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : "/placeholder-campaign.jpg"} alt={campaign.title} fill className="object-cover" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className={`text-xs font-semibold truncate ${darkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>{campaign.title}</h4>
-                            <p className={`text-[10px] ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>{campaign.organization}</p>
-                          </div>
-                        </div>
-                      )) : (
-                        <div className="p-4 text-center">
-                          <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>No results found</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Discover link */}
-                <Link href="/#campaigns"
-                  className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-colors ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
-                  onClick={(e) => { if (!checkNavigation()) e.preventDefault(); setMobileMenuOpen(false); }}>
-                  <svg className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Discover inspiring campaigns →</span>
-                </Link>
-
-                {/* Volunteer badge — hidden for organization role */}
-                {!isOrganization && (
-                  <Link
-                    href={isVolunteer ? "/profile/vouchers" : "/volunteer/register"}
-                    className={`group flex items-center gap-2 py-2 px-2 rounded-lg transition-all duration-300 ${darkMode ? 'hover:bg-zinc-800' : 'hover:bg-emerald-50'}`}
-                    onClick={(e) => { if (!checkNavigation()) e.preventDefault(); setMobileMenuOpen(false); }}>
-                    <div className={`p-1 rounded-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
-                      <Award size={18} className="transform transition-transform duration-300 group-hover:scale-110" />
-                    </div>
-                    <span className={`font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${isVolunteer
-                      ? (darkMode ? 'from-[#FFE088] via-[#BF953F] to-[#FCF6BA]' : 'from-[#BF953F] via-[#8A6E2F] to-[#BF953F]')
-                      : 'from-emerald-400 via-emerald-500 to-emerald-300'
-                      }`}>
-                      {isVolunteer ? 'Proud Volunteer' : 'Join as a Volunteer'}
-                    </span>
-                  </Link>
-                )}
-
-                {/* Role-based main menu items */}
-                <div className="space-y-1 border-t border-b py-3 border-zinc-200 dark:border-zinc-700">
-                  {activeMenuItems.map(item => (
-                    <Link key={item.name} href={item.path || '#'}
-                      className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
-                        ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
-                      onClick={(e) => { if (!checkNavigation()) e.preventDefault(); setMobileMenuOpen(false); }}>
-                      {item.isLucide ? (
-                        <item.icon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
-                      ) : (
-                        <Image src={item.icon} alt={item.name} width={20} height={20} className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
-                      )}
-                      <span>{item.name}</span>
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Start Fundraising — hidden for organization */}
-                {!isOrganization && (
-                  <div>
-                    <p className={`text-xs font-semibold mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>START</p>
-                    <div className="space-y-1">
-                      <Link href="/financial-aid"
-                        className={`group flex items-center justify-between py-2 px-2 rounded-lg transition-all duration-300
-                          ${darkMode ? "text-zinc-300 hover:bg-zinc-800" : "text-zinc-700 hover:bg-zinc-100"}`}
-                        onClick={(e) => { if (!checkNavigation()) e.preventDefault(); setMobileMenuOpen(false); }}>
-                        <div className="flex items-center gap-2">
-                          <Image src="/share.svg" alt="Start Fundraising" width={20} height={20} className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
-                          <span>Start fundraising</span>
-                        </div>
-                        <span className="text-xs text-emerald-600 font-medium">0% platform fee!</span>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-
-                {/* Register Organization — logged-out users only */}
-                {!userInfo && (
-                  <div>
-                    <p className={`text-xs font-semibold mb-2 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`}>ORGANIZATIONS</p>
-                    <Link href="/organization/login"
-                      className={`group flex items-center gap-3 py-2 px-2 rounded-lg transition-all duration-300
-                        ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
-                      onClick={() => setMobileMenuOpen(false)}>
-                      <OrgIcon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1.5" />
-                      <span>Organization Login</span>
-                    </Link>
-                  </div>
-                )}
-
-                {/* Support */}
-                <a href="/contactus"
-                  className={`flex items-center gap-2 py-2 px-2 rounded-lg transition-colors border-t pt-3 border-zinc-200 dark:border-zinc-700
-                    ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}
-                  onClick={(e) => { if (!checkNavigation()) e.preventDefault(); setMobileMenuOpen(false); }}>
-                  <span>🎧</span>
-                  <span>Support</span>
-                </a>
-
-                {/* Auth actions */}
-                <div className="space-y-1 border-t pt-3 border-zinc-200 dark:border-zinc-700">
-                  {userInfo ? (
-                    <button
-                      onClick={() => setShowLogoutModal(true)}
-                      disabled={isLoggingOut}
-                      className={`flex items-center gap-2 w-full text-left py-2 px-4 rounded-lg transition-all duration-300
-                        ${isLoggingOut ? 'text-zinc-400 cursor-not-allowed' : darkMode ? 'text-red-400 hover:bg-zinc-800' : 'text-red-600 hover:bg-zinc-100'}`}>
-                      {isLoggingOut ? (
-                        <>
-                          <svg className="animate-spin w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" opacity="0.25" />
-                            <path d="M22 12a10 10 0 0 1-10 10" />
-                          </svg>
-                          Logging out…
-                        </>
-                      ) : (
-                        <>
-                          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                          </svg>
-                          Logout
-                        </>
-                      )}
-                    </button>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => { handleAuthNavigation("/signup"); setMobileMenuOpen(false); }}
-                        className={`block w-full text-center py-2 px-4 rounded-lg transition-colors ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}>
-                        Sign up
-                      </button>
-                      <button
-                        onClick={() => { handleAuthNavigation("/login"); setMobileMenuOpen(false); }}
-                        className={`block w-full text-center py-2 px-4 rounded-lg transition-colors ${darkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'}`}>
-                        Log in
-                      </button>
-                    </>
-                  )}
-                </div>
-
-              </div>
-            </div>
-          </>
-        )}
       </header>
 
       {/* Logout Confirmation Modal */}
@@ -640,7 +677,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             </div>
             <h3 className="text-lg font-semibold text-center mb-2">Are you sure you want to leave?</h3>
             <p className={`text-sm text-center mb-6 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-              Staying logged in helps us reduce operational costs and lets your support reach those who need it faster 🤍
+              Staying logged in helps us reduce operational costs and lets your support reach those who need it faster
             </p>
             <div className="flex gap-3">
               <button onClick={() => setShowLogoutModal(false)}
