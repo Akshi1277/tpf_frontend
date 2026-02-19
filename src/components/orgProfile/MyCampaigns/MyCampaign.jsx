@@ -22,7 +22,7 @@ import {
   Plus
 } from "lucide-react"
 import { useToggleWishlistMutation, useGetWishlistQuery, useGetMyApplicationsQuery, useUploadClarificationDocumentsMutation } from "@/utils/slices/authApiSlice"
-import { useGetOrganizationCampaignRequestsQuery } from "@/utils/slices/organizationApiSlice"
+import { useGetOrganizationCampaignRequestsQuery, useUpdateCampaignRequestMutation } from "@/utils/slices/organizationApiSlice"
 import ShareModal from "../../ui/ShareModal"
 import { getMediaUrl } from "@/utils/media"
 
@@ -310,6 +310,22 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   const RequestCard = ({ request }) => {
     const isClarification = request.status === 'clarification';
     const isRejected = request.status === 'rejected';
+    const [comment, setComment] = useState(request.organizationStatement || "");
+    const [updateCampaignRequest, { isLoading: isUpdating }] = useUpdateCampaignRequestMutation();
+
+    const handleCommentSubmit = async () => {
+      if (!comment.trim()) return;
+      const formData = new FormData();
+      formData.append('organizationStatement', comment);
+
+      try {
+        await updateCampaignRequest({ id: request._id, formData }).unwrap();
+        alert("Comment submitted and request updated!");
+      } catch (err) {
+        console.error("Failed to submit comment:", err);
+        alert("Action failed. Please try again.");
+      }
+    };
 
     return (
       <motion.div
@@ -358,15 +374,52 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
           )}
 
           {isClarification && (
-            <button
-              onClick={() => router.push(`/organization/profile/my-campaigns/edit/${request._id}`)}
-              className={`w-full py-2 px-4 rounded-lg font-bold text-sm transition-all ${darkMode
-                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                : "bg-emerald-500 text-white hover:bg-emerald-600"
-                }`}
-            >
-              Edit & Resubmit
-            </button>
+            <div className="flex flex-col gap-3">
+              <div className="space-y-2">
+                <label className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                  Your Response / Comment
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Explain your changes or answer the clarification..."
+                  className={`w-full p-3 rounded-lg text-sm resize-none focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${darkMode ? "bg-zinc-900 text-white border-zinc-700" : "bg-gray-50 text-gray-900 border-gray-200"
+                    }`}
+                  rows={3}
+                />
+                <button
+                  onClick={handleCommentSubmit}
+                  disabled={isUpdating || !comment.trim()}
+                  className={`w-full py-2 px-4 rounded-lg font-bold text-xs transition-all ${isUpdating || !comment.trim()
+                      ? "bg-gray-400 cursor-not-allowed opacity-50"
+                      : darkMode
+                        ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30"
+                        : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                    }`}
+                >
+                  {isUpdating ? "Saving..." : "Save Comment"}
+                </button>
+              </div>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <span className={`w-full border-t ${darkMode ? "border-zinc-700" : "border-gray-200"}`}></span>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className={`px-2 ${darkMode ? "bg-zinc-800 text-zinc-500" : "bg-white text-gray-500"}`}>or</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => router.push(`/organization/profile/my-campaigns/edit/${request._id}`)}
+                className={`w-full py-2 px-4 rounded-lg font-bold text-sm transition-all ${darkMode
+                  ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                  : "bg-emerald-500 text-white hover:bg-emerald-600"
+                  }`}
+              >
+                Edit Full Form & Resubmit
+              </button>
+            </div>
           )}
         </div>
       </motion.div>
