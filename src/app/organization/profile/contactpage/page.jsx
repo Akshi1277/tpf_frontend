@@ -1,7 +1,6 @@
 "use client"
 
-import ContactPage from "@/components/orgProfile/contactpage/ContactPage";
-
+import ContactPage from "@/components/orgProfile/ContactPage/ContactPage";
 
 export default function Page() {
   // Get darkMode from parent layout via context or pass it down
