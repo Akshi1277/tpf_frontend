@@ -62,7 +62,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   useEffect(() => setHasMounted(true), []);
   const userInfo = useSelector((state) => state.auth.userInfo);
 
-  // ── NEW: role detection ──────────────────────────────────────────────────
+  // ── ROLE DETECTION (Reverted to Original) ───────────────────────────────
   const isOrganization = userInfo?.role === 'organization';
   const isVolunteer = userInfo?.role === 'volunteer';
 
@@ -110,8 +110,6 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
     } else {
       await logoutUser().unwrap();
     }
-
-    dispatch(logout());
     router.replace("/");
   };
 
@@ -135,6 +133,32 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   };
 
   const initials = userInfo?.fullName ? getInitials(userInfo.fullName) : null;
+
+  // ── TYPEWRITER EFFECT (Restored) ────────────────────────────────────────
+  const placeholders = ["medical support", "education", "clean water", "emergency relief", "orphan support"];
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [currentPlaceholder, setCurrentPlaceholder] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const timeout = setTimeout(() => {
+      const fullText = placeholders[placeholderIndex];
+      if (!isDeleting) {
+        setCurrentPlaceholder(fullText.slice(0, currentPlaceholder.length + 1));
+        if (currentPlaceholder.length + 1 === fullText.length) {
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        setCurrentPlaceholder(fullText.slice(0, currentPlaceholder.length - 1));
+        if (currentPlaceholder.length === 0) {
+          setIsDeleting(false);
+          setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+        }
+      }
+    }, isDeleting ? 50 : 100);
+    return () => clearTimeout(timeout);
+  }, [currentPlaceholder, isDeleting, placeholderIndex, mobileMenuOpen]);
 
   // ── FIXED: unauthenticated users go directly to /login, no toast ─────────
   const checkNavigation = (path, callback = null) => {
@@ -160,7 +184,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
     return true;
   };
 
-  // ── NEW: role-based menu items ───────────────────────────────────────────
+  // ── MENU CONFIGURATION (Original) ──────────────────────────────────────
   const regularMenuItems = [
     { name: 'My Profile', icon: User2Icon, isLucide: true, path: '/profile/userprofile' },
     { name: 'My Donations', icon: Heart, isLucide: true, path: '/profile/mydonation' },
@@ -437,9 +461,9 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             onChange={(e) => { setSearchQuery(e.target.value); setShowDropdown(true); }}
                             onFocus={() => setShowDropdown(true)}
                             onKeyDown={handleSearchCommit}
-                            placeholder="I want to support..."
+                            placeholder={currentPlaceholder ? `Search for ${currentPlaceholder}...` : "I want to support..."}
                             className={`w-full px-4 py-3 pl-12 rounded-xl border transition-all duration-300
-                              ${darkMode
+                                ${darkMode
                                 ? 'bg-transparent text-white placeholder-zinc-500 border-zinc-800 focus:border-emerald-500'
                                 : 'bg-zinc-50 text-zinc-900 placeholder-zinc-400 border-zinc-200 focus:border-emerald-500'
                               } focus:outline-none`}
@@ -589,50 +613,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                           </Link>
                         </motion.div>
 
-                        {/* Liquid Theme Toggle */}
-                        <motion.div variants={itemVariants} className="pt-4">
-                          <div className={`p-4 rounded-2xl border flex items-center justify-between transition-all duration-500
-                            ${darkMode ? 'bg-zinc-900/40 border-zinc-800/50' : 'bg-zinc-50 border-zinc-200'}`}>
-                            <div className="flex flex-col">
-                              <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>Appearance</span>
-                              <span className={`text-[11px] font-medium ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                                {darkMode ? 'Dark Mode' : 'Light Mode'}
-                              </span>
-                            </div>
-
-                            <motion.button
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => setDarkMode(!darkMode)}
-                              className={`relative w-16 h-8 rounded-full p-1 transition-colors duration-500 outline-none
-                                ${darkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`}
-                            >
-                              {/* Sliding Liquid Ball */}
-                              <motion.div
-                                className="absolute top-1 left-1 bottom-1 w-6 h-6 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/40 z-10 flex cursor-pointer items-center justify-center pt-[0px]"
-                                animate={{
-                                  x: darkMode ? 32 : 0,
-                                }}
-                                transition={{
-                                  type: "spring",
-                                  stiffness: 400,
-                                  damping: 30
-                                }}
-                              >
-                                {darkMode ? (
-                                  <Moon className="w-3.5 h-3.5 text-white" fill="currentColor" />
-                                ) : (
-                                  <Sun className="w-3.5 h-3.5 text-white" fill="currentColor" />
-                                )}
-                              </motion.div>
-
-                              {/* Static Icons Background */}
-                              <div className="flex justify-between px-1.5 items-center h-full w-full opacity-30">
-                                <Sun className={`w-3.5 h-3.5 ${darkMode ? 'text-zinc-500' : 'text-zinc-900'}`} />
-                                <Moon className={`w-3.5 h-3.5 ${darkMode ? 'text-zinc-500' : 'text-zinc-900'}`} />
-                              </div>
-                            </motion.button>
-                          </div>
-                        </motion.div>
+                      
 
                         <motion.div variants={itemVariants} className="pt-8 flex flex-col items-center gap-6">
                           {userInfo ? (
