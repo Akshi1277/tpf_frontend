@@ -1,6 +1,6 @@
 "use client"
 
-import DownloadsPage from "@/components/orgProfile/downloads/Downloads";
+import DownloadsPage from "@/components/orgProfile/Downloads/Downloads";
 
 export default function Page() {
   // Get darkMode from parent layout via context or pass it down
