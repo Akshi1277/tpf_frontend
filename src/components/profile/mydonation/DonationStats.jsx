@@ -340,108 +340,104 @@ export default function DonationStats({
           </div>
 
           {/* Scrollable Leaderboard */}
-<div className="max-h-[320px] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-transparent">
+          <div className="max-h-[320px] overflow-y-auto scrollbar-leaderboard" data-lenis-prevent>
 
-  {leaderboardLoading && (
-    <div className="p-6 text-center text-sm text-gray-500">
-      Loading leaderboard…
-    </div>
-  )}
+            {leaderboardLoading && (
+              <div className="p-6 text-center text-sm text-gray-500">
+                Loading leaderboard…
+              </div>
+            )}
 
-  {leaderboardError && (
-    <div className="p-6 text-center text-sm text-gray-500">
-      Leaderboard unavailable right now
-    </div>
-  )}
+            {leaderboardError && (
+              <div className="p-6 text-center text-sm text-gray-500">
+                Leaderboard unavailable right now
+              </div>
+            )}
 
-  {!leaderboardLoading &&
-    !leaderboardError &&
-    activeLeaderboard.length === 0 && (
-      <div className="p-6 text-center text-sm text-gray-500">
-        Be the first donor this period 🌱
-      </div>
-    )}
-
-  {showLeaderboard &&
-    activeLeaderboard.map((user, index) => (
-      <motion.div
-        key={user.id}
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3, delay: Math.min(index * 0.02, 0.1) }}
-        className={`p-3 border-b transition-all ${
-          user.isCurrentUser
-            ? darkMode
-              ? "bg-emerald-900/20 border-emerald-700"
-              : "bg-emerald-50 border-emerald-200"
-            : user.isPermanent
-            ? darkMode
-              ? "bg-gradient-to-r from-amber-900/30 via-amber-900/20 to-amber-900/30 border-amber-700/50 hover:from-amber-900/40 hover:via-amber-900/30 hover:to-amber-900/40"
-              : "bg-gradient-to-r from-amber-50 via-amber-100/50 to-amber-50 border-amber-300 hover:from-amber-100 hover:via-amber-100 hover:to-amber-100"
-            : darkMode
-            ? "border-zinc-800 hover:bg-zinc-700/30"
-            : "border-gray-100 hover:bg-gray-50"
-        }`}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 ${
-              user.rank <= 3
-                ? "bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg"
-                : user.isPermanent
-                ? darkMode
-                  ? "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md"
-                  : "bg-gradient-to-br from-amber-400 to-amber-500 text-white shadow-md"
-                : darkMode
-                ? "bg-zinc-700 text-zinc-400"
-                : "bg-gray-100 text-gray-600"
-            }`}
-          >
-            {getRankIcon(user.rank) || `#${user.rank}`}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p
-                className={`font-semibold text-sm truncate ${
-                  user.isPermanent
-                    ? darkMode
-                      ? "text-amber-300"
-                      : "text-amber-900"
-                    : darkMode
-                    ? "text-white"
-                    : "text-gray-900"
-                }`}
-              >
-                {user.name}
-                {user.isCurrentUser && " (You)"}
-              </p>
-
-              {user.isPermanent && (
-                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/30 border border-amber-500/50">
-                  <Star className="w-3 h-3 text-amber-600 fill-amber-500 flex-shrink-0" />
+            {!leaderboardLoading &&
+              !leaderboardError &&
+              activeLeaderboard.length === 0 && (
+                <div className="p-6 text-center text-sm text-gray-500">
+                  Be the first donor this period 🌱
                 </div>
               )}
-            </div>
 
-            <p
-              className={`text-xs font-medium ${
-                user.isPermanent
-                  ? darkMode
-                    ? "text-amber-400/80"
-                    : "text-amber-700"
-                  : darkMode
-                  ? "text-zinc-400"
-                  : "text-gray-600"
-              }`}
-            >
-              ₹{user.amount.toLocaleString("en-IN")}
-            </p>
+            {showLeaderboard &&
+              activeLeaderboard.map((user, index) => (
+                <motion.div
+                  key={user.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: Math.min(index * 0.02, 0.1) }}
+                  className={`p-3 border-b transition-all ${user.isCurrentUser
+                    ? darkMode
+                      ? "bg-emerald-900/20 border-emerald-700"
+                      : "bg-emerald-50 border-emerald-200"
+                    : user.isPermanent
+                      ? darkMode
+                        ? "bg-gradient-to-r from-amber-900/30 via-amber-900/20 to-amber-900/30 border-amber-700/50 hover:from-amber-900/40 hover:via-amber-900/30 hover:to-amber-900/40"
+                        : "bg-gradient-to-r from-amber-50 via-amber-100/50 to-amber-50 border-amber-300 hover:from-amber-100 hover:via-amber-100 hover:to-amber-100"
+                      : darkMode
+                        ? "border-zinc-800 hover:bg-zinc-700/30"
+                        : "border-gray-100 hover:bg-gray-50"
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm flex-shrink-0 ${user.rank <= 3
+                        ? "bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg"
+                        : user.isPermanent
+                          ? darkMode
+                            ? "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md"
+                            : "bg-gradient-to-br from-amber-400 to-amber-500 text-white shadow-md"
+                          : darkMode
+                            ? "bg-zinc-700 text-zinc-400"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                    >
+                      {getRankIcon(user.rank) || `#${user.rank}`}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p
+                          className={`font-semibold text-sm truncate ${user.isPermanent
+                            ? darkMode
+                              ? "text-amber-300"
+                              : "text-amber-900"
+                            : darkMode
+                              ? "text-white"
+                              : "text-gray-900"
+                            }`}
+                        >
+                          {user.name}
+                          {user.isCurrentUser && " (You)"}
+                        </p>
+
+                        {user.isPermanent && (
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/30 border border-amber-500/50">
+                            <Star className="w-3 h-3 text-amber-600 fill-amber-500 flex-shrink-0" />
+                          </div>
+                        )}
+                      </div>
+
+                      <p
+                        className={`text-xs font-medium ${user.isPermanent
+                          ? darkMode
+                            ? "text-amber-400/80"
+                            : "text-amber-700"
+                          : darkMode
+                            ? "text-zinc-400"
+                            : "text-gray-600"
+                          }`}
+                      >
+                        ₹{user.amount.toLocaleString("en-IN")}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
           </div>
-        </div>
-      </motion.div>
-    ))}
-</div>
 
 
           {/* Scroll indicator */}

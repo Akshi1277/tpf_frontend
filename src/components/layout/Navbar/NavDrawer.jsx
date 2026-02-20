@@ -129,7 +129,7 @@ export default function MobileMenu({
             <div
               ref={scrollRef}
               onScroll={handleScroll}
-              className="flex-1 overflow-y-auto px-5 pb-8 space-y-4"
+              className="flex-1 overflow-y-auto px-5 pb-8 space-y-4 scrollbar-nav"
               data-lenis-prevent
             >
               {/* ── IMPACT / CTA CARD ─────────────────────── */}

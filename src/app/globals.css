@@ -10,8 +10,10 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 
@@ -287,4 +289,67 @@ html {
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #D4AF37 transparent;
+}
+
+/* Leaderboard Specific Scrollbar */
+.scrollbar-leaderboard::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar-leaderboard::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-leaderboard::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.2);
+  /* Emerald light */
+  border-radius: 10px;
+}
+
+.scrollbar-leaderboard::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.5);
+}
+
+.dark .scrollbar-leaderboard::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.dark .scrollbar-leaderboard::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.4);
+}
+
+.scrollbar-leaderboard {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+}
+
+/* Nav Menu Specific Scrollbar */
+.scrollbar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-nav::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.2);
+  border-radius: 10px;
+}
+
+.scrollbar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+.dark .scrollbar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .scrollbar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.scrollbar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
 }
