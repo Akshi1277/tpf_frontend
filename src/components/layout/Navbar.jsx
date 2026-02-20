@@ -15,7 +15,6 @@ import { Search, MapPin, Building2, TrendingUp, Globe, Send, Headphones } from '
 import { useAppToast } from '@/app/AppToastContext';
 import { getMediaUrl } from '@/utils/media';
 import { Award, ChevronRight } from 'lucide-react';
-import { logout } from '@/utils/slices/authSlice';
 import { Drawer } from 'vaul';
 import { motion, AnimatePresence } from 'framer-motion';
 export default function Navbar({ darkMode, setDarkMode, scrolled }) {
@@ -101,12 +100,20 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   };
 
   const handleLogout = async () => {
-    if (userInfo?.type === "organization") {
-      await logoutOrganization().unwrap();
-    } else {
-      await logoutUser().unwrap();
+    setIsLoggingOut(true);
+    try {
+      if (userInfo?.type === "organization") {
+        await logoutOrganization().unwrap();
+      } else {
+        await logoutUser().unwrap();
+      }
+      router.replace("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutModal(false);
     }
-    router.replace("/");
   };
 
 
@@ -344,7 +351,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
               )}
               <button className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'}`}
                 onClick={() => router.push('/zakat-calculator')}>
-                <Image src="/TPFAid-Icon-Zakat-1.svg" alt="Zakat" width={28} height={28} className="w-7 h-7" />
+                <Image src="/TPFAid-Icon-Zakat-1.svg" alt="Zakat" width={28} height={28} className="w-6 h-6" />
               </button>
               <button onClick={() => setDarkMode(!darkMode)}
                 className={`p-2 rounded-full transition-colors cursor-pointer ${darkMode ? 'bg-zinc-800 hover:bg-zinc-800' : 'bg-white/80 hover:bg-zinc-100'}`}>
@@ -354,11 +361,11 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
               <Drawer.Root open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} direction="right">
                 <Drawer.Trigger asChild>
                   {hasMounted && userInfo ? (
-                    <button className="w-10 h-10 rounded-full flex items-center justify-center font-bold bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg">
+                    <button className="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center font-bold bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg">
                       {initials}
                     </button>
                   ) : (
-                    <button className={`p-2.5 rounded-full transition-all duration-300 ${darkMode ? 'bg-zinc-800 text-white' : 'bg-white text-zinc-900'}`}>
+                    <button className={`p-2.5 rounded-full cursor-pointer transition-all duration-300 ${darkMode ? 'bg-zinc-800 text-white' : 'bg-white text-zinc-900'}`}>
                       <Menu className="w-6 h-6" />
                     </button>
                   )}
@@ -613,7 +620,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
                         <motion.div variants={itemVariants} className="pt-8 flex flex-col items-center gap-6">
                           {userInfo ? (
-                            <button onClick={() => setShowLogoutModal(true)} disabled={isLoggingOut} className={`text-sm font-bold tracking-wide uppercase ${isLoggingOut ? 'text-zinc-500' : 'text-red-500 hover:text-red-400'}`}>
+                            <button onClick={() => { setShowLogoutModal(true); setMobileMenuOpen(false); }} disabled={isLoggingOut} className={`text-sm font-bold tracking-wide cursor-pointer uppercase ${isLoggingOut ? 'text-zinc-500' : 'text-red-500 hover:text-red-400'}`}>
                               {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
                             </button>
                           ) : (
@@ -662,9 +669,13 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                 Stay Logged In
               </button>
               <button
-                onClick={async () => { setShowLogoutModal(false); setMobileMenuOpen(false); await handleLogout(); }}
-                className="flex-1 py-2.5 rounded-lg font-medium bg-red-600 hover:bg-red-700 text-white transition-all">
-                Logout
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className={`flex-1 py-2.5 rounded-lg font-medium transition-all ${isLoggingOut
+                    ? 'bg-red-400 cursor-not-allowed'
+                    : 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                  } text-white`}>
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
               </button>
             </div>
           </div>
