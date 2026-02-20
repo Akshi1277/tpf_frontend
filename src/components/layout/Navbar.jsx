@@ -51,10 +51,6 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const [logoutOrganization] = useLogoutOrganizationMutation();
 
   const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'Subah Khair';
-    if (hour >= 12 && hour < 17) return 'Good Afternoon';
-    if (hour >= 17 && hour < 22) return 'Good Evening';
     return 'Salam';
   };
 
@@ -385,18 +381,18 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                     <div
                       ref={scrollRef}
                       onScroll={handleScroll}
-                      className="flex-1 overflow-y-auto scrollbar-hide flex flex-col px-6 pb-6 relative" data-lenis-prevent
+                      className="flex-1 overflow-y-auto scrollbar-hide flex flex-col px-5 pb-5 relative" data-lenis-prevent
                     >
                       <motion.div
                         variants={containerVariants}
                         initial="hidden"
                         animate={mobileMenuOpen ? "show" : "hidden"}
-                        className="space-y-6"
+                        className="space-y-4"
                       >
                         {/* Impact Card */}
                         <motion.div variants={itemVariants}>
                           {userInfo ? (
-                            <div className={`p-5 rounded-2xl border backdrop-blur-xl overflow-hidden relative group transition-all duration-500
+                            <div className={`p-4 rounded-2xl border backdrop-blur-xl overflow-hidden relative group transition-all duration-500
                               ${darkMode
                                 ? 'bg-zinc-900/40 border-zinc-800/50 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
                                 : 'bg-emerald-50/40 border-emerald-100/50 shadow-[0_8px_32px_rgba(16,185,129,0.05)]'}`}>
@@ -406,26 +402,26 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                                 ${darkMode ? 'bg-emerald-500' : 'bg-emerald-400'}`} />
 
                               <div className="relative z-10">
-                                <span className={`text-[10px] font-bold tracking-[0.2em] uppercase mb-1 block
+                                <span className={`text-[9px] font-bold tracking-[0.2em] uppercase mb-0 block
                                   ${darkMode ? 'text-zinc-500' : 'text-emerald-600/70'}`}>
                                   Your Impact
                                 </span>
-                                <h3 className={`text-xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                                <h3 className={`text-lg font-bold mb-0.5 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
                                   {greeting}, {userInfo.fullName?.split(' ')[0]}!
                                 </h3>
-                                <p className={`text-sm leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                <p className={`text-xs leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                                   You've supported <span className="font-bold text-emerald-500">{donationCount}</span> {donationCount === 1 ? 'cause' : 'causes'} this month.
                                 </p>
 
-                                <div className="mt-4 flex items-center gap-2">
-                                  <div className="flex -space-x-2">
+                                <div className="mt-3 flex items-center gap-2">
+                                  <div className="flex -space-x-1.5">
                                     {[1, 2, 3].map((i) => (
-                                      <div key={i} className={`w-6 h-6 rounded-full border-2 ${darkMode ? 'border-zinc-900 bg-zinc-800' : 'border-white bg-emerald-100'} flex items-center justify-center`}>
-                                        <Heart className="w-3 h-3 text-emerald-500" fill="currentColor" />
+                                      <div key={i} className={`w-5 h-5 rounded-full border-2 ${darkMode ? 'border-zinc-900 bg-zinc-800' : 'border-white bg-emerald-100'} flex items-center justify-center`}>
+                                        <Heart className="w-2.5 h-2.5 text-emerald-500" fill="currentColor" />
                                       </div>
                                     ))}
                                   </div>
-                                  <span className={`text-[11px] font-medium ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                  <span className={`text-[10px] font-medium ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                                     Keep spreading kindness
                                   </span>
                                 </div>
@@ -462,7 +458,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                             onFocus={() => setShowDropdown(true)}
                             onKeyDown={handleSearchCommit}
                             placeholder={currentPlaceholder ? `Search for ${currentPlaceholder}...` : "I want to support..."}
-                            className={`w-full px-4 py-3 pl-12 rounded-xl border transition-all duration-300
+                            className={`w-full px-4 py-2.5 pl-12 rounded-xl border transition-all duration-300
                                 ${darkMode
                                 ? 'bg-transparent text-white placeholder-zinc-500 border-zinc-800 focus:border-emerald-500'
                                 : 'bg-zinc-50 text-zinc-900 placeholder-zinc-400 border-zinc-200 focus:border-emerald-500'
@@ -613,7 +609,7 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
                           </Link>
                         </motion.div>
 
-                      
+
 
                         <motion.div variants={itemVariants} className="pt-8 flex flex-col items-center gap-6">
                           {userInfo ? (
