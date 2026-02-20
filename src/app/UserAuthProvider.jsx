@@ -102,46 +102,6 @@ export default function UserAuthProvider({ children }) {
   /* ---------------------------
      ROLE-BASED ROUTE PROTECTION
   ---------------------------- */
-  useEffect(() => {
-    if (!authChecked) return;
-
-    // Define route groups
-    const organizationRoutes = [
-      // "/organization",
-      "/org-dashboard",
-      "/dashboard",
-    ];
-
-    const userRoutes = [
-      "/profile",
-      "/wishlist",
-      "/donate",
-      "/my-applications",
-    ];
-
-    const isOrgRoute = organizationRoutes.some((route) =>
-      pathname.startsWith(route)
-    );
-
-    const isUserRoute = userRoutes.some((route) =>
-      pathname.startsWith(route)
-    );
-
-    // 🔒 Protect organization routes
-    if (isOrgRoute) {
-      if (!userInfo || userInfo.type !== "organization") {
-        router.push("/");
-      }
-    }
-
-    // 🔒 Protect user routes
-    if (isUserRoute) {
-      if (!userInfo || userInfo.type !== "user") {
-        router.push("/");
-      }
-    }
-
-  }, [authChecked, pathname, userInfo, router]);
 
   /* ---------------------------
      BLOCK APP UNTIL AUTH RESOLVED

@@ -29,14 +29,14 @@ const menuItems = [
   },
   {
     name: "My Donations",
-    path: "/org/mydonation",
+    path: "/organization/profile/mydonation",
     icon: Heart,
     gradient: "from-rose-500 to-pink-600",
     description: "View contributions",
   },
   {
     name: "Downloads",
-    path: "/org/downloads",
+    path: "/organization/profile/downloads",
     icon: Download,
     gradient: "from-cyan-500 to-blue-600",
     description: "Receipts & invoices",
@@ -50,14 +50,14 @@ const menuItems = [
   },
   {
     name: "Offline Donations",
-    path: "/org/offline-donations",
+    path: "/organization/profile/offline-donations",
     icon: IndianRupeeIcon,
     gradient: "from-amber-500 to-orange-500",
     description: "Manage offline donations",
   },
   {
     name: "Contact Us",
-    path: "/org/contactpage",
+    path: "/organization/profile/contactpage",
     icon: Wrench,
     gradient: "from-slate-500 to-zinc-600",
     description: "Support & feedback",

@@ -13,7 +13,6 @@ export default function ProfileLayout({ children }) {
   const { userInfo, authChecked } = useSelector((state) => state.auth);
   const router = useRouter();
   const { showToast } = useAppToast();
-
   const redirectingRef = useRef(false);
 
   const [darkMode, setDarkMode] = useState(() => {
@@ -25,8 +24,7 @@ export default function ProfileLayout({ children }) {
 
   useEffect(() => {
     const handleStorageChange = () => {
-      const savedMode = localStorage.getItem("darkMode");
-      setDarkMode(savedMode === "true");
+      setDarkMode(localStorage.getItem("darkMode") === "true");
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -37,55 +35,36 @@ export default function ProfileLayout({ children }) {
       window.removeEventListener("darkModeChanged", handleStorageChange);
     };
   }, []);
+// 🔐 Wait for auth resolution
+if (!authChecked) return <GlobalLoader />;
 
-  /* ------------------------------------------------------------------
-     UX IMPROVEMENTS ONLY (NO LOGIC CHANGES)
-  ------------------------------------------------------------------ */
+useEffect(() => {
+  if (authChecked && (!userInfo || userInfo.type !== "user")) {
+    showToast({
+      type: "info",
+      title: "Please Login to Continue",
+      message: "Small intentions lead to meaningful impact ✨",
+      duration: 2000,
+    });
 
-  // 1. While auth state is resolving → show global loader
-  if (!authChecked) {
-    return <GlobalLoader />;
+    router.replace("/login");
   }
+}, [authChecked, userInfo, router]);
 
-  // 2. Auth checked but user not logged in → toast + graceful redirect
-  if (!userInfo) {
-    if (!redirectingRef.current) {
-      redirectingRef.current = true;
-      showToast({
-        type: "info",
-        title: "Login Required",
-        message: "Every good intention begins with the right step ✨",
-        duration: 2000,
-      });
-
-
-
-      setTimeout(() => {
-        router.replace("/login");
-      }, 1000);
-    }
-
-    return <GlobalLoader />;
-  }
-
-  /* ------------------------------------------------------------------ */
+if (!userInfo || userInfo.type !== "user") {
+  return <GlobalLoader />;
+}
 
   return (
     <div
       className={`min-h-screen flex flex-col ${darkMode ? "bg-zinc-950" : "bg-gray-50"
         }`}
     >
-      <Navbar
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        scrolled={true}
-      />
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={true} />
 
       <div className="flex flex-1 pt-16">
-        {/* Sidebar (unchanged) */}
         <Sidebar darkMode={darkMode} />
 
-        {/* Main content */}
         <main className="flex-1 w-full lg:w-auto overflow-x-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16 sm:pb-20">
             {children}
@@ -93,7 +72,6 @@ export default function ProfileLayout({ children }) {
         </main>
       </div>
 
-      {/* Footer (unchanged) */}
       <Footer darkMode={darkMode} />
     </div>
   );

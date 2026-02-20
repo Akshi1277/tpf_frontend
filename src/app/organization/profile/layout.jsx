@@ -34,27 +34,30 @@ export default function OrgLayout({ children }) {
     };
   }, []);
 
+  // 🔐 Wait for auth resolution
   if (!authChecked) return <GlobalLoader />;
 
-  if (!userInfo || userInfo.role !== "organization") {
-    if (!redirectingRef.current) {
-      redirectingRef.current = true;
+  useEffect(() => {
+    if (authChecked && (!userInfo || userInfo.type !== "organization")) {
       showToast({
         type: "info",
-        title: "Access Denied",
-        message: "Please log in as an organization to continue.",
+        title: "Please Login to Continue",
+        message: "Small intentions lead to meaningful impact ✨",
         duration: 2000,
       });
-      setTimeout(() => router.replace("/organization/login"), 1000);
+
+      router.replace("/organization/login");
     }
+  }, [authChecked, userInfo, router]);
+
+  if (!userInfo || userInfo.type !== "organization") {
     return <GlobalLoader />;
   }
 
   return (
     <div
-      className={`min-h-screen flex flex-col ${
-        darkMode ? "bg-zinc-950" : "bg-gray-50"
-      }`}
+      className={`min-h-screen flex flex-col ${darkMode ? "bg-zinc-950" : "bg-gray-50"
+        }`}
     >
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={true} />
 

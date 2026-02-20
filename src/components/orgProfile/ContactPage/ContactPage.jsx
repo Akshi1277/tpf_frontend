@@ -76,13 +76,13 @@ export default function ContactPage({ darkModeFromParent }) {
     {
       icon: Mail,
       title: "Email Us",
-      value: "info@tpfaid.org",
+      value: "support@ummahfund.com",
       color: "emerald"
     },
     {
       icon: Phone,
       title: "Call Us",
-      value: "+91 9411565185",
+      value: "+1 (555) 123-4567",
       color: "blue"
     },
     {

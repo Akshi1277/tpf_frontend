@@ -1,6 +1,6 @@
 "use client";
 
-import OrgDashboard from "@/components/orgProfile/OrgDashboard";
+import OrgDashboard from "@/components/orgProfile/Dashboard/OrgDashboard";
 
 export default function Page() {
   const darkMode =
