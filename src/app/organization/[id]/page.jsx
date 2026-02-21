@@ -65,14 +65,14 @@ export default function OrganizationDetailPage() {
 
     // colour tokens
     const T = {
-        page:      darkMode ? "bg-zinc-950 text-white"              : "bg-slate-50 text-slate-900",
-        card:      darkMode ? "bg-zinc-900/90 border-zinc-800"      : "bg-white border-slate-200 shadow-sm",
-        muted:     darkMode ? "text-zinc-400"                       : "text-slate-500",
-        divider:   darkMode ? "border-zinc-800"                     : "border-slate-100",
-        pill:      darkMode ? "border-zinc-700 text-zinc-400"       : "border-slate-200 text-slate-500",
-        statBg:    darkMode ? "bg-zinc-900 border-zinc-800"         : "bg-white border-slate-200 shadow-sm",
-        tag:       darkMode ? "bg-zinc-800 text-emerald-400 border-zinc-700" : "bg-emerald-50 text-emerald-700 border-emerald-100",
-        innerRow:  darkMode ? "bg-zinc-800/50"                      : "bg-slate-50",
+        page: darkMode ? "bg-zinc-950 text-white" : "bg-slate-50 text-slate-900",
+        card: darkMode ? "bg-zinc-900/90 border-zinc-800" : "bg-white border-slate-200 shadow-sm",
+        muted: darkMode ? "text-zinc-400" : "text-slate-500",
+        divider: darkMode ? "border-zinc-800" : "border-slate-100",
+        pill: darkMode ? "border-zinc-700 text-zinc-400" : "border-slate-200 text-slate-500",
+        statBg: darkMode ? "bg-zinc-900 border-zinc-800" : "bg-white border-slate-200 shadow-sm",
+        tag: darkMode ? "bg-zinc-800 text-emerald-400 border-zinc-700" : "bg-emerald-50 text-emerald-700 border-emerald-100",
+        innerRow: darkMode ? "bg-zinc-800/50" : "bg-slate-50",
     };
 
     if (isLoading) return <GlobalLoader />;
@@ -206,9 +206,9 @@ export default function OrganizationDetailPage() {
                     {/* Stats strip — 4 equal pills below hero */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-14">
                         {[
-                            { icon: MapPin,   label: "City Office",  value: org.city },
-                            { icon: MapPin,   label: "State",        value: org.state },
-                            { icon: Users,    label: "Personnel",    value: org.isNGO ? org.ngoDetails?.employeeStrength : org.companyDetails?.numberOfEmployees || "N/A" },
+                            { icon: MapPin, label: "City Office", value: org.city },
+                            { icon: MapPin, label: "State", value: org.state },
+                            { icon: Users, label: "Personnel", value: org.isNGO ? org.ngoDetails?.employeeStrength : org.companyDetails?.numberOfEmployees || "N/A" },
                             { icon: Calendar, label: "Years Active", value: org.companyDetails?.yearsInOperation || "N/A" },
                         ].map(({ icon: Icon, label, value }, i) => (
                             <FadeUp key={i} delay={0.08 * i}>
@@ -298,6 +298,7 @@ export default function OrganizationDetailPage() {
                                     className={`rounded-[2rem] p-8 border ${darkMode ? "bg-zinc-900 border-zinc-800" : "!bg-white border-slate-200 shadow-sm"}`}
                                     color={darkMode ? "#0d2b1f" : "#ecfdf5"}
                                     radius={300}
+                                    showParticles={darkMode}
                                 >
                                     <div className="relative z-10">
                                         <div className="flex items-center gap-3 mb-8">
@@ -353,6 +354,7 @@ export default function OrganizationDetailPage() {
                                         className={`rounded-[2rem] p-6 border ${darkMode ? "bg-zinc-900 border-zinc-800" : "!bg-white border-slate-200 shadow-sm"}`}
                                         color={darkMode ? "#0d2b1f" : "#ecfdf5"}
                                         radius={250}
+                                        showParticles={darkMode}
                                     >
                                         <div className="relative z-10 flex items-center gap-5">
                                             <motion.div
