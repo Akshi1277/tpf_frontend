@@ -101,6 +101,18 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
     }),
 
     // ----------------------------------
+    // GET PUBLIC ORGANIZATIONS (LANDING PAGE)
+    // ----------------------------------
+    fetchPublicOrganizations: builder.query({
+      query: (params) => ({
+        url: "/organizations/public/list",
+        params, // { limit }
+      }),
+      providesTags: ["Organization"],
+    }),
+
+
+    // ----------------------------------
     // GET ORGANIZATION STATS (ADMIN)
     // ----------------------------------
     fetchOrganizationStats: builder.query({
@@ -205,6 +217,7 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
 export const {
   useRegisterOrganizationMutation,
   useFetchOrganizationsQuery,
+  useFetchPublicOrganizationsQuery,
   useGetOrganizationMeQuery,
   useFetchOrganizationStatsQuery,
   useFetchOrganizationByIdQuery,
@@ -220,3 +233,4 @@ export const {
   useGetAllCampaignRequestsQuery,
   useUpdateCampaignRequestStatusMutation,
 } = organizationApiSlice;
+

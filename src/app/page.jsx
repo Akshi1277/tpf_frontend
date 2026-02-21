@@ -9,9 +9,11 @@ import CampaignsSection from '@/components/home/CampaignsSection';
 import CuratedSection from '@/components/home/CuratedSection';
 import ImpactBanner from '@/components/home/ImpactBanner';
 import CommunitiesSection from '@/components/home/CommunitiesSection';
+import OrganizationSection from '@/components/home/OrganizationSection';
 import PartnersSection from '@/components/home/PartnersSection';
 import PulseSection from '@/components/home/PulseSection';
 import StoriesSection from '@/components/home/StoriesSection';
+
 import ScrollToTop from '@/components/ui/ScrollToTop';
 import StartFundraiserBanner from '@/components/home/FundraiserBanner';
 import { useState, useEffect } from 'react';
@@ -86,9 +88,14 @@ export default function Page() {
         <CommunitiesSection darkMode={darkMode} />
       </section>
 
+      <section id="organizations">
+        <OrganizationSection darkMode={darkMode} />
+      </section>
+
       <section id="partners">
         <PartnersSection darkMode={darkMode} />
       </section>
+
 
       <section id="pulse">
         <PulseSection darkMode={darkMode} />
