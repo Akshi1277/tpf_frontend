@@ -349,26 +349,27 @@ export default function OrganizationProfileStep({
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-              Organization Description (Optional - Max 250 words)
-            </label>
-            <textarea
-              name="organizationDescription"
-              value={formData.organizationDescription}
-              onChange={handleInputChange}
-              maxLength={maxDescriptionLength}
-              rows={5}
-              placeholder="Describe what your organization does and how it works..."
-              className={`w-full px-4 py-2.5 rounded-lg border transition-colors resize-none ${
-                darkMode
-                  ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-400 focus:border-emerald-500"
-                  : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400 focus:border-emerald-600"
-              } focus:outline-none focus:ring-2 focus:ring-emerald-500/20`}
-            />
-            <p className={`text-xs text-right mt-1 ${darkMode ? "text-zinc-400" : "text-zinc-500"}`}>
-              {formData.organizationDescription?.length || 0} / {maxDescriptionLength} characters
-            </p>
-          </div>
+  <label
+    className={`block text-sm font-medium mb-2 ${
+      darkMode ? "text-zinc-300" : "text-zinc-700"
+    }`}
+  >
+    Organization Description (Optional)
+  </label>
+
+  <textarea
+    name="organizationDescription"
+    value={formData.organizationDescription}
+    onChange={handleInputChange}
+    rows={5}
+    placeholder="Describe what your organization does and how it works..."
+    className={`w-full px-4 py-2.5 rounded-lg border transition-colors resize-none ${
+      darkMode
+        ? "bg-zinc-700 border-zinc-600 text-white placeholder-zinc-400 focus:border-emerald-500"
+        : "bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400 focus:border-emerald-600"
+    } focus:outline-none focus:ring-2 focus:ring-emerald-500/20`}
+  />
+</div>
         </div>
       </div>
 
