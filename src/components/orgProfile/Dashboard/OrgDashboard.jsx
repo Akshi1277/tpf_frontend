@@ -1,6 +1,7 @@
 "use client";
 
 import { useSelector } from "react-redux";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -20,8 +21,12 @@ import {
   ChevronRight,
   Handshake,
   ShieldCheck,
+  Edit2,
 } from "lucide-react";
 import { getMediaUrl } from "@/utils/media";
+import OrganizationEditModal from "./OrganizationEditModal";
+import { useUpdateOrganizationMutation, useRequestEditMutation } from "@/utils/slices/organizationApiSlice";
+import { toast } from "react-toastify";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -87,8 +92,8 @@ function StatCard({ icon: Icon, label, value, gradient, darkMode }) {
     <motion.div
       {...fadeUp(0.05)}
       className={`relative overflow-hidden rounded-2xl p-5 border ${darkMode
-          ? "bg-zinc-900 border-zinc-800"
-          : "bg-white border-gray-100 shadow-sm"
+        ? "bg-zinc-900 border-zinc-800"
+        : "bg-white border-gray-100 shadow-sm"
         }`}
     >
       <div
@@ -132,28 +137,39 @@ function InfoRow({ label, value, darkMode }) {
   );
 }
 
-function SectionCard({ title, icon: Icon, children, darkMode, delay = 0 }) {
+function SectionCard({ title, icon: Icon, children, darkMode, delay = 0, onEdit }) {
   return (
     <motion.div
       {...fadeUp(delay)}
       className={`rounded-2xl border overflow-hidden ${darkMode
-          ? "bg-zinc-900 border-zinc-800"
-          : "bg-white border-gray-100 shadow-sm"
+        ? "bg-zinc-900 border-zinc-800"
+        : "bg-white border-gray-100 shadow-sm"
         }`}
     >
       <div
-        className={`flex items-center gap-2.5 px-5 py-4 border-b ${darkMode ? "border-zinc-800" : "border-gray-100"
+        className={`flex items-center justify-between px-5 py-4 border-b ${darkMode ? "border-zinc-800" : "border-gray-100"
           }`}
       >
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-          <Icon className="w-3.5 h-3.5 text-white" />
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+            <Icon className="w-3.5 h-3.5 text-white" />
+          </div>
+          <h3
+            className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"
+              }`}
+          >
+            {title}
+          </h3>
         </div>
-        <h3
-          className={`text-sm font-bold ${darkMode ? "text-white" : "text-gray-900"
-            }`}
-        >
-          {title}
-        </h3>
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            className={`p-1.5 rounded-lg transition-colors ${darkMode ? "hover:bg-zinc-800 text-zinc-500 hover:text-white" : "hover:bg-gray-50 text-gray-400 hover:text-emerald-600"
+              }`}
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
       <div className="px-5 divide-y divide-dashed divide-gray-100 dark:divide-zinc-800">
         {children}
@@ -178,6 +194,77 @@ export default function OrgDashboard({ darkModeFromParent }) {
 
   const cd = org?.companyDetails || {};
   const contact = org?.contactDetails || {};
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
+
+  const [updateOrg, { isLoading: isUpdating }] = useUpdateOrganizationMutation();
+  const [requestEdit, { isLoading: isRequesting }] = useRequestEditMutation();
+
+  const handleEditSave = async (formData) => {
+    try {
+      if (activeSection === 'personal' || activeSection === 'contact' || (activeSection === 'basic' && formData.officialWebsite !== org.officialWebsite)) {
+        // Complex edits needing approval
+        const fd = new FormData();
+        if (formData.organizationLogo) fd.append('organizationLogo', formData.organizationLogo);
+        if (formData.officialWebsite) fd.append('officialWebsite', formData.officialWebsite);
+
+        if (activeSection === 'contact') {
+          fd.append('contactDetails', JSON.stringify({
+            contactName: formData.contactName,
+            designation: formData.designation,
+            contactEmail: formData.contactEmail,
+            contactNumber: formData.contactNumber
+          }));
+        }
+
+        if (activeSection === 'personal') {
+          fd.append('personalDetails', JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            mobile: formData.mobile
+          }));
+        }
+
+        await requestEdit({ id: org._id, formData: fd }).unwrap();
+        toast.info("Request submitted for admin approval");
+      } else {
+        // Basic edits - immediate
+        if (activeSection === 'basic') {
+          const fd = new FormData();
+          if (formData.organizationLogo) {
+            fd.append('organizationLogo', formData.organizationLogo);
+            await requestEdit({ id: org._id, formData: fd }).unwrap();
+          }
+          await updateOrg({
+            id: org._id,
+            data: { organizationDescription: formData.organizationDescription }
+          }).unwrap();
+        } else if (activeSection === 'stats') {
+          const updateData = {};
+          if (org.isNGO) {
+            updateData.ngoDetails = {
+              ...org.ngoDetails,
+              employeeStrength: formData.numberOfEmployees,
+              annualBudget: formData.annualRevenue
+            };
+          } else {
+            updateData.companyDetails = {
+              ...org.companyDetails,
+              numberOfEmployees: formData.numberOfEmployees,
+              annualRevenue: formData.annualRevenue,
+              yearsInOperation: formData.yearsInOperation
+            };
+          }
+          await updateOrg({ id: org._id, data: updateData }).unwrap();
+        }
+        toast.success("Profile updated successfully");
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+      toast.error(err.data?.message || "Update failed");
+    }
+  };
 
   const statusColor =
     org?.verificationStatus === "verified"
@@ -205,8 +292,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
         <motion.div
           {...fadeUp(0)}
           className={`relative overflow-hidden rounded-2xl sm:rounded-3xl border ${darkMode
-              ? "bg-zinc-900 border-zinc-800"
-              : "bg-white border-gray-100 shadow-md"
+            ? "bg-zinc-900 border-zinc-800"
+            : "bg-white border-gray-100 shadow-md"
             }`}
         >
           {/* top gradient strip */}
@@ -249,6 +336,12 @@ export default function OrgDashboard({ darkModeFromParent }) {
                   >
                     {org?.organizationName}
                   </h1>
+                  <button
+                    onClick={() => { setActiveSection('basic'); setIsModalOpen(true); }}
+                    className={`p-2 rounded-full transition-all ${darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-400" : "bg-gray-100 hover:bg-gray-200 text-gray-500"}`}
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusBg} ${statusColor}`}
                   >
@@ -290,8 +383,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`flex items-center gap-1.5 text-xs font-medium hover:underline ${darkMode
-                          ? "text-emerald-400"
-                          : "text-emerald-600"
+                        ? "text-emerald-400"
+                        : "text-emerald-600"
                         }`}
                     >
                       <Globe className="w-3.5 h-3.5" />
@@ -325,8 +418,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
             {org?.isNGO && (
               <div
                 className={`mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${darkMode
-                    ? "bg-violet-500/10 border-violet-500/20 text-violet-400"
-                    : "bg-violet-50 border-violet-200 text-violet-700"
+                  ? "bg-violet-500/10 border-violet-500/20 text-violet-400"
+                  : "bg-violet-50 border-violet-200 text-violet-700"
                   }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -368,6 +461,16 @@ export default function OrgDashboard({ darkModeFromParent }) {
           />
         </div>
 
+        <div className="flex justify-end">
+          <button
+            onClick={() => { setActiveSection('stats'); setIsModalOpen(true); }}
+            className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${darkMode ? "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800" : "bg-white border border-gray-100 text-gray-500 hover:text-emerald-600 hover:shadow-sm"}`}
+          >
+            <Edit2 className="w-3.5 h-3.5" />
+            Update Metrics
+          </button>
+        </div>
+
         {/* ── 2-col grid ───────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
@@ -377,6 +480,7 @@ export default function OrgDashboard({ darkModeFromParent }) {
             icon={Building2}
             darkMode={darkMode}
             delay={0.1}
+            onEdit={() => { setActiveSection('personal'); setIsModalOpen(true); }}
           >
             <InfoRow label="Business Domain" value={cd.businessDomain} darkMode={darkMode} />
             <InfoRow label="Director" value={cd.directorName} darkMode={darkMode} />
@@ -402,6 +506,7 @@ export default function OrgDashboard({ darkModeFromParent }) {
               icon={User}
               darkMode={darkMode}
               delay={0.15}
+              onEdit={() => { setActiveSection('contact'); setIsModalOpen(true); }}
             >
               <InfoRow label="Name" value={contact.contactName} darkMode={darkMode} />
               <InfoRow label="Designation" value={contact.designation} darkMode={darkMode} />
@@ -477,8 +582,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
               <a key={q.href} href={q.href}>
                 <div
                   className={`flex items-center gap-3.5 p-4 rounded-2xl border transition-colors duration-200 group ${darkMode
-                      ? "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
-                      : "bg-white border-gray-100 hover:border-gray-200 shadow-sm"
+                    ? "bg-zinc-900 border-zinc-800 hover:border-zinc-700"
+                    : "bg-white border-gray-100 hover:border-gray-200 shadow-sm"
                     }`}
                 >
                   <div
@@ -514,8 +619,8 @@ export default function OrgDashboard({ darkModeFromParent }) {
         <motion.div
           {...fadeUp(0.3)}
           className={`rounded-2xl px-6 py-5 text-center border ${darkMode
-              ? "bg-gradient-to-br from-emerald-900/30 to-teal-900/20 border-emerald-800/30"
-              : "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100"
+            ? "bg-gradient-to-br from-emerald-900/30 to-teal-900/20 border-emerald-800/30"
+            : "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100"
             }`}
         >
           <p
@@ -532,6 +637,14 @@ export default function OrgDashboard({ darkModeFromParent }) {
           </p>
         </motion.div>
 
+        <OrganizationEditModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          section={activeSection}
+          org={org}
+          onSave={handleEditSave}
+          isLoading={isUpdating || isRequesting}
+        />
       </div>
     </div>
   );

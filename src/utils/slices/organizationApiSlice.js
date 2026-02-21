@@ -145,6 +145,18 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
       ],
     }),
 
+    requestEdit: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/organizations/${id}/request-edit`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Organization", id },
+        "Organization",
+      ],
+    }),
+
     // ----------------------------------
     // VERIFY / REJECT ORGANIZATION (ADMIN)
     // ----------------------------------
@@ -222,6 +234,7 @@ export const {
   useFetchOrganizationStatsQuery,
   useFetchOrganizationByIdQuery,
   useUpdateOrganizationMutation,
+  useRequestEditMutation,
   useUpdateVerificationStatusMutation,
   useDeleteOrganizationMutation,
   useSendOrganizationOtpMutation,
