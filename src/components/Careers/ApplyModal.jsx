@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-
+import { useApplyToJobMutation } from "@/utils/slices/jobsApiSlice";
 // ─── Validation ───────────────────────────────────────────────────────────────
 function validateForm(values) {
     const errors = {};
@@ -59,7 +59,7 @@ export default function ApplyModal({ job, onClose, darkMode = false }) {
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-
+    const [applyToJob, { isLoading }] = useApplyToJobMutation();
     // Close on ESC
     useEffect(() => {
         const handler = (e) => e.key === "Escape" && onClose();
@@ -92,24 +92,30 @@ export default function ApplyModal({ job, onClose, darkMode = false }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const errs = validateForm(values);
-        if (Object.keys(errs).length) { setErrors(errs); return; }
-        setSubmitting(true);
+        if (Object.keys(errs).length) {
+            setErrors(errs);
+            return;
+        }
 
-        // ── Replace with real API call ────────────────────────────────────────
-        // const formData = new FormData();
-        // formData.append("jobId", job._id);
-        // formData.append("fullName", values.fullName);
-        // formData.append("email", values.email);
-        // formData.append("phone", values.phone);
-        // formData.append("resume", values.resume);
-        // formData.append("whyUs", values.whyUs);
-        // await fetch("/api/applications", { method: "POST", body: formData });
-        // ─────────────────────────────────────────────────────────────────────
+        try {
+            const formData = new FormData();
 
-        await new Promise((r) => setTimeout(r, 1800));
-        setSubmitting(false);
-        setSubmitted(true);
+            formData.append("jobId", job._id);
+            formData.append("fullName", values.fullName);
+            formData.append("email", values.email);
+            formData.append("phone", values.phone);
+            formData.append("coverLetter", values.whyUs);
+            formData.append("resume", values.resume);
+
+            await applyToJob(formData).unwrap();
+
+            setSubmitted(true);
+        } catch (error) {
+            console.error("Application error:", error);
+            alert(error?.data?.message || "Failed to submit application");
+        }
     };
 
     return (
@@ -260,10 +266,10 @@ export default function ApplyModal({ job, onClose, darkMode = false }) {
 
                                     <Field label="Resume" error={errors.resume} required darkMode={darkMode}>
                                         <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition ${errors.resume
-                                                ? "border-red-500 bg-red-950/30"
-                                                : darkMode
-                                                    ? "border-zinc-600 bg-zinc-700 hover:border-emerald-500 hover:bg-zinc-600"
-                                                    : "border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50"
+                                            ? "border-red-500 bg-red-950/30"
+                                            : darkMode
+                                                ? "border-zinc-600 bg-zinc-700 hover:border-emerald-500 hover:bg-zinc-600"
+                                                : "border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50"
                                             }`}>
                                             <svg className="text-emerald-400 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none">
                                                 <path d="M12 16V8m0 0l-3 3m3-3l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -296,10 +302,10 @@ export default function ApplyModal({ job, onClose, darkMode = false }) {
 
                                     <button
                                         type="submit"
-                                        disabled={submitting}
+                                        disabled={isLoading}
                                         className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm tracking-wide transition flex items-center justify-center gap-2 mt-2"
                                     >
-                                        {submitting ? (
+                                        {isLoading ? (
                                             <>
                                                 <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
                                                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.3" />

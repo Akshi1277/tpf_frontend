@@ -166,7 +166,7 @@ function ApplyPanel({ job, onApply, darkMode }) {
             <div className="px-5 pb-5 pt-3">
                 <button
                     onClick={onApply}
-                    className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition"
+                    className="w-full py-3 cursor-pointer rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition"
                     aria-label={`Apply for ${job.title}`}
                 >
                     Apply Now
@@ -363,7 +363,7 @@ export default function JobDetailPage({ darkMode = false }) {
                                 </div>
                                 <button
                                     onClick={handleApplyOpen}
-                                    className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition"
+                                    className="px-8 py-3 cursor-pointer rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition"
                                 >
                                     Apply Now
                                 </button>
