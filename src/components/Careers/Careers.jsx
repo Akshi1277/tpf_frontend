@@ -7,9 +7,9 @@ import { useGetAllJobsQuery } from "@/utils/slices/jobsApiSlice";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const TYPE_COLORS = {
     "Full-time": "bg-emerald-100 text-emerald-700",
-    "Part-time":  "bg-sky-100 text-sky-700",
-    Internship:   "bg-violet-100 text-violet-700",
-    Volunteer:    "bg-amber-100 text-amber-700",
+    "Part-time": "bg-sky-100 text-sky-700",
+    Internship: "bg-violet-100 text-violet-700",
+    Volunteer: "bg-amber-100 text-amber-700",
 };
 
 function formatDate(dateStr) {
@@ -76,9 +76,9 @@ function ApplyModal({ job, onClose, darkMode }) {
         resume: null,
         whyUs: "",
     });
-    const [errors, setErrors]     = useState({});
+    const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted]   = useState(false);
+    const [submitted, setSubmitted] = useState(false);
     const overlayRef = useRef(null);
 
     useEffect(() => {
@@ -140,6 +140,7 @@ function ApplyModal({ job, onClose, darkMode }) {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="modal-title"
+                data-lenis-prevent="true"
             >
                 <div
                     className={`relative w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden ${cardBg}`}
@@ -170,7 +171,7 @@ function ApplyModal({ job, onClose, darkMode }) {
                     </button>
 
                     {/* Body */}
-                    <div className="px-6 py-6 overflow-y-auto max-h-[70vh]">
+                    <div className="px-6 py-6 overflow-y-auto max-h-[70vh]" data-lenis-prevent="true">
                         {submitted ? (
                             <div className="flex flex-col items-center py-8 text-center">
                                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${darkMode ? "bg-emerald-900" : "bg-emerald-100"}`}>
@@ -230,13 +231,12 @@ function ApplyModal({ job, onClose, darkMode }) {
                                 </Field>
 
                                 <Field label="Resume" error={errors.resume} required darkMode={darkMode}>
-                                    <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition ${
-                                        errors.resume
+                                    <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition ${errors.resume
                                             ? "border-red-500 bg-red-950/30"
                                             : darkMode
                                                 ? "border-zinc-600 bg-zinc-700 hover:border-emerald-500 hover:bg-zinc-600"
                                                 : "border-slate-200 bg-slate-50 hover:border-emerald-400 hover:bg-emerald-50"
-                                    }`}>
+                                        }`}>
                                         <svg className="text-emerald-400 shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none">
                                             <path d="M12 16V8m0 0l-3 3m3-3l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                             <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="2" />
@@ -293,16 +293,14 @@ function ApplyModal({ job, onClose, darkMode }) {
 // ─── Job Card ─────────────────────────────────────────────────────────────────
 function JobCard({ job, onApply, darkMode }) {
     return (
-        <article className={`group rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 flex flex-col ${
-            darkMode
+        <article className={`group rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 flex flex-col ${darkMode
                 ? "bg-zinc-800 border-zinc-700 shadow-none hover:border-zinc-600"
                 : "bg-white border-slate-100 shadow-sm hover:shadow-md"
-        }`}>
+            }`}>
             <div className="p-6 flex-1">
                 <div className="flex items-center justify-between mb-3">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        TYPE_COLORS[job.employmentType] || "bg-slate-100 text-slate-600"
-                    }`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${TYPE_COLORS[job.employmentType] || "bg-slate-100 text-slate-600"
+                        }`}>
                         {job.employmentType}
                     </span>
                     <Link
@@ -313,9 +311,8 @@ function JobCard({ job, onApply, darkMode }) {
                     </Link>
                 </div>
 
-                <h3 className={`text-lg font-bold mb-1 group-hover:text-emerald-500 transition-colors ${
-                    darkMode ? "text-white" : "text-slate-800"
-                }`}>
+                <h3 className={`text-lg font-bold mb-1 group-hover:text-emerald-500 transition-colors ${darkMode ? "text-white" : "text-slate-800"
+                    }`}>
                     {job.title}
                 </h3>
 
@@ -355,9 +352,8 @@ function JobCard({ job, onApply, darkMode }) {
 function EmptyState({ darkMode }) {
     return (
         <div className="col-span-full flex flex-col items-center py-24 text-center">
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${
-                darkMode ? "bg-zinc-800" : "bg-emerald-50"
-            }`}>
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${darkMode ? "bg-zinc-800" : "bg-emerald-50"
+                }`}>
                 <svg className="text-emerald-400" width="40" height="40" viewBox="0 0 24 24" fill="none">
                     <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" stroke="currentColor" strokeWidth="1.5" />
                     <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" strokeWidth="1.5" />
@@ -385,13 +381,12 @@ function FilterBar({ active, onChange, darkMode }) {
                     key={t}
                     onClick={() => onChange(t)}
                     aria-pressed={active === t}
-                    className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition ${
-                        active === t
+                    className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition ${active === t
                             ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
                             : darkMode
                                 ? "bg-zinc-800 text-zinc-300 border-zinc-600 hover:border-emerald-500 hover:text-emerald-400"
                                 : "bg-white text-slate-600 border-slate-200 hover:border-emerald-400 hover:text-emerald-600"
-                    }`}
+                        }`}
                 >
                     {t}
                 </button>
@@ -407,9 +402,8 @@ function SkeletonGrid({ darkMode }) {
             {Array.from({ length: 6 }).map((_, i) => (
                 <div
                     key={i}
-                    className={`rounded-2xl border p-6 space-y-3 animate-pulse ${
-                        darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-slate-100"
-                    }`}
+                    className={`rounded-2xl border p-6 space-y-3 animate-pulse ${darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-slate-100"
+                        }`}
                 >
                     <div className={`h-4 rounded w-1/3 ${darkMode ? "bg-zinc-700" : "bg-slate-200"}`} />
                     <div className={`h-5 rounded w-3/4 ${darkMode ? "bg-zinc-700" : "bg-slate-200"}`} />
@@ -429,7 +423,7 @@ export default function CareersPage({ darkMode = false }) {
     const jobs = data?.data || [];
 
     const [activeFilter, setActiveFilter] = useState("All");
-    const [selectedJob, setSelectedJob]   = useState(null);
+    const [selectedJob, setSelectedJob] = useState(null);
 
     const filtered = activeFilter === "All"
         ? jobs
@@ -531,7 +525,7 @@ export default function CareersPage({ darkMode = false }) {
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             {[
-                                { icon: "🌍", title: "Real Impact",       desc: "Your work directly shapes lives across communities." },
+                                { icon: "🌍", title: "Real Impact", desc: "Your work directly shapes lives across communities." },
                                 { icon: "🤝", title: "Inclusive Culture", desc: "A diverse, welcoming team where every voice counts." },
                                 { icon: "📈", title: "Growth & Learning", desc: "Ongoing training, mentoring, and skill development." },
                             ].map((p) => (
