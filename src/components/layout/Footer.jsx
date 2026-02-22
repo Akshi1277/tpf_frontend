@@ -143,7 +143,7 @@ export default function Footer({ darkMode }) {
             <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Get Involve</div>
             <ul className="space-y-1.5 text-sm">
               {[
-                { name: 'Careers', comingSoon: true },
+                { name: 'Careers', path: '/careers' },
                 { name: 'Join TPF Aid', comingSoon: true },
                 { name: 'Volunteer Now', path: '/volunteer/register' },
                 { name: 'TPF Aid in News', comingSoon: true },
