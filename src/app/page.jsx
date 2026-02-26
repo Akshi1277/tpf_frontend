@@ -88,10 +88,7 @@ export default function Page() {
         <CommunitiesSection darkMode={darkMode} />
       </section>
 
-      <section id="organizations">
-        <OrganizationSection darkMode={darkMode} />
-      </section>
-
+     
       <section id="partners">
         <PartnersSection darkMode={darkMode} />
       </section>
