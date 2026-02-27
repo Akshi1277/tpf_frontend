@@ -295,6 +295,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
         onClose={() => setIsModalOpen(false)}
         darkMode={darkMode}
         campaignId={campaignId}
+        campaignSlug={campaign.slug}
         zakatVerified={campaign.zakatVerified}
         ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}

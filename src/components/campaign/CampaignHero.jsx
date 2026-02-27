@@ -122,6 +122,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
         onClose={() => setIsModalOpen(false)}
         darkMode={darkMode}
         campaignId={campaign._id} // or campaign.id depending on your schema
+        campaignSlug={campaign.slug}
         zakatVerified={campaign.zakatVerified}
         ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}
