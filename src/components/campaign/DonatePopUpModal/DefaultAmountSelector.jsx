@@ -1,7 +1,7 @@
 'use client'
 
 const presetAmounts = [
-  { value: 50,  label: '₹50' },
+  { value: 50,  label: '₹50'  },
   { value: 100, label: '₹100' },
   { value: 200, label: '₹200' },
   { value: 500, label: '₹500' },
@@ -15,12 +15,16 @@ export default function DefaultAmountSelector({
   setCustomAmount,
   showCustomAmountInput,
   setShowCustomAmountInput,
-  hideLabel = false,
 }) {
-  const activeCls = 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-sm';
-  const inactiveCls = darkMode
-    ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700/50'
-    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200';
+  const dk = darkMode;
+
+  const activeCls = dk
+    ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300 font-extrabold'
+    : 'bg-emerald-100 border-emerald-400 text-emerald-800 font-extrabold';
+
+  const inactiveCls = dk
+    ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500 hover:text-zinc-200 font-bold'
+    : 'bg-white border-gray-300 text-gray-700 hover:border-emerald-300 font-bold';
 
   const handleOtherClick = () => {
     const next = !showCustomAmountInput;
@@ -35,13 +39,8 @@ export default function DefaultAmountSelector({
   };
 
   return (
-    <div>
-      <label className={`block text-xs font-semibold mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-        Amount
-      </label>
-
-      {/* Preset row + Other button */}
-      <div className="grid grid-cols-5 gap-1.5">
+    <div className="space-y-2.5">
+      <div className="grid grid-cols-5 gap-2">
         {presetAmounts.map((amt) => (
           <button
             key={amt.value}
@@ -50,33 +49,27 @@ export default function DefaultAmountSelector({
               setCustomAmount('');
               setShowCustomAmountInput(false);
             }}
-            className={`
-              h-9 rounded-lg font-bold text-xs transition-all
-              ${selectedAmount === amt.value && !customAmount ? activeCls : inactiveCls}
-            `}
+            className={`h-9 rounded-lg font-extrabold text-xs transition-colors border ${
+              selectedAmount === amt.value && !customAmount ? activeCls : inactiveCls
+            }`}
           >
             {amt.label}
           </button>
         ))}
 
-        {/* Other — always a button */}
         <button
           onClick={handleOtherClick}
-          className={`
-            h-9 rounded-lg font-bold text-xs transition-all
-            ${showCustomAmountInput || customAmount ? activeCls : inactiveCls}
-          `}
+          className={`h-9 rounded-lg font-extrabold text-xs transition-colors border ${
+            showCustomAmountInput || customAmount ? activeCls : inactiveCls
+          }`}
         >
           {customAmount && !showCustomAmountInput ? `₹${customAmount}` : 'Other'}
         </button>
       </div>
 
-      {/* Full-width custom input — appears below the grid */}
       {showCustomAmountInput && (
-        <div className="mt-2 relative">
-          <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold pointer-events-none ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
-            ₹
-          </span>
+        <div className="relative">
+          <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold pointer-events-none ${dk ? 'text-zinc-400' : 'text-gray-400'}`}>₹</span>
           <input
             type="number"
             placeholder="Enter custom amount"
@@ -87,17 +80,14 @@ export default function DefaultAmountSelector({
               setCustomAmount(e.target.value);
               setSelectedAmount(null);
             }}
-            className={`
-              w-full h-10 pl-7 pr-10 text-sm rounded-xl font-semibold focus:outline-none transition-all
-              ${darkMode
-                ? 'bg-zinc-800 border-2 border-emerald-500 text-white placeholder-gray-600'
-                : 'bg-emerald-50 border-2 border-emerald-500 text-gray-900 placeholder-gray-400'}
-            `}
+            className={`w-full h-10 pl-7 pr-10 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
+              dk
+                ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
+                : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
+            }`}
           />
           {customAmount && parseInt(customAmount) >= 50 && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm font-bold pointer-events-none">
-              ✓
-            </span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm font-bold pointer-events-none">✓</span>
           )}
         </div>
       )}
