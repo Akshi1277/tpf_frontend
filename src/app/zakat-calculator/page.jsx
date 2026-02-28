@@ -27,25 +27,28 @@ const page = () => {
       <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
         {/* <Navbar darkMode={darkMode} setDarkMode={setDarkMode}  /> */}
 
-        <div className="absolute top-16 md:top-24 left-2 sm:left-4 md:left-8 z-20">
+        <div className="absolute top-16 md:top-24 left-4 sm:left-6 md:left-8 lg:left-12 z-20">
           <button
             type="button"
             onClick={() => router.back()}
-            className={`group flex items-center gap-2 transition-colors duration-200 ${darkMode
-              ? "text-white hover:text-emerald-400"
-              : "text-gray-900 hover:text-emerald-600"
+            className={`group flex items-center transition-all duration-300 ${darkMode ? "text-white" : "text-gray-900"
               }`}
             aria-label="Go back"
           >
             <div
-              className={`flex items-center justify-center w-8 h-8 sm:w-22 sm:h-10 rounded-lg sm:rounded-3xl border backdrop-blur-md py-5 px-3 shadow-lg transition-all duration-200 ${darkMode
-                ? "bg-black/40 border-white/20 hover:border-emerald-500/50 hover:bg-black/60"
-                : "bg-white/70 border-gray-200 hover:border-emerald-500/40 hover:bg-white"
-                }`}
+              className={`flex items-center justify-center h-10 sm:h-12 rounded-full border backdrop-blur-md shadow-lg transition-all duration-300 ${darkMode
+                  ? "bg-black/20 border-white/10 hover:bg-black/40 hover:border-emerald-500/50"
+                  : "bg-white/20 border-white/30 hover:bg-white/40 hover:border-emerald-500/40"
+                } px-3 sm:px-5`}
             >
-              
-              <ArrowLeft size={18} className="sm:size-[18px] mr-2" strokeWidth={1.5} />
-              Back
+              <ArrowLeft
+                size={20}
+                className="transition-transform duration-300 group-hover:-translate-x-1"
+                strokeWidth={2}
+              />
+              <span className="hidden sm:inline-block ml-2 font-semibold tracking-wide text-sm uppercase">
+                Back
+              </span>
             </div>
           </button>
         </div>
