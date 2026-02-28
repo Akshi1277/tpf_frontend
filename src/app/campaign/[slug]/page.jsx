@@ -151,6 +151,7 @@ export default function CampaignPage() {
         onClose={() => setIsFloatingModalOpen(false)}
         darkMode={darkMode}
         campaignId={campaign._id}
+        campaignSlug={campaign.slug}
         zakatVerified={campaign.zakatVerified}
         ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}
