@@ -22,14 +22,16 @@ const allDonationTypes = [
 ];
 
 /* ── tiny reusable primitives ─────────────────────────────────────────────── */
+// Mobile: tighter label (mb-1.5, smaller tracking). Desktop: original mb-3
 const SectionLabel = ({ children, dark, className = '' }) => (
-  <p className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${dark ? 'text-emerald-400/70' : 'text-emerald-600/70'} ${className}`}>
+  <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest mb-1.5 md:mb-3 ${dark ? 'text-emerald-400/70' : 'text-emerald-600/70'} ${className}`}>
     {children}
   </p>
 );
 
+// Mobile: tighter padding p-2.5. Desktop: original p-4
 const Card = ({ dark, children, className = '' }) => (
-  <div className={`rounded-xl p-4 ${dark ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50/80 border border-gray-100'} ${className}`}>
+  <div className={`rounded-xl p-2.5 md:p-4 ${dark ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50/80 border border-gray-100'} ${className}`}>
     {children}
   </div>
 );
@@ -74,7 +76,7 @@ export default function DonatePopUpModal({
   const resolvedSlug = campaignSlug || slugFromUrl;
   const campaignConfig = getCampaignConfig(resolvedSlug);
 
-  const dk = darkMode; // shorthand
+  const dk = darkMode;
 
   const filteredDonationTypes = (
     allowedDonationTypes?.length > 0
@@ -238,14 +240,16 @@ export default function DonatePopUpModal({
   const totalAmount = baseAmount + (tipAmount || 0);
 
   /* ── style tokens ────────────────────────────────────────── */
-  const inputCls = `w-full h-10 pl-9 pr-3 text-sm rounded-lg font-medium focus:outline-none transition-colors border ${
+  // Mobile: h-8, smaller text/padding. Desktop: h-10 original
+  const inputCls = `w-full h-8 md:h-10 pl-8 md:pl-9 pr-3 text-xs md:text-sm rounded-lg font-medium focus:outline-none transition-colors border ${
     dk
       ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
       : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
   }`;
 
+  // Mobile: h-7, text-[10px]. Desktop: h-9, text-xs (original)
   const typeBtn = (active, disabled) =>
-    `flex-1 flex items-center justify-center gap-1.5 h-9 rounded-lg text-xs font-bold transition-colors border ${
+    `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-7 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${
       disabled ? 'opacity-40 cursor-not-allowed ' : ''
     }${
       active
@@ -257,8 +261,9 @@ export default function DonatePopUpModal({
           : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300 hover:text-gray-800'
     }`;
 
+  // Mobile: h-7, text-[10px]. Desktop: h-9, text-xs (original)
   const tipBtn = (active) =>
-    `flex-1 h-9 rounded-lg text-xs font-extrabold transition-colors border ${
+    `flex-1 h-7 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${
       active
         ? dk
           ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
@@ -269,23 +274,23 @@ export default function DonatePopUpModal({
     }`;
 
   const CustomCheckbox = ({ checked, onChange, label }) => (
-    <label className="flex items-center gap-2.5 cursor-pointer select-none group">
+    <label className="flex items-center gap-2 cursor-pointer select-none group">
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`w-4 h-4 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${
+        className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${
           checked
             ? 'bg-emerald-500 border-emerald-500'
             : dk ? 'border-zinc-600 bg-zinc-800 group-hover:border-zinc-500' : 'border-gray-300 bg-white group-hover:border-emerald-300'
         }`}
       >
         {checked && (
-          <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 10 10" fill="none">
+          <svg className="w-2 h-2 md:w-2.5 md:h-2.5 text-white" viewBox="0 0 10 10" fill="none">
             <path d="M2 5l2.5 2.5L8 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         )}
       </button>
-      <span className={`text-xs font-medium ${dk ? 'text-zinc-400 group-hover:text-zinc-300' : 'text-gray-500 group-hover:text-gray-700'}`}>
+      <span className={`text-[10px] md:text-xs font-medium ${dk ? 'text-zinc-400 group-hover:text-zinc-300' : 'text-gray-500 group-hover:text-gray-700'}`}>
         {label}
       </span>
     </label>
@@ -309,7 +314,7 @@ export default function DonatePopUpModal({
             />
 
             {/* Positioning shell */}
-            <div className="fixed inset-x-0 bottom-0 md:inset-0 z-50 flex items-end md:items-center justify-center md:p-6">
+            <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center pt-8 md:p-6">
               <motion.div
                 key="donate-modal"
                 initial={{ opacity: 0, y: 20 }}
@@ -328,26 +333,26 @@ export default function DonatePopUpModal({
                   }`}
                   style={{ maxHeight: '93dvh' }}
                 >
-                  {/* Mobile drag pill */}
-                  <div className="flex justify-center pt-2.5 md:hidden flex-shrink-0">
+                  {/* Mobile drag pill — minimal gap */}
+                  <div className="flex justify-center pt-2 md:pt-2.5 md:hidden flex-shrink-0">
                     <div className={`w-8 h-1 rounded-full ${dk ? 'bg-zinc-700' : 'bg-gray-200'}`} />
                   </div>
 
-                  {/* ─── Header ─────────────────────────────────────────── */}
-                  <div className={`flex items-center gap-3 px-5 pt-4 pb-4 border-b flex-shrink-0 ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${
+                  {/* ─── Header — tighter padding on mobile ─────────────── */}
+                  <div className={`flex items-center gap-2 md:gap-3 px-3.5 md:px-5 pt-2 md:pt-4 pb-2 md:pb-4 border-b flex-shrink-0 ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
+                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${
                       dk
                         ? 'bg-emerald-500/20 shadow-emerald-900/40'
                         : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/25'
                     }`}>
-                      <Heart className={`w-5 h-5 ${dk ? 'text-emerald-400' : 'text-white'}`} fill="currentColor" />
+                      <Heart className={`w-4 h-4 md:w-5 md:h-5 ${dk ? 'text-emerald-400' : 'text-white'}`} fill="currentColor" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h2 className={`text-base font-bold ${dk ? 'text-white' : 'text-gray-900'}`}>Make a Difference</h2>
-                      <p className={`text-xs mt-0.5 ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>Your generosity transforms lives</p>
+                      <h2 className={`text-sm md:text-base font-bold ${dk ? 'text-white' : 'text-gray-900'}`}>Make a Difference</h2>
+                      <p className={`text-[10px] md:text-xs ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>Your generosity transforms lives</p>
                     </div>
 
-                    {/* Total pill — desktop, lives in header for immediate visibility */}
+                    {/* Total pill — desktop only (unchanged) */}
                     {baseAmount >= 50 && (
                       <div className={`hidden md:flex items-baseline gap-2 px-4 py-2 rounded-xl mr-1 ${
                         dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
@@ -364,31 +369,30 @@ export default function DonatePopUpModal({
 
                     <button
                       onClick={handleCloseAttempt}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
+                      className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
                         dk
                           ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200'
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700'
                       }`}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     </button>
                   </div>
 
-                  {/* ─── Scrollable body ─────────────────────────────────── */}
-                  <div className="overflow-y-auto overscroll-contain flex-1 [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="p-5 md:p-6 grid md:grid-cols-2 gap-5 md:gap-6">
+                  {/* ─── Body — tighter mobile padding & gaps ────────────── */}
+                  <div className="overflow-y-auto overscroll-contain md:flex-1 [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="p-3 md:p-6 grid md:grid-cols-2 gap-3 md:gap-6">
 
                       {/* ═══════════════════════════════
                           LEFT — Donation Type + Amount
                       ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2.5 md:gap-4">
 
                         {/* Donation Type */}
                         <Card dark={dk}>
                           <SectionLabel dark={dk}>Donation Type</SectionLabel>
-                          {/* Render all types in responsive rows */}
-                          <div className="flex flex-col gap-2">
-                            <div className="flex gap-2">
+                          <div className="flex flex-col gap-1.5 md:gap-2">
+                            <div className="flex gap-1.5 md:gap-2">
                               {filteredDonationTypes.slice(0, 3).map((type) => {
                                 const Icon = type.Icon;
                                 return (
@@ -398,15 +402,15 @@ export default function DonatePopUpModal({
                                     disabled={type.disabled}
                                     className={typeBtn(donationType === type.id, type.disabled)}
                                   >
-                                    <Icon className="w-3.5 h-3.5" />
+                                    <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" />
                                     <span>{type.label}</span>
-                                    {type.disabled && <Lock className="w-2.5 h-2.5 opacity-70" />}
+                                    {type.disabled && <Lock className="w-2 h-2 md:w-2.5 md:h-2.5 opacity-70" />}
                                   </button>
                                 );
                               })}
                             </div>
                             {filteredDonationTypes.length > 3 && (
-                              <div className="flex gap-2">
+                              <div className="flex gap-1.5 md:gap-2">
                                 {filteredDonationTypes.slice(3).map((type) => {
                                   const Icon = type.Icon;
                                   return (
@@ -416,9 +420,9 @@ export default function DonatePopUpModal({
                                       disabled={type.disabled}
                                       className={`${typeBtn(donationType === type.id, type.disabled)} max-w-[50%]`}
                                     >
-                                      <Icon className="w-3.5 h-3.5" />
+                                      <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" />
                                       <span>{type.label}</span>
-                                      {type.disabled && <Lock className="w-2.5 h-2.5 opacity-70" />}
+                                      {type.disabled && <Lock className="w-2 h-2 md:w-2.5 md:h-2.5 opacity-70" />}
                                     </button>
                                   );
                                 })}
@@ -456,7 +460,7 @@ export default function DonatePopUpModal({
                           )}
                         </Card>
 
-                        {/* Anonymous — desktop */}
+                        {/* Anonymous — desktop only */}
                         <div className="hidden md:block px-1">
                           <CustomCheckbox
                             checked={isAnonymous}
@@ -469,24 +473,24 @@ export default function DonatePopUpModal({
                       {/* ═══════════════════════════════
                           RIGHT — Details + Tip + CTA
                       ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2.5 md:gap-4">
 
                         {/* Guest details */}
                         {!userInfo && (
                           <Card dark={dk}>
                             <SectionLabel dark={dk}>Your Details</SectionLabel>
-                            <div className="space-y-2.5">
+                            <div className="space-y-1.5 md:space-y-2.5">
                               {[
                                 { Icon: User,  type: 'text',  placeholder: 'Full Name', value: fullName, onChange: setFullName },
                                 { Icon: Mail,  type: 'email', placeholder: 'Email',     value: email,    onChange: setEmail    },
                               ].map(({ Icon, type, placeholder, value, onChange }) => (
                                 <div key={placeholder} className="relative">
-                                  <Icon className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
+                                  <Icon className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
                                   <input type={type} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} className={inputCls} />
                                 </div>
                               ))}
                               <div className="relative">
-                                <Phone className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
+                                <Phone className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
                                 <input
                                   type="tel"
                                   placeholder="Mobile (10 digits)"
@@ -502,10 +506,10 @@ export default function DonatePopUpModal({
 
                         {/* Platform Tip */}
                         <Card dark={dk}>
-                          <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center justify-between mb-1.5 md:mb-3">
                             <SectionLabel dark={dk} className="mb-0">Platform Tip</SectionLabel>
                             <div className="group relative">
-                              <div className={`w-4 h-4 rounded-full flex items-center justify-center cursor-help text-[9px] font-extrabold border ${
+                              <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center cursor-help text-[8px] md:text-[9px] font-extrabold border ${
                                 dk ? 'border-zinc-400 text-zinc-300 bg-zinc-700' : 'border-gray-400 text-gray-600 bg-gray-100'
                               }`}>i</div>
                               <div className={`absolute bottom-full right-0 mb-2 w-48 p-2.5 rounded-xl text-[11px] leading-relaxed z-20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl ${
@@ -516,7 +520,7 @@ export default function DonatePopUpModal({
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-1.5 md:gap-2">
                             {tipPercentages.map((pct) => (
                               <button
                                 key={pct}
@@ -539,8 +543,8 @@ export default function DonatePopUpModal({
                             </button>
                           </div>
                           {showCustomTipInput && (
-                            <div className="mt-2.5 relative">
-                              <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold pointer-events-none ${dk ? 'text-zinc-400' : 'text-gray-400'}`}>₹</span>
+                            <div className="mt-1.5 md:mt-2.5 relative">
+                              <span className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none ${dk ? 'text-zinc-400' : 'text-gray-400'}`}>₹</span>
                               <input
                                 type="number"
                                 placeholder="Custom tip amount"
@@ -548,7 +552,7 @@ export default function DonatePopUpModal({
                                 autoFocus
                                 min={0}
                                 onChange={(e) => { setCustomTip(e.target.value); setTipPercentage(null); }}
-                                className={`w-full h-10 pl-7 pr-3 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
+                                className={`w-full h-8 md:h-10 pl-6 md:pl-7 pr-3 text-xs md:text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
                                   dk
                                     ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
                                     : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
@@ -558,41 +562,35 @@ export default function DonatePopUpModal({
                           )}
                         </Card>
 
-                        <div className="flex-1" />
-
-                        {/* Anonymous — mobile */}
-                        <div className="md:hidden px-1">
+                        {/* ── Mobile only: Anonymous + Total in one compact row ── */}
+                        <div className="md:hidden flex items-center justify-between px-0.5">
                           <CustomCheckbox
                             checked={isAnonymous}
                             onChange={setIsAnonymous}
                             label="Donate Anonymously"
                           />
-                        </div>
-
-                        {/* Total — mobile (desktop shows in header) */}
-                        {baseAmount >= 50 && (
-                          <div className={`flex md:hidden items-center justify-between px-4 py-3 rounded-xl ${
-                            dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
-                          }`}>
-                            <div>
-                              <p className={`text-xs font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</p>
+                          {baseAmount >= 50 && (
+                            <div className={`flex items-baseline gap-1.5 px-3 py-1.5 rounded-lg ${
+                              dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
+                            }`}>
+                              <span className={`text-[10px] font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</span>
+                              <span className={`text-base font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                ₹{totalAmount.toLocaleString()}
+                              </span>
                               {tipAmount > 0 && (
-                                <p className={`text-[10px] ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>incl. ₹{tipAmount} tip</p>
+                                <span className={`text-[9px] ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>+₹{tipAmount}</span>
                               )}
                             </div>
-                            <span className={`text-2xl font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                              ₹{totalAmount.toLocaleString()}
-                            </span>
-                          </div>
-                        )}
+                          )}
+                        </div>
 
                         {/* CTA */}
-                        <div className="space-y-2.5">
+                        <div className="space-y-1.5 md:space-y-2.5">
                           <button
                             onClick={handleDonate}
                             disabled={isDonating || baseAmount < 50}
                             className={`
-                              w-full h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
+                              w-full h-10 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
                               ${isDonating
                                 ? 'bg-emerald-600 text-white cursor-wait'
                                 : baseAmount >= 50
