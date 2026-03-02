@@ -15,7 +15,14 @@ export const donationApiSlice = apiSlice.injectEndpoints({
             }),
             providesTags: ["MyDonations"],
         }),
+        fetchCampaignDonors: builder.query({
+            query: ({ campaignId, page = 1, limit = 10 }) => ({
+                url: `/donations/campaign/${campaignId}/donors`,
+                params: { page, limit },
+            }),
+            providesTags: (result, error, { campaignId }) => [{ type: "CampaignDonors", id: campaignId }],
+        }),
     }),
 });
 
-export const { useFetchRecentDonationsQuery, useFetchMyDonationsQuery } = donationApiSlice;
+export const { useFetchRecentDonationsQuery, useFetchMyDonationsQuery, useFetchCampaignDonorsQuery } = donationApiSlice;

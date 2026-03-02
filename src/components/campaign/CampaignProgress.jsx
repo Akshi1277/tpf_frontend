@@ -1,12 +1,14 @@
 "use client"
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp,
   Calendar,
   Users,
   IndianRupee,
   Heart,
-  ArrowRight
+  ArrowRight,
+  TrendingUp as TrendingUpIcon,
+  X
 } from "lucide-react";
 import { useState } from "react";
 import Image from 'next/image';
@@ -18,9 +20,12 @@ import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { FiShare2 } from "react-icons/fi";
+import DonorListModal from "./DonorListModal";
+import { useFetchCampaignDonorsQuery } from "@/utils/slices/donationApiSlice";
 
 export default function CampaignProgress({ darkMode, campaign }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDonorModalOpen, setIsDonorModalOpen] = useState(false);
   const [openShare, setOpenShare] = useState(false);
 
   const router = useRouter();
@@ -139,8 +144,8 @@ export default function CampaignProgress({ darkMode, campaign }) {
                       setOpenShare(true);
                     }}
                     className={`peer flex items-center gap-1 transition-all duration-200 hover:scale-110 ${darkMode
-                        ? "text-zinc-400 hover:text-emerald-400"
-                        : "text-zinc-600 hover:text-emerald-600"
+                      ? "text-zinc-400 hover:text-emerald-400"
+                      : "text-zinc-600 hover:text-emerald-600"
                       }`}
                     title="Share this Campaign"
                   >
@@ -216,6 +221,14 @@ export default function CampaignProgress({ darkMode, campaign }) {
                 </motion.div>
               )}
             </div>
+
+            {/* DONOR AVATAR STACK */}
+            <DonorAvatarStack
+              campaignId={campaignId}
+              darkMode={darkMode}
+              totalDonors={totalDonors}
+              setIsDonorModalOpen={setIsDonorModalOpen}
+            />
 
             {/* DONATE NOW BUTTON - Updated Design */}
             <motion.button
@@ -309,7 +322,88 @@ export default function CampaignProgress({ darkMode, campaign }) {
           onClose={() => setOpenShare(false)}
         />
       )}
+
+      <DonorListModal
+        isOpen={isDonorModalOpen}
+        onClose={() => setIsDonorModalOpen(false)}
+        campaignId={campaignId}
+        darkMode={darkMode}
+      />
     </>
+  );
+}
+
+function DonorAvatarStack({ campaignId, darkMode, totalDonors, setIsDonorModalOpen }) {
+  const { data } = useFetchCampaignDonorsQuery({
+    campaignId,
+    page: 1,
+    limit: 6
+  });
+
+  const donors = data?.donors || [];
+
+  const getInitials = (name) => {
+    if (!name) return "KS";
+    const parts = name.split(" ");
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const getAvatarColor = (name) => {
+    const colors = [
+      'bg-blue-500', 'bg-emerald-500', 'bg-purple-500',
+      'bg-amber-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
+  if (donors.length === 0) return null;
+
+  return (
+    <div className="flex items-center gap-3 mb-6 transition-all duration-300">
+      <div className="flex -space-x-3 overflow-hidden">
+        {donors.map((donor, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className={`
+              relative !flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full ring-2 
+              ${darkMode ? "ring-zinc-800" : "ring-white"} 
+              text-white font-bold leading-none 
+              text-[10px] sm:text-xs shadow-sm shadow-black/10
+              ${getAvatarColor(donor.fullName)}
+            `}
+          >
+            {getInitials(donor.fullName)}
+          </motion.div>
+        ))}
+        {totalDonors > donors.length && (
+          <div className={`relative !flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full ring-2 ${darkMode ? "ring-zinc-800" : "ring-white"} bg-zinc-700 text-white font-bold text-[10px] sm:text-xs leading-none shadow-sm`}>
+            +{totalDonors - donors.length}
+          </div>
+        )}
+      </div>
+      <div>
+        <p className={`text-xs sm:text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+          <span className="font-bold text-emerald-500">{totalDonors} donors</span> supported this campaign.{" "}
+          <button
+            type="button"
+            onClick={() => setIsDonorModalOpen(true)}
+            className="text-emerald-500 hover:text-emerald-400 font-bold hover:underline inline-flex items-center gap-0.5 transition-all text-xs sm:text-sm"
+          >
+            Click here to view <ArrowRight className="w-3 h-3" />
+          </button>
+        </p>
+      </div>
+    </div>
   );
 }
 
