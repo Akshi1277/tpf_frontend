@@ -323,7 +323,7 @@ export default function DonatePopUpModal({
                 transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
                 onClick={(e) => e.stopPropagation()}
                 className="w-full md:max-w-3xl"
-                style={{ maxHeight: '93dvh' }}
+                style={{ maxHeight: 'calc(100dvh - 1rem)' }}
               >
                 <div
                   className={`flex flex-col overflow-hidden rounded-t-2xl md:rounded-2xl shadow-2xl ${
