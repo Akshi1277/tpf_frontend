@@ -337,10 +337,11 @@ function DonorAvatarStack({ campaignId, darkMode, totalDonors, setIsDonorModalOp
   const { data } = useFetchCampaignDonorsQuery({
     campaignId,
     page: 1,
-    limit: 6
+    limit: 4
   });
 
   const donors = data?.donors || [];
+  const hasMore = totalDonors > 4;
 
   const getInitials = (name) => {
     if (!name) return "KS";
@@ -375,9 +376,9 @@ function DonorAvatarStack({ campaignId, darkMode, totalDonors, setIsDonorModalOp
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
             className={`
-              relative !flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full ring-2 
-              ${darkMode ? "ring-zinc-800" : "ring-white"} 
-              text-white font-bold leading-none 
+              relative !flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full ring-2
+              ${darkMode ? "ring-zinc-800" : "ring-white"}
+              text-white font-bold leading-none
               text-[10px] sm:text-xs shadow-sm shadow-black/10
               ${getAvatarColor(donor.fullName)}
             `}
@@ -385,15 +386,34 @@ function DonorAvatarStack({ campaignId, darkMode, totalDonors, setIsDonorModalOp
             {getInitials(donor.fullName)}
           </motion.div>
         ))}
-        {totalDonors > donors.length && (
+        {hasMore && (
           <div className={`relative !flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 rounded-full ring-2 ${darkMode ? "ring-zinc-800" : "ring-white"} bg-zinc-700 text-white font-bold text-[10px] sm:text-xs leading-none shadow-sm`}>
-            +{totalDonors - donors.length}
+            +{totalDonors - 4}
           </div>
         )}
       </div>
       <div>
         <p className={`text-xs sm:text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-          <span className="font-bold text-emerald-500">{totalDonors} donors</span> supported this campaign.{" "}
+          <span className="font-bold text-emerald-500">
+            {(() => {
+              const firstDonor = donors[0];
+              const isAnonymous = firstDonor?.fullName?.toLowerCase() === "kind supporter";
+
+              if (totalDonors <= 1) {
+                return isAnonymous ? "1 donor" : (firstDonor?.fullName || "0 donors");
+              }
+
+              // Rounding logic for "and more" (e.g., 62 becomes 60+)
+              const displayCount = Math.floor((totalDonors - (isAnonymous ? 0 : 1)) / 10) * 10;
+              const hasRounding = displayCount > 0;
+
+              if (isAnonymous) {
+                return `${hasRounding ? displayCount + "+" : totalDonors} donors`;
+              } else {
+                return `${firstDonor.fullName}${hasRounding ? ` and ${displayCount}+ more` : " and others"}`;
+              }
+            })()}
+          </span> supported this campaign.{" "}
           <button
             type="button"
             onClick={() => setIsDonorModalOpen(true)}
