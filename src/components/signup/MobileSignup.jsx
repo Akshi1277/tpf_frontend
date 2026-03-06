@@ -23,9 +23,9 @@ export default function MobileSignup({
     updatingProfile
 }) {
     return (
-        <div className="lg:hidden min-h-screen flex flex-col">
+        <div className="lg:hidden min-h-screen flex flex-col overflow-x-hidden w-full">
             {/* Top Section - Branding & Visual */}
-            <div className="relative px-4 pt-24 pb-8">
+            <div className="relative px-4 pt-6 pb-8">
                 {/* Decorative Background */}
                 <div className="absolute inset-0 overflow-hidden">
                     <div className={`absolute top-0 left-0 w-72 h-72 rounded-full blur-3xl opacity-20 ${darkMode ? "bg-emerald-500/30" : "bg-emerald-400/40"
@@ -64,16 +64,16 @@ export default function MobileSignup({
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: 0.2 + i * 0.1 }}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${color === "emerald"
+                                    ? darkMode
+                                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                        : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                    : color === "blue"
                                         ? darkMode
-                                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                            : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                                        : color === "blue"
-                                            ? darkMode
-                                                ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                                                : "bg-blue-50 text-blue-700 border border-blue-200"
-                                            : darkMode
-                                                ? "bg-pink-500/20 text-pink-300 border border-pink-500/30"
-                                                : "bg-pink-50 text-pink-700 border border-pink-200"
+                                            ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                            : "bg-blue-50 text-blue-700 border border-blue-200"
+                                        : darkMode
+                                            ? "bg-pink-500/20 text-pink-300 border border-pink-500/30"
+                                            : "bg-pink-50 text-pink-700 border border-pink-200"
                                     }`}
                             >
                                 <Icon className="w-3.5 h-3.5" />
@@ -85,14 +85,14 @@ export default function MobileSignup({
             </div>
 
             {/* Form Section */}
-            <div className="flex-1 px-4 pb-8">
+            <div className="flex-1 px-4 pb-8 w-full">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className={`rounded-3xl p-6 sm:p-8 relative overflow-hidden ${darkMode
-                            ? "bg-zinc-900/80 backdrop-blur-xl border-2 border-zinc-800"
-                            : "bg-white/90 backdrop-blur-xl border-2 border-gray-100 shadow-xl"
+                    className={`rounded-3xl p-6 sm:p-8 relative overflow-hidden w-full max-w-lg mx-auto ${darkMode
+                        ? "bg-zinc-900/80 backdrop-blur-xl border-2 border-zinc-800"
+                        : "bg-white/90 backdrop-blur-xl border-2 border-gray-100 shadow-xl"
                         }`}
                 >
                     {/* Subtle gradient */}
@@ -134,8 +134,8 @@ export default function MobileSignup({
 
                                             <div
                                                 className={`relative flex items-center gap-3 px-4 py-3.5 sm:py-4 rounded-xl border-2 transition-all ${darkMode
-                                                        ? "bg-zinc-800 border-zinc-700 focus-within:border-emerald-500"
-                                                        : "bg-white border-gray-200 focus-within:border-emerald-500 focus-within:shadow-lg"
+                                                    ? "bg-zinc-800 border-zinc-700 focus-within:border-emerald-500"
+                                                    : "bg-white border-gray-200 focus-within:border-emerald-500 focus-within:shadow-lg"
                                                     }`}
                                             >
                                                 {/* 🇮🇳 Flag + Code */}
@@ -169,8 +169,8 @@ export default function MobileSignup({
                                                     }
                                                     placeholder="10-digit number"
                                                     className={`flex-1 bg-transparent text-base sm:text-lg font-medium outline-none ${darkMode
-                                                            ? "text-white placeholder-zinc-500"
-                                                            : "text-gray-900 placeholder-gray-400"
+                                                        ? "text-white placeholder-zinc-500"
+                                                        : "text-gray-900 placeholder-gray-400"
                                                         }`}
                                                     autoFocus
                                                 />
@@ -225,7 +225,7 @@ export default function MobileSignup({
                                         <a href="/policies" className="text-emerald-600 hover:text-emerald-700 font-medium">
                                             Policies
                                         </a>{" "}
-                                       
+
                                     </p>
                                 </motion.div>
                             )}
@@ -294,8 +294,8 @@ export default function MobileSignup({
                                                     }}
                                                     whileFocus={{ scale: 1.05 }}
                                                     className={`w-full aspect-square text-center text-2xl sm:text-3xl font-bold rounded-xl border-2 outline-none transition-all ${darkMode
-                                                            ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
-                                                            : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
+                                                        ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
+                                                        : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
                                                         }`}
                                                 />
                                             ))}
@@ -391,8 +391,8 @@ export default function MobileSignup({
                                                     onChange={(e) => setFullName(e.target.value)}
                                                     placeholder="John Doe"
                                                     className={`w-full pl-11 sm:pl-14 pr-4 sm:pr-5 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl border-2 outline-none transition-all ${darkMode
-                                                            ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
-                                                            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
+                                                        ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
+                                                        : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
                                                         }`}
                                                     autoFocus
                                                 />
@@ -414,8 +414,8 @@ export default function MobileSignup({
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder="john@example.com"
                                                     className={`w-full pl-11 sm:pl-14 pr-4 sm:pr-5 py-3.5 sm:py-4 text-base sm:text-lg rounded-xl border-2 outline-none transition-all ${darkMode
-                                                            ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
-                                                            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
+                                                        ? "bg-zinc-800 border-zinc-700 text-white placeholder-zinc-600 focus:border-emerald-500"
+                                                        : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:shadow-lg"
                                                         }`}
                                                 />
                                             </div>
