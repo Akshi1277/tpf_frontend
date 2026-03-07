@@ -43,6 +43,16 @@ export default function CampaignTabs({ darkMode, campaign }) {
   const [pendingDocsAccess, setPendingDocsAccess] = useState(false);
   const [pendingCommentsAccess, setPendingCommentsAccess] = useState(false);
   const [activeTab, setActiveTab] = useState('about');
+
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const aboutText = campaign?.about || '';
+  const ABOUT_CHAR_LIMIT = 700;
+  const isAboutLong = aboutText.length > ABOUT_CHAR_LIMIT;
+  const displayedAbout = isAboutLong && !aboutExpanded
+    ? aboutText.slice(0, ABOUT_CHAR_LIMIT).trimEnd() + '…'
+    : aboutText || 'No description provided.';
+
+
   const isAuthenticated = !!userInfo;
 
   // Comments State
@@ -284,13 +294,11 @@ export default function CampaignTabs({ darkMode, campaign }) {
           {/* ================= ABOUT TAB ================= */}
           {activeTab === 'about' && (
             <div className="space-y-8">
-              {/* About */}
               <div>
                 <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   About This Campaign
                 </h3>
 
-                {/* Beneficiary & Campaigner Info Boxes */}
                 {campaign?.beneficiaryName && (
                   <div className="space-y-4 mb-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -347,13 +355,11 @@ export default function CampaignTabs({ darkMode, campaign }) {
                             Follow Campaign Updates
                           </h4>
                         </div>
-
                         <div className="flex flex-wrap gap-2">
                           {Object.entries(socialMediaLinks).map(([platform, url]) => {
                             if (!url || url.trim() === '') return null;
                             const config = getSocialConfig(platform);
                             const Icon = config.icon;
-
                             return (
                               <a
                                 key={platform}
@@ -361,21 +367,20 @@ export default function CampaignTabs({ darkMode, campaign }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={`group/link flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-md ${darkMode
-                                    ? `${config.bgDark} border-zinc-700 ${config.darkHoverColor}`
-                                    : `${config.bgLight} border-gray-200 ${config.hoverColor}`
+                                  ? `${config.bgDark} border-zinc-700 ${config.darkHoverColor}`
+                                  : `${config.bgLight} border-gray-200 ${config.hoverColor}`
                                   }`}
                               >
                                 <div className={`p-1.5 rounded-md transition-colors ${darkMode
-                                    ? `${config.iconBgDark} ${config.iconHoverDark}`
-                                    : `${config.iconBgLight} ${config.iconHoverLight}`
+                                  ? `${config.iconBgDark} ${config.iconHoverDark}`
+                                  : `${config.iconBgLight} ${config.iconHoverLight}`
                                   }`}>
                                   <Icon className={`w-4 h-4 ${darkMode ? config.textDark : config.textLight}`} />
                                 </div>
                                 <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                   {getPlatformName(platform)}
                                 </span>
-                                <ExternalLink className={`w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                                  }`} />
+                                <ExternalLink className={`w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                               </a>
                             );
                           })}
@@ -385,22 +390,42 @@ export default function CampaignTabs({ darkMode, campaign }) {
                   </div>
                 )}
 
-                <p className={`whitespace-pre-line leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {campaign?.about || 'No description provided.'}
-                </p>
+                {/* About Text with Read More / Read Less */}
+                <div>
+                  <div className="relative">
+                    <p className={`whitespace-pre-line leading-relaxed text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {displayedAbout}
+                    </p>
+                    {isAboutLong && !aboutExpanded && (
+                      <div className={`absolute bottom-0 left-0 right-0 h-10 pointer-events-none ${darkMode ? 'bg-gradient-to-t from-zinc-800 to-transparent' : 'bg-gradient-to-t from-white to-transparent'
+                        }`} />
+                    )}
+                  </div>
+
+                  {isAboutLong && (
+                    <button
+                      onClick={() => setAboutExpanded(prev => !prev)}
+                      className={`mt-3 inline-flex items-center gap-1.5 text-sm font-semibold cursor-pointer transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'
+                        }`}
+                    >
+                      {aboutExpanded ? 'Read Less' : 'Read More'}
+                      <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${aboutExpanded ? '-rotate-90' : 'rotate-90'}`} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Impact Goals */}
               {impactGoals.length > 0 && (
-                <div className={`p-6 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100'}`}>
+                <div className={`p-4 sm:p-6 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100'}`}>
                   <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     <Award className="w-5 h-5 text-blue-500" />
                     Campaign Impact Goals
                   </h4>
                   <ul className="space-y-2">
                     {impactGoals.map((goal, i) => (
-                      <li key={i} className={`flex items-start gap-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <ChevronRight className="w-5 h-5 text-emerald-500 mt-0.5" />
+                      <li key={i} className={`flex items-start gap-3 text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <ChevronRight className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
                         <span>{goal}</span>
                       </li>
                     ))}
@@ -782,6 +807,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </div >
   );
 }

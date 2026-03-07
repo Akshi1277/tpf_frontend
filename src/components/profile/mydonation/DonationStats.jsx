@@ -22,7 +22,8 @@ export default function DonationStats({
   leaderboardLoading = false,
   leaderboardError = false,
   getRankIcon,
-  peopleHelped = 0
+  peopleHelped = 0,
+  rankByTab = {}
 }) {
 
   const [activeTab, setActiveTab] = useState("weekly")
@@ -36,7 +37,7 @@ export default function DonationStats({
   }
 
   const activeLeaderboard = getActiveData()
-
+  const activeUserStats = rankByTab[activeTab] || { rank: "—", amount: 0 };
   // ✅ Use real zakat + totals (still keep fallback logic)
   const calculatedZakat = 25000 // still from props ideally
   const zakatRemaining = Math.max(0, calculatedZakat - (donationStats.totalZakat || 0))
@@ -308,7 +309,7 @@ export default function DonationStats({
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${darkMode ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-500 text-white"
                 }`}>
-                #{currentUser.rank}
+                #{activeUserStats.rank}
               </div>
 
               <div className="flex-1 min-w-0">
@@ -332,7 +333,7 @@ export default function DonationStats({
               <div className="text-right">
                 <p className={`font-bold text-sm ${darkMode ? "text-emerald-400" : "text-emerald-600"
                   }`}>
-                  ₹{(currentUser.weeklyDonation || 0).toLocaleString("en-IN")}
+                  ₹{(activeUserStats.amount || 0).toLocaleString("en-IN")}
 
                 </p>
               </div>

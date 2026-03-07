@@ -49,14 +49,19 @@ export default function DonationsPage({ darkModeFromParent }) {
   } = useGetLeaderboardStatsQuery()
 
 
-  const currentUserFromLeaderboard = leaderboardStats?.weekly?.find(u => u.isCurrentUser) || null;
+// AFTER (fixed)
+const currentUserStats = leaderboardStats?.currentUser || {};
 
-  const currentUser = {
-    name: userInfo.fullName,
-    rank: currentUserFromLeaderboard?.rank ?? "—",
-    weeklyDonation: currentUserFromLeaderboard?.amount ?? 0,
-  };
-
+const currentUser = {
+  name: userInfo.fullName,
+  rank: currentUserStats?.weekly?.rank ?? "—",
+  weeklyDonation: currentUserStats?.weekly?.amount ?? 0,
+  rankByTab: {
+    weekly:  { rank: currentUserStats?.weekly?.rank  ?? "—", amount: currentUserStats?.weekly?.amount  ?? 0 },
+    monthly: { rank: currentUserStats?.monthly?.rank ?? "—", amount: currentUserStats?.monthly?.amount ?? 0 },
+    yearly:  { rank: currentUserStats?.yearly?.rank  ?? "—", amount: currentUserStats?.yearly?.amount  ?? 0 },
+  },
+};
 
   const donationStats = {
     totalAmount: userInfo?.donationStats?.totalAmount || 0,
@@ -168,6 +173,7 @@ export default function DonationsPage({ darkModeFromParent }) {
           darkMode={darkMode}
           donationStats={donationStats}
           currentUser={currentUser}
+          rankByTab={currentUser.rankByTab} 
           leaderboardData={leaderboardStats?.weekly || []}
           monthlyData={leaderboardStats?.monthly || []}
           yearlyData={leaderboardStats?.yearly || []}

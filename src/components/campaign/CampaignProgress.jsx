@@ -417,7 +417,7 @@ function DonorAvatarStack({ campaignId, darkMode, totalDonors, setIsDonorModalOp
           <button
             type="button"
             onClick={() => setIsDonorModalOpen(true)}
-            className="text-emerald-500 hover:text-emerald-400 font-bold hover:underline inline-flex items-center gap-0.5 transition-all text-xs sm:text-sm"
+            className="text-emerald-500 hover:text-emerald-400 font-bold hover:underline cursor-pointer inline-flex items-center gap-0.5 transition-all text-xs sm:text-sm"
           >
             Click here to view <ArrowRight className="w-3 h-3" />
           </button>

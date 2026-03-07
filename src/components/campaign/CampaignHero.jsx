@@ -8,7 +8,7 @@ import DonatePopUpModal from "./DonateModal";
 export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
   if (!campaign) return null;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false)
+
 
   const primaryImage = campaign.imageUrl;
 
@@ -32,18 +32,18 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
     return () => clearInterval(interval);
   }, [orderedImages.length]);
 
-  useEffect(() => {
-    const MAX_AUTO_OPENS = 3;
-    const storageKey = "donate_popup_count";
+  // useEffect(() => {
+  //   const MAX_AUTO_OPENS = 3;
+  //   const storageKey = "donate_popup_count";
 
-    const rawCount = sessionStorage.getItem(storageKey);
-    const count = rawCount ? parseInt(rawCount, 10) : 0;
+  //   const rawCount = sessionStorage.getItem(storageKey);
+  //   const count = rawCount ? parseInt(rawCount, 10) : 0;
 
-    if (count < MAX_AUTO_OPENS) {
-      setIsModalOpen(true);
-      sessionStorage.setItem(storageKey, String(count + 1));
-    }
-  }, []);
+  //   if (count < MAX_AUTO_OPENS) {
+  //     setIsModalOpen(true);
+  //     sessionStorage.setItem(storageKey, String(count + 1));
+  //   }
+  // }, []);
 
 
   return (
@@ -106,7 +106,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
 
           {/* DONATE NOW BUTTON */}
           <motion.button
-            onClick={() => setIsModalOpen(true)}
+            onClick={onDonateClick}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/50 transition-all"
@@ -117,17 +117,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
 
         </div>
       </motion.div>
-      <DonatePopUpModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        darkMode={darkMode}
-        campaignId={campaign._id} // or campaign.id depending on your schema
-        campaignSlug={campaign.slug}
-        zakatVerified={campaign.zakatVerified}
-        ribaEligible={campaign.ribaEligible}
-        taxEligible={campaign.taxBenefits}
-        allowedDonationTypes={campaign.allowedDonationTypes}
-      />
+     
 
     </>
   );

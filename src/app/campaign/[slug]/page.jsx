@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useFetchCampaignBySlugQuery } from "@/utils/slices/campaignApiSlice";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 
 import CampaignHero from "@/components/campaign/CampaignHero";
@@ -30,9 +30,26 @@ export default function CampaignPage() {
     skip: !slug,
   });
 
+  useEffect(() => {
+    if (isLoading) return; // wait until campaign loads
+
+    const MAX_AUTO_OPENS = 4;
+    const storageKey = "donate_popup_count";
+
+    const rawCount = sessionStorage.getItem(storageKey);
+    const count = rawCount ? parseInt(rawCount, 10) : 0;
+
+    if (count < MAX_AUTO_OPENS) {
+      setIsFloatingModalOpen(true);
+      sessionStorage.setItem(storageKey, String(count + 1));
+    }
+  }, [isLoading]);
+
   if (isLoading) {
     return <GlobalLoader />
   }
+
+
 
   if (error || !data?.campaign) {
     return (
@@ -42,15 +59,12 @@ export default function CampaignPage() {
     );
   }
 
+
+
   const campaign = data.campaign;
 
   const handleDonateClick = () => {
-    if (donationCardRef.current) {
-      donationCardRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }
+    setIsFloatingModalOpen(true);
   };
 
   return (
@@ -139,8 +153,8 @@ export default function CampaignPage() {
       <Footer darkMode={darkMode} />
 
       {/* Floating Donate Button - Only visible on mobile when scrolled */}
-      <FloatingDonateButton 
-        darkMode={darkMode} 
+      <FloatingDonateButton
+        darkMode={darkMode}
         onClick={() => setIsFloatingModalOpen(true)}
         isModalOpen={isFloatingModalOpen}
       />
