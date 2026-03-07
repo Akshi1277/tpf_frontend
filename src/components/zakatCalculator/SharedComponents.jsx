@@ -1,9 +1,8 @@
-
-import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+
 // Multi-field Adder Component
-const MultiFieldAdder = ({ fields, setFields, fieldLabels, placeholder = "Add item" }) => {
+const MultiFieldAdder = ({ fields, setFields, fieldLabels, placeholder = "Add item", darkMode = false }) => {
   const addField = () => {
     setFields([...fields, ...fieldLabels.map(() => '')]);
   };
@@ -23,29 +22,37 @@ const MultiFieldAdder = ({ fields, setFields, fieldLabels, placeholder = "Add it
   const groupCount = Math.ceil(fields.length / fieldLabels.length);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {[...Array(groupCount)].map((_, groupIndex) => (
-        <div key={groupIndex} className="bg-gray-50 p-4 rounded-xl space-y-3">
-          {fieldLabels.map((label, labelIndex) => (
-            <div key={labelIndex}>
-              <label className="block text-xs sm:text-sm font-medium mb-2 text-gray-700">{label}</label>
-              <input
-                type={label.toLowerCase().includes('amount') || label.toLowerCase().includes('value') ? 'number' : 'text'}
-                value={fields[groupIndex * fieldLabels.length + labelIndex] || ''}
-                onChange={(e) => updateField(groupIndex, labelIndex, e.target.value)}
-                placeholder={placeholder}
-                className="w-full px-3 sm:px-4 py-2.5 text-sm sm:text-base rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 outline-none transition-all"
-              />
-            </div>
-          ))}
+        <div key={groupIndex} className={`p-3 rounded-lg border ${
+          darkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-gray-50 border-gray-200'
+        }`}>
+          <div className="space-y-2">
+            {fieldLabels.map((label, labelIndex) => (
+              <div key={labelIndex}>
+                <label className={`block text-xs font-medium mb-1 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
+                  {label}
+                </label>
+                <input
+                  type={label.toLowerCase().includes('amount') || label.toLowerCase().includes('value') ? 'number' : 'text'}
+                  value={fields[groupIndex * fieldLabels.length + labelIndex] || ''}
+                  onChange={(e) => updateField(groupIndex, labelIndex, e.target.value)}
+                  placeholder={placeholder}
+                  className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors outline-none ${
+                    darkMode
+                      ? 'bg-zinc-900 border-zinc-600 text-white placeholder-zinc-500 focus:border-emerald-500'
+                      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
+                  } focus:ring-2 focus:ring-emerald-500/20`}
+                />
+              </div>
+            ))}
+          </div>
           {groupCount > 1 && (
             <button
               onClick={() => removeField(groupIndex)}
-              className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-1"
+              className="mt-2 text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              <X className="w-3 h-3" />
               Remove
             </button>
           )}
@@ -53,9 +60,13 @@ const MultiFieldAdder = ({ fields, setFields, fieldLabels, placeholder = "Add it
       ))}
       <button
         onClick={addField}
-        className="w-full py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+        className={`w-full py-2 text-sm font-medium rounded-lg border transition-colors flex items-center justify-center gap-1.5 ${
+          darkMode
+            ? 'bg-transparent border-zinc-700 text-zinc-300 hover:border-emerald-600 hover:text-emerald-400'
+            : 'bg-white border-gray-200 text-gray-600 hover:border-emerald-400 hover:text-emerald-600'
+        }`}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
         Add Another
@@ -64,7 +75,6 @@ const MultiFieldAdder = ({ fields, setFields, fieldLabels, placeholder = "Add it
   );
 };
 
-// Modal Component
 // Modal Component
 const Modal = ({ isOpen, onClose, title, children, darkMode = false }) => {
   if (!isOpen) return null;
@@ -75,41 +85,35 @@ const Modal = ({ isOpen, onClose, title, children, darkMode = false }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          initial={{ scale: 0.96, opacity: 0, y: 8 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          exit={{ scale: 0.96, opacity: 0, y: 8 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           onClick={(e) => e.stopPropagation()}
-          className={`rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl border-2 ${
-            darkMode 
-              ? 'bg-zinc-900 border-zinc-700 shadow-black/50' 
-              : 'bg-white border-gray-200 shadow-gray-400/30'
+          className={`rounded-2xl max-w-xl w-full max-h-[85vh] overflow-hidden shadow-2xl ${
+            darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-white border border-gray-200'
           }`}
         >
           {/* Header */}
-          <div className="sticky top-0 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 p-6 shadow-lg">
-            <div className="flex justify-between items-start gap-4">
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-1">{title}</h3>
-                <div className="h-1 w-20 bg-white/30 rounded-full" />
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all backdrop-blur-sm hover:scale-110 active:scale-95"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+          <div className="px-6 py-4 border-b flex items-center justify-between" style={{
+            background: 'linear-gradient(135deg, #2D7A5C 0%, #1E5A44 100%)',
+            borderColor: 'transparent'
+          }}>
+            <h3 className="text-base font-bold text-white">{title}</h3>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-
           {/* Content */}
-          <div className={`p-6 sm:p-8 overflow-y-auto max-h-[calc(85vh-88px)] ${
-            darkMode ? 'bg-zinc-900' : 'bg-white'
-          }`}>
+          <div className={`p-6 overflow-y-auto max-h-[calc(85vh-60px)] data-lenis-prevent ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
             {children}
           </div>
         </motion.div>
@@ -119,37 +123,45 @@ const Modal = ({ isOpen, onClose, title, children, darkMode = false }) => {
 };
 
 // Info Button Component
-const InfoButton = ({ onClick, text = "Learn more" }) => (
+const InfoButton = ({ onClick, text = "Learn more", darkMode = false }) => (
   <button
     onClick={onClick}
-    className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium text-sm transition-colors"
+    className={`inline-flex items-center gap-1 font-medium text-xs px-2.5 py-1 rounded-md border transition-colors ${
+      darkMode
+        ? 'text-emerald-400 border-emerald-800 hover:bg-emerald-950/50'
+        : 'text-emerald-700 border-emerald-200 hover:bg-emerald-50'
+    }`}
   >
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
-    <span className="underline">{text}</span>
+    {text}
   </button>
 );
 
 // Yes/No Toggle Component
-const YesNoToggle = ({ value, onChange, yesLabel = "Yes", noLabel = "No" }) => (
-  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+const YesNoToggle = ({ value, onChange, yesLabel = "Yes", noLabel = "No", darkMode = false }) => (
+  <div className="flex gap-2">
     <button
       onClick={() => onChange(true)}
-      className={`py-3 rounded-xl font-medium transition-all text-sm sm:text-base ${
-        value
-          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all ${
+        value === true
+          ? 'bg-emerald-600 text-white shadow-sm'
+          : darkMode
+          ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
       }`}
     >
       {yesLabel}
     </button>
     <button
       onClick={() => onChange(false)}
-      className={`py-3 rounded-xl font-medium transition-all text-sm sm:text-base ${
-        !value
-          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all ${
+        value === false
+          ? 'bg-emerald-600 text-white shadow-sm'
+          : darkMode
+          ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200'
       }`}
     >
       {noLabel}
@@ -158,24 +170,28 @@ const YesNoToggle = ({ value, onChange, yesLabel = "Yes", noLabel = "No" }) => (
 );
 
 // Input Field Component
-const InputField = ({ label, value, onChange, placeholder = "0.00", type = "number", helperText, prefix = "₹" }) => (
+const InputField = ({ label, value, onChange, placeholder = "0.00", type = "number", helperText, prefix = "₹", darkMode = false }) => (
   <div>
     {label && (
-      <label className="block text-sm sm:text-base font-semibold mb-2 text-gray-900">
+      <label className={`block text-sm font-semibold mb-1.5 ${darkMode ? 'text-zinc-200' : 'text-gray-800'}`}>
         {label}
       </label>
     )}
     <div className="relative">
-      <span className="absolute left-3 sm:left-4 top-3 sm:top-3.5 text-gray-400 text-sm sm:text-base">{prefix}</span>
+      <span className={`absolute left-3 top-2.5 text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>{prefix}</span>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-8 sm:pl-9 pr-4 py-3 sm:py-3.5 text-sm sm:text-base rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 outline-none transition-all"
+        className={`w-full pl-8 pr-4 py-2.5 text-sm rounded-lg border transition-colors outline-none ${
+          darkMode
+            ? 'bg-zinc-900 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
+            : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
+        } focus:ring-2 focus:ring-emerald-500/20`}
       />
     </div>
-    {helperText && <p className="text-xs sm:text-sm text-gray-500 mt-1.5">{helperText}</p>}
+    {helperText && <p className={`text-xs mt-1 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>{helperText}</p>}
   </div>
 );
 

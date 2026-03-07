@@ -7,262 +7,198 @@ import GettingStarted from "./GettingStarted";
 import HeroSection from "./HeroSection";
 import ProgressBar from "./ProgressBar";
 import Modals from "./Modals";
-import { Modal } from "./SharedComponents";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from 'axios';
+import { buildZakatPayload } from "@/utils/buildZakatPayload";
 
-// ===== MAIN COMPONENT =====
+// ── Spinner overlay ──
+const CalculatingSpinner = () => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.2 }}
+    className="fixed inset-0 z-50 flex items-center justify-center"
+    style={{ background: 'rgba(8,26,17,0.85)', backdropFilter: 'blur(6px)' }}
+  >
+    <div className="flex flex-col items-center gap-5">
+      {/* Circular spinner with gold ring */}
+      <div className="relative w-16 h-16">
+        <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(212,175,55,0.15)" strokeWidth="3" />
+          <motion.circle
+            cx="32" cy="32" r="28"
+            fill="none"
+            stroke="#D4AF37"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray="175.93"
+            animate={{ strokeDashoffset: [175.93, 0, 175.93] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg className="w-6 h-6" viewBox="0 0 100 100" fill="none">
+            <polygon points="50,5 61,35 93,35 68,57 79,91 50,70 21,91 32,57 7,35 39,35" fill="#D4AF37" opacity="0.7" />
+          </svg>
+        </div>
+      </div>
+      <div className="text-center">
+        <p className="text-white font-semibold text-sm">Calculating your Zakat</p>
+        <p className="text-white/40 text-xs mt-1">Verifying assets and Nisab threshold…</p>
+      </div>
+    </div>
+  </motion.div>
+);
+
+// In ZakatCalculator.jsx — replace the INITIAL_FORM constant with this:
+
+const INITIAL_FORM = {
+  cash: '',
+  hasGoldSilver: null, hasGold: false, hasSilver: false,
+  goldEntries: [{ grams: '', karat: '24' }],   // replaces goldGrams + goldKarat
+  silverEntries: [{ grams: '' }],               // replaces silverGrams
+  hasInvestments: null, hasStocks: false, hasCrypto: false,
+  hasPension: false, hasProperty: false,
+  investmentType: '',
+  activeInvestmentValue: '', passivePortfolioValue: '',
+  hasDividends: null, dividends: ['', '', ''],
+  cryptoValue: '', hasAccessToPension: null, pensionValue: '',
+  ownsOtherProperty: null, purchasedForResale: null,
+  propertyMarketValue: '', rentingProperty: null, rentalIncome: '',
+  owedMoney: null, expectPayback: null, owedAmount: '',
+  hasOtherAssets: null, otherAssets: ['', ''],
+  hasDebtsExpenses: null, debtsExpenses: ['', ''],
+};
+
 export default function ZakatCalculator() {
   const [currentStep, setCurrentStep] = useState(-1);
-  const formRef = useRef(null);
-  const [activeModal, setActiveModal] = useState(null);
-  
-  const [formData, setFormData] = useState({
-    cash: '',
-    hasGoldSilver: null,
-    hasGold: false,
-    hasSilver: false,
-    goldGrams: '',
-    goldValue: '',
-    silverGrams: '',
-    silverValue: '',
-    hasInvestments: null,
-    hasStocks: false,
-    hasCrypto: false,
-    hasPension: false,
-    hasProperty: false,
-    activeInvestmentValue: '',
-    passiveStocks: ['', ''],
-    hasDividends: null,
-    dividends: ['', '', ''],
-    cryptoValue: '',
-    hasAccessToPension: null,
-    pensionValue: '',
-    ownsOtherProperty: null,
-    purchasedForResale: null,
-    propertyMarketValue: '',
-    rentingProperty: null,
-    rentalIncome: '',
-    owedMoney: null,
-    expectPayback: null,
-    owedAmount: '',
-    hasOtherAssets: null,
-    otherAssets: ['', ''],
-    hasDebtsExpenses: null,
-    debtsExpenses: ['', '']
-  });
-
+  const [formData, setFormData] = useState(INITIAL_FORM);
   const [results, setResults] = useState(null);
+  const [activeModal, setActiveModal] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  const pageTopRef = useRef(null);   // very top of page (for hero)
+  const formRef = useRef(null);      // top of form area (for step nav)
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+
+  const scrollToForm = useCallback(() => {
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }, []);
 
   const steps = [
     { title: 'Assets', subtitle: 'What You Own' },
     { title: 'Debts Owed', subtitle: 'Money Coming In' },
     { title: 'Other Assets', subtitle: 'Additional Wealth' },
     { title: 'Liabilities', subtitle: 'What You Owe' },
-    { title: 'Results', subtitle: 'Your Zakat' }
+    { title: 'Results', subtitle: 'Your Zakat' },
   ];
 
-  const updateFormData = (key, value) => {
+  const updateFormData = (key, value) =>
     setFormData(prev => ({ ...prev, [key]: value }));
-  };
 
-  const nextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-      setTimeout(() => {
-        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > -1) {
-      setCurrentStep(currentStep - 1);
-      setTimeout(() => {
-        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  };
-
-  const calculateZakat = () => {
-    let totalAssets = parseFloat(formData.cash) || 0;
-    
-    if (formData.hasGold) {
-      totalAssets += (parseFloat(formData.goldGrams) || 0) * (parseFloat(formData.goldValue) || 0);
-    }
-    if (formData.hasSilver) {
-      totalAssets += (parseFloat(formData.silverGrams) || 0) * (parseFloat(formData.silverValue) || 0);
-    }
-    
-    if (formData.hasStocks) {
-      totalAssets += parseFloat(formData.activeInvestmentValue) || 0;
-      for (let i = 1; i < formData.passiveStocks.length; i += 2) {
-        totalAssets += (parseFloat(formData.passiveStocks[i]) || 0) * 0.3;
-      }
-      if (formData.hasDividends) {
-        for (let i = 0; i < formData.dividends.length; i += 3) {
-          const perShare = parseFloat(formData.dividends[i + 1]) || 0;
-          const shares = parseFloat(formData.dividends[i + 2]) || 0;
-          totalAssets += perShare * shares;
-        }
-      }
-    }
-    
-    if (formData.hasCrypto) {
-      totalAssets += parseFloat(formData.cryptoValue) || 0;
-    }
-    
-    if (formData.hasPension && formData.hasAccessToPension) {
-      totalAssets += (parseFloat(formData.pensionValue) || 0) * 0.3;
-    }
-    
-    if (formData.hasProperty) {
-      if (formData.purchasedForResale) {
-        totalAssets += parseFloat(formData.propertyMarketValue) || 0;
-      }
-      if (formData.rentingProperty) {
-        totalAssets += parseFloat(formData.rentalIncome) || 0;
-      }
-    }
-    
-    if (formData.owedMoney && formData.expectPayback) {
-      totalAssets += parseFloat(formData.owedAmount) || 0;
-    }
-    
-    if (formData.hasOtherAssets) {
-      for (let i = 1; i < formData.otherAssets.length; i += 2) {
-        totalAssets += parseFloat(formData.otherAssets[i]) || 0;
-      }
-    }
-    
-    let totalLiabilities = 0;
-    if (formData.hasDebtsExpenses) {
-      for (let i = 1; i < formData.debtsExpenses.length; i += 2) {
-        totalLiabilities += parseFloat(formData.debtsExpenses[i]) || 0;
-      }
-    }
-    
-    const zakatableWealth = totalAssets - totalLiabilities;
-    const nisab = 5950;
-    const zakatDue = zakatableWealth >= nisab ? zakatableWealth * 0.025 : 0;
-    
-    setResults({
-      totalAssets,
-      totalLiabilities,
-      zakatableWealth,
-      nisab,
-      zakatDue,
-      isEligible: zakatableWealth >= nisab
+  const nextStep = useCallback(() => {
+    setCurrentStep(prev => {
+      if (prev < steps.length - 1) return prev + 1;
+      return prev;
     });
-    
-    nextStep();
+    scrollToForm();
+  }, [scrollToForm]);
+
+  const prevStep = useCallback(() => {
+    setCurrentStep(prev => {
+      if (prev > -1) return prev - 1;
+      return prev;
+    });
+    scrollToForm();
+  }, [scrollToForm]);
+
+  const calculateZakat = async () => {
+    setIsCalculating(true);
+    try {
+      const payload = buildZakatPayload(formData);
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/zakat/calculate`,
+        payload
+      );
+      if (!data?.success) throw new Error("Zakat calculation failed");
+      setResults({ ...data.data, nisab: data.data.nisabValue });
+      setCurrentStep(prev => prev + 1);
+      scrollToForm();
+    } catch (error) {
+      console.error("Zakat calculation error:", error);
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   const resetForm = () => {
-    setFormData({
-      cash: '',
-      hasGoldSilver: null,
-      hasGold: false,
-      hasSilver: false,
-      goldGrams: '',
-      goldValue: '',
-      silverGrams: '',
-      silverValue: '',
-      hasInvestments: null,
-      hasStocks: false,
-      hasCrypto: false,
-      hasPension: false,
-      hasProperty: false,
-      activeInvestmentValue: '',
-      passiveStocks: ['', ''],
-      hasDividends: null,
-      dividends: ['', '', ''],
-      cryptoValue: '',
-      hasAccessToPension: null,
-      pensionValue: '',
-      ownsOtherProperty: null,
-      purchasedForResale: null,
-      propertyMarketValue: '',
-      rentingProperty: null,
-      rentalIncome: '',
-      owedMoney: null,
-      expectPayback: null,
-      owedAmount: '',
-      hasOtherAssets: null,
-      otherAssets: ['', ''],
-      hasDebtsExpenses: null,
-      debtsExpenses: ['', '']
-    });
+    setFormData(INITIAL_FORM);
     setResults(null);
     setCurrentStep(-1);
+    scrollToTop();
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     }).format(amount);
-  };
+
+  const isLanding = currentStep === -1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <HeroSection onStart={nextStep} />
-      
-      <ProgressBar currentStep={currentStep} steps={steps} />
-      
+    <div ref={pageTopRef} className={`min-h-screen ${isLanding ? '' : 'bg-gray-50'}`}>
+      {/* Spinner overlay */}
+      <AnimatePresence>
+        {isCalculating && <CalculatingSpinner />}
+      </AnimatePresence>
+
+      {/* Hero — only on landing */}
+      <AnimatePresence>
+        {isLanding && (
+          <HeroSection onStart={nextStep} formRef={formRef} />
+        )}
+      </AnimatePresence>
+
+      {/* Progress bar — only during form steps */}
+      {!isLanding && currentStep < steps.length && (
+        <ProgressBar currentStep={currentStep} steps={steps} />
+      )}
+
       <Modals activeModal={activeModal} setActiveModal={setActiveModal} />
 
-      <div ref={formRef} className="max-w-4xl mx-auto md:pb-64 px-4 sm:px-6 py-4 sm:py-6">
+      {/* Form area */}
+      <div
+        ref={formRef}
+        className={`${isLanding ? 'bg-gray-50' : ''} px-4 sm:px-6 py-6 sm:py-8`}
+        style={!isLanding ? { minHeight: 'calc(100vh - 64px)' } : {}}
+      >
         <AnimatePresence mode="wait">
           {currentStep === -1 && (
-            <GettingStarted onStart={nextStep} setActiveModal={setActiveModal} />
+            <GettingStarted key="start" onStart={nextStep} setActiveModal={setActiveModal} />
           )}
-
           {currentStep === 0 && (
-            <Assets 
-              formData={formData}
-              updateFormData={updateFormData}
-              onNext={nextStep}
-              setActiveModal={setActiveModal}
-            />
+            <Assets key="assets" formData={formData} updateFormData={updateFormData} onNext={nextStep} setActiveModal={setActiveModal} />
           )}
-
           {currentStep === 1 && (
-            <DebtsOwed
-              formData={formData}
-              updateFormData={updateFormData}
-              onNext={nextStep}
-              onBack={prevStep}
-            />
+            <DebtsOwed key="debts" formData={formData} updateFormData={updateFormData} onNext={nextStep} onBack={prevStep} />
           )}
-
           {currentStep === 2 && (
-            <OtherAssets
-              formData={formData}
-              updateFormData={updateFormData}
-              onNext={nextStep}
-              onBack={prevStep}
-              setActiveModal={setActiveModal}
-            />
+            <OtherAssets key="other" formData={formData} updateFormData={updateFormData} onNext={nextStep} onBack={prevStep} setActiveModal={setActiveModal} />
           )}
-
           {currentStep === 3 && (
-            <Liabilities
-              formData={formData}
-              updateFormData={updateFormData}
-              onCalculate={calculateZakat}
-              onBack={prevStep}
-              setActiveModal={setActiveModal}
-            />
+            <Liabilities key="liabilities" formData={formData} updateFormData={updateFormData} onCalculate={calculateZakat} onBack={prevStep} setActiveModal={setActiveModal} />
           )}
-
           {currentStep === 4 && results && (
-            <Results
-              results={results}
-              onReset={resetForm}
-              formatCurrency={formatCurrency}
-            />
+            <Results key="results" results={results} onReset={resetForm} formatCurrency={formatCurrency} />
           )}
         </AnimatePresence>
       </div>
