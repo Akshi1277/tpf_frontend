@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 import { Download, RotateCcw, TrendingUp, Minus, Scale, Calculator, Sparkles, Info, BookOpen, CheckCircle2, XCircle } from 'lucide-react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
+import generateZakatPDF from '@/utils/generateZakatPDF';
 // Small section heading
 const SectionLabel = ({ children, darkMode }) => (
   <p className={`text-[10px] font-bold tracking-[0.18em] uppercase mb-3 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>{children}</p>
@@ -11,10 +9,10 @@ const SectionLabel = ({ children, darkMode }) => (
 // Tooltip-style info callout
 const InfoCallout = ({ icon: Icon, title, body, colorClass = 'blue', darkMode = false }) => {
   const map = {
-    blue: { bg: darkMode ? 'bg-blue-900/20' : 'bg-blue-50', border: darkMode ? 'border-blue-900/50' : 'border-blue-100', title: darkMode ? 'text-blue-400' : 'text-blue-800', body: darkMode ? 'text-blue-300' : 'text-blue-700', icon: darkMode ? 'text-blue-400' : 'text-blue-500' },
+    blue:  { bg: darkMode ? 'bg-blue-900/20'    : 'bg-blue-50',    border: darkMode ? 'border-blue-900/50'    : 'border-blue-100',    title: darkMode ? 'text-blue-400'    : 'text-blue-800',    body: darkMode ? 'text-blue-300'    : 'text-blue-700',    icon: darkMode ? 'text-blue-400'    : 'text-blue-500'    },
     green: { bg: darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50', border: darkMode ? 'border-emerald-900/50' : 'border-emerald-100', title: darkMode ? 'text-emerald-400' : 'text-emerald-800', body: darkMode ? 'text-emerald-300' : 'text-emerald-700', icon: darkMode ? 'text-emerald-400' : 'text-emerald-500' },
-    gold: { bg: darkMode ? 'bg-amber-900/20' : 'bg-amber-50', border: darkMode ? 'border-amber-900/50' : 'border-amber-100', title: darkMode ? 'text-amber-400' : 'text-amber-800', body: darkMode ? 'text-amber-300' : 'text-amber-700', icon: darkMode ? 'text-amber-400' : 'text-amber-500' },
-    red: { bg: darkMode ? 'bg-red-900/20' : 'bg-red-50', border: darkMode ? 'border-red-900/50' : 'border-red-100', title: darkMode ? 'text-red-400' : 'text-red-800', body: darkMode ? 'text-red-300' : 'text-red-700', icon: darkMode ? 'text-red-400' : 'text-red-500' },
+    gold:  { bg: darkMode ? 'bg-amber-900/20'   : 'bg-amber-50',   border: darkMode ? 'border-amber-900/50'   : 'border-amber-100',   title: darkMode ? 'text-amber-400'   : 'text-amber-800',   body: darkMode ? 'text-amber-300'   : 'text-amber-700',   icon: darkMode ? 'text-amber-400'   : 'text-amber-500'   },
+    red:   { bg: darkMode ? 'bg-red-900/20'     : 'bg-red-50',     border: darkMode ? 'border-red-900/50'     : 'border-red-100',     title: darkMode ? 'text-red-400'     : 'text-red-800',     body: darkMode ? 'text-red-300'     : 'text-red-700',     icon: darkMode ? 'text-red-400'     : 'text-red-500'     },
   };
   const c = map[colorClass];
   return (
@@ -31,244 +29,21 @@ const InfoCallout = ({ icon: Icon, title, body, colorClass = 'blue', darkMode = 
 const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
   if (!results) return null;
 
-  const zakatableWealth = results.zakatableWealth || 0;
-  const nisab = results.nisab || 0;
-  const zakatDue = results.zakatDue || 0;
-  const totalAssets = results.totalAssets || 0;
+  const zakatableWealth  = results.zakatableWealth  || 0;
+  const nisab            = results.nisab            || 0;
+  const zakatDue         = results.zakatDue         || 0;
+  const totalAssets      = results.totalAssets      || 0;
   const totalLiabilities = results.totalLiabilities || 0;
-  const isEligible = results.isEligible;
+  const isEligible       = results.isEligible;
 
-  // Nisab context from API — fallback to typical values
-  const nisabBasis = results.nisabBasis || 'silver'; // 'gold' | 'silver'
-  const goldNisabGrams = 87.48;
-  const silverNisabGrams = 612.36;
-  const nisabLabel = nisabBasis === 'gold'
+  const nisabBasis        = results.nisabBasis || 'silver';
+  const goldNisabGrams    = 87.48;
+  const silverNisabGrams  = 612.36;
+  const nisabLabel        = nisabBasis === 'gold'
     ? `${goldNisabGrams}g of gold`
     : `${silverNisabGrams}g of silver`;
 
   const card = `rounded-2xl border ${darkMode ? 'bg-zinc-900/60 border-zinc-800' : 'bg-white border-gray-200'} overflow-hidden`;
-
-  // jsPDF default fonts don't support ₹; strip it and use "Rs." instead
-  const pdfCurrency = (val) => {
-    const str = formatCurrency(val);
-    return str.replace('₹', 'Rs. ');
-  };
-
-  const generatePDF = async () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let yPos = 20;
-
-    // ── Palette ──────────────────────────────────────────
-    // Minimalist, premium financial aesthetic
-    const textDark = [30, 41, 59];   // slate-800
-    const textMid = [100, 116, 139];  // slate-500
-    const textLight = [148, 163, 184];  // slate-400
-    const goldColor = [212, 175, 55];   // premium gold accent
-    const divider = [226, 232, 240];  // slate-200
-
-    // ── Load logo & sizes via Image → canvas → base64 ────
-    const loadLogoData = () => new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext('2d').drawImage(img, 0, 0);
-        resolve({
-          base64: canvas.toDataURL('image/png'),
-          width: img.naturalWidth,
-          height: img.naturalHeight
-        });
-      };
-      img.onerror = () => resolve(null);
-      img.src = '/TPFAid-Logo.png';
-    });
-
-    const logoData = await loadLogoData();
-
-    // ── Header Section ───────────────────────────────────
-    if (logoData && logoData.base64) {
-      // Scale height to 20px max, and calculate proportionate width
-      const targetHeight = 20;
-      const targetWidth = targetHeight * (logoData.width / logoData.height);
-      doc.addImage(logoData.base64, 'PNG', 14, 14, targetWidth, targetHeight);
-    }
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(...textLight);
-    doc.text('ZAKAT SUMMARY REPORT', pageWidth - 14, 20, { align: 'right' });
-
-    const dateStr = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
-    doc.setFontSize(9);
-    doc.setTextColor(...textDark);
-    doc.text(dateStr, pageWidth - 14, 26, { align: 'right' });
-
-    yPos = 44;
-
-    // ── Elegant Title & Status ───────────────────────────
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...textDark);
-    doc.text('Calculation Overview', 14, yPos);
-
-    if (isEligible) {
-      doc.setFillColor(...goldColor);
-      doc.rect(pageWidth - 14 - 3, yPos - 12, 3, 14, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(...goldColor);
-      doc.text('OBLIGATORY', pageWidth - 20, yPos - 2, { align: 'right' });
-    } else {
-      doc.setFillColor(...textLight);
-      doc.rect(pageWidth - 14 - 3, yPos - 12, 3, 14, 'F');
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.setTextColor(...textMid);
-      doc.text('BELOW NISAB', pageWidth - 20, yPos - 4, { align: 'right' });
-    }
-
-    yPos += 14;
-
-    // ── Section: Calculation Overview Table ──────────────
-    const overviewData = [
-      ['Total Zakatable Assets', pdfCurrency(totalAssets)],
-      ['Total Liabilities Deducted', pdfCurrency(totalLiabilities)],
-      ['Net Zakatable Wealth', pdfCurrency(zakatableWealth)],
-      ['Nisab Threshold', pdfCurrency(nisab)],
-      ['Zakat Due (2.5%)', pdfCurrency(zakatDue)],
-    ];
-
-    autoTable(doc, {
-      startY: yPos,
-      body: overviewData,
-      theme: 'plain',
-      tableWidth: pageWidth - 28,
-      margin: { left: 14, right: 14 },
-      styles: {
-        fontSize: 10,
-        cellPadding: { top: 6, bottom: 6, left: 2, right: 2 },
-        textColor: textDark,
-        font: 'helvetica'
-      },
-      columnStyles: {
-        0: { cellWidth: 120 },
-        1: { cellWidth: 56, halign: 'right' },
-      },
-      didDrawCell: function (data) {
-        // Draw a completely subtle, thin bottom border for every row
-        doc.setDrawColor(...divider);
-        doc.setLineWidth(0.1);
-        doc.line(
-          data.cell.x,
-          data.cell.y + data.cell.height,
-          data.cell.x + data.cell.width,
-          data.cell.y + data.cell.height
-        );
-      },
-      didParseCell(data) {
-        // The final row "Zakat Due" 
-        if (data.row.index === 4) {
-          data.cell.styles.fontStyle = 'bold';
-          data.cell.styles.fontSize = 12;
-          if (data.column.index === 1) {
-            data.cell.styles.textColor = isEligible ? textDark : textMid;
-          }
-        } else if (data.column.index === 1) {
-          // values are bolder than labels
-          data.cell.styles.fontStyle = 'bold';
-        }
-      },
-    });
-
-    yPos = doc.lastAutoTable.finalY + 20;
-
-    // ── Section: Asset Breakdown ─────────────────────────
-    const pdfData = results?.pdf;
-    if (pdfData?.inputs) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...textDark);
-      doc.text('Asset Breakdown', 14, yPos);
-      yPos += 8;
-
-      const inputs = pdfData.inputs;
-      const breakdownData = [];
-
-      if (inputs.cash)
-        breakdownData.push(['Cash & Bank Balances', pdfCurrency(inputs.cash)]);
-
-      if (inputs.gold?.length > 0) {
-        const totalGrams = inputs.gold.reduce((a, g) => a + g.grams, 0);
-        breakdownData.push([`Gold (${totalGrams}g total)`, pdfCurrency(pdfData.calculations?.goldValue || 0)]);
-      }
-
-      if (inputs.silver?.length > 0) {
-        const totalGrams = inputs.silver.reduce((a, s) => a + s.grams, 0);
-        breakdownData.push([`Silver (${totalGrams}g total)`, pdfCurrency(pdfData.calculations?.silverValue || 0)]);
-      }
-
-      if (inputs.crypto)
-        breakdownData.push(['Cryptocurrencies', pdfCurrency(inputs.crypto)]);
-
-      autoTable(doc, {
-        startY: yPos,
-        head: [['Asset Source', 'Assessed Value']],
-        body: breakdownData,
-        theme: 'plain',
-        tableWidth: pageWidth - 28,
-        margin: { left: 14, right: 14 },
-        headStyles: {
-          textColor: textLight,
-          fontStyle: 'bold',
-          fontSize: 8,
-          cellPadding: { top: 4, bottom: 4, left: 2, right: 2 },
-        },
-        styles: {
-          fontSize: 9,
-          textColor: textDark,
-          cellPadding: { top: 5, bottom: 5, left: 2, right: 2 },
-        },
-        columnStyles: {
-          0: { cellWidth: 120 },
-          1: { cellWidth: 56, halign: 'right', fontStyle: 'bold' },
-        },
-        didParseCell: function (data) {
-          // Ensure the header for the second column is right-aligned to match the values
-          if (data.section === 'head' && data.column.index === 1) {
-            data.cell.styles.halign = 'right';
-          }
-        },
-        didDrawPage: function () { },
-        didDrawCell: function (data) {
-          doc.setDrawColor(...divider);
-          doc.setLineWidth(0.1);
-          doc.line(
-            data.cell.x,
-            data.cell.y + data.cell.height,
-            data.cell.x + data.cell.width,
-            data.cell.y + data.cell.height
-          );
-        }
-      });
-
-
-      yPos = doc.lastAutoTable.finalY + 24;
-    }
-
-    // ── Disclaimer & Footer ──────────────────────────────
-    // doc.setFontSize(8);
-    // doc.setFont('helvetica', 'italic');
-    // doc.setTextColor(...textMid);
-    // doc.text(
-    //   'This document is auto-generated by TPF Aid for reference purposes only. Please verify calculations and Nisab thresholds with a qualified scholar before making obligatory payments.',
-    //   14, yPos, { maxWidth: pageWidth - 28, lineHeightFactor: 1.5 }
-    // );
-
-    doc.save('Zakat_Summary_TPFAid.pdf');
-  };
 
   return (
     <motion.div
@@ -282,10 +57,8 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
         className="rounded-2xl overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #0d2b1e 0%, #1a4a35 50%, #112b20 100%)' }}
       >
-        {/* Gold top line */}
         <div className="h-[2px]"
           style={{ background: 'linear-gradient(90deg, #D4AF37, rgba(212,175,55,0.3))' }} />
-
         <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex items-center gap-3 flex-1">
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -298,14 +71,13 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
               <p className="text-white/50 text-xs mt-0.5">Your comprehensive Zakat breakdown</p>
             </div>
           </div>
-          {/* Eligibility badge */}
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${isEligible
             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
             : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-            }`}>
+          }`}>
             {isEligible
               ? <><CheckCircle2 className="w-3.5 h-3.5" /> Zakat is Due</>
-              : <><XCircle className="w-3.5 h-3.5" /> Below Nisab</>
+              : <><XCircle       className="w-3.5 h-3.5" /> Below Nisab</>
             }
           </div>
         </div>
@@ -338,102 +110,157 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
         </motion.div>
       )}
 
-      <div className="grid sm:grid-cols-2 gap-4">
-        {/* ── Calculation breakdown ── */}
-        <div className={`${card} sm:col-span-2`}>
-          <div className="p-5">
-            <SectionLabel>Calculation Breakdown</SectionLabel>
-            <div className="space-y-1.5">
-              {[
-                {
-                  label: 'Total Zakatable Assets',
-                  value: totalAssets,
-                  icon: TrendingUp,
-                  iconColor: 'text-blue-500',
-                  bg: 'bg-blue-50',
-                  note: 'Cash, metals, investments, receivables',
-                },
-                {
-                  label: 'Total Liabilities Deducted',
-                  value: totalLiabilities,
-                  icon: Minus,
-                  iconColor: 'text-red-500',
-                  bg: 'bg-red-50',
-                  prefix: '−',
-                  note: 'Immediate debts & expenses',
-                },
-                {
-                  label: 'Net Zakatable Wealth',
-                  value: zakatableWealth,
-                  icon: Scale,
-                  iconColor: 'text-purple-600',
-                  bg: 'bg-purple-50',
-                  note: 'Assets minus liabilities',
-                  bold: true,
-                  separator: true,
-                },
-                {
-                  label: 'Nisab Threshold',
-                  value: nisab,
-                  icon: Calculator,
-                  iconColor: 'text-gray-400',
-                  bg: 'bg-gray-50',
-                  note: `Based on ${nisabLabel}`,
-                  muted: true,
-                },
-                {
-                  label: 'Zakat Due (2.5%)',
-                  value: zakatDue,
-                  icon: Sparkles,
-                  iconColor: 'text-emerald-600',
-                  bg: 'bg-emerald-50',
-                  note: 'Your obligatory payment',
-                  highlight: true,
-                },
-              ].map((row, idx) => {
-                const Icon = row.icon;
-                return (
-                  <div key={idx}>
-                    {row.separator && (
-                      <div className="flex items-center gap-2 py-1.5">
-                        <div className={`flex-1 h-px ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
-                        <span className={`text-[9px] font-bold tracking-widest uppercase ${darkMode ? 'text-zinc-600' : 'text-gray-300'}`}>Net</span>
-                        <div className={`flex-1 h-px ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
-                      </div>
-                    )}
-                    <motion.div
-                      initial={{ opacity: 0, x: -6 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className={`flex items-center gap-3 px-3.5 py-3 rounded-xl ${row.highlight
+      {/* ── Calculation breakdown ── */}
+      <div className={card}>
+        <div className="p-5">
+          <SectionLabel darkMode={darkMode}>Calculation Breakdown</SectionLabel>
+          <div className="space-y-1.5">
+            {[
+              {
+                label: 'Total Zakatable Assets',
+                value: totalAssets,
+                icon: TrendingUp,
+                iconColor: 'text-blue-500',
+                bg: 'bg-blue-50',
+                note: 'Cash, metals, investments, receivables',
+              },
+              {
+                label: 'Total Liabilities Deducted',
+                value: totalLiabilities,
+                icon: Minus,
+                iconColor: 'text-red-500',
+                bg: 'bg-red-50',
+                prefix: '−',
+                note: 'Immediate debts & expenses',
+              },
+              {
+                label: 'Net Zakatable Wealth',
+                value: zakatableWealth,
+                icon: Scale,
+                iconColor: 'text-purple-600',
+                bg: 'bg-purple-50',
+                note: 'Assets minus liabilities',
+                bold: true,
+                separator: true,
+              },
+              {
+                label: 'Nisab Threshold',
+                value: nisab,
+                icon: Calculator,
+                iconColor: 'text-gray-400',
+                bg: 'bg-gray-50',
+                note: `Based on ${nisabLabel}`,
+                muted: true,
+              },
+              {
+                label: 'Zakat Due (2.5%)',
+                value: zakatDue,
+                icon: Sparkles,
+                iconColor: 'text-emerald-600',
+                bg: 'bg-emerald-50',
+                note: 'Your obligatory payment',
+                highlight: true,
+              },
+            ].map((row, idx) => {
+              const Icon = row.icon;
+              return (
+                <div key={idx}>
+                  {row.separator && (
+                    <div className="flex items-center gap-2 py-1.5">
+                      <div className={`flex-1 h-px ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
+                      <span className={`text-[9px] font-bold tracking-widest uppercase ${darkMode ? 'text-zinc-600' : 'text-gray-300'}`}>Net</span>
+                      <div className={`flex-1 h-px ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
+                    </div>
+                  )}
+                  <motion.div
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className={`flex items-center gap-3 px-3.5 py-3 rounded-xl ${
+                      row.highlight
                         ? (darkMode ? 'bg-emerald-900/20 border border-emerald-900/50' : 'bg-emerald-50 border border-emerald-200')
                         : row.bold
                           ? (darkMode ? 'bg-purple-900/20 border border-purple-900/50' : 'bg-purple-50 border border-purple-100')
                           : (darkMode ? 'bg-zinc-800/30 border border-zinc-800' : 'bg-gray-50/60 border border-gray-100')
-                        }`}
-                    >
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${row.bg}`}>
-                        <Icon className={`w-3.5 h-3.5 ${darkMode && row.iconColor === 'text-blue-500' ? 'text-blue-400' : row.iconColor}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold leading-tight ${row.muted ? (darkMode ? 'text-zinc-500' : 'text-gray-400') : (darkMode ? 'text-zinc-200' : 'text-gray-800')}`}>
-                          {row.label}
-                        </p>
-                        <p className={`text-xs mt-0.5 ${darkMode ? 'text-zinc-400' : 'text-gray-400'}`}>{row.note}</p>
-                      </div>
-                      <span className={`text-sm font-bold tabular-nums flex-shrink-0 ${row.highlight ? (darkMode ? 'text-emerald-400' : 'text-emerald-700') : row.bold ? (darkMode ? 'text-purple-400' : 'text-purple-700') : row.muted ? (darkMode ? 'text-zinc-500' : 'text-gray-400') : (darkMode ? 'text-zinc-300' : 'text-gray-700')
-                        }`}>
-                        {row.prefix}{formatCurrency(Math.abs(row.value))}
-                      </span>
-                    </motion.div>
-                  </div>
-                );
-              })}
+                    }`}
+                  >
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${row.bg}`}>
+                      <Icon className={`w-3.5 h-3.5 ${darkMode && row.iconColor === 'text-blue-500' ? 'text-blue-400' : row.iconColor}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-semibold leading-tight ${row.muted ? (darkMode ? 'text-zinc-500' : 'text-gray-400') : (darkMode ? 'text-zinc-200' : 'text-gray-800')}`}>
+                        {row.label}
+                      </p>
+                      <p className={`text-xs mt-0.5 ${darkMode ? 'text-zinc-400' : 'text-gray-400'}`}>{row.note}</p>
+                    </div>
+                    <span className={`text-sm font-bold tabular-nums flex-shrink-0 ${
+                      row.highlight ? (darkMode ? 'text-emerald-400' : 'text-emerald-700')
+                      : row.bold     ? (darkMode ? 'text-purple-400'  : 'text-purple-700')
+                      : row.muted    ? (darkMode ? 'text-zinc-500'    : 'text-gray-400')
+                      :                (darkMode ? 'text-zinc-300'    : 'text-gray-700')
+                    }`}>
+                      {row.prefix}{formatCurrency(Math.abs(row.value))}
+                    </span>
+                  </motion.div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Eligibility message ── */}
+      <div
+        className={`${card} border-0 overflow-hidden`}
+        style={isEligible
+          ? { background: darkMode ? 'linear-gradient(135deg, rgba(6,78,59,0.3), rgba(6,95,70,0.3))' : 'linear-gradient(135deg, #f0fdf4, #ecfdf5)', border: darkMode ? '1px solid rgba(16,185,129,0.2)' : '1px solid #bbf7d0' }
+          : { background: darkMode ? 'linear-gradient(135deg, rgba(30,58,138,0.3), rgba(30,64,175,0.3))' : 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: darkMode ? '1px solid rgba(59,130,246,0.2)' : '1px solid #bfdbfe' }
+        }
+      >
+        <div className="p-5">
+          <div className="flex items-start gap-4">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isEligible ? (darkMode ? 'bg-emerald-900/50' : 'bg-emerald-100') : (darkMode ? 'bg-blue-900/50' : 'bg-blue-100')}`}>
+              {isEligible
+                ? <CheckCircle2 className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                : <Info         className={`w-5 h-5 ${darkMode ? 'text-blue-400'    : 'text-blue-600'}`}    />
+              }
+            </div>
+            <div>
+              <p className={`font-bold text-sm mb-1 ${isEligible ? (darkMode ? 'text-emerald-400' : 'text-emerald-800') : (darkMode ? 'text-blue-400' : 'text-blue-800')}`}>
+                {isEligible ? 'Zakat is Obligatory' : 'Zakat is Not Required at This Time'}
+              </p>
+              <p className={`text-xs leading-relaxed ${isEligible ? (darkMode ? 'text-emerald-300' : 'text-emerald-700') : (darkMode ? 'text-blue-300' : 'text-blue-700')}`}>
+                {isEligible
+                  ? "Your zakatable wealth exceeds the Nisab threshold. Zakat at 2.5% is obligatory if you have maintained this level of wealth for one complete lunar year (Haul). We recommend paying at the same time each Islamic year."
+                  : "Your net zakatable wealth falls below the Nisab threshold. Zakat is not obligatory at this time. If your wealth increases above Nisab, a new one-year Haul period begins. Voluntary Sadaqah (charity) is always encouraged and rewarded by Allah."}
+              </p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ── Nisab Explained ── */}
+      {/* ── Actions ── */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          onClick={() => generateZakatPDF(results, formatCurrency)}
+          className="flex-1 py-3 px-5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 shadow-sm relative group overflow-hidden hover:scale-[1.02] active:scale-95 duration-300"
+          style={{ background: 'linear-gradient(135deg, #2D7A5C 0%, #1E5A44 100%)' }}
+        >
+          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+          <Download className="w-4 h-4 relative z-10" />
+          <span className="relative z-10">Download Summary</span>
+        </button>
+        <button
+          onClick={onReset}
+          className={`flex-1 py-3 px-5 rounded-xl text-sm font-bold border transition-all flex items-center justify-center gap-2 ${darkMode ? 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
+        >
+          <RotateCcw className="w-4 h-4" /> New Calculation
+        </button>
+      </div>
+
+      {/* ── Nisab Explained + How it's Calculated ── */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        {/* Nisab Explained */}
         <div className={card}>
           <div className="p-5">
             <div className="flex items-center gap-2 mb-3">
@@ -469,14 +296,13 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
           </div>
         </div>
 
-        {/* ── How it's calculated ── */}
+        {/* How Nisab is Applied */}
         <div className={card}>
           <div className="p-5">
             <div className="flex items-center gap-2 mb-3">
               <Calculator className="w-4 h-4 text-emerald-500" />
-              <SectionLabel>How Nisab is Applied</SectionLabel>
+              <SectionLabel darkMode={darkMode}>How Nisab is Applied</SectionLabel>
             </div>
-
             <div className="space-y-2 mb-3">
               {[
                 {
@@ -497,9 +323,9 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                   body: isEligible
                     ? 'Your wealth exceeds the threshold — Zakat is obligatory if held for 1 lunar year.'
                     : 'Your wealth is below the threshold. Zakat is not due, but voluntary Sadaqah is encouraged.',
-                  color: isEligible 
+                  color: isEligible
                     ? (darkMode ? 'bg-emerald-900/20 border-emerald-900/50' : 'bg-emerald-50 border-emerald-100')
-                    : (darkMode ? 'bg-blue-900/20 border-blue-900/50' : 'bg-blue-50 border-blue-100'),
+                    : (darkMode ? 'bg-blue-900/20 border-blue-900/50'      : 'bg-blue-50 border-blue-100'),
                 },
               ].map((item) => (
                 <div key={item.step} className={`flex items-start gap-3 p-3 rounded-xl border ${item.color}`}>
@@ -513,64 +339,17 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                 </div>
               ))}
             </div>
-
             {isEligible && (
               <InfoCallout
                 icon={Info}
                 title="The Haul Condition"
                 body="Zakat is only due if this level of wealth has been maintained for one complete lunar year (Haul). If your wealth dropped below Nisab at any point, the Haul resets."
                 colorClass="gold"
+                darkMode={darkMode}
               />
             )}
           </div>
         </div>
-      </div>
-
-      {/* ── Eligibility message ── */}
-      <div className={`${card} border-0 overflow-hidden`}
-        style={isEligible
-          ? { background: darkMode ? 'linear-gradient(135deg, rgba(6,78,59,0.3), rgba(6,95,70,0.3))' : 'linear-gradient(135deg, #f0fdf4, #ecfdf5)', border: darkMode ? '1px solid rgba(16,185,129,0.2)' : '1px solid #bbf7d0' }
-          : { background: darkMode ? 'linear-gradient(135deg, rgba(30,58,138,0.3), rgba(30,64,175,0.3))' : 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: darkMode ? '1px solid rgba(59,130,246,0.2)' : '1px solid #bfdbfe' }
-        }>
-        <div className="p-5">
-          <div className="flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isEligible ? (darkMode ? 'bg-emerald-900/50' : 'bg-emerald-100') : (darkMode ? 'bg-blue-900/50' : 'bg-blue-100')}`}>
-              {isEligible
-                ? <CheckCircle2 className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
-                : <Info className={`w-5 h-5 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-              }
-            </div>
-            <div>
-              <p className={`font-bold text-sm mb-1 ${isEligible ? (darkMode ? 'text-emerald-400' : 'text-emerald-800') : (darkMode ? 'text-blue-400' : 'text-blue-800')}`}>
-                {isEligible ? 'Zakat is Obligatory' : 'Zakat is Not Required at This Time'}
-              </p>
-              <p className={`text-xs leading-relaxed ${isEligible ? (darkMode ? 'text-emerald-300' : 'text-emerald-700') : (darkMode ? 'text-blue-300' : 'text-blue-700')}`}>
-                {isEligible
-                  ? "Your zakatable wealth exceeds the Nisab threshold. Zakat at 2.5% is obligatory if you have maintained this level of wealth for one complete lunar year (Haul). We recommend paying at the same time each Islamic year."
-                  : "Your net zakatable wealth falls below the Nisab threshold. Zakat is not obligatory at this time. If your wealth increases above Nisab, a new one-year Haul period begins. Voluntary Sadaqah (charity) is always encouraged and rewarded by Allah."}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Actions ── */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <button
-          onClick={generatePDF}
-          className="flex-1 py-3 px-5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 shadow-sm relative group overflow-hidden hover:scale-[1.02] active:scale-95 duration-300"
-          style={{ background: 'linear-gradient(135deg, #2D7A5C 0%, #1E5A44 100%)' }}
-        >
-          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-          <Download className="w-4 h-4 relative z-10" />
-          <span className="relative z-10">Download Summary</span>
-        </button>
-        <button
-          onClick={onReset}
-          className={`flex-1 py-3 px-5 rounded-xl text-sm font-bold border transition-all flex items-center justify-center gap-2 ${darkMode ? 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
-        >
-          <RotateCcw className="w-4 h-4" /> New Calculation
-        </button>
       </div>
 
       {/* ── Closing duaa ── */}
