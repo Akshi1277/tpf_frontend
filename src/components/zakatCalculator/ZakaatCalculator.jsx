@@ -72,7 +72,7 @@ const INITIAL_FORM = {
   hasDebtsExpenses: null, debtsExpenses: ['', ''],
 };
 
-export default function ZakatCalculator() {
+export default function ZakatCalculator({ darkMode = false }) {
   const [currentStep, setCurrentStep] = useState(-1);
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [results, setResults] = useState(null);
@@ -155,7 +155,7 @@ export default function ZakatCalculator() {
   const isLanding = currentStep === -1;
 
   return (
-    <div ref={pageTopRef} className={`min-h-screen ${isLanding ? '' : 'bg-gray-50'}`}>
+    <div ref={pageTopRef} className={`min-h-screen ${isLanding ? '' : darkMode ? 'bg-zinc-900' : 'bg-gray-50'}`}>
       {/* Spinner overlay */}
       <AnimatePresence>
         {isCalculating && <CalculatingSpinner />}
@@ -164,41 +164,41 @@ export default function ZakatCalculator() {
       {/* Hero — only on landing */}
       <AnimatePresence>
         {isLanding && (
-          <HeroSection onStart={nextStep} formRef={formRef} />
+          <HeroSection onStart={nextStep} formRef={formRef} darkMode={darkMode} />
         )}
       </AnimatePresence>
 
       {/* Progress bar — only during form steps */}
       {!isLanding && currentStep < steps.length && (
-        <ProgressBar currentStep={currentStep} steps={steps} />
+        <ProgressBar currentStep={currentStep} steps={steps} darkMode={darkMode} />
       )}
 
-      <Modals activeModal={activeModal} setActiveModal={setActiveModal} />
+      <Modals activeModal={activeModal} setActiveModal={setActiveModal} darkMode={darkMode} />
 
       {/* Form area */}
       <div
         ref={formRef}
-        className={`${isLanding ? 'bg-gray-50' : ''} px-4 sm:px-6 py-6 sm:py-8`}
+        className={`${isLanding ? (darkMode ? 'bg-zinc-900' : 'bg-gray-50') : ''} px-4 sm:px-6 py-6 sm:py-8`}
         style={!isLanding ? { minHeight: 'calc(100vh - 64px)' } : {}}
       >
         <AnimatePresence mode="wait">
           {currentStep === -1 && (
-            <GettingStarted key="start" onStart={nextStep} setActiveModal={setActiveModal} />
+            <GettingStarted key="start" onStart={nextStep} setActiveModal={setActiveModal} darkMode={darkMode} />
           )}
           {currentStep === 0 && (
-            <Assets key="assets" formData={formData} updateFormData={updateFormData} onNext={nextStep} setActiveModal={setActiveModal} />
+            <Assets key="assets" formData={formData} updateFormData={updateFormData} onNext={nextStep} setActiveModal={setActiveModal} darkMode={darkMode} />
           )}
           {currentStep === 1 && (
-            <DebtsOwed key="debts" formData={formData} updateFormData={updateFormData} onNext={nextStep} onBack={prevStep} />
+            <DebtsOwed key="debts" formData={formData} updateFormData={updateFormData} onNext={nextStep} onBack={prevStep} darkMode={darkMode} />
           )}
           {currentStep === 2 && (
-            <OtherAssets key="other" formData={formData} updateFormData={updateFormData} onNext={nextStep} onBack={prevStep} setActiveModal={setActiveModal} />
+            <OtherAssets key="other" formData={formData} updateFormData={updateFormData} onNext={nextStep} onBack={prevStep} setActiveModal={setActiveModal} darkMode={darkMode} />
           )}
           {currentStep === 3 && (
-            <Liabilities key="liabilities" formData={formData} updateFormData={updateFormData} onCalculate={calculateZakat} onBack={prevStep} setActiveModal={setActiveModal} />
+            <Liabilities key="liabilities" formData={formData} updateFormData={updateFormData} onCalculate={calculateZakat} onBack={prevStep} setActiveModal={setActiveModal} darkMode={darkMode} />
           )}
           {currentStep === 4 && results && (
-            <Results key="results" results={results} onReset={resetForm} formatCurrency={formatCurrency} />
+            <Results key="results" results={results} onReset={resetForm} formatCurrency={formatCurrency} darkMode={darkMode} />
           )}
         </AnimatePresence>
       </div>

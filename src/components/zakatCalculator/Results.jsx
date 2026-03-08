@@ -1,18 +1,20 @@
 import { motion } from 'framer-motion';
 import { Download, RotateCcw, TrendingUp, Minus, Scale, Calculator, Sparkles, Info, BookOpen, CheckCircle2, XCircle } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Small section heading
-const SectionLabel = ({ children }) => (
-  <p className="text-[10px] font-bold tracking-[0.18em] uppercase text-gray-400 mb-3">{children}</p>
+const SectionLabel = ({ children, darkMode }) => (
+  <p className={`text-[10px] font-bold tracking-[0.18em] uppercase mb-3 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>{children}</p>
 );
 
 // Tooltip-style info callout
-const InfoCallout = ({ icon: Icon, title, body, colorClass = 'blue' }) => {
+const InfoCallout = ({ icon: Icon, title, body, colorClass = 'blue', darkMode = false }) => {
   const map = {
-    blue: { bg: 'bg-blue-50', border: 'border-blue-100', title: 'text-blue-800', body: 'text-blue-700', icon: 'text-blue-500' },
-    green: { bg: 'bg-emerald-50', border: 'border-emerald-100', title: 'text-emerald-800', body: 'text-emerald-700', icon: 'text-emerald-500' },
-    gold: { bg: 'bg-amber-50', border: 'border-amber-100', title: 'text-amber-800', body: 'text-amber-700', icon: 'text-amber-500' },
-    red: { bg: 'bg-red-50', border: 'border-red-100', title: 'text-red-800', body: 'text-red-700', icon: 'text-red-500' },
+    blue: { bg: darkMode ? 'bg-blue-900/20' : 'bg-blue-50', border: darkMode ? 'border-blue-900/50' : 'border-blue-100', title: darkMode ? 'text-blue-400' : 'text-blue-800', body: darkMode ? 'text-blue-300' : 'text-blue-700', icon: darkMode ? 'text-blue-400' : 'text-blue-500' },
+    green: { bg: darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50', border: darkMode ? 'border-emerald-900/50' : 'border-emerald-100', title: darkMode ? 'text-emerald-400' : 'text-emerald-800', body: darkMode ? 'text-emerald-300' : 'text-emerald-700', icon: darkMode ? 'text-emerald-400' : 'text-emerald-500' },
+    gold: { bg: darkMode ? 'bg-amber-900/20' : 'bg-amber-50', border: darkMode ? 'border-amber-900/50' : 'border-amber-100', title: darkMode ? 'text-amber-400' : 'text-amber-800', body: darkMode ? 'text-amber-300' : 'text-amber-700', icon: darkMode ? 'text-amber-400' : 'text-amber-500' },
+    red: { bg: darkMode ? 'bg-red-900/20' : 'bg-red-50', border: darkMode ? 'border-red-900/50' : 'border-red-100', title: darkMode ? 'text-red-400' : 'text-red-800', body: darkMode ? 'text-red-300' : 'text-red-700', icon: darkMode ? 'text-red-400' : 'text-red-500' },
   };
   const c = map[colorClass];
   return (
@@ -44,7 +46,229 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
     ? `${goldNisabGrams}g of gold`
     : `${silverNisabGrams}g of silver`;
 
-  const card = `rounded-2xl border bg-white border-gray-200 overflow-hidden`;
+  const card = `rounded-2xl border ${darkMode ? 'bg-zinc-900/60 border-zinc-800' : 'bg-white border-gray-200'} overflow-hidden`;
+
+  // jsPDF default fonts don't support ₹; strip it and use "Rs." instead
+  const pdfCurrency = (val) => {
+    const str = formatCurrency(val);
+    return str.replace('₹', 'Rs. ');
+  };
+
+  const generatePDF = async () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 20;
+
+    // ── Palette ──────────────────────────────────────────
+    // Minimalist, premium financial aesthetic
+    const textDark = [30, 41, 59];   // slate-800
+    const textMid = [100, 116, 139];  // slate-500
+    const textLight = [148, 163, 184];  // slate-400
+    const goldColor = [212, 175, 55];   // premium gold accent
+    const divider = [226, 232, 240];  // slate-200
+
+    // ── Load logo & sizes via Image → canvas → base64 ────
+    const loadLogoData = () => new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        resolve({
+          base64: canvas.toDataURL('image/png'),
+          width: img.naturalWidth,
+          height: img.naturalHeight
+        });
+      };
+      img.onerror = () => resolve(null);
+      img.src = '/TPFAid-Logo.png';
+    });
+
+    const logoData = await loadLogoData();
+
+    // ── Header Section ───────────────────────────────────
+    if (logoData && logoData.base64) {
+      // Scale height to 20px max, and calculate proportionate width
+      const targetHeight = 20;
+      const targetWidth = targetHeight * (logoData.width / logoData.height);
+      doc.addImage(logoData.base64, 'PNG', 14, 14, targetWidth, targetHeight);
+    }
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...textLight);
+    doc.text('ZAKAT SUMMARY REPORT', pageWidth - 14, 20, { align: 'right' });
+
+    const dateStr = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    doc.setFontSize(9);
+    doc.setTextColor(...textDark);
+    doc.text(dateStr, pageWidth - 14, 26, { align: 'right' });
+
+    yPos = 44;
+
+    // ── Elegant Title & Status ───────────────────────────
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...textDark);
+    doc.text('Calculation Overview', 14, yPos);
+
+    if (isEligible) {
+      doc.setFillColor(...goldColor);
+      doc.rect(pageWidth - 14 - 3, yPos - 12, 3, 14, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...goldColor);
+      doc.text('OBLIGATORY', pageWidth - 20, yPos - 2, { align: 'right' });
+    } else {
+      doc.setFillColor(...textLight);
+      doc.rect(pageWidth - 14 - 3, yPos - 12, 3, 14, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(...textMid);
+      doc.text('BELOW NISAB', pageWidth - 20, yPos - 4, { align: 'right' });
+    }
+
+    yPos += 14;
+
+    // ── Section: Calculation Overview Table ──────────────
+    const overviewData = [
+      ['Total Zakatable Assets', pdfCurrency(totalAssets)],
+      ['Total Liabilities Deducted', pdfCurrency(totalLiabilities)],
+      ['Net Zakatable Wealth', pdfCurrency(zakatableWealth)],
+      ['Nisab Threshold', pdfCurrency(nisab)],
+      ['Zakat Due (2.5%)', pdfCurrency(zakatDue)],
+    ];
+
+    autoTable(doc, {
+      startY: yPos,
+      body: overviewData,
+      theme: 'plain',
+      tableWidth: pageWidth - 28,
+      margin: { left: 14, right: 14 },
+      styles: {
+        fontSize: 10,
+        cellPadding: { top: 6, bottom: 6, left: 2, right: 2 },
+        textColor: textDark,
+        font: 'helvetica'
+      },
+      columnStyles: {
+        0: { cellWidth: 120 },
+        1: { cellWidth: 56, halign: 'right' },
+      },
+      didDrawCell: function (data) {
+        // Draw a completely subtle, thin bottom border for every row
+        doc.setDrawColor(...divider);
+        doc.setLineWidth(0.1);
+        doc.line(
+          data.cell.x,
+          data.cell.y + data.cell.height,
+          data.cell.x + data.cell.width,
+          data.cell.y + data.cell.height
+        );
+      },
+      didParseCell(data) {
+        // The final row "Zakat Due" 
+        if (data.row.index === 4) {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.styles.fontSize = 12;
+          if (data.column.index === 1) {
+            data.cell.styles.textColor = isEligible ? textDark : textMid;
+          }
+        } else if (data.column.index === 1) {
+          // values are bolder than labels
+          data.cell.styles.fontStyle = 'bold';
+        }
+      },
+    });
+
+    yPos = doc.lastAutoTable.finalY + 20;
+
+    // ── Section: Asset Breakdown ─────────────────────────
+    const pdfData = results?.pdf;
+    if (pdfData?.inputs) {
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...textDark);
+      doc.text('Asset Breakdown', 14, yPos);
+      yPos += 8;
+
+      const inputs = pdfData.inputs;
+      const breakdownData = [];
+
+      if (inputs.cash)
+        breakdownData.push(['Cash & Bank Balances', pdfCurrency(inputs.cash)]);
+
+      if (inputs.gold?.length > 0) {
+        const totalGrams = inputs.gold.reduce((a, g) => a + g.grams, 0);
+        breakdownData.push([`Gold (${totalGrams}g total)`, pdfCurrency(pdfData.calculations?.goldValue || 0)]);
+      }
+
+      if (inputs.silver?.length > 0) {
+        const totalGrams = inputs.silver.reduce((a, s) => a + s.grams, 0);
+        breakdownData.push([`Silver (${totalGrams}g total)`, pdfCurrency(pdfData.calculations?.silverValue || 0)]);
+      }
+
+      if (inputs.crypto)
+        breakdownData.push(['Cryptocurrencies', pdfCurrency(inputs.crypto)]);
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Asset Source', 'Assessed Value']],
+        body: breakdownData,
+        theme: 'plain',
+        tableWidth: pageWidth - 28,
+        margin: { left: 14, right: 14 },
+        headStyles: {
+          textColor: textLight,
+          fontStyle: 'bold',
+          fontSize: 8,
+          cellPadding: { top: 4, bottom: 4, left: 2, right: 2 },
+        },
+        styles: {
+          fontSize: 9,
+          textColor: textDark,
+          cellPadding: { top: 5, bottom: 5, left: 2, right: 2 },
+        },
+        columnStyles: {
+          0: { cellWidth: 120 },
+          1: { cellWidth: 56, halign: 'right', fontStyle: 'bold' },
+        },
+        didParseCell: function (data) {
+          // Ensure the header for the second column is right-aligned to match the values
+          if (data.section === 'head' && data.column.index === 1) {
+            data.cell.styles.halign = 'right';
+          }
+        },
+        didDrawPage: function () { },
+        didDrawCell: function (data) {
+          doc.setDrawColor(...divider);
+          doc.setLineWidth(0.1);
+          doc.line(
+            data.cell.x,
+            data.cell.y + data.cell.height,
+            data.cell.x + data.cell.width,
+            data.cell.y + data.cell.height
+          );
+        }
+      });
+
+
+      yPos = doc.lastAutoTable.finalY + 24;
+    }
+
+    // ── Disclaimer & Footer ──────────────────────────────
+    // doc.setFontSize(8);
+    // doc.setFont('helvetica', 'italic');
+    // doc.setTextColor(...textMid);
+    // doc.text(
+    //   'This document is auto-generated by TPF Aid for reference purposes only. Please verify calculations and Nisab thresholds with a qualified scholar before making obligatory payments.',
+    //   14, yPos, { maxWidth: pageWidth - 28, lineHeightFactor: 1.5 }
+    // );
+
+    doc.save('Zakat_Summary_TPFAid.pdf');
+  };
 
   return (
     <motion.div
@@ -75,11 +299,10 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
             </div>
           </div>
           {/* Eligibility badge */}
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${
-            isEligible
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-              : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-          }`}>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${isEligible
+            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+            : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+            }`}>
             {isEligible
               ? <><CheckCircle2 className="w-3.5 h-3.5" /> Zakat is Due</>
               : <><XCircle className="w-3.5 h-3.5" /> Below Nisab</>
@@ -173,35 +396,33 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                   <div key={idx}>
                     {row.separator && (
                       <div className="flex items-center gap-2 py-1.5">
-                        <div className="flex-1 h-px bg-gray-100" />
-                        <span className="text-[9px] font-bold tracking-widest text-gray-300 uppercase">Net</span>
-                        <div className="flex-1 h-px bg-gray-100" />
+                        <div className={`flex-1 h-px ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
+                        <span className={`text-[9px] font-bold tracking-widest uppercase ${darkMode ? 'text-zinc-600' : 'text-gray-300'}`}>Net</span>
+                        <div className={`flex-1 h-px ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
                       </div>
                     )}
                     <motion.div
                       initial={{ opacity: 0, x: -6 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className={`flex items-center gap-3 px-3.5 py-3 rounded-xl ${
-                        row.highlight
-                          ? 'bg-emerald-50 border border-emerald-200'
-                          : row.bold
-                          ? 'bg-purple-50 border border-purple-100'
-                          : 'bg-gray-50/60 border border-gray-100'
-                      }`}
+                      className={`flex items-center gap-3 px-3.5 py-3 rounded-xl ${row.highlight
+                        ? (darkMode ? 'bg-emerald-900/20 border border-emerald-900/50' : 'bg-emerald-50 border border-emerald-200')
+                        : row.bold
+                          ? (darkMode ? 'bg-purple-900/20 border border-purple-900/50' : 'bg-purple-50 border border-purple-100')
+                          : (darkMode ? 'bg-zinc-800/30 border border-zinc-800' : 'bg-gray-50/60 border border-gray-100')
+                        }`}
                     >
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${row.bg}`}>
-                        <Icon className={`w-3.5 h-3.5 ${row.iconColor}`} />
+                        <Icon className={`w-3.5 h-3.5 ${darkMode && row.iconColor === 'text-blue-500' ? 'text-blue-400' : row.iconColor}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold leading-tight ${row.muted ? 'text-gray-400' : 'text-gray-800'}`}>
+                        <p className={`text-sm font-semibold leading-tight ${row.muted ? (darkMode ? 'text-zinc-500' : 'text-gray-400') : (darkMode ? 'text-zinc-200' : 'text-gray-800')}`}>
                           {row.label}
                         </p>
-                        <p className="text-xs text-gray-400 mt-0.5">{row.note}</p>
+                        <p className={`text-xs mt-0.5 ${darkMode ? 'text-zinc-400' : 'text-gray-400'}`}>{row.note}</p>
                       </div>
-                      <span className={`text-sm font-bold tabular-nums flex-shrink-0 ${
-                        row.highlight ? 'text-emerald-700' : row.bold ? 'text-purple-700' : row.muted ? 'text-gray-400' : 'text-gray-700'
-                      }`}>
+                      <span className={`text-sm font-bold tabular-nums flex-shrink-0 ${row.highlight ? (darkMode ? 'text-emerald-400' : 'text-emerald-700') : row.bold ? (darkMode ? 'text-purple-400' : 'text-purple-700') : row.muted ? (darkMode ? 'text-zinc-500' : 'text-gray-400') : (darkMode ? 'text-zinc-300' : 'text-gray-700')
+                        }`}>
                         {row.prefix}{formatCurrency(Math.abs(row.value))}
                       </span>
                     </motion.div>
@@ -216,25 +437,25 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
         <div className={card}>
           <div className="p-5">
             <div className="flex items-center gap-2 mb-3">
-              <BookOpen className="w-4 h-4 text-amber-500" />
-              <SectionLabel>What is Nisab?</SectionLabel>
+              <BookOpen className={`w-4 h-4 ${darkMode ? 'text-amber-400' : 'text-amber-500'}`} />
+              <SectionLabel darkMode={darkMode}>What is Nisab?</SectionLabel>
             </div>
-            <p className="text-xs text-gray-600 leading-relaxed mb-3">
-              <strong className="text-gray-800">Nisab</strong> is the minimum threshold of wealth a Muslim must possess before Zakat becomes obligatory. It was established by the Prophet Muhammad ﷺ and is equivalent to either:
+            <p className={`text-xs leading-relaxed mb-3 ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
+              <strong className={darkMode ? 'text-zinc-200' : 'text-gray-800'}>Nisab</strong> is the minimum threshold of wealth a Muslim must possess before Zakat becomes obligatory. It was established by the Prophet Muhammad ﷺ and is equivalent to either:
             </p>
             <div className="space-y-2 mb-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
-                <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0 text-sm">🥇</div>
+              <div className={`flex items-center gap-3 p-3 rounded-xl border ${darkMode ? 'bg-amber-900/20 border-amber-900/50' : 'bg-amber-50 border-amber-100'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm ${darkMode ? 'bg-amber-900/40' : 'bg-amber-100'}`}>🥇</div>
                 <div>
-                  <p className="text-xs font-bold text-amber-800">Gold Standard</p>
-                  <p className="text-xs text-amber-700 mt-0.5">87.48 grams of pure (24K) gold</p>
+                  <p className={`text-xs font-bold ${darkMode ? 'text-amber-400' : 'text-amber-800'}`}>Gold Standard</p>
+                  <p className={`text-xs mt-0.5 ${darkMode ? 'text-amber-300' : 'text-amber-700'}`}>87.48 grams of pure (24K) gold</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                <div className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 text-sm">🥈</div>
+              <div className={`flex items-center gap-3 p-3 rounded-xl border ${darkMode ? 'bg-zinc-800/30 border-zinc-800' : 'bg-gray-50 border-gray-100'}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`}>🥈</div>
                 <div>
-                  <p className="text-xs font-bold text-gray-700">Silver Standard</p>
-                  <p className="text-xs text-gray-500 mt-0.5">612.36 grams of pure silver</p>
+                  <p className={`text-xs font-bold ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>Silver Standard</p>
+                  <p className={`text-xs mt-0.5 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>612.36 grams of pure silver</p>
                 </div>
               </div>
             </div>
@@ -243,6 +464,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
               title="Which standard is used?"
               body="Most scholars recommend the silver standard as it results in a lower threshold, ensuring more Muslims fulfil their obligation. Your calculation used the silver Nisab."
               colorClass="blue"
+              darkMode={darkMode}
             />
           </div>
         </div>
@@ -261,13 +483,13 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                   step: '1',
                   title: 'Current Nisab Value',
                   body: `Today's Nisab = ${formatCurrency(nisab)} (based on live silver/gold spot price)`,
-                  color: 'bg-emerald-50 border-emerald-100',
+                  color: darkMode ? 'bg-emerald-900/20 border-emerald-900/50' : 'bg-emerald-50 border-emerald-100',
                 },
                 {
                   step: '2',
                   title: 'Compare Your Wealth',
                   body: `Your net zakatable wealth: ${formatCurrency(zakatableWealth)}`,
-                  color: 'bg-purple-50 border-purple-100',
+                  color: darkMode ? 'bg-purple-900/20 border-purple-900/50' : 'bg-purple-50 border-purple-100',
                 },
                 {
                   step: '3',
@@ -275,16 +497,18 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                   body: isEligible
                     ? 'Your wealth exceeds the threshold — Zakat is obligatory if held for 1 lunar year.'
                     : 'Your wealth is below the threshold. Zakat is not due, but voluntary Sadaqah is encouraged.',
-                  color: isEligible ? 'bg-emerald-50 border-emerald-100' : 'bg-blue-50 border-blue-100',
+                  color: isEligible 
+                    ? (darkMode ? 'bg-emerald-900/20 border-emerald-900/50' : 'bg-emerald-50 border-emerald-100')
+                    : (darkMode ? 'bg-blue-900/20 border-blue-900/50' : 'bg-blue-50 border-blue-100'),
                 },
               ].map((item) => (
                 <div key={item.step} className={`flex items-start gap-3 p-3 rounded-xl border ${item.color}`}>
-                  <span className="w-5 h-5 rounded-full bg-white border border-gray-200 text-[10px] font-bold text-gray-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className={`w-5 h-5 rounded-full border text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5 ${darkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-white border-gray-200 text-gray-500'}`}>
                     {item.step}
                   </span>
                   <div>
-                    <p className="text-xs font-bold text-gray-700">{item.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{item.body}</p>
+                    <p className={`text-xs font-bold ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>{item.title}</p>
+                    <p className={`text-xs mt-0.5 leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>{item.body}</p>
                   </div>
                 </div>
               ))}
@@ -305,22 +529,22 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
       {/* ── Eligibility message ── */}
       <div className={`${card} border-0 overflow-hidden`}
         style={isEligible
-          ? { background: 'linear-gradient(135deg, #f0fdf4, #ecfdf5)', border: '1px solid #bbf7d0' }
-          : { background: 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: '1px solid #bfdbfe' }
+          ? { background: darkMode ? 'linear-gradient(135deg, rgba(6,78,59,0.3), rgba(6,95,70,0.3))' : 'linear-gradient(135deg, #f0fdf4, #ecfdf5)', border: darkMode ? '1px solid rgba(16,185,129,0.2)' : '1px solid #bbf7d0' }
+          : { background: darkMode ? 'linear-gradient(135deg, rgba(30,58,138,0.3), rgba(30,64,175,0.3))' : 'linear-gradient(135deg, #eff6ff, #f0f9ff)', border: darkMode ? '1px solid rgba(59,130,246,0.2)' : '1px solid #bfdbfe' }
         }>
         <div className="p-5">
           <div className="flex items-start gap-4">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isEligible ? 'bg-emerald-100' : 'bg-blue-100'}`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isEligible ? (darkMode ? 'bg-emerald-900/50' : 'bg-emerald-100') : (darkMode ? 'bg-blue-900/50' : 'bg-blue-100')}`}>
               {isEligible
-                ? <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                : <Info className="w-5 h-5 text-blue-600" />
+                ? <CheckCircle2 className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                : <Info className={`w-5 h-5 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
               }
             </div>
             <div>
-              <p className={`font-bold text-sm mb-1 ${isEligible ? 'text-emerald-800' : 'text-blue-800'}`}>
+              <p className={`font-bold text-sm mb-1 ${isEligible ? (darkMode ? 'text-emerald-400' : 'text-emerald-800') : (darkMode ? 'text-blue-400' : 'text-blue-800')}`}>
                 {isEligible ? 'Zakat is Obligatory' : 'Zakat is Not Required at This Time'}
               </p>
-              <p className={`text-xs leading-relaxed ${isEligible ? 'text-emerald-700' : 'text-blue-700'}`}>
+              <p className={`text-xs leading-relaxed ${isEligible ? (darkMode ? 'text-emerald-300' : 'text-emerald-700') : (darkMode ? 'text-blue-300' : 'text-blue-700')}`}>
                 {isEligible
                   ? "Your zakatable wealth exceeds the Nisab threshold. Zakat at 2.5% is obligatory if you have maintained this level of wealth for one complete lunar year (Haul). We recommend paying at the same time each Islamic year."
                   : "Your net zakatable wealth falls below the Nisab threshold. Zakat is not obligatory at this time. If your wealth increases above Nisab, a new one-year Haul period begins. Voluntary Sadaqah (charity) is always encouraged and rewarded by Allah."}
@@ -333,35 +557,38 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
       {/* ── Actions ── */}
       <div className="flex flex-col sm:flex-row gap-3">
         <button
-          className="flex-1 py-3 px-5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 shadow-sm"
+          onClick={generatePDF}
+          className="flex-1 py-3 px-5 rounded-xl text-sm font-bold text-white transition-all flex items-center justify-center gap-2 shadow-sm relative group overflow-hidden hover:scale-[1.02] active:scale-95 duration-300"
           style={{ background: 'linear-gradient(135deg, #2D7A5C 0%, #1E5A44 100%)' }}
         >
-          <Download className="w-4 h-4" /> Download Summary
+          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+          <Download className="w-4 h-4 relative z-10" />
+          <span className="relative z-10">Download Summary</span>
         </button>
         <button
           onClick={onReset}
-          className="flex-1 py-3 px-5 rounded-xl text-sm font-bold border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+          className={`flex-1 py-3 px-5 rounded-xl text-sm font-bold border transition-all flex items-center justify-center gap-2 ${darkMode ? 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}
         >
           <RotateCcw className="w-4 h-4" /> New Calculation
         </button>
       </div>
 
       {/* ── Closing duaa ── */}
-      <div className="rounded-2xl border border-gray-100 bg-white p-5 text-center">
-        <p className="text-sm leading-relaxed text-gray-500 italic mb-3">
+      <div className={`rounded-2xl border p-5 text-center ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'}`}>
+        <p className={`text-sm leading-relaxed italic mb-3 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>
           May your Zakat purify your wealth and bring blessings to you and those in need.
         </p>
         <p
           className="text-xl leading-loose mb-1"
-          style={{ fontFamily: '"Noto Naskh Arabic", Georgia, serif', color: '#2D7A5C', direction: 'rtl' }}
+          style={{ fontFamily: '"Noto Naskh Arabic", Georgia, serif', color: darkMode ? '#34D399' : '#2D7A5C', direction: 'rtl' }}
         >
           خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِم بِهَا
         </p>
-        <p className="text-xs text-gray-400 italic mb-2">
+        <p className={`text-xs italic mb-2 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
           "Take from their wealth a charity by which you purify them and cause them to increase." — Quran 9:103
         </p>
-        <div className="h-px bg-gray-100 my-3" />
-        <p className="text-xs text-gray-400">
+        <div className={`h-px my-3 ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
+        <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
           "The example of those who spend their wealth in the way of Allah is like a seed of grain that sprouts seven ears; in every ear there are a hundred grains." — Quran 2:261
         </p>
       </div>
