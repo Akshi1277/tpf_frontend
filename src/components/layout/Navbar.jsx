@@ -19,7 +19,6 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   // ── STATE ─────────────────────────────────────────────────────────────
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -27,6 +26,13 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
 
   // ── DATA ──────────────────────────────────────────────────────────────
   const userInfo = useSelector((state) => state.auth.userInfo);
+  const authChecked = useSelector((state) => state.auth.authChecked);
+
+  // Auth is ready if either:
+  // 1. authChecked is true (API has responded), OR
+  // 2. userInfo already exists (hydrated from localStorage synchronously)
+  const isAuthReady = authChecked || !!userInfo;
+
   const isOrganization = userInfo?.type === 'organization';
   const isVolunteer = userInfo?.role === 'volunteer';
 
@@ -57,8 +63,6 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
   const greeting = 'Salam';
 
   // ── EFFECTS ───────────────────────────────────────────────────────────
-  useEffect(() => setHasMounted(true), []);
-
   useEffect(() => {
     const saved = localStorage.getItem('darkMode');
     if (saved !== null) setDarkMode(saved === 'true');
@@ -159,7 +163,8 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
             <DesktopNav
               darkMode={darkMode}
               setDarkMode={setDarkMode}
-              userInfo={hasMounted ? userInfo : null}
+              userInfo={userInfo}
+              isAuthReady={isAuthReady}
               isOrganization={isOrganization}
               initials={initials}
               searchQuery={searchQuery}
@@ -180,7 +185,8 @@ export default function Navbar({ darkMode, setDarkMode, scrolled }) {
         open={mobileMenuOpen}
         onOpenChange={setMobileMenuOpen}
         darkMode={darkMode}
-        userInfo={hasMounted ? userInfo : null}
+        userInfo={userInfo}
+        isAuthReady={isAuthReady}
         isOrganization={isOrganization}
         isVolunteer={isVolunteer}
         donationCount={donationCount}

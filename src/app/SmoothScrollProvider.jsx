@@ -1,15 +1,20 @@
 "use client";
 
-import { useEffect, createContext } from "react";
+import { useEffect, createContext, useRef } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Disable GSAP's own lagSmoothing — Lenis handles this
+gsap.ticker.lagSmoothing(0);
+
 export const SmoothScrollContext = createContext(null);
 
 export default function SmoothScrollProvider({ children }) {
+  const lenisRef = useRef(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -17,15 +22,26 @@ export default function SmoothScrollProvider({ children }) {
       duration: 1.1,
       smoothWheel: true,
       wheelMultiplier: 1,
+      // ✅ Prevent Lenis from fighting with ScrollTrigger on non-scroll elements
+      prevent: (node) => node.closest("[data-lenis-prevent]") !== null,
     });
 
-    // --- CRITICAL: Sync Lenis with GSAP ticker ---
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
+    lenisRef.current = lenis;
 
-    // --- Connect ScrollTrigger to Lenis ---
-    lenis.on("scroll", () => ScrollTrigger.update());
+    // ✅ Use a named RAF fn so we can cleanly remove it on teardown
+    const rafFn = (time) => lenis.raf(time * 1000);
+    gsap.ticker.add(rafFn);
+
+    // ✅ Throttle ScrollTrigger.update — runs on every scroll event otherwise
+    let rafId = null;
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        ScrollTrigger.update();
+        rafId = null;
+      });
+    };
+    lenis.on("scroll", onScroll);
 
     ScrollTrigger.scrollerProxy("body", {
       scrollTop(value) {
@@ -46,23 +62,22 @@ export default function SmoothScrollProvider({ children }) {
     ScrollTrigger.addEventListener("refresh", () => lenis.resize());
     ScrollTrigger.refresh();
 
-    // --- Fix for Next route changes ---
-    const handleRouteChange = () => {
-      ScrollTrigger.refresh();
-    };
-
+    const handleRouteChange = () => ScrollTrigger.refresh();
     window.addEventListener("routeChangeComplete", handleRouteChange);
 
     return () => {
       window.removeEventListener("routeChangeComplete", handleRouteChange);
-      gsap.ticker.remove(lenis.raf);
+      lenis.off("scroll", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+      gsap.ticker.remove(rafFn);     // ✅ Remove exact fn reference, not lenis.raf
       lenis.destroy();
       ScrollTrigger.killAll();
+      lenisRef.current = null;
     };
   }, []);
 
   return (
-    <SmoothScrollContext.Provider value={true}>
+    <SmoothScrollContext.Provider value={lenisRef}>
       {children}
     </SmoothScrollContext.Provider>
   );
