@@ -26,6 +26,7 @@ export default function MobileMenu({
   onOpenChange,
   darkMode,
   userInfo,
+  isAuthReady,       // ✅ NEW — true once auth state is resolved
   isOrganization,
   isVolunteer,
   donationCount,
@@ -86,9 +87,12 @@ export default function MobileMenu({
 
             <Drawer.Title className="sr-only">Navigation Menu</Drawer.Title>
 
-            {/* Top Bar — auth buttons + close */}
+            {/* ── TOP BAR — auth buttons + close ───────────────────────────── */}
             <div className="flex-shrink-0 flex items-center justify-between px-4 py-3">
-              {!userInfo ? (
+              {!isAuthReady ? (
+                // Skeleton while auth resolves — prevents Sign up flash
+                <div className={`h-8 w-32 rounded-xl animate-pulse ${darkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+              ) : !userInfo ? (
                 <div className="flex gap-2">
                   <button
                     onClick={() => { handleAuthNavigation('/signup'); close(); }}
@@ -134,7 +138,12 @@ export default function MobileMenu({
             >
               {/* ── IMPACT / CTA CARD ─────────────────────── */}
               <FadeIn delay={40}>
-                {userInfo ? (
+                {!isAuthReady ? (
+                  // Skeleton while auth resolves — prevents card flash
+                  <div className={`p-4 rounded-2xl border h-[108px] animate-pulse
+                    ${darkMode ? 'bg-zinc-900/60 border-zinc-800/60' : 'bg-zinc-100 border-zinc-200'}`}
+                  />
+                ) : userInfo ? (
                   <div className={`p-4 rounded-2xl border overflow-hidden relative
                     ${darkMode
                       ? 'bg-zinc-900/60 border-zinc-800/60'
@@ -241,8 +250,8 @@ export default function MobileMenu({
                 </Link>
               </FadeIn>
 
-              {/* ── VOLUNTEER ──────────────────────────────── */}
-              {!isOrganization && (
+              {/* ── VOLUNTEER — only shown once auth resolved ──────────────── */}
+              {isAuthReady && !isOrganization && (
                 <FadeIn delay={130}>
                   <Link
                     href={isVolunteer ? '/profile/vouchers' : '/volunteer/register'}
@@ -263,35 +272,37 @@ export default function MobileMenu({
                 <div className={`h-px ${darkMode ? 'bg-zinc-800' : 'bg-zinc-100'}`} />
               </FadeIn>
 
-              {/* ── MENU ITEMS ─────────────────────────────── */}
-              <FadeIn delay={160}>
-                <nav className="space-y-3.5">
-                  {activeMenuItems.map((item, i) => (
-                    <Link
-                      key={item.name}
-                      href={item.path || '#'}
-                      className={`flex items-center gap-3.5 text-sm font-medium transition-colors
-                        ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-emerald-600'}`}
-                      onClick={close}
-                    >
-                      <span className="w-5 flex-shrink-0 flex justify-center">
-                        {item.isLucide
-                          ? <item.icon className="w-[18px] h-[18px]" />
-                          : <Image src={item.icon} alt={item.name} width={18} height={18} />
-                        }
-                      </span>
-                      {item.name}
-                    </Link>
-                  ))}
-                </nav>
-              </FadeIn>
+              {/* ── MENU ITEMS — only shown once auth resolved ─────────────── */}
+              {isAuthReady && (
+                <FadeIn delay={160}>
+                  <nav className="space-y-3.5">
+                    {activeMenuItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.path || '#'}
+                        className={`flex items-center gap-3.5 text-sm font-medium transition-colors
+                          ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-emerald-600'}`}
+                        onClick={close}
+                      >
+                        <span className="w-5 flex-shrink-0 flex justify-center">
+                          {item.isLucide
+                            ? <item.icon className="w-[18px] h-[18px]" />
+                            : <Image src={item.icon} alt={item.name} width={18} height={18} />
+                          }
+                        </span>
+                        {item.name}
+                      </Link>
+                    ))}
+                  </nav>
+                </FadeIn>
+              )}
 
               <FadeIn delay={200}>
                 <div className={`h-px ${darkMode ? 'bg-zinc-800' : 'bg-zinc-100'}`} />
               </FadeIn>
 
-              {/* ── START FUNDRAISING ──────────────────────── */}
-              {!isOrganization && (
+              {/* ── START FUNDRAISING — only shown once auth resolved ──────── */}
+              {isAuthReady && !isOrganization && (
                 <FadeIn delay={220}>
                   <div className="space-y-2">
                     <p className={`text-[10px] font-bold tracking-widest uppercase ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
@@ -327,8 +338,8 @@ export default function MobileMenu({
                 </FadeIn>
               )}
 
-              {/* ── ORGANIZATIONS (distinct card) ─────────── */}
-              {!userInfo && (
+              {/* ── ORGANIZATIONS — only shown once auth resolved + logged out ─ */}
+              {isAuthReady && !userInfo && (
                 <FadeIn delay={240}>
                   <div className={`rounded-2xl border p-4 space-y-3
                     ${darkMode
@@ -351,7 +362,7 @@ export default function MobileMenu({
                 </FadeIn>
               )}
 
-              {/* ── SUPPORT (separate, neutral) ────────────── */}
+              {/* ── SUPPORT ────────────────────────────────── */}
               <FadeIn delay={255}>
                 <Link
                   href="/contactus"
@@ -367,8 +378,6 @@ export default function MobileMenu({
               </FadeIn>
 
             </div>
-
-
           </Drawer.Content>
         </Drawer.Portal>
       </Drawer.Root>

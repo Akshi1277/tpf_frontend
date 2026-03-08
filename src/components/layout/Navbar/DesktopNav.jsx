@@ -9,6 +9,7 @@ export default function DesktopNav({
   darkMode,
   setDarkMode,
   userInfo,
+  isAuthReady,       // ✅ NEW — true once we know auth state (from localStorage or API)
   isOrganization,
   initials,
   searchQuery,
@@ -114,8 +115,8 @@ export default function DesktopNav({
 
       {/* RIGHT – Actions */}
       <div className="flex items-center gap-2">
-        {/* Start Fundraising - desktop only */}
-        {!isOrganization && (
+        {/* Start Fundraising - desktop only, hide while auth is resolving */}
+        {isAuthReady && !isOrganization && (
           <button
             className="hidden md:flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm transition-colors cursor-pointer whitespace-nowrap"
             onClick={() => checkNavigation('/financial-aid')}
@@ -145,24 +146,33 @@ export default function DesktopNav({
             : <Moon className="w-4.5 h-4.5 text-zinc-900" style={{ width: 18, height: 18 }} />}
         </button>
 
-        {/* Avatar / Hamburger - equal 36x36 */}
-        <button
-          onClick={onMenuOpen}
-          className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer transition-colors font-bold text-sm
-            ${userInfo
-              ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md'
-              : darkMode
-                ? 'bg-zinc-800 hover:bg-zinc-700 text-white'
-                : 'bg-white hover:bg-zinc-100 text-zinc-900'}`}
-        >
-          {userInfo && initials
-            ? initials
-            : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-        </button>
+        {/* Avatar / Hamburger / Skeleton */}
+        {!isAuthReady ? (
+          // ── Still resolving auth → pulse skeleton, no flash ──
+          <div
+            className={`w-9 h-9 rounded-full flex-shrink-0 animate-pulse
+              ${darkMode ? 'bg-zinc-700' : 'bg-zinc-200'}`}
+          />
+        ) : (
+          // ── Auth resolved → show real button ──
+          <button
+            onClick={onMenuOpen}
+            className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer transition-colors font-bold text-sm
+              ${userInfo
+                ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md'
+                : darkMode
+                  ? 'bg-zinc-800 hover:bg-zinc-700 text-white'
+                  : 'bg-white hover:bg-zinc-100 text-zinc-900'}`}
+          >
+            {userInfo && initials
+              ? initials
+              : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+          </button>
+        )}
       </div>
     </>
   );
