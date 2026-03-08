@@ -133,11 +133,11 @@ export default function CampaignsSection({ darkMode }) {
             ref={containerRef}
             className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide"
           >
-            <div className="flex gap-4 sm:gap-5">
+            <div className="flex gap-4 sm:gap-5 items-stretch">
               {filteredCampaigns.map((campaign) => (
                 <div
                   key={campaign._id}
-                  className="flex-shrink-0 w-[280px] sm:w-[285px]"
+                  className="flex-shrink-0 w-[280px] sm:w-[285px] flex"
                 >
                   <CampaignCard campaign={campaign} darkMode={darkMode} />
                 </div>

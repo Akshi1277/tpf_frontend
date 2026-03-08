@@ -104,10 +104,10 @@ export default function CampaignCard({ campaign, darkMode }) {
 
           {/* Content section */}
           <div className="p-4 sm:p-5">
-            <h3 className="font-semibold text-sm sm:text-base mb-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] text-white">
+            <h3 className="font-semibold text-sm sm:text-base mb-1 line-clamp-2 h-[2.5rem] sm:h-[3rem] text-white">
               {campaign.title}
             </h3>
-            <p className="text-xs sm:text-sm text-zinc-200 mb-3 truncate">{campaign.org}</p>
+            <p className="text-xs sm:text-sm text-zinc-200 mb-3 truncate h-[1.25rem] sm:h-[1.5rem]">{campaign.org}</p>
 
             <div className="mb-3">
               <div className="flex justify-between text-xs sm:text-sm mb-2">
@@ -228,12 +228,11 @@ export default function CampaignCard({ campaign, darkMode }) {
   return (
     <div
       onClick={() => router.push(`/campaign/${campaign.slug}`)}
-      className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center rounded-2xl cursor-pointer overflow-hidden transition-all duration-300
+      className={`flex flex-col w-full snap-center rounded-2xl cursor-pointer overflow-hidden transition-all duration-300 h-full
         ${darkMode ? 'bg-zinc-800' : 'bg-white'}
-        
         shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
     >
-      <div className="relative aspect-video">
+      <div className="relative h-40 flex-shrink-0">
         <img
           src={getMediaUrl(campaign.image)}
           alt={campaign.title}
@@ -254,11 +253,11 @@ export default function CampaignCard({ campaign, darkMode }) {
         )}
       </div>
 
-      <div className="p-4 sm:p-5">
-        <h3 className={`font-semibold text-sm sm:text-base mb-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] ${COLORS.neutralHeading}`}>
+      <div className="p-4 sm:p-5 flex flex-col flex-grow">
+        <h3 className={`font-semibold text-sm sm:text-base mb-1 line-clamp-2 h-[2.5rem] sm:h-[3rem] ${COLORS.neutralHeading}`}>
           {campaign.title}
         </h3>
-        <p className={`text-xs sm:text-sm ${COLORS.neutralBody} mb-3 truncate`}>{campaign.org}</p>
+        <p className={`text-xs sm:text-sm ${COLORS.neutralBody} mb-3 truncate h-[1.25rem] sm:h-[1.5rem]`}>{campaign.org}</p>
 
         <div className="mb-3">
           <div className="flex justify-between text-xs sm:text-sm mb-2">
@@ -378,13 +377,10 @@ export default function CampaignCard({ campaign, darkMode }) {
 
             </button>
           </div>
-          {campaign.zakatVerified && (
-
-            <div className={`flex items-center gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full ${darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'}`}>
-              <CheckCircle className="w-3 h-3 text-emerald-600" />
-              <span className={`${darkMode ? 'text-emerald-400' : 'text-emerald-700'} whitespace-nowrap`}>Zakaat Verified</span>
-            </div>
-          )}
+          <div className={`flex items-center gap-1 text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full transition-opacity ${campaign.zakatVerified ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50'}`}>
+            <CheckCircle className="w-3 h-3 text-emerald-600" />
+            <span className={`${darkMode ? 'text-emerald-400' : 'text-emerald-700'} whitespace-nowrap`}>Zakaat Verified</span>
+          </div>
         </div>
 
       </div>
