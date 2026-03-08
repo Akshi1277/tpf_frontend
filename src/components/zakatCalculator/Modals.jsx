@@ -18,14 +18,14 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
           <p className={`text-base leading-relaxed ${
             darkMode ? 'text-zinc-300' : 'text-gray-600'
           }`}>
-            Having these documents ready will help you complete the calculation accurately and efficiently.
+            Having these ready will help you fill in the form without having to guess any numbers.
           </p>
           <div className="space-y-3">
             {[
               { title: 'Bank Statements', desc: 'Recent statements showing all account balances' },
-              { title: 'Precious Metals Documentation', desc: 'Invoices or certificates for gold and silver' },
-              { title: 'Investment Portfolios', desc: 'Current values of stocks, bonds, and dividends' },
-              { title: 'Retirement Accounts', desc: 'Pension and retirement fund statements' }
+              { title: 'Gold & Silver Records', desc: 'Any receipts, certificates, or notes about your gold and silver' },
+              { title: 'Investment Records', desc: 'Current value of your shares, funds, or any other investments' },
+              { title: 'Pension Statements', desc: 'How much is in your pension or retirement savings' }
             ].map((doc, idx) => (
               <motion.div
                 key={idx}
@@ -78,20 +78,20 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
             <p className={`text-sm leading-relaxed ${
               darkMode ? 'text-blue-200' : 'text-blue-900'
             }`}>
-              For jewelry containing mixed metals and precious stones, consult a professional jeweler.
+              If your jewellery is mixed with other metals or has gems in it, a jeweller can help you find out the gold or silver content.
             </p>
           </div>
 
           <div className="space-y-4">
             <h4 className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Steps to Calculate:
+              How to find your gold/silver value:
             </h4>
             <ol className="space-y-3">
               {[
-                'Visit your local jeweler with your jewelry',
-                'Request separate weighing of gold and silver components',
-                'Obtain current market price per gram',
-                'Calculate: Weight (grams) × Price per gram'
+                'Take your gold or silver to a local jeweller',
+                'Ask them to weigh each item separately',
+                'Find out the current price per gram (you can search online)',
+                'Multiply the weight by the price per gram to get the value'
               ].map((step, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <span className={`flex items-center justify-center w-6 h-6 rounded-full text-sm font-bold flex-shrink-0 ${
@@ -120,15 +120,15 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
       >
         <div className="space-y-5 -mt-1">
           <p className={`text-base ${darkMode ? 'text-zinc-300' : 'text-gray-600'}`}>
-            The following investment types are commonly subject to Zakat:
+            These are the most common types of investments that Zakat applies to:
           </p>
           <div className="grid gap-3">
             {[
-              { title: 'Equities', desc: 'Stocks, shares, and mutual funds' },
-              { title: 'Retirement Accounts', desc: '401(k), IRA, ESA, RRSP, RESP' },
-              { title: 'Real Estate', desc: 'Investment properties and REITs' },
-              { title: 'Pension Funds', desc: 'Accessible retirement savings' },
-              { title: 'Digital Assets', desc: 'Cryptocurrencies and tokens' }
+              { title: 'Shares & Funds', desc: 'Any shares you own in companies or investment funds' },
+              { title: 'Retirement Savings', desc: 'EPF, NPS, 401(k), IRA, or similar accounts' },
+              { title: 'Property', desc: 'Property you bought to sell or rent out (not your home)' },
+              { title: 'Pension', desc: 'Retirement savings you can currently access' },
+              { title: 'Cryptocurrency', desc: 'Bitcoin, Ethereum, and other digital coins or tokens' }
             ].map((inv, idx) => (
               <div
                 key={idx}
@@ -178,7 +178,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
             <p className={`text-sm leading-relaxed ${
               darkMode ? 'text-purple-200/80' : 'text-purple-800/80'
             }`}>
-              If you actively trade stocks as a swing trader or day trader, buying and selling frequently to profit from market movements.
+              You regularly buy and sell shares to make quick profits — for example, trading daily or weekly.
             </p>
           </div>
 
@@ -195,7 +195,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
             <p className={`text-sm leading-relaxed ${
               darkMode ? 'text-blue-200/80' : 'text-blue-800/80'
             }`}>
-              If you buy and hold stocks for long-term growth, typically not trading frequently.
+              You buy shares and keep them for a long time — you don't trade often and are focused on long-term growth.
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
           <p className={`text-base leading-relaxed ${
             darkMode ? 'text-zinc-300' : 'text-gray-700'
           }`}>
-            Only the zakatable assets within shares are liable for Zakat. Scholars have allowed approximating this to <strong className={darkMode ? 'text-emerald-400' : 'text-emerald-600'}>30% of market value</strong>.
+            Not all of your shares' value is subject to Zakat — only the zakatable portion. Scholars allow using <strong className={darkMode ? 'text-emerald-400' : 'text-emerald-600'}>30% of market value</strong>.
           </p>
 
           <div className={`p-6 rounded-xl border ${
@@ -301,18 +301,18 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
             <p className={`font-semibold mb-2 text-lg ${
               darkMode ? 'text-orange-300' : 'text-orange-900'
             }`}>
-              Simple Rule
+              Easy to Understand
             </p>
             <p className={`text-sm ${
               darkMode ? 'text-orange-200/80' : 'text-orange-800/80'
             }`}>
-              If you have access to withdraw or control the funds, Zakat is due on them.
+              If you can take money out of your pension right now, Zakat applies to it.
             </p>
           </div>
 
           <div className="space-y-4">
             <p className={`text-sm ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
-              Only zakatable assets are liable. Scholars allow approximating this to <strong>30% of market value</strong>.
+              Not everything in your pension is subject to Zakat. Scholars say you can use <strong>30% of the total value</strong> as a simple estimate.
             </p>
 
             <div className={`p-5 rounded-xl border ${
@@ -328,7 +328,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
               <p className={`text-sm mt-2 ${
                 darkMode ? 'text-blue-200/80' : 'text-blue-800/80'
               }`}>
-                If you cannot withdraw or control the funds, pay Zakat only when they mature and become accessible.
+                If you can't take the money out yet, you don't need to pay Zakat on it now. Pay when you can actually access it.
               </p>
             </div>
           </div>
@@ -344,14 +344,14 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
       >
         <div className="space-y-5">
           <p className={`text-base ${darkMode ? 'text-zinc-300' : 'text-gray-600'}`}>
-            Additional assets that may be subject to Zakat:
+            Other things you might own that could be subject to Zakat:
           </p>
           <div className="grid gap-3">
             {[
-              { title: 'Business Inventory', desc: 'Goods and materials held for sale' },
-              { title: 'International Accounts', desc: 'Foreign bank accounts and holdings' },
-              { title: 'Agricultural Assets', desc: 'Livestock and food crops' },
-              { title: 'Trade Receivables', desc: 'Outstanding payments from business' }
+              { title: 'Business Stock', desc: 'Products or materials your business holds for sale' },
+              { title: 'Overseas Bank Accounts', desc: 'Money you have in bank accounts in other countries' },
+              { title: 'Money Owed by Clients', desc: 'Payments your business is waiting to receive' },
+              { title: 'Valuable Collections', desc: 'Collectibles or items of significant value held as investments' }
             ].map((asset, idx) => (
               <div
                 key={idx}
@@ -393,7 +393,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
       >
         <div className="space-y-5">
           <p className={`text-base ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
-            <strong>Immediately due</strong> refers to your next scheduled payment, not annual totals.
+            This means only include the <strong>next payment you owe</strong> — not the total for the whole year.
           </p>
 
           <div className={`p-6 rounded-xl border ${
@@ -408,7 +408,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
               </h5>
             </div>
             <p className={`text-sm ${darkMode ? 'text-emerald-200/90' : 'text-emerald-900/90'}`}>
-              If you pay car insurance monthly, deduct only one month's payment—not the annual premium.
+              If you pay car insurance every month, only enter one month's amount — not the full year's premium.
             </p>
           </div>
         </div>
@@ -423,14 +423,14 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
       >
         <div className="space-y-5">
           <p className={`text-base ${darkMode ? 'text-zinc-300' : 'text-gray-600'}`}>
-            Typical upcoming expenses you may deduct:
+            Here are some common bills and payments you can subtract from your wealth:
           </p>
           <div className="grid gap-3">
             {[
-              { title: 'Housing Costs', desc: 'Next rent or mortgage payment', icon: '🏠' },
-              { title: 'Insurance Premiums', desc: 'Upcoming home, auto, and medical insurance', icon: '🛡️' },
-              { title: 'Utility Bills', desc: 'Next energy, water, and internet bills', icon: '💡' },
-              { title: 'Transportation', desc: 'Upcoming car payments and fuel costs', icon: '🚗' }
+              { title: 'Rent / Mortgage', desc: 'Your next rent or home loan payment', icon: '🏠' },
+              { title: 'Insurance', desc: 'Your next home, car, or health insurance payment', icon: '🛡️' },
+              { title: 'Utility Bills', desc: 'Next electricity, water, or internet bill', icon: '💡' },
+              { title: 'Car Payment', desc: 'Your next car loan or lease payment', icon: '🚗' }
             ].map((expense, idx) => (
               <div
                 key={idx}
@@ -463,7 +463,7 @@ const Modals = ({ activeModal, setActiveModal, darkMode = false }) => {
             <p className={`text-sm italic ${
               darkMode ? 'text-blue-200' : 'text-blue-900'
             }`}>
-              Remember: Only deduct your next upcoming payment, not annual amounts.
+              Tip: Always enter the next payment due — not the full year's total.
             </p>
           </div>
         </div>

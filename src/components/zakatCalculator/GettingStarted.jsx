@@ -14,7 +14,7 @@ const GettingStarted = ({ onStart, setActiveModal, darkMode = false }) => {
         <div className={`rounded-2xl shadow-sm border overflow-hidden ${darkMode ? 'bg-[#121212] border-zinc-800' : 'bg-white border-gray-200'}`}>
           <div className="p-6 sm:p-8">
             <h2 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-zinc-100' : 'text-gray-900'}`}>Before You Begin</h2>
-            <p className={`text-sm mb-6 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Have these ready for an accurate calculation</p>
+            <p className={`text-sm mb-6 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Getting these ready will make the process much easier</p>
 
             <div className="space-y-3 mb-6">
               <button
@@ -29,7 +29,7 @@ const GettingStarted = ({ onStart, setActiveModal, darkMode = false }) => {
                   </div>
                   <div>
                     <p className={`text-sm font-semibold ${darkMode ? 'text-emerald-400' : 'text-emerald-900'}`}>Documents to Have Ready</p>
-                    <p className={`text-xs ${darkMode ? 'text-emerald-300' : 'text-emerald-700'}`}>Bank statements, investment records & more</p>
+                    <p className={`text-xs ${darkMode ? 'text-emerald-300' : 'text-emerald-700'}`}>Bank statements, gold records & more</p>
                   </div>
                 </div>
                 <svg className={`w-4 h-4 group-hover:translate-x-0.5 transition-transform ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">

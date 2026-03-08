@@ -122,7 +122,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                 icon: TrendingUp,
                 iconColor: 'text-blue-500',
                 bg: 'bg-blue-50',
-                note: 'Cash, metals, investments, receivables',
+                note: 'Cash, gold/silver, investments, money owed to you',
               },
               {
                 label: 'Total Liabilities Deducted',
@@ -131,7 +131,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                 iconColor: 'text-red-500',
                 bg: 'bg-red-50',
                 prefix: '−',
-                note: 'Immediate debts & expenses',
+                note: 'Bills and debts you owe right now',
               },
               {
                 label: 'Net Zakatable Wealth',
@@ -139,7 +139,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                 icon: Scale,
                 iconColor: 'text-purple-600',
                 bg: 'bg-purple-50',
-                note: 'Assets minus liabilities',
+                note: 'Your wealth after deducting what you owe',
                 bold: true,
                 separator: true,
               },
@@ -149,7 +149,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                 icon: Calculator,
                 iconColor: 'text-gray-400',
                 bg: 'bg-gray-50',
-                note: `Based on ${nisabLabel}`,
+                note: `Minimum wealth required to pay Zakat (based on ${nisabLabel})`,
                 muted: true,
               },
               {
@@ -158,7 +158,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                 icon: Sparkles,
                 iconColor: 'text-emerald-600',
                 bg: 'bg-emerald-50',
-                note: 'Your obligatory payment',
+                note: 'The amount of Zakat you must pay',
                 highlight: true,
               },
             ].map((row, idx) => {
