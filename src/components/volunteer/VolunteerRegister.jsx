@@ -40,8 +40,11 @@ export default function VolunteerRegister({ darkMode }) {
         state: "",
         city: "",
         expertise: "",
-        customExpertise: ""
+        customExpertise: "",
+        helpDescription: ""
     })
+
+    const helpWordCount = formData.helpDescription.trim() ? formData.helpDescription.trim().split(/\s+/).length : 0;
 
     const [selectedStateCode, setSelectedStateCode] = useState("")
     const [cities, setCities] = useState([])
@@ -111,7 +114,7 @@ export default function VolunteerRegister({ darkMode }) {
         e.preventDefault()
         setLoading(true)
 
-        if (!formData.fullName || !formData.email || !formData.phone || !formData.gender || !formData.state || !formData.city || !formData.expertise) {
+        if (!formData.fullName || !formData.email || !formData.phone || !formData.gender || !formData.state || !formData.city || !formData.expertise || !formData.helpDescription) {
             showToast({
                 title: "Incomplete Form",
                 message: "Please fill all required fields",
@@ -131,6 +134,16 @@ export default function VolunteerRegister({ darkMode }) {
             return
         }
 
+        if (helpWordCount > 500) {
+            showToast({
+                title: "Limit Exceeded",
+                message: "Description should not exceed 500 words",
+                type: "warning"
+            })
+            setLoading(false)
+            return
+        }
+
         try {
             const professionToUpdate = formData.expertise === "Other" ? formData.customExpertise : formData.expertise;
 
@@ -141,7 +154,8 @@ export default function VolunteerRegister({ darkMode }) {
                 gender: formData.gender,
                 state: formData.state,
                 city: formData.city,
-                profession: professionToUpdate
+                profession: professionToUpdate,
+                helpDescription: formData.helpDescription
             }).unwrap()
 
             showToast({
@@ -637,7 +651,6 @@ export default function VolunteerRegister({ darkMode }) {
                                         />
                                     </div>
 
-                                    {/* Custom Expertise (Conditional) */}
                                     <AnimatePresence>
                                         {showCustomExpertise && (
                                             <motion.div
@@ -664,9 +677,36 @@ export default function VolunteerRegister({ darkMode }) {
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
+
+                                    {/* How can you help Description */}
+                                    <div className="md:col-span-2 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <label className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${darkMode ? 'text-zinc-500' : 'text-gray-600'}`}>
+                                                <Heart size={14} className="text-[#D4AF37]" /> How can you help True Path Foundation?
+                                            </label>
+                                            <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${helpWordCount > 500 ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
+                                                {helpWordCount} / 500 WORDS
+                                            </span>
+                                        </div>
+                                        <textarea
+                                            name="helpDescription"
+                                            value={formData.helpDescription}
+                                            onChange={handleInputChange}
+                                            placeholder="Tell us about how you can contribute to our cause, your motivations, and any specific ways you'd like to help..."
+                                            rows={5}
+                                            className={`w-full px-6 py-4 rounded-2xl border-2 outline-none transition-all font-medium resize-none ${darkMode
+                                                ? 'bg-zinc-800/50 border-zinc-700/50 focus:border-[#D4AF37] text-white focus:bg-zinc-800'
+                                                : 'bg-gray-50 border-gray-100 focus:border-[#D4AF37] text-gray-900 focus:bg-white focus:shadow-md'
+                                                } ${helpWordCount > 500 ? 'border-red-500/50' : ''}`}
+                                            required
+                                        />
+                                        {helpWordCount > 500 && (
+                                            <p className="text-[10px] text-red-500 font-bold flex items-center gap-1">
+                                                <AlertCircle size={10} /> Word limit exceeded
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-
-
 
                                 <div className="pt-4">
                                     <button
@@ -690,7 +730,6 @@ export default function VolunteerRegister({ darkMode }) {
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-4 border-t border-zinc-700/10">
-
                                     {!userInfo && (
                                         <Link href="/login" className="text-sm font-bold text-emerald-500 hover:text-[#D4AF37] transition-colors flex items-center gap-2">
                                             Already a TPF Volunteer? Login
@@ -703,8 +742,6 @@ export default function VolunteerRegister({ darkMode }) {
                     </motion.div>
                 </div>
             </div>
-
-
         </div>
     )
 }

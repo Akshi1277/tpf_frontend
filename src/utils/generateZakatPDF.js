@@ -4,17 +4,21 @@ import autoTable from 'jspdf-autotable';
 // ─────────────────────────────────────────────────────────────────
 // Palette — emerald / white / slate (mirrors the website)
 // ─────────────────────────────────────────────────────────────────
-const EMERALD        = [45,  122, 92];    // #2D7A5C
-const EMERALD_DARK   = [26,   74, 53];    // #1a4a35
-const EMERALD_LIGHT  = [209, 238, 224];   // soft emerald tint
-const EMERALD_ROW    = [240, 249, 245];   // table row tint
-const GOLD           = [212, 175, 55];    // #D4AF37
-const TEXT_DARK      = [30,   41, 59];    // slate-800
-const TEXT_MID       = [100, 116, 139];   // slate-500
-const TEXT_LIGHT     = [148, 163, 184];   // slate-400
-const DIVIDER        = [226, 232, 240];   // slate-200
-const WHITE          = [255, 255, 255];
-const PAGE_BG        = [248, 250, 252];   // slate-50
+const EMERALD = [16, 185, 129];    // #10b981 (Website Primary)
+const EMERALD_DARK = [5, 150, 105];    // #059669 (Website Deep)
+const EMERALD_LIGHT = [209, 250, 229];   // #d1fae5
+const EMERALD_ROW = [240, 253, 244];   // #f0fdf4
+
+// Metallic colors for specific assets (no general 'yellow')
+const METAL_GOLD = [184, 134, 11];    // Darker, rich metallic gold
+const METAL_SILVER = [120, 130, 140];   // Slate-silver tone
+
+const TEXT_DARK = [30, 41, 59];    // slate-800
+const TEXT_MID = [100, 116, 139];   // slate-500
+const TEXT_LIGHT = [148, 163, 184];   // slate-400
+const DIVIDER = [226, 232, 240];   // slate-200
+const WHITE = [255, 255, 255];
+const PAGE_BG = [248, 250, 252];   // slate-50
 
 // ─────────────────────────────────────────────────────────────────
 // Micro-helpers
@@ -44,7 +48,7 @@ const loadLogo = () =>
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const c = document.createElement('canvas');
-      c.width  = img.naturalWidth;
+      c.width = img.naturalWidth;
       c.height = img.naturalHeight;
       c.getContext('2d').drawImage(img, 0, 0);
       resolve({ base64: c.toDataURL('image/png'), w: img.naturalWidth, h: img.naturalHeight });
@@ -58,14 +62,20 @@ const loadLogo = () =>
  * Returns the y position after the heading (ready for content).
  */
 const heading = (doc, text, y, PW, ML, MR) => {
-  fillRR(doc, ML, y, 3, 12, 1, EMERALD);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(10.5);
   doc.setTextColor(...EMERALD_DARK);
-  doc.text(text, ML + 6, y + 8.5);
+  doc.text(text, ML, y + 8);
+
+  // Thin minimalist underline (Option 2)
+  doc.setDrawColor(...EMERALD);
+  doc.setLineWidth(0.6);
+  doc.line(ML, y + 10, ML + 15, y + 10); // Short accent underline
+
   doc.setDrawColor(...DIVIDER);
-  doc.setLineWidth(0.25);
-  doc.line(ML + 6, y + 12, PW - MR, y + 12);
+  doc.setLineWidth(0.2);
+  doc.line(ML, y + 10, PW - MR, y + 10); // Full width soft divider
+
   return y + 18;
 };
 
@@ -77,49 +87,47 @@ const generateZakatPDF = async (results, formatCurrency) => {
 
   // ── Destructure full API response ────────────────────
   const {
-    totalAssets      = 0,
+    totalAssets = 0,
     totalLiabilities = 0,
-    zakatableWealth  = 0,
-    zakatDue         = 0,
-    isEligible       = false,
-    pdf: pdfObj      = {},
+    zakatableWealth = 0,
+    zakatDue = 0,
+    isEligible = false,
+    pdf: pdfObj = {},
   } = results;
 
-  const nisabVal          = pdfObj?.nisab?.value            ?? results.nisabValue ?? results.nisab ?? 0;
-  const nisabType         = (pdfObj?.nisab?.type            ?? results.nisabType  ?? 'SILVER').toUpperCase();
-  const goldNisabGrams    = pdfObj?.nisab?.goldNisabGrams   ?? 87.48;
-  const silverNisabGrams  = pdfObj?.nisab?.silverNisabGrams ?? 612.36;
-  const goldPPG           = pdfObj?.metalPrices?.goldPricePerGram   ?? 0;
-  const silverPPG         = pdfObj?.metalPrices?.silverPricePerGram ?? 0;
-  const calc              = pdfObj?.calculations ?? {};
-  const inputs            = pdfObj?.inputs       ?? {};
-  const generatedAt       = pdfObj?.generatedAt ? new Date(pdfObj.generatedAt) : new Date();
+  const nisabVal = pdfObj?.nisab?.value ?? results.nisabValue ?? results.nisab ?? 0;
+  const nisabType = (pdfObj?.nisab?.type ?? results.nisabType ?? 'SILVER').toUpperCase();
+  const goldNisabGrams = pdfObj?.nisab?.goldNisabGrams ?? 87.48;
+  const silverNisabGrams = pdfObj?.nisab?.silverNisabGrams ?? 612.36;
+  const goldPPG = pdfObj?.metalPrices?.goldPricePerGram ?? 0;
+  const silverPPG = pdfObj?.metalPrices?.silverPricePerGram ?? 0;
+  const calc = pdfObj?.calculations ?? {};
+  const inputs = pdfObj?.inputs ?? {};
+  const generatedAt = pdfObj?.generatedAt ? new Date(pdfObj.generatedAt) : new Date();
 
-  const fmt  = (v) => pdfFmt(formatCurrency, v);
+  const fmt = (v) => pdfFmt(formatCurrency, v);
   const fNum = (n, d = 2) => Number(n ?? 0).toLocaleString('en-IN', { maximumFractionDigits: d });
 
-  const goldNisabAmt   = goldNisabGrams   * goldPPG;
+  const goldNisabAmt = goldNisabGrams * goldPPG;
   const silverNisabAmt = silverNisabGrams * silverPPG;
 
   // ── Document setup ────────────────────────────────────
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-  const PW  = doc.internal.pageSize.getWidth();   // 210 mm
-  const PH  = doc.internal.pageSize.getHeight();  // 297 mm
-  const ML  = 14;
-  const MR  = 14;
-  const CW  = PW - ML - MR;  // 182 mm
+  const PW = doc.internal.pageSize.getWidth();   // 210 mm
+  const PH = doc.internal.pageSize.getHeight();  // 297 mm
+  const ML = 14;
+  const MR = 14;
+  const CW = PW - ML - MR;  // 182 mm
 
   // Page 1 background
   doc.setFillColor(...PAGE_BG);
   doc.rect(0, 0, PW, PH, 'F');
 
-  // ─────────────────────────────────────────────────────
-  // HEADER BAND
-  // ─────────────────────────────────────────────────────
+  // Header Band
   fillRR(doc, 0, 0, PW, 36, 0, EMERALD_DARK);
-  // Gold top stripe
-  doc.setFillColor(...GOLD);
-  doc.rect(0, 0, PW, 2.5, 'F');
+  // Soft emerald top stripe instead of yellow
+  doc.setFillColor(...EMERALD);
+  doc.rect(0, 0, PW, 1.5, 'F');
 
   // Logo — small, left-aligned (height = 9 mm)
   const logo = await loadLogo();
@@ -132,7 +140,7 @@ const generateZakatPDF = async (results, formatCurrency) => {
   // Report label (top right)
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.setTextColor(...GOLD);
+  doc.setTextColor(...WHITE);
   doc.text('ZAKAT SUMMARY REPORT', PW - MR, 15, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
@@ -145,38 +153,39 @@ const generateZakatPDF = async (results, formatCurrency) => {
   const pillTxt = isEligible ? 'ZAKAT OBLIGATORY' : 'BELOW NISAB';
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
-  const pillColor = isEligible ? GOLD : TEXT_LIGHT;
+  const pillColor = isEligible ? [255, 255, 255] : TEXT_LIGHT;
   doc.setTextColor(...pillColor);
   doc.text(pillTxt, PW - MR, 29, { align: 'right' });
 
   let y = 46;
 
-  // ─────────────────────────────────────────────────────
   // SECTION 1 — Calculation Summary Card
-  // ─────────────────────────────────────────────────────
-  const cardH = 54;
+  const cardH = 58;
   fillRR(doc, ML, y, CW, cardH, 3, WHITE);
   strokeRR(doc, ML, y, CW, cardH, 3, DIVIDER);
-  // Left accent bar
-  fillRR(doc, ML, y, 3.5, cardH, 2, EMERALD);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(...EMERALD_DARK);
-  doc.text('Calculation Summary', ML + 8, y + 10);
+  doc.text('Calculation Summary', ML + 6, y + 10);
+
+  // Soft minimalist accent underline
+  doc.setDrawColor(...EMERALD);
+  doc.setLineWidth(0.8);
+  doc.line(ML + 6, y + 12, ML + 22, y + 12);
 
   // Rows
   const summRows = [
-    { label: 'Total Zakatable Assets',     value: fmt(totalAssets),      bold: false },
+    { label: 'Total Zakatable Assets', value: fmt(totalAssets), bold: false },
     { label: 'Total Liabilities Deducted', value: `- ${fmt(totalLiabilities)}`, bold: false },
-    { label: 'Net Zakatable Wealth',       value: fmt(zakatableWealth),  bold: true  },
-    { label: 'Nisab Threshold',            value: fmt(nisabVal),         bold: false, muted: true },
+    { label: 'Net Zakatable Wealth', value: fmt(zakatableWealth), bold: true },
+    { label: 'Nisab Threshold', value: fmt(nisabVal), bold: false, muted: true },
   ];
 
   let ry = y + 17;
   summRows.forEach(({ label, value, bold, muted }, i) => {
     if (i % 2 === 0) {
-      doc.setFillColor(248, 252, 250);
+      doc.setFillColor(...PAGE_BG);
       doc.rect(ML + 4, ry - 2.5, CW - 8, 7, 'F');
     }
     doc.setFont('helvetica', 'normal');
@@ -189,11 +198,12 @@ const generateZakatPDF = async (results, formatCurrency) => {
     ry += 8;
   });
 
-  // Zakat Due — highlighted row
-  fillRR(doc, ML + 4, ry - 2.5, CW - 8, 9, 2, EMERALD);
+  // Zakat Due — Clean highlighted row (stays inside the card)
+  doc.setFillColor(...EMERALD_LIGHT);
+  doc.rect(ML + 3.8, ry - 2.5, CW - 7.6, 9, 'F');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
-  doc.setTextColor(...WHITE);
+  doc.setTextColor(...EMERALD_DARK);
   doc.text('Zakat Due (2.5%)', ML + 8, ry + 4);
   doc.text(fmt(zakatDue), PW - MR - 5, ry + 4, { align: 'right' });
 
@@ -290,11 +300,11 @@ const generateZakatPDF = async (results, formatCurrency) => {
 
   y = doc.lastAutoTable.finalY + 4;
 
-  // Total row
-  fillRR(doc, ML, y, CW, 9.5, 2, EMERALD_LIGHT);
+  // Total row — using Gold theme to increase visibility
+  fillRR(doc, ML, y, CW, 9.5, 2, [255, 250, 235]); // Very light gold tint
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
-  doc.setTextColor(...EMERALD_DARK);
+  doc.setTextColor(...METAL_GOLD);
   doc.text('Total Zakatable Assets', ML + 5, y + 6.5);
   doc.text(fmt(totalAssets), PW - MR - 5, y + 6.5, { align: 'right' });
   y += 16;
@@ -327,17 +337,22 @@ const generateZakatPDF = async (results, formatCurrency) => {
   const cH2 = 40;
 
   const drawNisabCard = (x, type, grams, pricePPG, nisabAmt, isUsed) => {
-    const bg   = isUsed ? EMERALD      : WHITE;
-    const bord = isUsed ? EMERALD      : DIVIDER;
-    const t1   = isUsed ? WHITE        : TEXT_DARK;
-    const t2   = isUsed ? [200,235,220]: TEXT_MID;
-    const t3   = isUsed ? GOLD         : TEXT_LIGHT;
+    // Silver color for silver, gold color for gold
+    const metalColor = type === 'GOLD' ? METAL_GOLD : METAL_SILVER;
+    // Always use metal color for background and white for text as requested
+    const bg = metalColor;
+    const t1 = WHITE;
+    const t2 = [245, 245, 245];
+    const t3 = WHITE;
 
     fillRR(doc, x, y, cW2, cH2, 3, bg);
-    strokeRR(doc, x, y, cW2, cH2, 3, bord, 0.5);
+
+    // Add the white highlight border for that premium "weighted" look
+    // We use a stronger line for the "Applied" card to maintain clear distinction
+    strokeRR(doc, x + 1, y + 1, cW2 - 2, cH2 - 2, 2.5, WHITE, isUsed ? 0.8 : 0.4);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(8.5);
     doc.setTextColor(...t1);
     doc.text(type === 'GOLD' ? '  Gold Nisab' : '  Silver Nisab', x + 5, y + 8);
 
@@ -348,13 +363,13 @@ const generateZakatPDF = async (results, formatCurrency) => {
     doc.text(`Spot price: Rs. ${fNum(pricePPG, 0)}/g`, x + 5, y + 21);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9.5);
+    doc.setFontSize(10);
     doc.setTextColor(...t1);
     doc.text(fmt(nisabAmt), x + 5, y + 30);
 
     if (isUsed) {
       doc.setFontSize(6.5);
-      doc.setTextColor(...GOLD);
+      doc.setTextColor(...t3);
       doc.text('APPLIED TO YOUR CALCULATION', x + 5, y + 37);
     } else {
       doc.setFontSize(6.5);
@@ -363,8 +378,8 @@ const generateZakatPDF = async (results, formatCurrency) => {
     }
   };
 
-  drawNisabCard(ML,          'GOLD',   goldNisabGrams,   goldPPG,   goldNisabAmt,   nisabType === 'GOLD');
-  drawNisabCard(ML + cW2 + 5,'SILVER', silverNisabGrams, silverPPG, silverNisabAmt, nisabType === 'SILVER');
+  drawNisabCard(ML, 'GOLD', goldNisabGrams, goldPPG, goldNisabAmt, nisabType === 'GOLD');
+  drawNisabCard(ML + cW2 + 5, 'SILVER', silverNisabGrams, silverPPG, silverNisabAmt, nisabType === 'SILVER');
 
   y += cH2 + 8;
 
@@ -457,18 +472,22 @@ const generateZakatPDF = async (results, formatCurrency) => {
 
   fillRR(doc, ML, y, CW, 28, 3, WHITE);
   strokeRR(doc, ML, y, CW, 28, 3, DIVIDER);
-  fillRR(doc, ML, y, 3.5, 28, 2, GOLD);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.setTextColor(...TEXT_DARK);
-  doc.text('Spot Metal Prices at Time of Calculation', ML + 8, y + 8);
+  doc.text('Spot Metal Prices at Time of Calculation', ML + 6, y + 8);
 
-  // Left column — prices
-  doc.setFont('helvetica', 'normal');
+  doc.setDrawColor(...EMERALD);
+  doc.setLineWidth(0.4);
+  doc.line(ML + 6, y + 10, ML + 18, y + 10);
+
+  // Left column — prices with metallic colors
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
-  doc.setTextColor(...TEXT_MID);
+  doc.setTextColor(...METAL_GOLD);
   doc.text(`Gold (24K pure):   Rs. ${fNum(goldPPG, 0)} per gram`, ML + 8, y + 16);
+  doc.setTextColor(...METAL_SILVER);
   doc.text(`Silver (pure):        Rs. ${fNum(silverPPG, 0)} per gram`, ML + 8, y + 22);
 
   // Right column — nisab equivalents
@@ -489,13 +508,12 @@ const generateZakatPDF = async (results, formatCurrency) => {
     fillRR(doc, 0, PH - 13, PW, 13, 0, EMERALD_DARK);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.5);
-    doc.setTextColor(...GOLD);
+    doc.setTextColor(255, 255, 255);
     doc.text('TPF Aid — Zakat Calculator', ML, PH - 5.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(180, 210, 195);
-    doc.text('For reference only. Please verify with a qualified Islamic scholar.', PW / 2, PH - 5.5, { align: 'center' });
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...GOLD);
+    doc.setTextColor(255, 255, 255);
     doc.text(`${p} / ${totalPages}`, PW - MR, PH - 5.5, { align: 'right' });
   }
 
