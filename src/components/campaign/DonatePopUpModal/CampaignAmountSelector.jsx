@@ -124,8 +124,18 @@ export default function CampaignAmountSelector({
     }
   };
 
-  const flatPresets = config.presets.filter(p => !p.qty);
-  const kitPresets = config.presets.filter(p => p.qty);
+  const flatPresets = (config.presets && config.presets.length > 0)
+    ? config.presets.filter(p => !p.qty)
+    : [
+      { amount: 50, label: '₹50' },
+      { amount: 100, label: '₹100' },
+      { amount: 500, label: '₹500' },
+      { amount: 1000, label: '₹1000' }
+    ];
+
+  const kitPresets = (config.presets && config.presets.length > 0)
+    ? config.presets.filter(p => p.qty)
+    : [];
 
   const isOtherActive = showCustomAmountInput || !!customAmount;
 
