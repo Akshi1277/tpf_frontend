@@ -10,12 +10,12 @@ import { useRouter } from 'next/navigation';
 
 const page = () => {
   const [darkMode, setDarkMode] = useState(() => {
-  if (typeof window !== "undefined") {
-    const saved = localStorage.getItem("darkMode");
-    return saved ? JSON.parse(saved) : false;
-  }
-  return false;
-});
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("darkMode");
+      return saved ? JSON.parse(saved) : false;
+    }
+    return false;
+  });
   const [scrolled, setScrolled] = useState(true); // 👈 Always true
   const router = useRouter();
 
@@ -29,12 +29,13 @@ const page = () => {
       <div className={`min-h-screen ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
         <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
 
-          
+
 
         <ZakatCalculator darkMode={darkMode} />
 
         <CampaignCarouselSection
           darkMode={darkMode}
+          zakatOnly={true}
           title="Zakat Eligible Campaigns"
           subtitle="Direct your Zakat to verified causes and help the needy."
         />

@@ -10,7 +10,7 @@ const calcDaysLeft = (deadline) => {
     return Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
 };
 
-export default function CampaignCarouselSection({ darkMode, title = "Ongoing Campaigns", subtitle = "Explore causes that matter most to our community" }) {
+export default function CampaignCarouselSection({ darkMode, zakatOnly = false, title = "Ongoing Campaigns", subtitle = "Explore causes that matter most to our community" }) {
     const [scrollIndex, setScrollIndex] = useState(0);
     const [isUserScrolling, setIsUserScrolling] = useState(false);
     const containerRef = useRef(null);
@@ -24,7 +24,8 @@ export default function CampaignCarouselSection({ darkMode, title = "Ongoing Cam
                     item.type === 'fundraiser' &&
                     item.campaignStatus === 'ACTIVE' &&
                     typeof item.campaignSlug === 'string' &&
-                    item.campaignSlug.trim().length > 0
+                    item.campaignSlug.trim().length > 0 &&
+                    (!zakatOnly || item.zakatVerified)
             )
             .map((campaign) => ({
                 ...campaign,
