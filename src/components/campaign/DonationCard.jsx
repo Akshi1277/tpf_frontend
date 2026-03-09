@@ -10,9 +10,10 @@ import { useSoftSignupMutation } from '@/utils/slices/authApiSlice';
 import CampaignAmountSelector, { getCampaignConfig } from './DonatePopUpModal/CampaignAmountSelector';
 import DefaultAmountSelector from './DonatePopUpModal/DefaultAmountSelector';
 import ExitConfirmationModal from './DonatePopUpModal/ExitConfirmationModal';
-
+import ZakatFeeModal from './ZakatFeeModal';
+import { GATEWAY_FEE_PERCENT } from './ZakatFeeModal';
 /* ─────────────────────────────────────────────────────────────────────────────
-   Donation-type definitions (with icons, matching the modal)
+   Donation-type definitions
 ───────────────────────────────────────────────────────────────────────────── */
 const allDonationTypes = [
   { id: 'ZAKAAT', label: 'Zakat', desc: 'Obligatory charity', Icon: Moon },
@@ -60,6 +61,10 @@ export default function DonationCard({
   const [isDonating, setIsDonating] = useState(false);
   const [cashfreeData, setCashfreeData] = useState(null);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+
+  /* ── Zakat fee modal state ────────────────────────────────────────────── */
+  const [showZakatFeeModal, setShowZakatFeeModal] = useState(false);
+  const [zakatFeeChoice, setZakatFeeChoice] = useState(null); // 'pay_more' | 'count_less'
 
   const checkoutStartedRef = useRef(false);
 
@@ -139,8 +144,26 @@ export default function DonationCard({
     throw new Error('Unable to identify user');
   };
 
+  /* ── Intercept donate: show Zakat modal when needed ──────────────────── */
+  const handleDonateClick = () => {
+    const amount = selectedAmount || parseInt(customAmount);
+    if (!amount || amount < 50) { handleDonate(); return; }
+    if (donationType === 'ZAKAAT' && zakatVerified) {
+      setShowZakatFeeModal(true);
+      return;
+    }
+    handleDonate();
+  };
+
+  /* ── Called when user picks an option in the Zakat fee modal ─────────── */
+  const handleZakatFeeConfirm = (choice) => {
+    setZakatFeeChoice(choice);
+    setShowZakatFeeModal(false);
+    handleDonate(choice);
+  };
+
   /* ── Donate handler ───────────────────────────────────────────────────── */
-  const handleDonate = async () => {
+  const handleDonate = async (zakatChoice = zakatFeeChoice) => {
     if (isDonating) return;
     const amount = selectedAmount || parseInt(customAmount);
     if (!amount) return;
@@ -168,6 +191,13 @@ export default function DonationCard({
       }
     }
 
+    // For Zakat "pay_more": bump the amount so the net received equals the intended Zakat
+    let finalAmount = amount;
+    if (donationType === 'ZAKAAT' && zakatChoice === 'pay_more') {
+      const feeAmount = Math.round(amount * (GATEWAY_FEE_PERCENT / 100) * 100) / 100;
+      finalAmount = Math.round((amount + feeAmount) * 100) / 100;
+    }
+
     setIsDonating(true);
     try {
       let userIdToUse = userId;
@@ -178,7 +208,7 @@ export default function DonationCard({
       const calculatedTipAmount = customTip
         ? parseInt(customTip)
         : tipPercentage
-          ? Math.round(amount * (tipPercentage / 100))
+          ? Math.round(finalAmount * (tipPercentage / 100))
           : 0;
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/initiate`, {
@@ -186,13 +216,14 @@ export default function DonationCard({
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          amount,
+          amount: finalAmount,
           tipAmount: calculatedTipAmount,
           campaignId,
           donationType,
           isAnonymous,
           isTaxEligible: claim80G,
           userId: userIdToUse,
+          ...(donationType === 'ZAKAAT' && { zakatFeeChoice: zakatChoice }),
         }),
       });
       const data = await res.json();
@@ -261,7 +292,6 @@ export default function DonationCard({
     </label>
   );
 
-  /* ── Section label (matches card's existing style) ───────────────────── */
   const SectionLabel = ({ children }) => (
     <label className={`block text-sm font-semibold mb-4 ${dk ? 'text-gray-200' : 'text-gray-800'}`}>
       {children}
@@ -287,10 +317,8 @@ export default function DonationCard({
                 Your contribution makes a difference
               </p>
             </div>
-            {/* Total pill — shows once a valid amount is selected */}
             {baseAmount >= 50 && (
-              <div className={`flex-shrink-0 flex items-baseline gap-1.5 px-3 py-1.5 rounded-xl ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
-                }`}>
+              <div className={`flex-shrink-0 flex items-baseline gap-1.5 px-3 py-1.5 rounded-xl ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'}`}>
                 <span className={`text-[10px] font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</span>
                 <span className={`text-base font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
                   ₹{totalAmount.toLocaleString()}
@@ -368,8 +396,7 @@ export default function DonationCard({
         </div>
 
         {/* ── Selected amount summary ───────────────────────────────────── */}
-        <div className={`mb-6 px-3 py-2.5 rounded-lg flex items-center justify-between ${dk ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50 border border-gray-100'
-          }`}>
+        <div className={`mb-6 px-3 py-2.5 rounded-lg flex items-center justify-between ${dk ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50 border border-gray-100'}`}>
           <span className={`text-xs font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Donation amount</span>
           {baseAmount >= 50 ? (
             <span className={`text-sm font-extrabold ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
@@ -384,7 +411,7 @@ export default function DonationCard({
           )}
         </div>
 
-        {/* ── Guest Details (logged-out only) ──────────────────────────── */}
+        {/* ── Guest Details ────────────────────────────────────────────── */}
         {!userInfo && (
           <div className="mb-8">
             <SectionLabel>Your Details</SectionLabel>
@@ -416,9 +443,7 @@ export default function DonationCard({
         {/* ── Platform Tip ─────────────────────────────────────────────── */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <label className={`text-sm font-semibold ${dk ? 'text-gray-200' : 'text-gray-800'}`}>
-              Support TPF
-            </label>
+            <label className={`text-sm font-semibold ${dk ? 'text-gray-200' : 'text-gray-800'}`}>Support TPF</label>
             <div className="group relative">
               <Info className="w-4 h-4 text-emerald-500 cursor-help" />
               <div className={`
@@ -432,8 +457,6 @@ export default function DonationCard({
               </div>
             </div>
           </div>
-
-          {/* Tip percentage buttons */}
           <div className="flex gap-2 mb-3">
             {tipPercentages.map((pct) => (
               <button
@@ -456,8 +479,6 @@ export default function DonationCard({
               {customTip && !showCustomTipInput ? `₹${customTip}` : 'Other'}
             </button>
           </div>
-
-          {/* Custom tip input */}
           {showCustomTipInput && (
             <div className="relative">
               <span className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold pointer-events-none ${dk ? 'text-zinc-400' : 'text-gray-400'}`}>₹</span>
@@ -475,8 +496,6 @@ export default function DonationCard({
               />
             </div>
           )}
-
-          {/* Calculated tip display */}
           {tipAmount > 0 && (
             <p className={`mt-2 text-xs font-medium ${dk ? 'text-zinc-500' : 'text-gray-500'}`}>
               Tip: ₹{tipAmount.toLocaleString()}
@@ -487,23 +506,15 @@ export default function DonationCard({
 
         {/* ── Checkboxes ───────────────────────────────────────────────── */}
         <div className="mb-6 space-y-3">
-          <CustomCheckbox
-            checked={isAnonymous}
-            onChange={setIsAnonymous}
-            label="Make my donation anonymous"
-          />
+          <CustomCheckbox checked={isAnonymous} onChange={setIsAnonymous} label="Make my donation anonymous" />
           {taxEligible && (
-            <CustomCheckbox
-              checked={claim80G}
-              onChange={setClaim80G}
-              label="Claim 80G tax benefits"
-            />
+            <CustomCheckbox checked={claim80G} onChange={setClaim80G} label="Claim 80G tax benefits" />
           )}
         </div>
 
         {/* ── Donate Button ─────────────────────────────────────────────── */}
         <button
-          onClick={handleDonate}
+          onClick={handleDonateClick}
           disabled={isDonating || baseAmount < 50}
           className={`
             w-full h-14 rounded-lg font-bold text-base mb-4 transition-all
@@ -550,6 +561,14 @@ export default function DonationCard({
           </p>
         </div>
       </div>
+
+      {/* ── Zakat Fee Modal ──────────────────────────────────────────────── */}
+      <ZakatFeeModal
+        isOpen={showZakatFeeModal}
+        onConfirm={handleZakatFeeConfirm}
+        darkMode={dk}
+        donationAmount={baseAmount}
+      />
 
       {/* ── Exit Confirmation Modal ──────────────────────────────────────── */}
       <ExitConfirmationModal
