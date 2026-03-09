@@ -6,26 +6,35 @@ import { hijriMonths } from '@/lib/constants';
 import Link from 'next/link';
 import { useAppToast } from '@/app/AppToastContext';
 
-import { useGetHijriDateQuery } from '@/utils/slices/apiSlice';
-
+import { useGetHijriCalendarQuery } from '@/utils/slices/apiSlice';
 export default function Footer({ darkMode }) {
   const { showToast } = useAppToast();
   const today = new Date();
-  const dateStr = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-  const { data: hijriData } = useGetHijriDateQuery(dateStr);
+  const { data: calendar } = useGetHijriCalendarQuery({
+    month: today.getMonth() + 1,
+    year: today.getFullYear(),
+  });
 
   let hijriFromApi = null;
-  if (hijriData?.data) {
-    const { hijri, gregorian: greg } = hijriData.data;
-    if (hijri && greg) {
-      const monthName = hijri.month?.en || hijriMonths[Number(hijri.month) - 1];
-      const [dayStr, monthStr, yearStr] = greg.date.split('-');
-      const dayNum = parseInt(dayStr);
-      const monthNum = parseInt(monthStr);
-      const yearNum = parseInt(yearStr);
-      const gregDate = new Date(yearNum, monthNum - 1, dayNum);
+
+  if (calendar) {
+    const todayData = calendar.find(
+      (d) => Number(d.gregorian.day) === today.getDate()
+    );
+
+    if (todayData) {
+      const { hijri, gregorian } = todayData;
+
+      const monthName = hijri.month.en;
+
+      const gregDate = new Date(
+        gregorian.year,
+        gregorian.month.number - 1,
+        gregorian.day
+      );
+
       const day = gregDate.getDate();
-      const month = gregDate.toLocaleString('en-GB', { month: 'long' });
+      const month = gregDate.toLocaleString("en-GB", { month: "long" });
       const year = gregDate.getFullYear();
 
       const getOrdinal = (n) => {
@@ -35,7 +44,10 @@ export default function Footer({ darkMode }) {
       };
 
       const formattedGreg = `${day}${getOrdinal(day)} ${month} ${year}`;
-      hijriFromApi = `${monthName} ${hijri.day}, ${hijri.year}  (${greg.weekday.en}, ${formattedGreg})`;
+
+      const adjustedDay = Math.max(1, Number(hijri.day) - 1);
+
+      hijriFromApi = `${monthName} ${adjustedDay}, ${hijri.year} (${gregorian.weekday.en}, ${formattedGreg})`;
     }
   }
 

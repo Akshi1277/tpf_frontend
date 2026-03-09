@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Heart, Lock, Info, Check, AlertCircle, Sparkles, ShieldCheck, User, Mail, Phone, Moon, Coins, Gift, Star, HandHeart } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useAppToast } from '@/app/AppToastContext';
-import { useDonationIdentifyMutation } from '@/utils/slices/authApiSlice';
+import { useSoftSignupMutation } from '@/utils/slices/authApiSlice';
 
 import CampaignAmountSelector, { getCampaignConfig } from './DonatePopUpModal/CampaignAmountSelector';
 import DefaultAmountSelector from './DonatePopUpModal/DefaultAmountSelector';
@@ -64,7 +64,7 @@ export default function DonationCard({
 
   const userInfo       = useSelector((state) => state.auth.userInfo);
   const { showToast }  = useAppToast();
-  const [donationIdentify] = useDonationIdentifyMutation();
+  const [softSignup] = useSoftSignupMutation();
 
   /* ── Campaign config ──────────────────────────────────────────────────── */
   const pathname      = usePathname();
@@ -133,7 +133,7 @@ export default function DonationCard({
 
   /* ── Identify guest user ──────────────────────────────────────────────── */
   const handleIdentifyUser = async () => {
-    const result = await donationIdentify({ fullName, email, mobileNo }).unwrap();
+    const result = await softSignup({ fullName, email, mobileNo }).unwrap();
     if (result?.data?.userId) return result.data.userId;
     throw new Error('Unable to identify user');
   };

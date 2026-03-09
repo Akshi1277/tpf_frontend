@@ -3,14 +3,15 @@ import { logout, setCredentials } from "./authSlice";
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
 
-    donationIdentify: builder.mutation({
-      query: ({ fullName, email, mobileNo }) => ({
+    softSignup: builder.mutation({
+      query: ({ fullName, email, mobileNo, nisaabDate }) => ({
         url: "/user/identity",
         method: "POST",
         body: {
           fullName,
           email,
           mobileNo,
+          nisaabDate
         },
       }),
     }),
@@ -149,7 +150,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 });
 
 export const {
-  useDonationIdentifyMutation,
+  useSoftSignupMutation,
   useSendOtpMutation,
   useVerifyOtpMutation,
   useUpdateProfileMutation,
