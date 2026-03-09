@@ -9,9 +9,8 @@ const SectionCard = ({ children, darkMode, delay = 0 }) => (
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.3, delay }}
-    className={`rounded-xl border ${
-      darkMode ? 'bg-zinc-900/60 border-zinc-800' : 'bg-white border-gray-200'
-    }`}
+    className={`rounded-xl border ${darkMode ? 'bg-zinc-900/60 border-zinc-800' : 'bg-white border-gray-200'
+      }`}
   >
     {children}
   </motion.div>
@@ -38,9 +37,8 @@ const GoldEntryRow = ({ entry, index, onChange, onRemove, canRemove, darkMode })
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -6 }}
     transition={{ duration: 0.2 }}
-    className={`p-3 rounded-lg border space-y-2 ${
-      darkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-white border-gray-200'
-    }`}
+    className={`p-3 rounded-lg border space-y-2 ${darkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-white border-gray-200'
+      }`}
   >
     <div className="flex items-center justify-between">
       <span className={`text-xs font-semibold ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>
@@ -64,11 +62,10 @@ const GoldEntryRow = ({ entry, index, onChange, onRemove, canRemove, darkMode })
             value={entry.grams}
             onChange={(e) => onChange({ ...entry, grams: e.target.value })}
             placeholder="0.00"
-            className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-emerald-500/20 ${
-              darkMode
+            className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-emerald-500/20 ${darkMode
                 ? 'bg-zinc-900 border-zinc-600 text-white placeholder-zinc-500 focus:border-emerald-500'
                 : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
-            }`}
+              }`}
           />
         </div>
       </div>
@@ -79,11 +76,10 @@ const GoldEntryRow = ({ entry, index, onChange, onRemove, canRemove, darkMode })
         <select
           value={entry.karat}
           onChange={(e) => onChange({ ...entry, karat: e.target.value })}
-          className={`w-full px-3 py-2 text-sm rounded-lg border outline-none transition-colors ${
-            darkMode
+          className={`w-full px-3 py-2 text-sm rounded-lg border outline-none transition-colors ${darkMode
               ? 'bg-zinc-900 border-zinc-600 text-white focus:border-emerald-500'
               : 'bg-white border-gray-200 text-gray-900 focus:border-emerald-500'
-          }`}
+            }`}
         >
           {KARAT_OPTIONS.map(k => (
             <option key={k} value={k}>{k}K</option>
@@ -100,9 +96,8 @@ const SilverEntryRow = ({ entry, index, onChange, onRemove, canRemove, darkMode 
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -6 }}
     transition={{ duration: 0.2 }}
-    className={`p-3 rounded-lg border ${
-      darkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-white border-gray-200'
-    }`}
+    className={`p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-white border-gray-200'
+      }`}
   >
     <div className="flex items-center justify-between mb-2">
       <span className={`text-xs font-semibold ${darkMode ? 'text-zinc-300' : 'text-gray-600'}`}>
@@ -125,11 +120,10 @@ const SilverEntryRow = ({ entry, index, onChange, onRemove, canRemove, darkMode 
           value={entry.grams}
           onChange={(e) => onChange({ ...entry, grams: e.target.value })}
           placeholder="0.00"
-          className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-emerald-500/20 ${
-            darkMode
+          className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-emerald-500/20 ${darkMode
               ? 'bg-zinc-900 border-zinc-600 text-white placeholder-zinc-500 focus:border-emerald-500'
               : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
-          }`}
+            }`}
         />
       </div>
     </div>
@@ -151,9 +145,8 @@ const RateSourceToggle = ({ metal, rateSource, onChangeSource, manualRate, onCha
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className={`mt-3 p-3 rounded-lg border ${
-        darkMode ? 'bg-zinc-800/40 border-zinc-700' : 'bg-gray-50 border-gray-200'
-      }`}
+      className={`mt-3 p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-700' : 'bg-gray-50 border-gray-200'
+        }`}
     >
       <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
         {isGold ? 'Gold' : 'Silver'} rate source
@@ -162,13 +155,12 @@ const RateSourceToggle = ({ metal, rateSource, onChangeSource, manualRate, onCha
         {/* Auto button */}
         <button
           onClick={() => onChangeSource('api')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs rounded-lg font-semibold transition-colors border ${
-            rateSource === 'api'
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs rounded-lg font-semibold transition-colors border ${rateSource === 'api'
               ? 'bg-emerald-600 text-white border-emerald-600'
               : darkMode
-              ? 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-zinc-500'
-              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-          }`}
+                ? 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-zinc-500'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+            }`}
         >
           <Wifi className="w-3 h-3" />
           Auto (Live rate)
@@ -176,13 +168,12 @@ const RateSourceToggle = ({ metal, rateSource, onChangeSource, manualRate, onCha
         {/* Manual button */}
         <button
           onClick={() => onChangeSource('manual')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs rounded-lg font-semibold transition-colors border ${
-            rateSource === 'manual'
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs rounded-lg font-semibold transition-colors border ${rateSource === 'manual'
               ? 'bg-emerald-600 text-white border-emerald-600'
               : darkMode
-              ? 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-zinc-500'
-              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-          }`}
+                ? 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-zinc-500'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+            }`}
         >
           <PencilLine className="w-3 h-3" />
           Manual input
@@ -213,7 +204,7 @@ const RateSourceToggle = ({ metal, rateSource, onChangeSource, manualRate, onCha
             className="overflow-hidden"
           >
             <p className={`text-xs mb-2 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
-              Enter the current market rate for 1 gram of pure (24K) {isGold ? 'gold' : 'silver'} in ₹.
+              Enter the current market rate for 1 gram of {isGold ? 'pure (24K) gold' : 'pure silver'} in ₹.
             </p>
             <div className="relative">
               <span className={`absolute left-3 top-2.5 text-xs font-medium ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>₹</span>
@@ -222,11 +213,10 @@ const RateSourceToggle = ({ metal, rateSource, onChangeSource, manualRate, onCha
                 value={manualRate}
                 onChange={(e) => onChangeManualRate(e.target.value)}
                 placeholder={isGold ? 'e.g. 7500' : 'e.g. 90'}
-                className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-emerald-500/20 ${
-                  darkMode
+                className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-emerald-500/20 ${darkMode
                     ? 'bg-zinc-900 border-zinc-600 text-white placeholder-zinc-500 focus:border-emerald-500'
                     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
-                }`}
+                  }`}
               />
             </div>
           </motion.div>
@@ -325,15 +315,13 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                   className="overflow-hidden mt-4 space-y-3"
                 >
                   {/* ── Gold ── */}
-                  <div className={`rounded-lg border p-4 transition-colors ${
-                    formData.hasGold
+                  <div className={`rounded-lg border p-4 transition-colors ${formData.hasGold
                       ? darkMode ? 'bg-amber-950/20 border-amber-800/40' : 'bg-amber-50/60 border-amber-200'
                       : darkMode ? 'bg-zinc-800/30 border-zinc-700' : 'bg-gray-50 border-gray-200'
-                  }`}>
+                    }`}>
                     <label className="flex items-center gap-3 mb-3 cursor-pointer">
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        formData.hasGold ? 'bg-emerald-600 border-emerald-600' : darkMode ? 'border-zinc-600' : 'border-gray-300'
-                      }`}>
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${formData.hasGold ? 'bg-emerald-600 border-emerald-600' : darkMode ? 'border-zinc-600' : 'border-gray-300'
+                        }`}>
                         {formData.hasGold && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                       </div>
                       <input type="checkbox" checked={formData.hasGold} onChange={(e) => updateFormData('hasGold', e.target.checked)} className="sr-only" />
@@ -370,11 +358,10 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                           </AnimatePresence>
                           <button
                             onClick={addGoldEntry}
-                            className={`w-full py-2 text-xs font-semibold rounded-lg border transition-colors flex items-center justify-center gap-1.5 ${
-                              darkMode
+                            className={`w-full py-2 text-xs font-semibold rounded-lg border transition-colors flex items-center justify-center gap-1.5 ${darkMode
                                 ? 'border-amber-800/50 text-amber-400 hover:bg-amber-950/30'
                                 : 'border-amber-200 text-amber-700 hover:bg-amber-50'
-                            }`}
+                              }`}
                           >
                             <Plus className="w-3.5 h-3.5" /> Add Another Gold Entry
                           </button>
@@ -394,15 +381,13 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                   </div>
 
                   {/* ── Silver ── */}
-                  <div className={`rounded-lg border p-4 transition-colors ${
-                    formData.hasSilver
+                  <div className={`rounded-lg border p-4 transition-colors ${formData.hasSilver
                       ? darkMode ? 'bg-zinc-700/20 border-zinc-600' : 'bg-gray-100/60 border-gray-300'
                       : darkMode ? 'bg-zinc-800/30 border-zinc-700' : 'bg-gray-50 border-gray-200'
-                  }`}>
+                    }`}>
                     <label className="flex items-center gap-3 mb-3 cursor-pointer">
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        formData.hasSilver ? 'bg-emerald-600 border-emerald-600' : darkMode ? 'border-zinc-600' : 'border-gray-300'
-                      }`}>
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${formData.hasSilver ? 'bg-emerald-600 border-emerald-600' : darkMode ? 'border-zinc-600' : 'border-gray-300'
+                        }`}>
                         {formData.hasSilver && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                       </div>
                       <input type="checkbox" checked={formData.hasSilver} onChange={(e) => updateFormData('hasSilver', e.target.checked)} className="sr-only" />
@@ -439,11 +424,10 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                           </AnimatePresence>
                           <button
                             onClick={addSilverEntry}
-                            className={`w-full py-2 text-xs font-semibold rounded-lg border transition-colors flex items-center justify-center gap-1.5 ${
-                              darkMode
+                            className={`w-full py-2 text-xs font-semibold rounded-lg border transition-colors flex items-center justify-center gap-1.5 ${darkMode
                                 ? 'border-zinc-600 text-zinc-300 hover:bg-zinc-700/30'
                                 : 'border-gray-300 text-gray-600 hover:bg-gray-50'
-                            }`}
+                              }`}
                           >
                             <Plus className="w-3.5 h-3.5" /> Add Another Silver Entry
                           </button>
@@ -506,9 +490,8 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         { key: 'hasProperty', label: 'Property' },
                       ].map(({ key, label }) => (
                         <label key={key} className="flex items-center gap-2 cursor-pointer">
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
-                            formData[key] ? 'bg-emerald-600 border-emerald-600' : darkMode ? 'border-zinc-600' : 'border-gray-300'
-                          }`}>
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${formData[key] ? 'bg-emerald-600 border-emerald-600' : darkMode ? 'border-zinc-600' : 'border-gray-300'
+                            }`}>
                             {formData[key] && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                           </div>
                           <input type="checkbox" checked={formData[key]} onChange={(e) => updateFormData(key, e.target.checked)} className="sr-only" />
@@ -525,9 +508,8 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className={`overflow-hidden rounded-lg border p-4 ${
-                          darkMode ? 'bg-blue-950/10 border-blue-900/30' : 'bg-blue-50/50 border-blue-100'
-                        }`}
+                        className={`overflow-hidden rounded-lg border p-4 ${darkMode ? 'bg-blue-950/10 border-blue-900/30' : 'bg-blue-50/50 border-blue-100'
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <p className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-blue-400' : 'text-blue-700'}`}>Shares & Funds</p>
@@ -543,13 +525,12 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                                 <button
                                   key={val}
                                   onClick={() => updateFormData('investmentType', val)}
-                                  className={`flex-1 py-2 text-xs rounded-lg font-semibold transition-colors border ${
-                                    formData.investmentType === val
+                                  className={`flex-1 py-2 text-xs rounded-lg font-semibold transition-colors border ${formData.investmentType === val
                                       ? 'bg-emerald-600 text-white border-emerald-600'
                                       : darkMode
-                                      ? 'bg-zinc-800 text-zinc-300 border-zinc-700'
-                                      : 'bg-white text-gray-600 border-gray-200'
-                                  }`}
+                                        ? 'bg-zinc-800 text-zinc-300 border-zinc-700'
+                                        : 'bg-white text-gray-600 border-gray-200'
+                                    }`}
                                 >
                                   {label}
                                 </button>
@@ -604,9 +585,8 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className={`overflow-hidden rounded-lg border p-4 ${
-                          darkMode ? 'bg-purple-950/10 border-purple-900/30' : 'bg-purple-50/50 border-purple-100'
-                        }`}
+                        className={`overflow-hidden rounded-lg border p-4 ${darkMode ? 'bg-purple-950/10 border-purple-900/30' : 'bg-purple-50/50 border-purple-100'
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <p className={`text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${darkMode ? 'text-purple-400' : 'text-purple-700'}`}>
@@ -632,9 +612,8 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className={`overflow-hidden rounded-lg border p-4 ${
-                          darkMode ? 'bg-orange-950/10 border-orange-900/30' : 'bg-orange-50/50 border-orange-100'
-                        }`}
+                        className={`overflow-hidden rounded-lg border p-4 ${darkMode ? 'bg-orange-950/10 border-orange-900/30' : 'bg-orange-50/50 border-orange-100'
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-3">
                           <p className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-orange-400' : 'text-orange-700'}`}>Pension & Retirement Savings</p>
@@ -668,9 +647,8 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className={`overflow-hidden rounded-lg border p-4 ${
-                          darkMode ? 'bg-teal-950/10 border-teal-900/30' : 'bg-teal-50/50 border-teal-100'
-                        }`}
+                        className={`overflow-hidden rounded-lg border p-4 ${darkMode ? 'bg-teal-950/10 border-teal-900/30' : 'bg-teal-50/50 border-teal-100'
+                          }`}
                       >
                         <p className={`text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 mb-3 ${darkMode ? 'text-teal-400' : 'text-teal-700'}`}>
                           <Building2 className="w-3.5 h-3.5" /> Real Estate
