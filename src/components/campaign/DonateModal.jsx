@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Lock, X, Sparkles, Moon, Coins, Gift, Star, HandHeart, User, Mail, Phone, ShieldCheck } from 'lucide-react';
+import { Heart, Lock, X, Sparkles, Moon, Coins, Gift, Star, HandHeart, User, Mail, Phone, ShieldCheck, AlertCircle, ArrowRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useAppToast } from '@/app/AppToastContext';
 import { useSoftSignupMutation } from "@/utils/slices/authApiSlice";
@@ -12,6 +12,7 @@ import DefaultAmountSelector from './DonatePopUpModal/DefaultAmountSelector';
 import ExitConfirmationModal from './DonatePopUpModal/ExitConfirmationModal';
 
 const tipPercentages = [0, 5, 10, 15];
+const GATEWAY_FEE_PERCENT = 2.3;
 
 const allDonationTypes = [
   { id: 'ZAKAAT', label: 'Zakat', Icon: Moon },
@@ -22,19 +23,215 @@ const allDonationTypes = [
 ];
 
 /* ── tiny reusable primitives ─────────────────────────────────────────────── */
-// Mobile: tighter label (mb-1.5, smaller tracking). Desktop: original mb-3
 const SectionLabel = ({ children, dark, className = '' }) => (
-  <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest mb-1.5 md:mb-3 ${dark ? 'text-emerald-400/70' : 'text-emerald-600/70'} ${className}`}>
+  <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest mb-1.5 md:mb-2 ${dark ? 'text-emerald-400/70' : 'text-emerald-600/70'} ${className}`}>
     {children}
   </p>
 );
 
-// Mobile: tighter padding p-2.5. Desktop: original p-4
 const Card = ({ dark, children, className = '' }) => (
   <div className={`rounded-xl p-2.5 md:p-4 ${dark ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50/80 border border-gray-100'} ${className}`}>
     {children}
   </div>
 );
+
+/* ── Zakat Gateway Fee Modal ──────────────────────────────────────────────── */
+function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
+  const dk = darkMode;
+  const feeAmount    = Math.round(donationAmount * (GATEWAY_FEE_PERCENT / 100) * 100) / 100;
+  const countedZakat = Math.round((donationAmount - feeAmount) * 100) / 100;
+  const totalWithFee = Math.round((donationAmount + feeAmount) * 100) / 100;
+
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) setSelected(null);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop — sits above the donate modal (z-[60]) */}
+          <motion.div
+            key="zakat-fee-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-[60] bg-black/50"
+            style={{ backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)' }}
+          />
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-[61] flex items-center justify-center p-4">
+            <motion.div
+              key="zakat-fee-modal"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden ${
+                dk ? 'bg-zinc-900 border border-zinc-700' : 'bg-white border border-gray-100'
+              }`}
+            >
+              {/* Header */}
+              <div className={`px-5 pt-5 pb-4 border-b ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
+                <div className="flex items-start gap-3">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    dk ? 'bg-amber-500/15' : 'bg-amber-50'
+                  }`}>
+                    <AlertCircle className={`w-5 h-5 ${dk ? 'text-amber-400' : 'text-amber-500'}`} />
+                  </div>
+                  <div>
+                    <h3 className={`text-sm font-bold ${dk ? 'text-white' : 'text-gray-900'}`}>
+                      Zakat & Payment Gateway Fee
+                    </h3>
+                    <p className={`text-[11px] mt-0.5 leading-relaxed ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
+                      Online payments incur a{' '}
+                      <span className={`font-semibold ${dk ? 'text-amber-400' : 'text-amber-600'}`}>
+                        {GATEWAY_FEE_PERCENT}% gateway charge
+                      </span>
+                      . For Zakat, every rupee counts — please choose how to handle this.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Info strip */}
+              <div className={`mx-4 mt-4 rounded-xl px-4 py-3 ${
+                dk ? 'bg-zinc-800/60 border border-zinc-700/50' : 'bg-gray-50 border border-gray-100'
+              }`}>
+                <p className={`text-[10px] font-bold uppercase tracking-wider mb-2.5 ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>
+                  Your intended Zakat
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className={`text-xl font-extrabold tracking-tight ${dk ? 'text-white' : 'text-gray-900'}`}>
+                    ₹{donationAmount.toLocaleString()}
+                  </span>
+                  <div className={`text-right text-[11px] ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
+                    <span>Gateway fee = </span>
+                    <span className={`font-semibold ${dk ? 'text-amber-400' : 'text-amber-600'}`}>
+                      ₹{feeAmount.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Options */}
+              <div className="px-4 mt-3 space-y-2.5">
+
+                {/* Option 1: Pay more */}
+                <button
+                  onClick={() => setSelected('pay_more')}
+                  className={`w-full text-left rounded-xl border-2 p-3.5 transition-all ${
+                    selected === 'pay_more'
+                      ? dk
+                        ? 'border-emerald-500 bg-emerald-500/10'
+                        : 'border-emerald-500 bg-emerald-50'
+                      : dk
+                        ? 'border-zinc-700 bg-zinc-800/40 hover:border-zinc-600'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <div className={`mt-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      selected === 'pay_more'
+                        ? 'border-emerald-500 bg-emerald-500'
+                        : dk ? 'border-zinc-600' : 'border-gray-300'
+                    }`}>
+                      {selected === 'pay_more' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </div>
+                    <div>
+                      <p className={`text-xs font-bold mb-0.5 ${dk ? 'text-white' : 'text-gray-900'}`}>
+                        Pay ₹{totalWithFee.toLocaleString()} — cover the fee
+                      </p>
+                      <p className={`text-[11px] leading-relaxed ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
+                        You pay{' '}
+                        <span className={`font-semibold ${dk ? 'text-zinc-200' : 'text-gray-700'}`}>
+                          ₹{totalWithFee.toLocaleString()}
+                        </span>{' '}
+                        so the full{' '}
+                        <span className={`font-semibold ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                          ₹{donationAmount.toLocaleString()}
+                        </span>{' '}
+                        counts toward your Zakat.
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Option 2: Count less */}
+                <button
+                  onClick={() => setSelected('count_less')}
+                  className={`w-full text-left rounded-xl border-2 p-3.5 transition-all ${
+                    selected === 'count_less'
+                      ? dk
+                        ? 'border-emerald-500 bg-emerald-500/10'
+                        : 'border-emerald-500 bg-emerald-50'
+                      : dk
+                        ? 'border-zinc-700 bg-zinc-800/40 hover:border-zinc-600'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <div className={`mt-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      selected === 'count_less'
+                        ? 'border-emerald-500 bg-emerald-500'
+                        : dk ? 'border-zinc-600' : 'border-gray-300'
+                    }`}>
+                      {selected === 'count_less' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </div>
+                    <div>
+                      <p className={`text-xs font-bold mb-0.5 ${dk ? 'text-white' : 'text-gray-900'}`}>
+                        Pay ₹{donationAmount.toLocaleString()} — count less
+                      </p>
+                      <p className={`text-[11px] leading-relaxed ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
+                        You pay{' '}
+                        <span className={`font-semibold ${dk ? 'text-zinc-200' : 'text-gray-700'}`}>
+                          ₹{donationAmount.toLocaleString()}
+                        </span>
+                        , but only{' '}
+                        <span className={`font-semibold ${dk ? 'text-amber-400' : 'text-amber-600'}`}>
+                          ₹{countedZakat.toLocaleString()}
+                        </span>{' '}
+                        counts toward your Zakat after the gateway deduction.
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* CTA */}
+              <div className="px-4 pt-3 pb-5">
+                <button
+                  onClick={() => selected && onConfirm(selected)}
+                  disabled={!selected}
+                  className={`w-full h-11 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                    selected
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-600/20 active:scale-[0.98]'
+                      : dk
+                        ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  Continue
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <p className={`text-center text-[10px] mt-2 ${dk ? 'text-zinc-600' : 'text-gray-400'}`}>
+                  This is for your personal Zakat accounting only
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
 
 export default function DonatePopUpModal({
   isOpen,
@@ -66,6 +263,10 @@ export default function DonatePopUpModal({
 
   const [isDonating, setIsDonating] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+
+  // ── Zakat fee modal state ──────────────────────────────────────────────────
+  const [showZakatFeeModal, setShowZakatFeeModal] = useState(false);
+  const [zakatFeeChoice, setZakatFeeChoice]       = useState(null); // 'pay_more' | 'count_less'
 
   const checkoutStartedRef = useRef(false);
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -136,6 +337,7 @@ export default function DonatePopUpModal({
       setShowCustomTipInput(false);
       setCustomTip('');
       setTipPercentage(0);
+      setZakatFeeChoice(null);
     }
   }, [isOpen, resolvedSlug]);
 
@@ -145,12 +347,34 @@ export default function DonatePopUpModal({
     throw new Error('Unable to identify user');
   };
 
-  const handleDonate = async () => {
-    if (isDonating) return;
+  // ── Intercept donate click: show Zakat fee modal when needed ──────────────
+  const handleDonateClick = () => {
     const amount = selectedAmount || parseInt(customAmount);
-    if (!amount) return;
+    // Run cheap validation first before showing modal
+    if (!amount || amount < 50) {
+      handleDonate();
+      return;
+    }
+    if (donationType === 'ZAKAAT' && zakatVerified) {
+      setShowZakatFeeModal(true);
+      return;
+    }
+    handleDonate();
+  };
 
-    if (amount < 50) {
+  // ── Called when user picks an option in the Zakat fee modal ───────────────
+  const handleZakatFeeConfirm = (choice) => {
+    setZakatFeeChoice(choice);
+    setShowZakatFeeModal(false);
+    handleDonate(choice);
+  };
+
+  const handleDonate = async (zakatChoice = zakatFeeChoice) => {
+    if (isDonating) return;
+    const baseAmt = selectedAmount || parseInt(customAmount);
+    if (!baseAmt) return;
+
+    if (baseAmt < 50) {
       showToast({ title: 'Minimum Amount', message: 'The minimum donation amount is ₹50.', type: 'error' });
       return;
     }
@@ -171,6 +395,13 @@ export default function DonatePopUpModal({
         showToast({ title: 'Valid Mobile Required', message: 'Please enter a valid 10-digit mobile number.', type: 'error' });
         return;
       }
+    }
+
+    // For Zakat "pay_more": bump the amount so the net received equals the intended Zakat
+    let amount = baseAmt;
+    if (donationType === 'ZAKAAT' && zakatChoice === 'pay_more') {
+      const feeAmount = Math.round(baseAmt * (GATEWAY_FEE_PERCENT / 100) * 100) / 100;
+      amount = Math.round((baseAmt + feeAmount) * 100) / 100;
     }
 
     setIsDonating(true);
@@ -198,6 +429,8 @@ export default function DonatePopUpModal({
           isAnonymous,
           isTaxEligible: false,
           userId: userIdToUse,
+          // Pass Zakat fee choice to backend for record-keeping
+          ...(donationType === 'ZAKAAT' && { zakatFeeChoice: zakatChoice }),
         }),
       });
       const data = await res.json();
@@ -241,13 +474,11 @@ export default function DonatePopUpModal({
   const totalAmount = baseAmount + (tipAmount || 0);
 
   /* ── style tokens ────────────────────────────────────────── */
-  // Mobile: h-8, smaller text/padding. Desktop: h-10 original
   const inputCls = `w-full h-8 md:h-10 pl-8 md:pl-9 pr-3 text-xs md:text-sm rounded-lg font-medium focus:outline-none transition-colors border ${dk
     ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
     : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
     }`;
 
-  // Mobile: h-7, text-[10px]. Desktop: h-9, text-xs (original)
   const typeBtn = (active, disabled) =>
     `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-7 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${disabled ? 'opacity-40 cursor-not-allowed ' : ''
     }${active
@@ -259,7 +490,6 @@ export default function DonatePopUpModal({
         : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300 hover:text-gray-800'
     }`;
 
-  // Mobile: h-7, text-[10px]. Desktop: h-9, text-xs (original)
   const tipBtn = (active) =>
     `flex-1 h-7 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${active
       ? dk
@@ -372,13 +602,14 @@ export default function DonatePopUpModal({
                   </div>
 
                   {/* ─── Body — tighter mobile padding & gaps ────────────── */}
-                  <div className="overflow-y-auto overscroll-contain md:flex-1 [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="p-3 md:p-6 grid md:grid-cols-2 gap-3 md:gap-6">
+                  <div className="overflow-y-auto overscroll-contain md:overflow-hidden md:flex-1 [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="p-3 md:p-0 md:h-full grid md:grid-cols-2 gap-3 md:gap-0 md:divide-x md:divide-zinc-800/0">
+                      {/* invisible divider handled by padding asymmetry (pr-3 / pl-3) */}
 
                       {/* ═══════════════════════════════
                           LEFT — Donation Type + Amount
                       ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-2.5 md:gap-4">
+                      <div className="flex flex-col gap-2.5 md:gap-2 md:overflow-y-auto md:p-6 md:pr-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
                         {/* Donation Type */}
                         <Card dark={dk}>
@@ -451,22 +682,21 @@ export default function DonatePopUpModal({
                               setShowCustomAmountInput={setShowCustomAmountInput}
                             />
                           )}
+                          {/* Anonymous — desktop only, inside card so it never gets pushed out of viewport */}
+                          <div className={`hidden md:block mt-2 pt-2 border-t ${dk ? 'border-zinc-700/50' : 'border-gray-100'}`}>
+                            <CustomCheckbox
+                              checked={isAnonymous}
+                              onChange={setIsAnonymous}
+                              label="Donate Anonymously"
+                            />
+                          </div>
                         </Card>
-
-                        {/* Anonymous — desktop only */}
-                        <div className="hidden md:block px-1">
-                          <CustomCheckbox
-                            checked={isAnonymous}
-                            onChange={setIsAnonymous}
-                            label="Donate Anonymously"
-                          />
-                        </div>
                       </div>
 
                       {/* ═══════════════════════════════
                           RIGHT — Details + Tip + CTA
                       ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-2.5 md:gap-4">
+                      <div className="flex flex-col gap-2.5 md:gap-3 md:overflow-y-auto md:p-6 md:pl-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
                         {/* Guest details */}
                         {!userInfo && (
@@ -576,7 +806,7 @@ export default function DonatePopUpModal({
                         {/* CTA */}
                         <div className="space-y-1.5 md:space-y-2.5">
                           <button
-                            onClick={handleDonate}
+                            onClick={handleDonateClick}
                             disabled={isDonating || baseAmount < 50}
                             className={`
                               w-full h-10 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
@@ -620,6 +850,14 @@ export default function DonatePopUpModal({
           </>
         )}
       </AnimatePresence>
+
+      {/* ── Zakat Gateway Fee Modal ────────────────────────────────────────── */}
+      <ZakatFeeModal
+        isOpen={showZakatFeeModal}
+        onConfirm={handleZakatFeeConfirm}
+        darkMode={dk}
+        donationAmount={baseAmount}
+      />
 
       <ExitConfirmationModal
         isOpen={showExitConfirmation}
