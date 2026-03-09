@@ -140,10 +140,10 @@ export default function CampaignAmountSelector({
   const isOtherActive = showCustomAmountInput || !!customAmount;
 
   return (
-    <div className="space-y-2.5">
-      {/* Unit cost badge - Only show if in unit mode and cost exists */}
+    <div className="space-y-2">
+      {/* Unit cost badge */}
       {(config.configType !== 'fixed' && config.unitCost > 0) && (
-        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${dk ? 'bg-zinc-900/60 text-zinc-400 border border-zinc-700/50' : 'bg-white text-gray-500 border border-gray-200'
+        <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[11px] font-medium ${dk ? 'bg-zinc-900/60 text-zinc-400 border border-zinc-700/50' : 'bg-white text-gray-500 border border-gray-200'
           }`}>
           <span>{config.emoji}</span>
           <span>1 {config.unitName || config.itemName} = ₹{config.unitCost.toLocaleString()}</span>
@@ -151,7 +151,7 @@ export default function CampaignAmountSelector({
       )}
 
       {/* Flat amounts + Other — 3 equal columns */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1.5">
         {flatPresets.map((preset, i) => {
           const key = `flat-${i}`;
           const isActive = selectedPresetKey === key && !customAmount;
@@ -160,7 +160,7 @@ export default function CampaignAmountSelector({
             <button
               key={key}
               onClick={() => selectPreset(preset, key)}
-              className={`h-9 rounded-lg text-sm font-extrabold transition-colors border ${isActive ? activeFlat : inactiveFlat}`}
+              className={`h-8 rounded-lg text-sm font-extrabold transition-colors border ${isActive ? activeFlat : inactiveFlat}`}
             >
               {label}
             </button>
@@ -168,14 +168,14 @@ export default function CampaignAmountSelector({
         })}
         <button
           onClick={handleOtherClick}
-          className={`h-9 rounded-lg text-xs font-extrabold transition-colors border ${isOtherActive ? activeFlat : inactiveFlat}`}
+          className={`h-8 rounded-lg text-xs font-extrabold transition-colors border ${isOtherActive ? activeFlat : inactiveFlat}`}
         >
           {customAmount && !showCustomAmountInput ? `₹${parseInt(customAmount).toLocaleString()}` : 'Other'}
         </button>
       </div>
 
       {/* Kit presets — 2 columns */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-1.5">
         {kitPresets.map((preset, i) => {
           const key = `kit-${i}`;
           const isActive = selectedPresetKey === key && !customAmount;
@@ -185,12 +185,12 @@ export default function CampaignAmountSelector({
             <button
               key={key}
               onClick={() => selectPreset(preset, key)}
-              className={`h-12 rounded-lg transition-colors flex flex-col items-center justify-center gap-0.5 px-3 border ${isActive ? activeKit : inactiveKit}`}
+              className={`h-10 rounded-lg transition-colors flex flex-col items-center justify-center gap-0.5 px-2 border ${isActive ? activeKit : inactiveKit}`}
             >
-              <span className={`text-[11px] font-medium leading-none ${isActive ? 'opacity-70' : dk ? 'text-zinc-500' : 'text-gray-400'}`}>
+              <span className={`text-[10px] font-medium leading-none ${isActive ? 'opacity-70' : dk ? 'text-zinc-500' : 'text-gray-400'}`}>
                 {label}
               </span>
-              <span className="text-sm font-bold leading-none mt-0.5">{sublabel}</span>
+              <span className="text-xs font-bold leading-none mt-0.5">{sublabel}</span>
             </button>
           );
         })}
@@ -211,7 +211,7 @@ export default function CampaignAmountSelector({
               setSelectedAmount(null);
               setSelectedPresetKey(null);
             }}
-            className={`w-full h-10 pl-7 pr-10 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${dk
+            className={`w-full h-9 pl-7 pr-10 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${dk
               ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
               : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
               }`}

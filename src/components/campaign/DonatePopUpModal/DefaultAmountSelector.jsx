@@ -39,8 +39,8 @@ export default function DefaultAmountSelector({
   };
 
   return (
-    <div className="space-y-2.5">
-      <div className="grid grid-cols-5 gap-2">
+    <div className="space-y-2">
+      <div className="grid grid-cols-5 gap-1.5">
         {presetAmounts.map((amt) => (
           <button
             key={amt.value}
@@ -49,7 +49,7 @@ export default function DefaultAmountSelector({
               setCustomAmount('');
               setShowCustomAmountInput(false);
             }}
-            className={`h-9 rounded-lg font-extrabold text-xs transition-colors border ${
+            className={`h-8 rounded-lg font-extrabold text-xs transition-colors border ${
               selectedAmount === amt.value && !customAmount ? activeCls : inactiveCls
             }`}
           >
@@ -59,7 +59,7 @@ export default function DefaultAmountSelector({
 
         <button
           onClick={handleOtherClick}
-          className={`h-9 rounded-lg font-extrabold text-xs transition-colors border ${
+          className={`h-8 rounded-lg font-extrabold text-xs transition-colors border ${
             showCustomAmountInput || customAmount ? activeCls : inactiveCls
           }`}
         >
@@ -80,7 +80,7 @@ export default function DefaultAmountSelector({
               setCustomAmount(e.target.value);
               setSelectedAmount(null);
             }}
-            className={`w-full h-10 pl-7 pr-10 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
+            className={`w-full h-9 pl-7 pr-10 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
               dk
                 ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
                 : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'

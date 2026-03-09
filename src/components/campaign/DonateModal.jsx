@@ -24,16 +24,17 @@ const allDonationTypes = [
 
 /* ── tiny reusable primitives ─────────────────────────────────────────────── */
 const SectionLabel = ({ children, dark, className = '' }) => (
-  <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest mb-1.5 md:mb-2 ${dark ? 'text-emerald-400/70' : 'text-emerald-600/70'} ${className}`}>
+  <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest mb-1 md:mb-2 ${dark ? 'text-emerald-400/70' : 'text-emerald-600/70'} ${className}`}>
     {children}
   </p>
 );
 
 const Card = ({ dark, children, className = '' }) => (
-  <div className={`rounded-xl p-2.5 md:p-4 ${dark ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50/80 border border-gray-100'} ${className}`}>
+  <div className={`rounded-xl p-2 md:p-4 ${dark ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50/80 border border-gray-100'} ${className}`}>
     {children}
   </div>
 );
+
 
 /* ── Zakat Gateway Fee Modal ──────────────────────────────────────────────── */
 function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
@@ -42,10 +43,10 @@ function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
   const countedZakat = Math.round((donationAmount - feeAmount) * 100) / 100;
   const totalWithFee = Math.round((donationAmount + feeAmount) * 100) / 100;
 
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState('pay_more');
 
   useEffect(() => {
-    if (isOpen) setSelected(null);
+    if (isOpen) setSelected('pay_more');
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -88,14 +89,14 @@ function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
                   </div>
                   <div>
                     <h3 className={`text-sm font-bold ${dk ? 'text-white' : 'text-gray-900'}`}>
-                      Zakat & Payment Gateway Fee
+                      A small processing fee applies
                     </h3>
                     <p className={`text-[11px] mt-0.5 leading-relaxed ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
-                      Online payments incur a{' '}
-                      <span className={`font-semibold ${dk ? 'text-amber-400' : 'text-amber-600'}`}>
-                        {GATEWAY_FEE_PERCENT}% gateway charge
-                      </span>
-                      . For Zakat, every rupee counts — please choose how to handle this.
+                      Help us receive the{' '}
+                      <span className={`font-bold ${dk ? 'text-white' : 'text-gray-900'}`}>
+                        full ₹{donationAmount.toLocaleString()} donation
+                      </span>{' '}
+                      by covering the payment processing fee — not us, the payment provider charges it.
                     </p>
                   </div>
                 </div>
@@ -106,14 +107,14 @@ function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
                 dk ? 'bg-zinc-800/60 border border-zinc-700/50' : 'bg-gray-50 border border-gray-100'
               }`}>
                 <p className={`text-[10px] font-bold uppercase tracking-wider mb-2.5 ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>
-                  Your intended Zakat
+                  Your Zakat amount
                 </p>
                 <div className="flex items-center justify-between">
                   <span className={`text-xl font-extrabold tracking-tight ${dk ? 'text-white' : 'text-gray-900'}`}>
                     ₹{donationAmount.toLocaleString()}
                   </span>
                   <div className={`text-right text-[11px] ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
-                    <span>Gateway fee = </span>
+                    <span>Processing fee = </span>
                     <span className={`font-semibold ${dk ? 'text-amber-400' : 'text-amber-600'}`}>
                       ₹{feeAmount.toLocaleString()}
                     </span>
@@ -147,18 +148,11 @@ function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
                     </div>
                     <div>
                       <p className={`text-xs font-bold mb-0.5 ${dk ? 'text-white' : 'text-gray-900'}`}>
-                        Pay ₹{totalWithFee.toLocaleString()} — cover the fee
+                        Add ₹{feeAmount.toLocaleString()} to cover the processing fee
                       </p>
                       <p className={`text-[11px] leading-relaxed ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
-                        You pay{' '}
-                        <span className={`font-semibold ${dk ? 'text-zinc-200' : 'text-gray-700'}`}>
-                          ₹{totalWithFee.toLocaleString()}
-                        </span>{' '}
-                        so the full{' '}
-                        <span className={`font-semibold ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                          ₹{donationAmount.toLocaleString()}
-                        </span>{' '}
-                        counts toward your Zakat.
+                        100% of your Zakat reaches those in need.{' '}
+                        <span className={`font-bold ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>Total: ₹{totalWithFee.toLocaleString()}</span>
                       </p>
                     </div>
                   </div>
@@ -187,18 +181,14 @@ function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
                     </div>
                     <div>
                       <p className={`text-xs font-bold mb-0.5 ${dk ? 'text-white' : 'text-gray-900'}`}>
-                        Pay ₹{donationAmount.toLocaleString()} — count less
+                        Pay ₹{donationAmount.toLocaleString()} — deduct fee from Zakat
                       </p>
                       <p className={`text-[11px] leading-relaxed ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>
-                        You pay{' '}
-                        <span className={`font-semibold ${dk ? 'text-zinc-200' : 'text-gray-700'}`}>
-                          ₹{donationAmount.toLocaleString()}
-                        </span>
-                        , but only{' '}
-                        <span className={`font-semibold ${dk ? 'text-amber-400' : 'text-amber-600'}`}>
+                        Only{' '}
+                        <span className={`font-bold ${dk ? 'text-amber-400' : 'text-amber-600'}`}>
                           ₹{countedZakat.toLocaleString()}
                         </span>{' '}
-                        counts toward your Zakat after the gateway deduction.
+                        will count as your Zakat after the fee is deducted.
                       </p>
                     </div>
                   </div>
@@ -218,11 +208,11 @@ function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
                         : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >
-                  Continue
+                  Donate Now ₹{selected === 'pay_more' ? totalWithFee.toLocaleString() : donationAmount.toLocaleString()}
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <p className={`text-center text-[10px] mt-2 ${dk ? 'text-zinc-600' : 'text-gray-400'}`}>
-                  This is for your personal Zakat accounting only
+                  We don't keep any fees — this is just for your Zakat records
                 </p>
               </div>
             </motion.div>
@@ -232,6 +222,7 @@ function ZakatFeeModal({ isOpen, onConfirm, darkMode, donationAmount }) {
     </AnimatePresence>
   );
 }
+
 
 export default function DonatePopUpModal({
   isOpen,
@@ -480,7 +471,7 @@ export default function DonatePopUpModal({
     }`;
 
   const typeBtn = (active, disabled) =>
-    `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-7 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${disabled ? 'opacity-40 cursor-not-allowed ' : ''
+    `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${disabled ? 'opacity-40 cursor-not-allowed ' : ''
     }${active
       ? dk
         ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
@@ -491,7 +482,7 @@ export default function DonatePopUpModal({
     }`;
 
   const tipBtn = (active) =>
-    `flex-1 h-7 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${active
+    `flex-1 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${active
       ? dk
         ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
         : 'bg-emerald-100 border-emerald-400 text-emerald-900'
@@ -549,22 +540,22 @@ export default function DonatePopUpModal({
                 transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
                 onClick={(e) => e.stopPropagation()}
                 className="w-full md:max-w-3xl"
-                style={{ maxHeight: 'calc(100dvh - 1rem)' }}
+                style={{ maxHeight: '100dvh' }}
               >
                 <div
-                  className={`flex flex-col overflow-hidden rounded-t-2xl md:rounded-2xl shadow-2xl ${dk
+                  className={`flex flex-col overflow-hidden rounded-2xl shadow-2xl ${dk
                     ? 'bg-zinc-900 border border-zinc-800'
                     : 'bg-white border border-gray-100'
                     }`}
-                  style={{ maxHeight: '93dvh' }}
+                  style={{ maxHeight: '100dvh' }}
                 >
-                  {/* Mobile drag pill — minimal gap */}
-                  <div className="flex justify-center pt-2 md:pt-2.5 md:hidden flex-shrink-0">
+                  {/* Mobile drag pill */}
+                  <div className="flex justify-center pt-1.5 md:pt-2.5 md:hidden flex-shrink-0">
                     <div className={`w-8 h-1 rounded-full ${dk ? 'bg-zinc-700' : 'bg-gray-200'}`} />
                   </div>
 
-                  {/* ─── Header — tighter padding on mobile ─────────────── */}
-                  <div className={`flex items-center gap-2 md:gap-3 px-3.5 md:px-5 pt-2 md:pt-4 pb-2 md:pb-4 border-b flex-shrink-0 ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
+                  {/* ─── Header ─────────────── */}
+                  <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-5 pt-1.5 md:pt-4 pb-1.5 md:pb-4 border-b flex-shrink-0 ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
                     <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${dk
                       ? 'bg-emerald-500/20 shadow-emerald-900/40'
                       : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/25'
@@ -601,21 +592,21 @@ export default function DonatePopUpModal({
                     </button>
                   </div>
 
-                  {/* ─── Body — tighter mobile padding & gaps ────────────── */}
-                  <div className="overflow-y-auto overscroll-contain md:overflow-hidden md:flex-1 [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="p-3 md:p-0 md:h-full grid md:grid-cols-2 gap-3 md:gap-0 md:divide-x md:divide-zinc-800/0">
+                  {/* ─── Body ────────────── */}
+                  <div className="overflow-y-auto overscroll-contain flex-1 [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="p-2 md:p-0 md:h-full grid md:grid-cols-2 gap-2 md:gap-0 md:divide-x md:divide-zinc-800/0">
                       {/* invisible divider handled by padding asymmetry (pr-3 / pl-3) */}
 
                       {/* ═══════════════════════════════
                           LEFT — Donation Type + Amount
                       ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-2.5 md:gap-2 md:overflow-y-auto md:p-6 md:pr-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                      <div className="flex flex-col gap-2 md:gap-2 md:overflow-y-auto md:p-6 md:pr-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
                         {/* Donation Type */}
                         <Card dark={dk}>
                           <SectionLabel dark={dk}>Donation Type</SectionLabel>
-                          <div className="flex flex-col gap-1.5 md:gap-2">
-                            <div className="flex gap-1.5 md:gap-2">
+                          <div className="flex flex-col gap-1 md:gap-2">
+                            <div className="flex gap-1 md:gap-2">
                               {filteredDonationTypes.slice(0, 3).map((type) => {
                                 const Icon = type.Icon;
                                 return (
@@ -633,7 +624,7 @@ export default function DonatePopUpModal({
                               })}
                             </div>
                             {filteredDonationTypes.length > 3 && (
-                              <div className="flex gap-1.5 md:gap-2">
+                              <div className="flex gap-1 md:gap-2">
                                 {filteredDonationTypes.slice(3).map((type) => {
                                   const Icon = type.Icon;
                                   return (
@@ -696,13 +687,13 @@ export default function DonatePopUpModal({
                       {/* ═══════════════════════════════
                           RIGHT — Details + Tip + CTA
                       ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-2.5 md:gap-3 md:overflow-y-auto md:p-6 md:pl-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                      <div className="flex flex-col gap-2 md:gap-3 md:overflow-y-auto md:p-6 md:pl-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
 
                         {/* Guest details */}
                         {!userInfo && (
                           <Card dark={dk}>
                             <SectionLabel dark={dk}>Your Details</SectionLabel>
-                            <div className="space-y-1.5 md:space-y-2.5">
+                            <div className="space-y-1 md:space-y-2.5">
                               {[
                                 { Icon: User, type: 'text', placeholder: 'Full Name', value: fullName, onChange: setFullName },
                                 { Icon: Mail, type: 'email', placeholder: 'Email', value: email, onChange: setEmail },
@@ -729,7 +720,7 @@ export default function DonatePopUpModal({
 
                         {/* Platform Tip */}
                         <Card dark={dk}>
-                          <div className="flex items-center justify-between mb-1.5 md:mb-3">
+                          <div className="flex items-center justify-between mb-1 md:mb-3">
                             <SectionLabel dark={dk} className="mb-0">Platform Tip</SectionLabel>
                             <div className="group relative">
                               <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center cursor-help text-[8px] md:text-[9px] font-extrabold border ${dk ? 'border-zinc-400 text-zinc-300 bg-zinc-700' : 'border-gray-400 text-gray-600 bg-gray-100'
@@ -741,7 +732,7 @@ export default function DonatePopUpModal({
                               </div>
                             </div>
                           </div>
-                          <div className="flex gap-1.5 md:gap-2">
+                          <div className="flex gap-1 md:gap-2">
                             {tipPercentages.map((pct) => (
                               <button
                                 key={pct}
@@ -764,7 +755,7 @@ export default function DonatePopUpModal({
                             </button>
                           </div>
                           {showCustomTipInput && (
-                            <div className="mt-1.5 md:mt-2.5 relative">
+                            <div className="mt-1 md:mt-2.5 relative">
                               <span className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none ${dk ? 'text-zinc-400' : 'text-gray-400'}`}>₹</span>
                               <input
                                 type="number"
@@ -790,10 +781,10 @@ export default function DonatePopUpModal({
                             label="Donate Anonymously"
                           />
                           {baseAmount >= 50 && (
-                            <div className={`flex items-baseline gap-1.5 px-3 py-1.5 rounded-lg ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
+                            <div className={`flex items-baseline gap-1 px-2.5 py-1 rounded-lg ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
                               }`}>
                               <span className={`text-[10px] font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</span>
-                              <span className={`text-base font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                              <span className={`text-sm font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
                                 ₹{totalAmount.toLocaleString()}
                               </span>
                               {tipAmount > 0 && (
@@ -804,12 +795,12 @@ export default function DonatePopUpModal({
                         </div>
 
                         {/* CTA */}
-                        <div className="space-y-1.5 md:space-y-2.5">
+                        <div className="space-y-1 md:space-y-2.5">
                           <button
                             onClick={handleDonateClick}
                             disabled={isDonating || baseAmount < 50}
                             className={`
-                              w-full h-10 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
+                              w-full h-9 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
                               ${isDonating
                                 ? 'bg-emerald-600 text-white cursor-wait'
                                 : baseAmount >= 50
