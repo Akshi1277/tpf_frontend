@@ -137,6 +137,7 @@ export default function CampaignPage() {
               taxEligible={campaign.taxBenefits}
               ribaEligible={campaign.ribaEligible}
               allowedDonationTypes={campaign.allowedDonationTypes}
+              unitConfig={campaign.unitConfig}
               darkMode={darkMode}
             />
           </div>
@@ -177,6 +178,7 @@ export default function CampaignPage() {
         ribaEligible={campaign.ribaEligible}
         taxEligible={campaign.taxBenefits}
         allowedDonationTypes={campaign.allowedDonationTypes}
+        unitConfig={campaign.unitConfig}
       />
     </div>
   );

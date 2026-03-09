@@ -15,11 +15,11 @@ import ExitConfirmationModal from './DonatePopUpModal/ExitConfirmationModal';
    Donation-type definitions (with icons, matching the modal)
 ───────────────────────────────────────────────────────────────────────────── */
 const allDonationTypes = [
-  { id: 'ZAKAAT',  label: 'Zakat',   desc: 'Obligatory charity',  Icon: Moon      },
-  { id: 'RIBA',    label: 'RIBA',    desc: 'Interest Money',       Icon: Coins     },
-  { id: 'SADAQAH', label: 'Sadaqah', desc: 'Voluntary charity',    Icon: Gift      },
-  { id: 'LILLAH',  label: 'Lillah',  desc: 'For sake of Allah',    Icon: Star      },
-  { id: 'IMDAD',   label: 'Imdad',   desc: 'Emergency relief',     Icon: HandHeart },
+  { id: 'ZAKAAT', label: 'Zakat', desc: 'Obligatory charity', Icon: Moon },
+  { id: 'RIBA', label: 'RIBA', desc: 'Interest Money', Icon: Coins },
+  { id: 'SADAQAH', label: 'Sadaqah', desc: 'Voluntary charity', Icon: Gift },
+  { id: 'LILLAH', label: 'Lillah', desc: 'For sake of Allah', Icon: Star },
+  { id: 'IMDAD', label: 'Imdad', desc: 'Emergency relief', Icon: HandHeart },
 ];
 
 const tipPercentages = [0, 5, 10, 15];
@@ -32,44 +32,45 @@ export default function DonationCard({
   taxEligible,
   ribaEligible,
   allowedDonationTypes = [],
+  unitConfig = null,
 }) {
   /* ── Amount state ─────────────────────────────────────────────────────── */
-  const [selectedAmount,        setSelectedAmount]        = useState(100);
-  const [customAmount,          setCustomAmount]          = useState('');
+  const [selectedAmount, setSelectedAmount] = useState(100);
+  const [customAmount, setCustomAmount] = useState('');
   const [showCustomAmountInput, setShowCustomAmountInput] = useState(false);
-  const [selectedPresetKey,     setSelectedPresetKey]     = useState(null);
+  const [selectedPresetKey, setSelectedPresetKey] = useState(null);
 
   /* ── Tip state ────────────────────────────────────────────────────────── */
-  const [tipPercentage,     setTipPercentage]     = useState(0);
-  const [customTip,         setCustomTip]         = useState('');
-  const [showCustomTipInput,setShowCustomTipInput]= useState(false);
+  const [tipPercentage, setTipPercentage] = useState(0);
+  const [customTip, setCustomTip] = useState('');
+  const [showCustomTipInput, setShowCustomTipInput] = useState(false);
 
   /* ── Donor state ──────────────────────────────────────────────────────── */
   const [donationType, setDonationType] = useState('SADAQAH');
-  const [isAnonymous,  setIsAnonymous]  = useState(false);
-  const [claim80G,     setClaim80G]     = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [claim80G, setClaim80G] = useState(false);
 
   /* ── Guest details ────────────────────────────────────────────────────── */
   const [fullName, setFullName] = useState('');
-  const [email,    setEmail]    = useState('');
+  const [email, setEmail] = useState('');
   const [mobileNo, setMobileNo] = useState('');
-  const [userId,   setUserId]   = useState(null);
+  const [userId, setUserId] = useState(null);
 
   /* ── UI / flow state ──────────────────────────────────────────────────── */
-  const [isDonating,           setIsDonating]           = useState(false);
-  const [cashfreeData,         setCashfreeData]         = useState(null);
+  const [isDonating, setIsDonating] = useState(false);
+  const [cashfreeData, setCashfreeData] = useState(null);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
 
   const checkoutStartedRef = useRef(false);
 
-  const userInfo       = useSelector((state) => state.auth.userInfo);
-  const { showToast }  = useAppToast();
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const { showToast } = useAppToast();
   const [softSignup] = useSoftSignupMutation();
 
   /* ── Campaign config ──────────────────────────────────────────────────── */
-  const pathname      = usePathname();
-  const slugFromUrl   = pathname?.split('/campaign/')?.[1]?.split('/')?.[0] || null;
-  const resolvedSlug  = campaignSlug || slugFromUrl;
+  const pathname = usePathname();
+  const slugFromUrl = pathname?.split('/campaign/')?.[1]?.split('/')?.[0] || null;
+  const resolvedSlug = campaignSlug || slugFromUrl;
   const campaignConfig = getCampaignConfig(resolvedSlug);
 
   const dk = darkMode;
@@ -78,12 +79,12 @@ export default function DonationCard({
   const filteredDonationTypes = (
     allowedDonationTypes?.length > 0
       ? allDonationTypes.filter((t) =>
-          allowedDonationTypes.some(
-            (at) =>
-              at.toUpperCase() === t.id.toUpperCase() ||
-              (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
-          )
+        allowedDonationTypes.some(
+          (at) =>
+            at.toUpperCase() === t.id.toUpperCase() ||
+            (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
         )
+      )
       : allDonationTypes
   ).map((t) => ({
     ...t,
@@ -123,12 +124,12 @@ export default function DonationCard({
   }, [resolvedSlug]);
 
   /* ── Derived amounts ──────────────────────────────────────────────────── */
-  const baseAmount  = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
-  const tipAmount   = customTip
+  const baseAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
+  const tipAmount = customTip
     ? parseInt(customTip)
     : tipPercentage
-    ? Math.round(baseAmount * (tipPercentage / 100))
-    : 0;
+      ? Math.round(baseAmount * (tipPercentage / 100))
+      : 0;
   const totalAmount = baseAmount + (tipAmount || 0);
 
   /* ── Identify guest user ──────────────────────────────────────────────── */
@@ -177,8 +178,8 @@ export default function DonationCard({
       const calculatedTipAmount = customTip
         ? parseInt(customTip)
         : tipPercentage
-        ? Math.round(amount * (tipPercentage / 100))
-        : 0;
+          ? Math.round(amount * (tipPercentage / 100))
+          : 0;
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/initiate`, {
         method: 'POST',
@@ -226,21 +227,19 @@ export default function DonationCard({
   }, [cashfreeData]);
 
   /* ── Style helpers ────────────────────────────────────────────────────── */
-  const inputCls = `w-full h-10 pl-9 pr-3 text-sm rounded-lg font-medium focus:outline-none transition-colors border ${
-    dk
-      ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
-      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
-  }`;
+  const inputCls = `w-full h-10 pl-9 pr-3 text-sm rounded-lg font-medium focus:outline-none transition-colors border ${dk
+    ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
+    : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
+    }`;
 
   const tipBtnCls = (active) =>
-    `flex-1 h-9 rounded-lg text-xs font-extrabold transition-colors border ${
-      active
-        ? dk
-          ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
-          : 'bg-emerald-100 border-emerald-400 text-emerald-900'
-        : dk
-          ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500'
-          : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300'
+    `flex-1 h-9 rounded-lg text-xs font-extrabold transition-colors border ${active
+      ? dk
+        ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
+        : 'bg-emerald-100 border-emerald-400 text-emerald-900'
+      : dk
+        ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500'
+        : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300'
     }`;
 
   /* ── Custom checkbox ──────────────────────────────────────────────────── */
@@ -249,11 +248,10 @@ export default function DonationCard({
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${
-          checked
-            ? 'bg-emerald-500 border-emerald-500'
-            : dk ? 'border-zinc-600 bg-zinc-800 group-hover:border-zinc-500' : 'border-gray-300 bg-white group-hover:border-emerald-300'
-        }`}
+        className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${checked
+          ? 'bg-emerald-500 border-emerald-500'
+          : dk ? 'border-zinc-600 bg-zinc-800 group-hover:border-zinc-500' : 'border-gray-300 bg-white group-hover:border-emerald-300'
+          }`}
       >
         {checked && <Check className="w-3 h-3 text-white" />}
       </button>
@@ -291,9 +289,8 @@ export default function DonationCard({
             </div>
             {/* Total pill — shows once a valid amount is selected */}
             {baseAmount >= 50 && (
-              <div className={`flex-shrink-0 flex items-baseline gap-1.5 px-3 py-1.5 rounded-xl ${
-                dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
-              }`}>
+              <div className={`flex-shrink-0 flex items-baseline gap-1.5 px-3 py-1.5 rounded-xl ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
+                }`}>
                 <span className={`text-[10px] font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</span>
                 <span className={`text-base font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
                   ₹{totalAmount.toLocaleString()}
@@ -343,9 +340,10 @@ export default function DonationCard({
         {/* ── Amount ───────────────────────────────────────────────────── */}
         <div className="mb-2">
           <SectionLabel>Choose Amount</SectionLabel>
-          {campaignConfig ? (
+          {(campaignConfig || unitConfig) ? (
             <CampaignAmountSelector
               slug={resolvedSlug}
+              unitConfig={unitConfig}
               darkMode={dk}
               selectedAmount={selectedAmount}
               setSelectedAmount={setSelectedAmount}
@@ -370,9 +368,8 @@ export default function DonationCard({
         </div>
 
         {/* ── Selected amount summary ───────────────────────────────────── */}
-        <div className={`mb-6 px-3 py-2.5 rounded-lg flex items-center justify-between ${
-          dk ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50 border border-gray-100'
-        }`}>
+        <div className={`mb-6 px-3 py-2.5 rounded-lg flex items-center justify-between ${dk ? 'bg-zinc-800/50 border border-zinc-700/50' : 'bg-gray-50 border border-gray-100'
+          }`}>
           <span className={`text-xs font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Donation amount</span>
           {baseAmount >= 50 ? (
             <span className={`text-sm font-extrabold ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
@@ -393,8 +390,8 @@ export default function DonationCard({
             <SectionLabel>Your Details</SectionLabel>
             <div className="space-y-2.5">
               {[
-                { Icon: User,  type: 'text',  placeholder: 'Full Name', value: fullName, onChange: setFullName },
-                { Icon: Mail,  type: 'email', placeholder: 'Email',     value: email,    onChange: setEmail    },
+                { Icon: User, type: 'text', placeholder: 'Full Name', value: fullName, onChange: setFullName },
+                { Icon: Mail, type: 'email', placeholder: 'Email', value: email, onChange: setEmail },
               ].map(({ Icon, type, placeholder, value, onChange }) => (
                 <div key={placeholder} className="relative">
                   <Icon className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
@@ -471,11 +468,10 @@ export default function DonationCard({
                 autoFocus
                 min={0}
                 onChange={(e) => { setCustomTip(e.target.value); setTipPercentage(null); }}
-                className={`w-full h-10 pl-7 pr-3 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
-                  dk
-                    ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
-                    : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
-                }`}
+                className={`w-full h-10 pl-7 pr-3 text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${dk
+                  ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
+                  : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
+                  }`}
               />
             </div>
           )}
@@ -535,8 +531,8 @@ export default function DonationCard({
               {baseAmount === 0
                 ? 'Enter Amount to Continue'
                 : baseAmount < 50
-                ? 'Minimum ₹50 to Donate'
-                : `Donate ₹${totalAmount.toLocaleString()}`}
+                  ? 'Minimum ₹50 to Donate'
+                  : `Donate ₹${totalAmount.toLocaleString()}`}
             </>
           )}
         </button>
