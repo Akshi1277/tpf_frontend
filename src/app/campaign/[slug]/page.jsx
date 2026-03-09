@@ -25,6 +25,7 @@ export default function CampaignPage() {
   const [scrolled, setScrolled] = useState(true);
   const donationCardRef = useRef(null);
   const [isFloatingModalOpen, setIsFloatingModalOpen] = useState(false);
+  const [isDonorModalOpen, setIsDonorModalOpen] = useState(false);
 
   const { data, isLoading, error } = useFetchCampaignBySlugQuery(slug, {
     skip: !slug,
@@ -111,7 +112,13 @@ export default function CampaignPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* PROGRESS */}
         <div className="mt-4 sm:mt-6">
-          <CampaignProgress darkMode={darkMode} campaign={campaign} />
+          <CampaignProgress
+            darkMode={darkMode}
+            campaign={campaign}
+            onDonateClick={handleDonateClick}
+            isDonorModalOpen={isDonorModalOpen}
+            setIsDonorModalOpen={setIsDonorModalOpen}
+          />
         </div>
 
         {/* TABS AND DONATION CARD */}
@@ -156,7 +163,7 @@ export default function CampaignPage() {
       <FloatingDonateButton
         darkMode={darkMode}
         onClick={() => setIsFloatingModalOpen(true)}
-        isModalOpen={isFloatingModalOpen}
+        isModalOpen={isFloatingModalOpen || isDonorModalOpen}
       />
 
       {/* Floating Button Donation Modal */}

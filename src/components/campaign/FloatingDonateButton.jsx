@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 
 export default function FloatingDonateButton({ darkMode, onClick, isModalOpen }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,12 +19,26 @@ export default function FloatingDonateButton({ darkMode, onClick, isModalOpen })
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // Observer to detect when a modal is open (modals usually set body overflow: hidden)
+    const observer = new MutationObserver(() => {
+      setIsAnyModalOpen(document.body.style.overflow === 'hidden');
+    });
+
+    observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+
+    // Initial check
+    setIsAnyModalOpen(document.body.style.overflow === 'hidden');
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
+    };
   }, []);
 
   return (
     <AnimatePresence>
-      {isVisible && !isModalOpen && (
+      {isVisible && !isModalOpen && !isAnyModalOpen && (
         <motion.button
           initial={{ opacity: 0, y: 20, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -13,7 +13,6 @@ import {
 import { useState } from "react";
 import Image from 'next/image';
 import DonateModal from "./DonationCard";
-import DonatePopUpModal from "./DonateModal";
 import ShareModal from "../ui/ShareModal";
 import TrustSafety from "./TrustSafety";
 import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
@@ -23,9 +22,7 @@ import { FiShare2 } from "react-icons/fi";
 import DonorListModal from "./DonorListModal";
 import { useFetchCampaignDonorsQuery } from "@/utils/slices/donationApiSlice";
 
-export default function CampaignProgress({ darkMode, campaign }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDonorModalOpen, setIsDonorModalOpen] = useState(false);
+export default function CampaignProgress({ darkMode, campaign, onDonateClick, isDonorModalOpen, setIsDonorModalOpen }) {
   const [openShare, setOpenShare] = useState(false);
 
   const router = useRouter();
@@ -232,7 +229,7 @@ export default function CampaignProgress({ darkMode, campaign }) {
 
             {/* DONATE NOW BUTTON - Updated Design */}
             <motion.button
-              onClick={() => setIsModalOpen(true)}
+              onClick={onDonateClick}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={`
@@ -302,18 +299,6 @@ export default function CampaignProgress({ darkMode, campaign }) {
         </div>
       </motion.div>
 
-      {/* Modals */}
-      <DonatePopUpModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        darkMode={darkMode}
-        campaignId={campaignId}
-        campaignSlug={campaign.slug}
-        zakatVerified={campaign.zakatVerified}
-        ribaEligible={campaign.ribaEligible}
-        taxEligible={campaign.taxBenefits}
-        allowedDonationTypes={allowedDonationTypes}
-      />
 
       {openShare && (
         <ShareModal
