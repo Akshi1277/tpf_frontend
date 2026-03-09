@@ -131,12 +131,14 @@ export default function CampaignAmountSelector({
 
   return (
     <div className="space-y-2.5">
-      {/* Unit cost badge */}
-      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${dk ? 'bg-zinc-900/60 text-zinc-400 border border-zinc-700/50' : 'bg-white text-gray-500 border border-gray-200'
-        }`}>
-        <span>{config.emoji}</span>
-        <span>1 {config.unitName} = ₹{config.unitCost.toLocaleString()}</span>
-      </div>
+      {/* Unit cost badge - Only show if in unit mode and cost exists */}
+      {(config.configType !== 'fixed' && config.unitCost > 0) && (
+        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium ${dk ? 'bg-zinc-900/60 text-zinc-400 border border-zinc-700/50' : 'bg-white text-gray-500 border border-gray-200'
+          }`}>
+          <span>{config.emoji}</span>
+          <span>1 {config.unitName || config.itemName} = ₹{config.unitCost.toLocaleString()}</span>
+        </div>
+      )}
 
       {/* Flat amounts + Other — 3 equal columns */}
       <div className="grid grid-cols-3 gap-2">
