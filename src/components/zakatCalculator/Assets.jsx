@@ -168,9 +168,9 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
       className="max-w-3xl mx-auto"
     >
       <div className="mb-6">
-        <h2 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Assets & Holdings</h2>
+        <h2 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Your Wealth & Savings</h2>
         <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
-          Document your current assets and investments
+          Tell us about the money and valuables you currently own
         </p>
       </div>
 
@@ -179,8 +179,8 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
         <SectionCard darkMode={darkMode} delay={0.05}>
           <SectionHeader
             icon={Wallet}
-            title="Liquid Assets"
-            subtitle="Cash, savings accounts, and readily available funds"
+            title="Cash & Bank Accounts"
+            subtitle="Money you have in hand or in the bank right now"
             accent={darkMode ? 'text-emerald-400' : 'text-emerald-600'}
             darkMode={darkMode}
           />
@@ -189,7 +189,7 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
               label="Total Cash & Savings"
               value={formData.cash}
               onChange={(val) => updateFormData('cash', val)}
-              helperText="Include checking accounts, savings, and physical cash"
+              helperText="Add up all your bank accounts, savings, and any cash at home"
               darkMode={darkMode}
             />
           </div>
@@ -239,7 +239,7 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                       <input type="checkbox" checked={formData.hasGold} onChange={(e) => updateFormData('hasGold', e.target.checked)} className="sr-only" />
                       <div>
                         <span className={`text-sm font-semibold ${darkMode ? 'text-zinc-100' : 'text-gray-900'}`}>Gold Holdings</span>
-                        <span className={`text-xs ml-2 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Jewelry, bullion, coins</span>
+                        <span className={`text-xs ml-2 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Jewellery, bars, coins</span>
                       </div>
                     </label>
 
@@ -253,7 +253,7 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                           className="overflow-hidden space-y-2 pt-1"
                         >
                           <p className={`text-xs mb-1 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
-                            Add each group separately if they differ in karat
+                            If you have gold of different purities, add them separately
                           </p>
                           <AnimatePresence>
                             {formData.goldEntries.map((entry, idx) => (
@@ -298,7 +298,7 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                       <input type="checkbox" checked={formData.hasSilver} onChange={(e) => updateFormData('hasSilver', e.target.checked)} className="sr-only" />
                       <div>
                         <span className={`text-sm font-semibold ${darkMode ? 'text-zinc-100' : 'text-gray-900'}`}>Silver Holdings</span>
-                        <span className={`text-xs ml-2 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Jewelry, bullion, coins</span>
+                        <span className={`text-xs ml-2 ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Jewellery, bars, coins</span>
                       </div>
                     </label>
 
@@ -312,7 +312,7 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                           className="overflow-hidden space-y-2 pt-1"
                         >
                           <p className={`text-xs mb-1 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
-                            Add each silver item separately if needed
+                            Add each silver item separately if you have different pieces
                           </p>
                           <AnimatePresence>
                             {formData.silverEntries.map((entry, idx) => (
@@ -352,10 +352,10 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
           <SectionHeader
             icon={TrendingUp}
             title="Investments"
-            subtitle="Stocks, crypto, pension, and real estate"
+            subtitle="Shares, crypto, pension savings, and property you own"
             accent={darkMode ? 'text-blue-400' : 'text-blue-600'}
             darkMode={darkMode}
-            action={<InfoButton onClick={() => setActiveModal('investments')} text="What qualifies?" darkMode={darkMode} />}
+            action={<InfoButton onClick={() => setActiveModal('investments')} text="What counts?" darkMode={darkMode} />}
           />
           <div className="px-5 pb-5">
             <label className={`block text-xs font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
@@ -380,10 +380,10 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                     <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Select all that apply</p>
                     <div className="grid grid-cols-2 gap-2">
                       {[
-                        { key: 'hasStocks', label: 'Stocks / Funds' },
+                        { key: 'hasStocks', label: 'Shares / Funds' },
                         { key: 'hasCrypto', label: 'Crypto' },
-                        { key: 'hasPension', label: 'Pension / 401k' },
-                        { key: 'hasProperty', label: 'Real Estate' },
+                        { key: 'hasPension', label: 'Pension / Retirement' },
+                        { key: 'hasProperty', label: 'Property' },
                       ].map(({ key, label }) => (
                         <label key={key} className="flex items-center gap-2 cursor-pointer">
                           <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
@@ -410,35 +410,35 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         }`}
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <p className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-blue-400' : 'text-blue-700'}`}>Stocks & Funds</p>
+                          <p className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-blue-400' : 'text-blue-700'}`}>Shares & Funds</p>
                           <InfoButton onClick={() => setActiveModal('activePassive')} text="Active vs Passive?" darkMode={darkMode} />
                         </div>
                         <div className="space-y-3">
                           <div>
                             <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
-                              Are you an active or passive investor?
+                              How do you invest in shares?
                             </label>
                             <div className="flex gap-2">
-                              {['active', 'passive'].map((type) => (
+                              {[{ val: 'active', label: 'I buy & sell often' }, { val: 'passive', label: 'I buy & hold long-term' }].map(({ val, label }) => (
                                 <button
-                                  key={type}
-                                  onClick={() => updateFormData('investmentType', type)}
+                                  key={val}
+                                  onClick={() => updateFormData('investmentType', val)}
                                   className={`flex-1 py-2 text-xs rounded-lg font-semibold transition-colors border ${
-                                    formData.investmentType === type
+                                    formData.investmentType === val
                                       ? 'bg-emerald-600 text-white border-emerald-600'
                                       : darkMode
                                       ? 'bg-zinc-800 text-zinc-300 border-zinc-700'
                                       : 'bg-white text-gray-600 border-gray-200'
                                   }`}
                                 >
-                                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                                  {label}
                                 </button>
                               ))}
                             </div>
                           </div>
                           {formData.investmentType === 'active' && (
                             <InputField
-                              label="Total active portfolio value"
+                              label="Total value of your shares"
                               value={formData.activeInvestmentValue}
                               onChange={(val) => updateFormData('activeInvestmentValue', val)}
                               darkMode={darkMode}
@@ -447,10 +447,10 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                           {formData.investmentType === 'passive' && (
                             <div className="space-y-3">
                               <InputField
-                                label="Current Holding Value of Portfolio"
+                                label="Total value of your shares today"
                                 value={formData.passivePortfolioValue}
                                 onChange={(val) => updateFormData('passivePortfolioValue', val)}
-                                helperText="Total current market value of all passive holdings"
+                                helperText="The current total value of all your shares and funds"
                                 darkMode={darkMode}
                               />
                               <div>
@@ -490,15 +490,15 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                       >
                         <div className="flex items-center justify-between mb-3">
                           <p className={`text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${darkMode ? 'text-purple-400' : 'text-purple-700'}`}>
-                            <Bitcoin className="w-3.5 h-3.5" /> Digital Assets
+                            <Bitcoin className="w-3.5 h-3.5" /> Cryptocurrency
                           </p>
                           <InfoButton onClick={() => setActiveModal('crypto')} text="Learn more" darkMode={darkMode} />
                         </div>
                         <InputField
-                          label="Total cryptocurrency value"
+                          label="Total value of your crypto"
                           value={formData.cryptoValue}
                           onChange={(val) => updateFormData('cryptoValue', val)}
-                          helperText="Combined market value of all digital assets"
+                          helperText="Add up the current value of all your coins and tokens"
                           darkMode={darkMode}
                         />
                       </motion.div>
@@ -517,22 +517,22 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         }`}
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <p className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-orange-400' : 'text-orange-700'}`}>Pension & Retirement</p>
+                          <p className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-orange-400' : 'text-orange-700'}`}>Pension & Retirement Savings</p>
                           <InfoButton onClick={() => setActiveModal('pension')} text="Learn more" darkMode={darkMode} />
                         </div>
                         <div className="space-y-3">
                           <div>
                             <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
-                              Do you have immediate access to these funds?
+                              Can you withdraw this money right now?
                             </label>
                             <YesNoToggle value={formData.hasAccessToPension} onChange={(val) => updateFormData('hasAccessToPension', val)} darkMode={darkMode} />
                           </div>
                           {formData.hasAccessToPension && (
                             <InputField
-                              label="Total pension value"
+                              label="Total pension / retirement savings value"
                               value={formData.pensionValue}
                               onChange={(val) => updateFormData('pensionValue', val)}
-                              helperText="30% of accessible funds will be used in calculation"
+                              helperText="30% of this amount will be used in the calculation"
                               darkMode={darkMode}
                             />
                           )}
@@ -558,21 +558,21 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                         <div className="space-y-3">
                           <div>
                             <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
-                              Property acquired for resale?
+                              Did you buy this property to sell it later?
                             </label>
                             <YesNoToggle value={formData.purchasedForResale} onChange={(val) => updateFormData('purchasedForResale', val)} darkMode={darkMode} />
                           </div>
                           {formData.purchasedForResale && (
-                            <InputField label="Current market value" value={formData.propertyMarketValue} onChange={(val) => updateFormData('propertyMarketValue', val)} darkMode={darkMode} />
+                            <InputField label="What is it worth today?" value={formData.propertyMarketValue} onChange={(val) => updateFormData('propertyMarketValue', val)} darkMode={darkMode} />
                           )}
                           <div>
                             <label className={`block text-xs font-medium mb-1.5 ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
-                              Generating rental income?
+                              Do you rent this property out to others?
                             </label>
                             <YesNoToggle value={formData.rentingProperty} onChange={(val) => updateFormData('rentingProperty', val)} darkMode={darkMode} />
                           </div>
                           {formData.rentingProperty && (
-                            <InputField label="Annual rental income" value={formData.rentalIncome} onChange={(val) => updateFormData('rentalIncome', val)} darkMode={darkMode} />
+                            <InputField label="How much rent do you earn per year?" value={formData.rentalIncome} onChange={(val) => updateFormData('rentalIncome', val)} darkMode={darkMode} />
                           )}
                         </div>
                       </motion.div>

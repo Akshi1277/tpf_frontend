@@ -15,8 +15,8 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
       className="max-w-3xl mx-auto"
     >
       <div className="mb-6">
-        <h2 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Debts Owed to You</h2>
-        <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Money owed to you by others</p>
+        <h2 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Money Others Owe You</h2>
+        <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Has anyone borrowed money from you?</p>
       </div>
 
       <div className="space-y-4">
@@ -27,13 +27,13 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
                 <HandCoins className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
               </div>
               <div>
-                <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Receivable Accounts</h3>
-                <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Personal loans, business receivables, or other debts owed to you</p>
+                <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Loans You've Given</h3>
+                <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Money you lent to a friend, family member, or through your business</p>
               </div>
             </div>
 
             <label className={`block text-xs font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
-              Does anyone owe you money?
+              Has anyone borrowed money from you?
             </label>
             <YesNoToggle value={formData.owedMoney} onChange={(val) => updateFormData('owedMoney', val)} darkMode={darkMode} />
 
@@ -48,7 +48,7 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
                 >
                   <div className={`p-4 rounded-lg border ${darkMode ? 'bg-zinc-800/30 border-zinc-700' : 'bg-gray-50 border-gray-100'}`}>
                     <label className={`block text-xs font-medium mb-2 ${darkMode ? 'text-zinc-300' : 'text-gray-700'}`}>
-                      Do you reasonably expect repayment?
+                      Do you think they will pay you back?
                     </label>
                     <YesNoToggle value={formData.expectPayback} onChange={(val) => updateFormData('expectPayback', val)} darkMode={darkMode} />
                   </div>
@@ -63,10 +63,10 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
                         className={`p-4 rounded-lg border ${darkMode ? 'bg-emerald-950/10 border-emerald-900/30' : 'bg-emerald-50/50 border-emerald-100'}`}
                       >
                         <InputField
-                          label="Total Amount Receivable"
+                          label="How much do they owe you in total?"
                           value={formData.owedAmount}
                           onChange={(val) => updateFormData('owedAmount', val)}
-                          helperText="Total amount you reasonably expect to collect"
+                          helperText="Enter the total you expect to get back"
                           darkMode={darkMode}
                         />
                       </motion.div>
@@ -81,9 +81,9 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
                       >
                         <AlertCircle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                         <div>
-                          <p className={`text-sm font-semibold ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>No Zakat Due on This Amount</p>
+                          <p className={`text-sm font-semibold ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>No Zakat on This</p>
                           <p className={`text-xs mt-0.5 ${darkMode ? 'text-blue-400/80' : 'text-blue-800/70'}`}>
-                            Zakat is not payable on debts you don't reasonably expect to recover.
+                            If you don't expect to get the money back, you don't need to include it in your Zakat.
                           </p>
                         </div>
                       </motion.div>
@@ -100,7 +100,7 @@ const DebtsOwed = ({ formData, updateFormData, onNext, onBack, darkMode = false 
                   className={`p-4 rounded-lg border flex items-start gap-3 mt-4 ${darkMode ? 'bg-emerald-950/20 border-emerald-900/30' : 'bg-emerald-50 border-emerald-200'}`}
                 >
                   <CheckCircle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
-                  <p className={`text-sm ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>No outstanding receivables — you can proceed to the next section.</p>
+                  <p className={`text-sm ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>Nobody owes you money — you can move on to the next step.</p>
                 </motion.div>
               )}
             </AnimatePresence>

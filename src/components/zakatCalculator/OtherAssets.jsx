@@ -15,8 +15,8 @@ const OtherAssets = ({ formData, updateFormData, onNext, onBack, setActiveModal,
       className="max-w-3xl mx-auto"
     >
       <div className="mb-6">
-        <h2 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Other Assets</h2>
-        <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Miscellaneous wealth and holdings not previously categorized</p>
+        <h2 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Anything Else You Own</h2>
+        <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>Other valuable things you own that we haven't covered yet</p>
       </div>
 
       <div className="space-y-4">
@@ -28,15 +28,15 @@ const OtherAssets = ({ formData, updateFormData, onNext, onBack, setActiveModal,
                   <Package className={`w-4 h-4 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
                 <div>
-                  <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Miscellaneous Holdings</h3>
-                  <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Business inventory, international accounts, agricultural assets</p>
+                  <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Other Valuables</h3>
+                  <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-500'}`}>Business stock, overseas accounts, and other items of value</p>
                 </div>
               </div>
               <InfoButton onClick={() => setActiveModal('otherAssets')} text="Examples" darkMode={darkMode} />
             </div>
 
             <label className={`block text-xs font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
-              Do you have additional assets not mentioned previously?
+              Do you own anything valuable that we haven't asked about yet?
             </label>
             <YesNoToggle value={formData.hasOtherAssets} onChange={(val) => updateFormData('hasOtherAssets', val)} darkMode={darkMode} />
 
@@ -52,13 +52,13 @@ const OtherAssets = ({ formData, updateFormData, onNext, onBack, setActiveModal,
                   <div className={`p-3 rounded-lg border flex items-start gap-2 mb-3 ${darkMode ? 'bg-blue-950/20 border-blue-900/30' : 'bg-blue-50 border-blue-100'}`}>
                     <Info className={`w-4 h-4 mt-0.5 flex-shrink-0 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                     <p className={`text-xs ${darkMode ? 'text-blue-300' : 'text-blue-800'}`}>
-                      Include a clear description and current cash value for each asset.
+                      Write what it is and how much it is worth today.
                     </p>
                   </div>
                   <MultiFieldAdder
                     fields={formData.otherAssets}
                     setFields={(val) => updateFormData('otherAssets', val)}
-                    fieldLabels={['Asset description', 'Current cash value']}
+                    fieldLabels={['What is it?', 'How much is it worth today?']}
                     placeholder="Enter details"
                     darkMode={darkMode}
                   />
@@ -73,7 +73,7 @@ const OtherAssets = ({ formData, updateFormData, onNext, onBack, setActiveModal,
                   className={`p-4 rounded-lg border flex items-start gap-3 mt-4 ${darkMode ? 'bg-emerald-950/20 border-emerald-900/30' : 'bg-emerald-50 border-emerald-200'}`}
                 >
                   <CheckCircle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
-                  <p className={`text-sm ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>No additional assets — you can proceed to liabilities and expenses.</p>
+                  <p className={`text-sm ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>No other valuables — you can move on to the next step.</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -86,7 +86,7 @@ const OtherAssets = ({ formData, updateFormData, onNext, onBack, setActiveModal,
             <Info className="w-3.5 h-3.5" /> Common Examples
           </p>
           <div className="grid grid-cols-2 gap-1">
-            {['Business inventory or stock', 'International bank accounts', 'Agricultural produce or livestock', 'Trade receivables', 'Valuable collections', 'Intellectual property'].map((example, idx) => (
+            {['Business stock held for sale', 'Overseas bank accounts', 'Money owed to your business', 'Valuable collections', 'Intellectual property'].map((example, idx) => (
               <p key={idx} className={`text-xs flex items-center gap-1.5 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
                 <span className="text-emerald-500">•</span> {example}
               </p>
