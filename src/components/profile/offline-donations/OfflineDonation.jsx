@@ -1,6 +1,6 @@
 "use client"
 
-import { useGetOfflineDonationsQuery, useCreateOfflineDonationMutation } from "@/utils/slices/offlineDonationSlice"
+import { useGetOfflineDonationsQuery, useCreateOfflineDonationMutation, useGetCampaignDropdownQuery } from "@/utils/slices/offlineDonationSlice"
 import { useDispatch } from "react-redux"
 import { useSelector } from "react-redux"
 import { setCredentials } from "@/utils/slices/authSlice"
@@ -34,7 +34,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
   const [selectedMethod, setSelectedMethod] = useState(null)
   const [showSuccess, setShowSuccess] = useState(false)
   const [isClient, setIsClient] = useState(false);
-
+  const { data: campaignData } = useGetCampaignDropdownQuery();
+  const campaigns = campaignData?.campaigns || [];
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -68,7 +69,9 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
     chequeNumber: "",
     chequeDate: "",
     bankAccountName: "",
-    remarks: ""
+    remarks: "",
+    donationType: "",  // ← MISSING
+    campaignId: "",
   })
 
   useEffect(() => {
@@ -114,7 +117,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
         method: formData.method,
         amount, // ✅ FIX
         remarks: formData.remarks || "",
-
+        donationType: formData.donationType,  // ← MISSING
+        campaignId: formData.campaignId,
         bankName: formData.bankName,
         bankAccountName: formData.bankAccountName,
         transactionDate: formData.transactionDate,
@@ -641,7 +645,56 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                               </p>
                             )}
                           </div>
-
+                          {/* Donation Type */}
+                          <div>
+                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                              Donation Type <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <FileText className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <select
+                                name="donationType"
+                                value={formData.donationType}
+                                onChange={handleInputChange}
+                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all appearance-none ${darkMode
+                                  ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
+                                  : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
+                                  }`}
+                              >
+                                <option value="">Select donation type</option>
+                                <option value="ZAKAAT">ZAKAAT</option>
+                                <option value="LILLAH">LILLAH</option>
+                                <option value="IMDAD">IMDAD</option>
+                                <option value="SADQAH">SADQAH</option>
+                                <option value="RIBA">RIBA</option>
+                              </select>
+                            </div>
+                          </div>
+                          {/* Campaign */}
+                          <div>
+                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                              Campaign <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <Landmark className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <select
+                                name="campaignId"
+                                value={formData.campaignId}
+                                onChange={handleInputChange}
+                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all appearance-none ${darkMode
+                                  ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
+                                  : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
+                                  }`}
+                              >
+                                <option value="">Select a campaign</option>
+                                {campaigns.map((c) => (
+                                  <option key={c._id} value={c._id}>
+                                    {c.title}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
@@ -890,8 +943,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
                       <button
                         onClick={handleSubmit}
-                        disabled={!formData.amount || creating}
-                        className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${!formData.amount || creating
+                        disabled={!formData.amount || !formData.donationType || !formData.campaignId || creating}
+                        className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${!formData.amount || !formData.donationType || !formData.campaignId || creating
                           ? "bg-gray-400 cursor-not-allowed text-white"
                           : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
                           }`}

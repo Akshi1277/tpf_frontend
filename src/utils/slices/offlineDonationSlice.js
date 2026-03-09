@@ -42,6 +42,13 @@ export const offlineDonationApiSlice = apiSlice.injectEndpoints({
     getOfflineDonationById: builder.query({
       query: (id) => `/offline-donations/${id}`,
     }),
+
+    getCampaignDropdown: builder.query({
+      query: () => ({
+        url: "offline-donations/campaign-dropdown",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -49,4 +56,5 @@ export const {
   useCreateOfflineDonationMutation,
   useGetOfflineDonationsQuery,
   useGetOfflineDonationByIdQuery,
+  useGetCampaignDropdownQuery
 } = offlineDonationApiSlice;
