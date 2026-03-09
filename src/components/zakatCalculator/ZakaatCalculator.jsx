@@ -170,15 +170,18 @@ export default function ZakatCalculator({ darkMode = false }) {
 
       {/* Progress bar — only during form steps */}
       {!isLanding && currentStep < steps.length && (
-        <ProgressBar currentStep={currentStep} steps={steps} darkMode={darkMode} />
+        <div className="hidden sm:block">
+          <ProgressBar currentStep={currentStep} steps={steps} darkMode={darkMode} />
+        </div>
       )}
 
       <Modals activeModal={activeModal} setActiveModal={setActiveModal} darkMode={darkMode} />
 
       {/* Form area */}
+      {/* Form area */}
       <div
         ref={formRef}
-        className={`${isLanding ? (darkMode ? 'bg-zinc-900' : 'bg-gray-50') : ''} px-4 sm:px-6 py-6 sm:py-8`}
+        className={`${isLanding ? (darkMode ? 'bg-zinc-900' : 'bg-gray-50') : ''} px-4 sm:px-6 pt-16 pb-6 sm:py-8`}
         style={!isLanding ? { minHeight: 'calc(100vh - 64px)' } : {}}
       >
         <AnimatePresence mode="wait">

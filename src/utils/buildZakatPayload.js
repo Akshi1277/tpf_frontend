@@ -64,6 +64,17 @@ export const buildZakatPayload = (formData) => {
         formData.owedMoney && formData.expectPayback
           ? Number(formData.owedAmount || 0)
           : 0,
+
+      // Manual rate overrides — null when user chose "Auto (Live rate)"
+      customGoldPricePerGram:
+        formData.hasGold && formData.goldRateSource === 'manual' && formData.manualGoldRate
+          ? Number(formData.manualGoldRate)
+          : null,
+
+      customSilverPricePerGram:
+        formData.hasSilver && formData.silverRateSource === 'manual' && formData.manualSilverRate
+          ? Number(formData.manualSilverRate)
+          : null,
     },
 
     liabilities: formData.hasDebtsExpenses

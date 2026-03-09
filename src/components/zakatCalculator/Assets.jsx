@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { InputField, InfoButton, MultiFieldAdder, YesNoToggle } from './SharedComponents';
-import { TrendingUp, Bitcoin, Wallet, Building2, Gem, ChevronRight, Check, Plus, X } from 'lucide-react';
+import { TrendingUp, Bitcoin, Wallet, Building2, Gem, ChevronRight, Check, Plus, X, Wifi, PencilLine } from 'lucide-react';
 
 const KARAT_OPTIONS = ['24', '22', '21', '18', '14', '12', '9'];
 
@@ -135,6 +135,106 @@ const SilverEntryRow = ({ entry, index, onChange, onRemove, canRemove, darkMode 
     </div>
   </motion.div>
 );
+
+/**
+ * RateSourceToggle
+ * Lets the user pick between fetching the rate from the API or entering it manually.
+ */
+const RateSourceToggle = ({ metal, rateSource, onChangeSource, manualRate, onChangeManualRate, darkMode }) => {
+  const isGold = metal === 'gold';
+  const accentAuto = isGold
+    ? darkMode ? 'text-amber-400' : 'text-amber-700'
+    : darkMode ? 'text-zinc-300' : 'text-gray-600';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className={`mt-3 p-3 rounded-lg border ${
+        darkMode ? 'bg-zinc-800/40 border-zinc-700' : 'bg-gray-50 border-gray-200'
+      }`}
+    >
+      <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>
+        {isGold ? 'Gold' : 'Silver'} rate source
+      </p>
+      <div className="flex gap-2 mb-2">
+        {/* Auto button */}
+        <button
+          onClick={() => onChangeSource('api')}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs rounded-lg font-semibold transition-colors border ${
+            rateSource === 'api'
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : darkMode
+              ? 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-zinc-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+          }`}
+        >
+          <Wifi className="w-3 h-3" />
+          Auto (Live rate)
+        </button>
+        {/* Manual button */}
+        <button
+          onClick={() => onChangeSource('manual')}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs rounded-lg font-semibold transition-colors border ${
+            rateSource === 'manual'
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : darkMode
+              ? 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-zinc-500'
+              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+          }`}
+        >
+          <PencilLine className="w-3 h-3" />
+          Manual input
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {rateSource === 'api' && (
+          <motion.p
+            key="api-note"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className={`text-xs overflow-hidden ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}
+          >
+            We'll fetch the latest {isGold ? 'gold' : 'silver'} rate automatically from gold-api.com at calculation time.
+          </motion.p>
+        )}
+
+        {rateSource === 'manual' && (
+          <motion.div
+            key="manual-input"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <p className={`text-xs mb-2 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
+              Enter the current market rate for 1 gram of pure (24K) {isGold ? 'gold' : 'silver'} in ₹.
+            </p>
+            <div className="relative">
+              <span className={`absolute left-3 top-2.5 text-xs font-medium ${darkMode ? 'text-zinc-400' : 'text-gray-500'}`}>₹</span>
+              <input
+                type="number"
+                value={manualRate}
+                onChange={(e) => onChangeManualRate(e.target.value)}
+                placeholder={isGold ? 'e.g. 7500' : 'e.g. 90'}
+                className={`w-full pl-7 pr-3 py-2 text-sm rounded-lg border outline-none transition-colors focus:ring-2 focus:ring-emerald-500/20 ${
+                  darkMode
+                    ? 'bg-zinc-900 border-zinc-600 text-white placeholder-zinc-500 focus:border-emerald-500'
+                    : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
+                }`}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = false }) => {
   const navBtn = `px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2`;
@@ -278,6 +378,16 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                           >
                             <Plus className="w-3.5 h-3.5" /> Add Another Gold Entry
                           </button>
+
+                          {/* ── Gold rate source ── */}
+                          <RateSourceToggle
+                            metal="gold"
+                            rateSource={formData.goldRateSource || 'api'}
+                            onChangeSource={(val) => updateFormData('goldRateSource', val)}
+                            manualRate={formData.manualGoldRate || ''}
+                            onChangeManualRate={(val) => updateFormData('manualGoldRate', val)}
+                            darkMode={darkMode}
+                          />
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -337,6 +447,16 @@ const Assets = ({ formData, updateFormData, onNext, setActiveModal, darkMode = f
                           >
                             <Plus className="w-3.5 h-3.5" /> Add Another Silver Entry
                           </button>
+
+                          {/* ── Silver rate source ── */}
+                          <RateSourceToggle
+                            metal="silver"
+                            rateSource={formData.silverRateSource || 'api'}
+                            onChangeSource={(val) => updateFormData('silverRateSource', val)}
+                            manualRate={formData.manualSilverRate || ''}
+                            onChangeManualRate={(val) => updateFormData('manualSilverRate', val)}
+                            darkMode={darkMode}
+                          />
                         </motion.div>
                       )}
                     </AnimatePresence>

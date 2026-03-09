@@ -80,9 +80,9 @@ const heading = (doc, text, y, PW, ML, MR) => {
 };
 
 // ─────────────────────────────────────────────────────────────────
-// Main export
+// Main export  — accepts optional recipientName
 // ─────────────────────────────────────────────────────────────────
-const generateZakatPDF = async (results, formatCurrency) => {
+const generateZakatPDF = async (results, formatCurrency, recipientName = '') => {
   if (!results) return;
 
   // ── Destructure full API response ────────────────────
@@ -111,6 +111,13 @@ const generateZakatPDF = async (results, formatCurrency) => {
   const goldNisabAmt = goldNisabGrams * goldPPG;
   const silverNisabAmt = silverNisabGrams * silverPPG;
 
+  // ── Name label for header ─────────────────────────────
+  // e.g. "Aquib's Zakat Summary" — only shown when name is available
+  const firstName = recipientName?.trim()?.split(' ')?.[0] || '';
+  const nameLabel = firstName
+    ? `${firstName}'s Zakat Summary`
+    : 'Zakat Summary Report';
+
   // ── Document setup ────────────────────────────────────
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   const PW = doc.internal.pageSize.getWidth();   // 210 mm
@@ -137,17 +144,17 @@ const generateZakatPDF = async (results, formatCurrency) => {
     doc.addImage(logo.base64, 'PNG', ML, 13.5, lw, lh);
   }
 
-  // Report label (top right)
+  // ── Top-right: personalised name (bold) + date ────────
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...WHITE);
+  doc.text(nameLabel, PW - MR, 13, { align: 'right' });
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
-  doc.setTextColor(...WHITE);
-  doc.text('ZAKAT SUMMARY REPORT', PW - MR, 15, { align: 'right' });
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.5);
   doc.setTextColor(200, 225, 212);
   const dateStr = generatedAt.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
-  doc.text(dateStr, PW - MR, 21, { align: 'right' });
+  doc.text(dateStr, PW - MR, 20, { align: 'right' });
 
   // Eligibility pill
   const pillTxt = isEligible ? 'ZAKAT OBLIGATORY' : 'BELOW NISAB';
@@ -224,7 +231,7 @@ const generateZakatPDF = async (results, formatCurrency) => {
       const val = g.grams * goldPPG * (g.karat / 24);
       assetRows.push([
         `Gold — ${g.karat}K (${fNum(g.grams, 2)}g)`,
-        `${fNum(g.grams, 2)}g × Rs. ${fNum(goldPPG, 0)}/g × ${g.karat}/24`,
+        `${fNum(g.grams, 2)}g x Rs. ${fNum(goldPPG, 0)}/g x ${g.karat}/24`,
         fmt(val),
       ]);
     });
@@ -235,7 +242,7 @@ const generateZakatPDF = async (results, formatCurrency) => {
       const val = s.grams * silverPPG;
       assetRows.push([
         `Silver (${fNum(s.grams, 2)}g)`,
-        `${fNum(s.grams, 2)}g × Rs. ${fNum(silverPPG, 0)}/g`,
+        `${fNum(s.grams, 2)}g x Rs. ${fNum(silverPPG, 0)}/g`,
         fmt(val),
       ]);
     });
@@ -337,18 +344,13 @@ const generateZakatPDF = async (results, formatCurrency) => {
   const cH2 = 40;
 
   const drawNisabCard = (x, type, grams, pricePPG, nisabAmt, isUsed) => {
-    // Silver color for silver, gold color for gold
     const metalColor = type === 'GOLD' ? METAL_GOLD : METAL_SILVER;
-    // Always use metal color for background and white for text as requested
     const bg = metalColor;
     const t1 = WHITE;
     const t2 = [245, 245, 245];
     const t3 = WHITE;
 
     fillRR(doc, x, y, cW2, cH2, 3, bg);
-
-    // Add the white highlight border for that premium "weighted" look
-    // We use a stronger line for the "Applied" card to maintain clear distinction
     strokeRR(doc, x + 1, y + 1, cW2 - 2, cH2 - 2, 2.5, WHITE, isUsed ? 0.8 : 0.4);
 
     doc.setFont('helvetica', 'bold');
@@ -482,7 +484,6 @@ const generateZakatPDF = async (results, formatCurrency) => {
   doc.setLineWidth(0.4);
   doc.line(ML + 6, y + 10, ML + 18, y + 10);
 
-  // Left column — prices with metallic colors
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.setTextColor(...METAL_GOLD);
@@ -490,7 +491,6 @@ const generateZakatPDF = async (results, formatCurrency) => {
   doc.setTextColor(...METAL_SILVER);
   doc.text(`Silver (pure):        Rs. ${fNum(silverPPG, 0)} per gram`, ML + 8, y + 22);
 
-  // Right column — nisab equivalents
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.setTextColor(...EMERALD_DARK);
@@ -498,6 +498,88 @@ const generateZakatPDF = async (results, formatCurrency) => {
   doc.text(`Silver Nisab = Rs. ${fNum(silverNisabAmt, 0)}`, PW - MR - 5, y + 22, { align: 'right' });
 
   y += 36;
+
+  // ─────────────────────────────────────────────────────
+  // SECTION 6 — CTA (Need Help / Donate Your Zakat)
+  // ─────────────────────────────────────────────────────
+  if (y > 230) {
+    doc.addPage();
+    doc.setFillColor(...PAGE_BG);
+    doc.rect(0, 0, PW, PH, 'F');
+    y = 16;
+  }
+
+  // ── CTA layout constants ─────────────────────────────
+  const halfW   = (CW - 6) / 2;   // width of each half-card
+  const pad     = 5;               // inner padding
+  const titleY  = 9;               // title baseline from card top
+  const bodyY   = 16;              // body text start
+  const btnH    = 9;               // button height
+  const btnGap  = 4;               // gap between body text bottom and button
+
+  // Measure wrapped body text height for each card so the card auto-sizes
+  doc.setFontSize(6.8);
+  const helpLines   = doc.splitTextToSize('Facing issues or need guidance to calculate your Zakat correctly? Our team is here to help.', halfW - pad * 2);
+  const donateLines = doc.splitTextToSize('Donate your Zakat securely through our verified campaign and make a real difference.', halfW - pad * 2);
+  const lineH = 4;   // ~6.8pt line height in mm
+  const helpBodyH   = helpLines.length   * lineH;
+  const donateBodyH = donateLines.length * lineH;
+  const innerH = Math.max(helpBodyH, donateBodyH) + bodyY + btnGap + btnH + pad;
+  const ctaH   = innerH + 8;   // outer card height = inner + top/bottom margin
+
+  fillRR(doc, ML, y, CW, ctaH, 3, WHITE);
+  strokeRR(doc, ML, y, CW, ctaH, 3, DIVIDER);
+
+  // ── Left — WhatsApp help card ──────────────────────────
+  fillRR(doc, ML + 2,           y + 4, halfW, ctaH - 8, 2, [240, 253, 244]);
+  strokeRR(doc, ML + 2,         y + 4, halfW, ctaH - 8, 2, [187, 247, 208], 0.3);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...EMERALD_DARK);
+  doc.text('Need Help with Your Calculation?', ML + 2 + pad, y + 4 + titleY);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.8);
+  doc.setTextColor(...TEXT_MID);
+  doc.text(helpLines, ML + 2 + pad, y + 4 + bodyY);
+
+  const waBtnY = y + 4 + bodyY + helpBodyH + btnGap;
+  const waBtnX = ML + 2 + pad;
+  const waBtnW = halfW - pad * 2;
+  fillRR(doc, waBtnX, waBtnY, waBtnW, btnH, 2, [37, 211, 102]);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...WHITE);
+  doc.text('Chat on WhatsApp', waBtnX + waBtnW / 2, waBtnY + btnH * 0.62, { align: 'center' });
+  doc.link(waBtnX, waBtnY, waBtnW, btnH, { url: 'https://wa.me/919411565185' });
+
+  // ── Right — Donate card ────────────────────────────────
+  const rightX = ML + halfW + 6;
+  fillRR(doc, rightX,           y + 4, halfW, ctaH - 8, 2, EMERALD_LIGHT);
+  strokeRR(doc, rightX,         y + 4, halfW, ctaH - 8, 2, [110, 231, 183], 0.3);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...EMERALD_DARK);
+  doc.text('Ready to Pay Your Zakat?', rightX + pad, y + 4 + titleY);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.8);
+  doc.setTextColor(...TEXT_MID);
+  doc.text(donateLines, rightX + pad, y + 4 + bodyY);
+
+  const dBtnY = y + 4 + bodyY + donateBodyH + btnGap;
+  const dBtnX = rightX + pad;
+  const dBtnW = halfW - pad * 2;
+  fillRR(doc, dBtnX, dBtnY, dBtnW, btnH, 2, EMERALD_DARK);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...WHITE);
+  doc.text('Donate Your Zakat Now', dBtnX + dBtnW / 2, dBtnY + btnH * 0.62, { align: 'center' });
+  doc.link(dBtnX, dBtnY, dBtnW, btnH, { url: 'https://tpfaid.org/campaign/zakat-campaign-b35284' });
+
+  y += ctaH + 8;
 
   // ─────────────────────────────────────────────────────
   // FOOTER (every page)

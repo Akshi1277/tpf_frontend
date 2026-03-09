@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Lock, X, Sparkles, Moon, Coins, Gift, Star, HandHeart, User, Mail, Phone, ShieldCheck } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useAppToast } from '@/app/AppToastContext';
-import { useDonationIdentifyMutation } from "@/utils/slices/authApiSlice";
+import { useSoftSignupMutation } from "@/utils/slices/authApiSlice";
 
 import CampaignAmountSelector, { getCampaignConfig } from './DonatePopUpModal/CampaignAmountSelector';
 import DefaultAmountSelector from './DonatePopUpModal/DefaultAmountSelector';
@@ -69,7 +69,7 @@ export default function DonatePopUpModal({
   const checkoutStartedRef = useRef(false);
   const userInfo           = useSelector((state) => state.auth.userInfo);
   const { showToast }      = useAppToast();
-  const [donationIdentify] = useDonationIdentifyMutation();
+  const [softSignup] = useSoftSignupMutation();
 
   const pathname     = usePathname();
   const slugFromUrl  = pathname?.split('/campaign/')?.[1]?.split('/')?.[0] || null;
@@ -139,7 +139,7 @@ export default function DonatePopUpModal({
   }, [isOpen, resolvedSlug]);
 
   const handleIdentifyUser = async () => {
-    const result = await donationIdentify({ fullName, email, mobileNo }).unwrap();
+    const result = await softSignup({ fullName, email, mobileNo }).unwrap();
     if (result?.data?.userId) return result.data.userId;
     throw new Error('Unable to identify user');
   };
