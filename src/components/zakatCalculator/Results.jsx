@@ -6,7 +6,7 @@ import { useSoftSignupMutation } from '@/utils/slices/authApiSlice';
 import { useAppToast } from '@/app/AppToastContext';
 import generateZakatPDF from '@/utils/generateZakatPDF';
 import GuestDetailsModal from './GuestDetailsModal'; // ← adjust path if needed
-
+import axios from "axios"
 // Small section heading
 const SectionLabel = ({ children, darkMode }) => (
   <p className={`text-[10px] font-bold tracking-[0.18em] uppercase mb-3 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>{children}</p>
@@ -15,10 +15,10 @@ const SectionLabel = ({ children, darkMode }) => (
 // Tooltip-style info callout
 const InfoCallout = ({ icon: Icon, title, body, colorClass = 'blue', darkMode = false }) => {
   const map = {
-    blue:  { bg: darkMode ? 'bg-blue-900/20'    : 'bg-blue-50',    border: darkMode ? 'border-blue-900/50'    : 'border-blue-100',    title: darkMode ? 'text-blue-400'    : 'text-blue-800',    body: darkMode ? 'text-blue-300'    : 'text-blue-700',    icon: darkMode ? 'text-blue-400'    : 'text-blue-500'    },
+    blue: { bg: darkMode ? 'bg-blue-900/20' : 'bg-blue-50', border: darkMode ? 'border-blue-900/50' : 'border-blue-100', title: darkMode ? 'text-blue-400' : 'text-blue-800', body: darkMode ? 'text-blue-300' : 'text-blue-700', icon: darkMode ? 'text-blue-400' : 'text-blue-500' },
     green: { bg: darkMode ? 'bg-emerald-900/20' : 'bg-emerald-50', border: darkMode ? 'border-emerald-900/50' : 'border-emerald-100', title: darkMode ? 'text-emerald-400' : 'text-emerald-800', body: darkMode ? 'text-emerald-300' : 'text-emerald-700', icon: darkMode ? 'text-emerald-400' : 'text-emerald-500' },
-    gold:  { bg: darkMode ? 'bg-amber-900/20'   : 'bg-amber-50',   border: darkMode ? 'border-amber-900/50'   : 'border-amber-100',   title: darkMode ? 'text-amber-400'   : 'text-amber-800',   body: darkMode ? 'text-amber-300'   : 'text-amber-700',   icon: darkMode ? 'text-amber-400'   : 'text-amber-500'   },
-    red:   { bg: darkMode ? 'bg-red-900/20'     : 'bg-red-50',     border: darkMode ? 'border-red-900/50'     : 'border-red-100',     title: darkMode ? 'text-red-400'     : 'text-red-800',     body: darkMode ? 'text-red-300'     : 'text-red-700',     icon: darkMode ? 'text-red-400'     : 'text-red-500'     },
+    gold: { bg: darkMode ? 'bg-amber-900/20' : 'bg-amber-50', border: darkMode ? 'border-amber-900/50' : 'border-amber-100', title: darkMode ? 'text-amber-400' : 'text-amber-800', body: darkMode ? 'text-amber-300' : 'text-amber-700', icon: darkMode ? 'text-amber-400' : 'text-amber-500' },
+    red: { bg: darkMode ? 'bg-red-900/20' : 'bg-red-50', border: darkMode ? 'border-red-900/50' : 'border-red-100', title: darkMode ? 'text-red-400' : 'text-red-800', body: darkMode ? 'text-red-300' : 'text-red-700', icon: darkMode ? 'text-red-400' : 'text-red-500' },
   };
   const c = map[colorClass];
   return (
@@ -33,41 +33,57 @@ const InfoCallout = ({ icon: Icon, title, body, colorClass = 'blue', darkMode = 
 };
 
 const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
-  const userInfo        = useSelector((state) => state.auth.userInfo);
-  const { showToast }   = useAppToast();
-  const [softSignup]    = useSoftSignupMutation();
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const { showToast } = useAppToast();
+  const [softSignup] = useSoftSignupMutation();
 
   const [showGuestModal, setShowGuestModal] = useState(false);
-  const [isSubmitting, setIsSubmitting]     = useState(false);
-  const [hasDownloaded, setHasDownloaded]   = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasDownloaded, setHasDownloaded] = useState(false);
 
   if (!results) return null;
 
-  const zakatableWealth  = results.zakatableWealth  || 0;
-  const nisab            = results.nisab            || 0;
-  const zakatDue         = results.zakatDue         || 0;
-  const totalAssets      = results.totalAssets      || 0;
+  const zakatableWealth = results.zakatableWealth || 0;
+  const nisab = results.nisab || 0;
+  const zakatDue = results.zakatDue || 0;
+  const totalAssets = results.totalAssets || 0;
   const totalLiabilities = results.totalLiabilities || 0;
-  const isEligible       = results.isEligible;
+  const isEligible = results.isEligible;
 
-  const nisabBasis        = results.nisabBasis || 'silver';
-  const goldNisabGrams    = 87.48;
-  const silverNisabGrams  = 612.36;
-  const nisabLabel        = nisabBasis === 'gold'
+  const nisabBasis = results.nisabBasis || 'silver';
+  const goldNisabGrams = 87.48;
+  const silverNisabGrams = 612.36;
+  const nisabLabel = nisabBasis === 'gold'
     ? `${goldNisabGrams}g of gold`
     : `${silverNisabGrams}g of silver`;
 
   const card = `rounded-2xl border ${darkMode ? 'bg-zinc-900/60 border-zinc-800' : 'bg-white border-gray-200'} overflow-hidden`;
 
   /* ── Download button handler ─────────────────────────────────────────── */
-  const handleDownloadClick = () => {
+  const handleDownloadClick = async () => {
     if (userInfo) {
+      await saveZakatCalculation(results.zakatDue);
       // Already logged in — download immediately
       generateZakatPDF(results, formatCurrency, userInfo?.fullName || '');
       setHasDownloaded(true);
     } else {
       // Guest — open modal to collect details first
       setShowGuestModal(true);
+    }
+  };
+  const saveZakatCalculation = async (zakatDue, userId) => {
+    try {
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/zakat/calculate-zakat`,
+        {
+          zakatDue,
+          userId
+        }
+      );
+
+    } catch (error) {
+      console.error("Failed to save zakat calculation:", error);
     }
   };
 
@@ -78,7 +94,8 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
       // 1. Soft-signup (same pattern as DonatePopUpModal)
       const result = await softSignup({ fullName, email, mobileNo, nisaabDate }).unwrap();
       if (!result?.data?.userId) throw new Error('Could not identify user');
-
+      const userId = result.data.userId;
+      await saveZakatCalculation(results.zakatDue,userId);
       // 2. Download the PDF
       generateZakatPDF(results, formatCurrency, fullName);
       setHasDownloaded(true);
@@ -103,6 +120,8 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
       setIsSubmitting(false);
     }
   };
+
+
 
   return (
     <>
@@ -134,10 +153,10 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${isEligible
               ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
               : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-            }`}>
+              }`}>
               {isEligible
                 ? <><CheckCircle2 className="w-3.5 h-3.5" /> Zakat is Due</>
-                : <><XCircle       className="w-3.5 h-3.5" /> Below Nisab</>
+                : <><XCircle className="w-3.5 h-3.5" /> Below Nisab</>
               }
             </div>
           </div>
@@ -236,13 +255,12 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                       initial={{ opacity: 0, x: -6 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className={`flex items-center gap-3 px-3.5 py-3 rounded-xl ${
-                        row.highlight
-                          ? (darkMode ? 'bg-emerald-900/20 border border-emerald-900/50' : 'bg-emerald-50 border border-emerald-200')
-                          : row.bold
-                            ? (darkMode ? 'bg-purple-900/20 border border-purple-900/50' : 'bg-purple-50 border border-purple-100')
-                            : (darkMode ? 'bg-zinc-800/30 border border-zinc-800' : 'bg-gray-50/60 border border-gray-100')
-                      }`}
+                      className={`flex items-center gap-3 px-3.5 py-3 rounded-xl ${row.highlight
+                        ? (darkMode ? 'bg-emerald-900/20 border border-emerald-900/50' : 'bg-emerald-50 border border-emerald-200')
+                        : row.bold
+                          ? (darkMode ? 'bg-purple-900/20 border border-purple-900/50' : 'bg-purple-50 border border-purple-100')
+                          : (darkMode ? 'bg-zinc-800/30 border border-zinc-800' : 'bg-gray-50/60 border border-gray-100')
+                        }`}
                     >
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${row.bg}`}>
                         <Icon className={`w-3.5 h-3.5 ${darkMode && row.iconColor === 'text-blue-500' ? 'text-blue-400' : row.iconColor}`} />
@@ -253,12 +271,11 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                         </p>
                         <p className={`text-xs mt-0.5 ${darkMode ? 'text-zinc-400' : 'text-gray-400'}`}>{row.note}</p>
                       </div>
-                      <span className={`text-sm font-bold tabular-nums flex-shrink-0 ${
-                        row.highlight ? (darkMode ? 'text-emerald-400' : 'text-emerald-700')
-                        : row.bold     ? (darkMode ? 'text-purple-400'  : 'text-purple-700')
-                        : row.muted    ? (darkMode ? 'text-zinc-500'    : 'text-gray-400')
-                        :                (darkMode ? 'text-zinc-300'    : 'text-gray-700')
-                      }`}>
+                      <span className={`text-sm font-bold tabular-nums flex-shrink-0 ${row.highlight ? (darkMode ? 'text-emerald-400' : 'text-emerald-700')
+                        : row.bold ? (darkMode ? 'text-purple-400' : 'text-purple-700')
+                          : row.muted ? (darkMode ? 'text-zinc-500' : 'text-gray-400')
+                            : (darkMode ? 'text-zinc-300' : 'text-gray-700')
+                        }`}>
                         {row.prefix}{formatCurrency(Math.abs(row.value))}
                       </span>
                     </motion.div>
@@ -282,7 +299,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isEligible ? (darkMode ? 'bg-emerald-900/50' : 'bg-emerald-100') : (darkMode ? 'bg-blue-900/50' : 'bg-blue-100')}`}>
                 {isEligible
                   ? <CheckCircle2 className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
-                  : <Info         className={`w-5 h-5 ${darkMode ? 'text-blue-400'    : 'text-blue-600'}`}    />
+                  : <Info className={`w-5 h-5 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                 }
               </div>
               <div>
@@ -395,7 +412,7 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
                       : 'Your wealth is below the threshold. Zakat is not due, but voluntary Sadaqah is encouraged.',
                     color: isEligible
                       ? (darkMode ? 'bg-emerald-900/20 border-emerald-900/50' : 'bg-emerald-50 border-emerald-100')
-                      : (darkMode ? 'bg-blue-900/20 border-blue-900/50'      : 'bg-blue-50 border-blue-100'),
+                      : (darkMode ? 'bg-blue-900/20 border-blue-900/50' : 'bg-blue-50 border-blue-100'),
                   },
                 ].map((item) => (
                   <div key={item.step} className={`flex items-start gap-3 p-3 rounded-xl border ${item.color}`}>
