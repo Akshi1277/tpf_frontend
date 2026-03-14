@@ -8,6 +8,7 @@ import { getMediaUrl } from "@/utils/media";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import GlobalLoader from "@/components/GlobalLoader";
+import DOMPurify from "dompurify";
 
 export default function BlogPage() {
   const { slug } = useParams();
@@ -317,7 +318,7 @@ export default function BlogPage() {
                     } prose-headings:font-black prose-headings:tracking-tight prose-p:leading-relaxed prose-a:font-semibold prose-a:no-underline hover:prose-a:underline prose-blockquote:italic prose-blockquote:font-medium prose-blockquote:border-l-4 prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-pre:rounded-xl prose-img:rounded-2xl prose-hr:border-2 ${
                       darkMode ? "prose-hr:border-zinc-800" : "prose-hr:border-gray-200"
                     }`}
-                    dangerouslySetInnerHTML={{ __html: blog.content }}
+                    dangerouslySetInnerHTML={{ __html: typeof window !== 'undefined' ? DOMPurify.sanitize(blog.content) : blog.content }}
                   />
                 ) : (
                   // If plain text, format it with beautiful typography
