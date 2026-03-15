@@ -27,6 +27,7 @@ import {
   Twitter,
   Linkedin,
   ExternalLink,
+  X,
 } from 'lucide-react';
 import {
   useGetCommentsQuery,
@@ -43,6 +44,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
   const [pendingDocsAccess, setPendingDocsAccess] = useState(false);
   const [pendingCommentsAccess, setPendingCommentsAccess] = useState(false);
   const [activeTab, setActiveTab] = useState('about');
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const aboutText = campaign?.about || '';
@@ -243,6 +245,17 @@ export default function CampaignTabs({ darkMode, campaign }) {
     }
   };
 
+  // Scroll lock for document preview modal
+  useEffect(() => {
+    if (previewDoc) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [previewDoc]);
+
   return (
     <div className={`${darkMode ? 'bg-zinc-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden`}>
       {/* ---------------- TABS ---------------- */}
@@ -252,7 +265,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
           { id: 'status', icon: Activity, label: 'Current Status' },
           { id: 'documents', icon: FileText, label: 'Documents', badge: documents.length },
           { id: 'comments', icon: MessageCircle, label: 'Comments', badge: commentsData?.data?.length || 0 },
-        ].map((tab) => (
+        ].filter(tab => tab.id !== 'documents' || tab.badge > 0).map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -482,17 +495,15 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           </div>
                         </div>
 
-                        <a
-                          href={getMediaUrl(doc.fileUrl)}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => setPreviewDoc(doc)}
                           className={`px-4 py-2 rounded-lg font-medium transition-colors ${darkMode
                             ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
                             : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                             }`}
                         >
                           View Document
-                        </a>
+                        </button>
                       </motion.div>
                     ))}
                   </div>
@@ -754,6 +765,91 @@ export default function CampaignTabs({ darkMode, campaign }) {
         darkMode={darkMode}
         onLoginSuccess={() => setShowLoginModal(false)}
       />
+
+      {/* ================= DOCUMENT PREVIEW MODAL ================= */}
+      <AnimatePresence>
+        {previewDoc && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-[70] p-4 sm:p-8"
+            onClick={() => setPreviewDoc(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative w-full max-w-5xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
+            >
+              {/* Modal Header */}
+              <div className={`flex items-center justify-between p-4 border-b ${darkMode ? 'border-zinc-800' : 'border-gray-200'}`}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className={`font-bold truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {previewDoc.name}
+                    </h3>
+                    <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {previewDoc.fileType?.toUpperCase()} Document
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setPreviewDoc(null)}
+                  className={`p-2 rounded-xl transition-colors ${darkMode ? 'hover:bg-zinc-800 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="flex-1 overflow-auto bg-zinc-950/50 flex items-center justify-center p-4" data-lenis-prevent>
+                {previewDoc.fileType?.toLowerCase() === 'pdf' ? (
+                  <iframe
+                    src={`${getMediaUrl(previewDoc.fileUrl)}#toolbar=0`}
+                    className="w-full h-full min-h-[60vh] rounded-lg bg-white"
+                    title={previewDoc.name}
+                  />
+                ) : (
+                  <img
+                    src={getMediaUrl(previewDoc.fileUrl)}
+                    alt={previewDoc.name}
+                    className="max-w-full max-h-full object-contain shadow-2xl rounded-lg"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/fallback-document.png'; // Fallback if image fails
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className={`p-4 border-t flex justify-end gap-3 ${darkMode ? 'border-zinc-800' : 'border-gray-200'}`}>
+                <a
+                  href={getMediaUrl(previewDoc.fileUrl)}
+                  download
+                  className={`px-6 py-2 rounded-xl font-semibold transition-all ${darkMode
+                    ? 'bg-zinc-800 text-white hover:bg-zinc-700'
+                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    }`}
+                >
+                  Download Original
+                </a>
+                <button
+                  onClick={() => setPreviewDoc(null)}
+                  className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-all"
+                >
+                  Close Preview
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ================= DELETE CONFIRMATION MODAL ================= */}
       <AnimatePresence>
