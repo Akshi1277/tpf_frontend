@@ -54,16 +54,13 @@ export default function CampaignTabs({ darkMode, campaign }) {
     ? aboutText.slice(0, ABOUT_CHAR_LIMIT).trimEnd() + '…'
     : aboutText || 'No description provided.';
 
-
   const isAuthenticated = !!userInfo;
 
-  // Comments State
   const [commentPage, setCommentPage] = useState(1);
   const [newComment, setNewComment] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  /* ---------------- API HOOKS ---------------- */
   const { data: commentsData, isLoading: commentsLoading, isFetching: commentsFetching } = useGetCommentsQuery({
     campaignId: campaign?._id,
     page: commentPage
@@ -74,15 +71,12 @@ export default function CampaignTabs({ darkMode, campaign }) {
   const [addComment, { isLoading: isAdding }] = useAddCommentMutation();
   const [deleteComment, { isLoading: isDeleting }] = useDeleteCommentMutation();
 
-  /* ---------------- SAFE DATA ---------------- */
   const impactGoals = campaign?.impactGoals ?? [];
   const documents = campaign?.documents ?? [];
 
-  // Get social media links from the latest submission
   const socialMediaLinks = campaign?.socialMediaSubmissions?.[0]?.links || {};
   const hasSocialMedia = Object.values(socialMediaLinks).some(link => link && link.trim() !== '');
 
-  // Helper to get social media icon and color
   const getSocialConfig = (platform) => {
     const configs = {
       instagram: {
@@ -173,7 +167,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
     return configs[platform] || configs.other;
   };
 
-  // Helper to get platform display name
   const getPlatformName = (platform) => {
     const names = {
       instagram: 'Instagram',
@@ -245,7 +238,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
     }
   };
 
-  // Scroll lock for document preview modal
   useEffect(() => {
     if (previewDoc) {
       const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -410,16 +402,14 @@ export default function CampaignTabs({ darkMode, campaign }) {
                       {displayedAbout}
                     </p>
                     {isAboutLong && !aboutExpanded && (
-                      <div className={`absolute bottom-0 left-0 right-0 h-10 pointer-events-none ${darkMode ? 'bg-gradient-to-t from-zinc-800 to-transparent' : 'bg-gradient-to-t from-white to-transparent'
-                        }`} />
+                      <div className={`absolute bottom-0 left-0 right-0 h-10 pointer-events-none ${darkMode ? 'bg-gradient-to-t from-zinc-800 to-transparent' : 'bg-gradient-to-t from-white to-transparent'}`} />
                     )}
                   </div>
 
                   {isAboutLong && (
                     <button
                       onClick={() => setAboutExpanded(prev => !prev)}
-                      className={`mt-3 inline-flex items-center gap-1.5 text-sm font-semibold cursor-pointer transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'
-                        }`}
+                      className={`mt-3 inline-flex items-center gap-1.5 text-sm font-semibold cursor-pointer transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}
                     >
                       {aboutExpanded ? 'Read Less' : 'Read More'}
                       <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${aboutExpanded ? '-rotate-90' : 'rotate-90'}`} />
@@ -458,8 +448,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.3 }}
-                      className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${darkMode ? 'bg-zinc-900' : 'bg-gray-100'
-                        }`}
+                      className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${darkMode ? 'bg-zinc-900' : 'bg-gray-100'}`}
                     >
                       <Inbox className={`w-10 h-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                     </motion.div>
@@ -478,15 +467,15 @@ export default function CampaignTabs({ darkMode, campaign }) {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className={`flex items-center justify-between p-4 rounded-lg border transition-all hover:shadow-md
+                        className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-lg border transition-all hover:shadow-md
                           ${darkMode ? 'border-zinc-700 hover:border-emerald-500/50' : 'border-gray-200 hover:border-emerald-400'}`}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0">
                             <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                           </div>
-                          <div>
-                            <p className={`font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          <div className="min-w-0">
+                            <p className={`font-medium truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                               {doc.name}
                             </p>
                             <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -497,7 +486,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
 
                         <button
                           onClick={() => setPreviewDoc(doc)}
-                          className={`px-4 py-2 rounded-lg font-medium transition-colors ${darkMode
+                          className={`w-full sm:w-auto shrink-0 px-4 py-2 rounded-lg font-medium transition-colors text-center ${darkMode
                             ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
                             : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                             }`}
@@ -541,7 +530,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
             <div className="relative min-h-[350px] flex flex-col">
               <div className={`flex-1 ${!isAuthenticated ? 'opacity-40 blur-sm pointer-events-none' : ''}`}>
                 <div className="space-y-8">
-                  {/* --- Post Comment Section --- */}
                   {isAuthenticated && !commentsData?.userHasCommented && (
                     <div className={`p-4 rounded-xl border ${darkMode ? 'bg-zinc-900 border-zinc-700' : 'bg-gray-50 border-gray-100'}`}>
                       <div className="flex gap-4">
@@ -585,7 +573,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
                     </div>
                   )}
 
-                  {/* --- Comment List --- */}
                   <div className="space-y-4">
                     {commentsLoading && commentPage === 1 ? (
                       <div className="text-center py-10">
@@ -597,8 +584,7 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           initial={{ scale: 0.9, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ duration: 0.3 }}
-                          className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${darkMode ? 'bg-zinc-900' : 'bg-gray-100'
-                            }`}
+                          className={`w-20 h-20 rounded-full mb-6 flex items-center justify-center ${darkMode ? 'bg-zinc-900' : 'bg-gray-100'}`}
                         >
                           <MessageSquare className={`w-10 h-10 ${darkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                         </motion.div>
@@ -635,8 +621,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
                                       {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                     </span>
                                   </div>
-
-                                  {/* Delete Action */}
                                   {comment.isOwner && (
                                     <button
                                       onClick={() => handleDelete(comment._id)}
@@ -655,7 +639,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
                                     </button>
                                   )}
                                 </div>
-
                                 <p className={`whitespace-pre-wrap break-words ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                   {comment.content}
                                 </p>
@@ -664,7 +647,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
                           </motion.div>
                         ))}
 
-                        {/* Show More / Less / Load More */}
                         <div className="flex flex-col items-center gap-3 pt-2">
                           {(commentsData?.totalCount > 5 || commentsData?.data?.length > 5) && (
                             <button
@@ -674,7 +656,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
                               {isExpanded ? 'Show Less Comments' : 'Show More Comments'}
                             </button>
                           )}
-
                           {isExpanded && commentsData?.hasMore && (
                             <button
                               onClick={() => setCommentPage(prev => prev + 1)}
@@ -773,80 +754,62 @@ export default function CampaignTabs({ darkMode, campaign }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-[70] p-4 sm:p-8"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/90 flex flex-col z-[70]"
             onClick={() => setPreviewDoc(null)}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            {/* Minimal top bar */}
+            <div
+              className="flex items-center justify-between px-5 py-3 shrink-0"
               onClick={(e) => e.stopPropagation()}
-              className={`relative w-full max-w-5xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}
             >
-              {/* Modal Header */}
-              <div className={`flex items-center justify-between p-4 border-b ${darkMode ? 'border-zinc-800' : 'border-gray-200'}`}>
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className={`font-bold truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                      {previewDoc.name}
-                    </h3>
-                    <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {previewDoc.fileType?.toUpperCase()} Document
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setPreviewDoc(null)}
-                  className={`p-2 rounded-xl transition-colors ${darkMode ? 'hover:bg-zinc-800 text-gray-400' : 'hover:bg-gray-100 text-gray-500'}`}
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Modal Content */}
-              <div className="flex-1 overflow-auto bg-zinc-950/50 flex items-center justify-center p-4" data-lenis-prevent>
-                {previewDoc.fileType?.toLowerCase() === 'pdf' ? (
-                  <iframe
-                    src={`${getMediaUrl(previewDoc.fileUrl)}#toolbar=0`}
-                    className="w-full h-full min-h-[60vh] rounded-lg bg-white"
-                    title={previewDoc.name}
-                  />
-                ) : (
-                  <img
-                    src={getMediaUrl(previewDoc.fileUrl)}
-                    alt={previewDoc.name}
-                    className="max-w-full max-h-full object-contain shadow-2xl rounded-lg"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/fallback-document.png'; // Fallback if image fails
-                    }}
-                  />
-                )}
-              </div>
-
-              {/* Modal Footer */}
-              <div className={`p-4 border-t flex justify-end gap-3 ${darkMode ? 'border-zinc-800' : 'border-gray-200'}`}>
+              <span className="text-white/60 text-sm truncate max-w-[70%]">
+                {previewDoc.name}
+              </span>
+              <div className="flex items-center gap-4">
                 <a
                   href={getMediaUrl(previewDoc.fileUrl)}
                   download
-                  className={`px-6 py-2 rounded-xl font-semibold transition-all ${darkMode
-                    ? 'bg-zinc-800 text-white hover:bg-zinc-700'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                    }`}
+                  className="text-white/50 hover:text-white text-xs transition-colors"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  Download Original
+                  Download
                 </a>
                 <button
                   onClick={() => setPreviewDoc(null)}
-                  className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-all"
+                  className="text-white/50 hover:text-white transition-colors"
                 >
-                  Close Preview
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </motion.div>
+            </div>
+
+            {/* Document fills remaining space */}
+            <div
+              className="flex-1 overflow-auto flex items-center justify-center px-4 py-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {previewDoc.fileType?.toLowerCase() === 'pdf' ? (
+                <iframe
+                  src={`${getMediaUrl(previewDoc.fileUrl)}#toolbar=0&navpanes=0`}
+                  className="w-full max-w-3xl h-[calc(100vh-80px)] rounded-sm"
+                  title={previewDoc.name}
+                />
+              ) : (
+                <motion.img
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.25 }}
+                  src={getMediaUrl(previewDoc.fileUrl)}
+                  alt={previewDoc.name}
+                  className="max-w-3xl w-full object-contain rounded-sm"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/fallback-document.png';
+                  }}
+                />
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -872,14 +835,12 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 <div className={`p-4 rounded-full mb-4 ${darkMode ? 'bg-red-500/10' : 'bg-red-50'}`}>
                   <Trash2 className="w-8 h-8 text-red-500" />
                 </div>
-
                 <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   Delete Comment?
                 </h3>
                 <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   This action cannot be undone. Are you sure you want to remove your comment?
                 </p>
-
                 <div className="flex w-full gap-3">
                   <button
                     onClick={() => setDeleteConfirm({ show: false, id: null })}
@@ -903,6 +864,6 @@ export default function CampaignTabs({ darkMode, campaign }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div >
+    </div>
   );
 }

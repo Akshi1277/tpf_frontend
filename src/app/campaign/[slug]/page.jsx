@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import CampaignHero from "@/components/campaign/CampaignHero";
 import CampaignProgress from "@/components/campaign/CampaignProgress";
 import CampaignTabs from "@/components/campaign/CampaignTabs";
+import CampaignVideo from "@/components/campaign/CampaignVideo";
 import DonationCard from "@/components/campaign/DonationCard";
 import DonatePopUpModal from "@/components/campaign/DonateModal";
 import RelatedCampaigns from "@/components/campaign/RelatedCampaigns";
@@ -32,7 +33,7 @@ export default function CampaignPage() {
   });
 
   useEffect(() => {
-    if (isLoading) return; // wait until campaign loads
+    if (isLoading) return;
 
     const MAX_AUTO_OPENS = 4;
     const storageKey = "donate_popup_count";
@@ -47,10 +48,8 @@ export default function CampaignPage() {
   }, [isLoading]);
 
   if (isLoading) {
-    return <GlobalLoader />
+    return <GlobalLoader />;
   }
-
-
 
   if (error || !data?.campaign) {
     return (
@@ -59,8 +58,6 @@ export default function CampaignPage() {
       </div>
     );
   }
-
-
 
   const campaign = data.campaign;
 
@@ -76,31 +73,32 @@ export default function CampaignPage() {
         scrolled={scrolled}
       />
 
-      {/* Hero Section - Full width with overlay back button */}
+      {/* Hero Section */}
       <div className="relative w-full pt-14 md:pt-20">
-        {/* BACK BUTTON - Absolute positioned over hero */}
+        {/* Back Button */}
         <div className="absolute top-16 md:top-24 left-2 sm:left-4 md:left-8 z-20">
           <button
             type="button"
             onClick={() => router.back()}
-            className={`group flex items-center gap-2 transition-colors duration-200 ${darkMode
-              ? "text-white hover:text-emerald-400"
-              : "text-gray-900 hover:text-emerald-600"
-              }`}
+            className={`group flex items-center gap-2 transition-colors duration-200 ${
+              darkMode
+                ? "text-white hover:text-emerald-400"
+                : "text-gray-900 hover:text-emerald-600"
+            }`}
             aria-label="Go back"
           >
             <div
-              className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border backdrop-blur-md shadow-lg transition-all duration-200 ${darkMode
-                ? "bg-black/40 border-white/20 hover:border-emerald-500/50 hover:bg-black/60"
-                : "bg-white/70 border-gray-200 hover:border-emerald-500/40 hover:bg-white"
-                }`}
+              className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border backdrop-blur-md shadow-lg transition-all duration-200 ${
+                darkMode
+                  ? "bg-black/40 border-white/20 hover:border-emerald-500/50 hover:bg-black/60"
+                  : "bg-white/70 border-gray-200 hover:border-emerald-500/40 hover:bg-white"
+              }`}
             >
               <ArrowLeft size={18} className="sm:size-[20px]" strokeWidth={2.5} />
             </div>
           </button>
         </div>
 
-        {/* HERO - Full width */}
         <CampaignHero
           campaign={campaign}
           darkMode={darkMode}
@@ -108,9 +106,9 @@ export default function CampaignPage() {
         />
       </div>
 
-      {/* Main Content Container */}
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* PROGRESS */}
+        {/* Progress */}
         <div className="mt-4 sm:mt-6">
           <CampaignProgress
             darkMode={darkMode}
@@ -121,14 +119,14 @@ export default function CampaignPage() {
           />
         </div>
 
-        {/* TABS AND DONATION CARD */}
+        {/* Tabs + Donation Card grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mt-6">
-          {/* TABS */}
+          {/* Tabs - left 2/3 */}
           <div className="lg:col-span-2">
             <CampaignTabs campaign={campaign} darkMode={darkMode} />
           </div>
 
-          {/* DONATION */}
+          {/* Donation Card - right 1/3 */}
           <div className="lg:col-span-1" ref={donationCardRef}>
             <DonationCard
               campaignId={campaign._id}
@@ -143,12 +141,23 @@ export default function CampaignPage() {
           </div>
         </div>
 
-        {/* TRUST & SAFETY - Only visible on mobile (below lg) */}
+        {/* Trust & Safety - mobile only */}
         <div className="lg:hidden mt-6">
           <TrustSafety darkMode={darkMode} />
         </div>
 
-        {/* RELATED */}
+        {/* ── Campaign Video ── */}
+        {/* On desktop: video sits in the left 2/3 column to match the tabs width */}
+        {/* On mobile: full width */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mt-6">
+          <div className="lg:col-span-2">
+            <CampaignVideo campaign={campaign} darkMode={darkMode} />
+          </div>
+          {/* empty right column keeps video aligned with tabs above */}
+          <div className="hidden lg:block lg:col-span-1" />
+        </div>
+
+        {/* Related Campaigns */}
         <RelatedCampaigns
           category={campaign.category}
           currentSlug={campaign.slug}
@@ -160,14 +169,12 @@ export default function CampaignPage() {
 
       <Footer darkMode={darkMode} />
 
-      {/* Floating Donate Button - Only visible on mobile when scrolled */}
       <FloatingDonateButton
         darkMode={darkMode}
         onClick={() => setIsFloatingModalOpen(true)}
         isModalOpen={isFloatingModalOpen || isDonorModalOpen}
       />
 
-      {/* Floating Button Donation Modal */}
       <DonatePopUpModal
         isOpen={isFloatingModalOpen}
         onClose={() => setIsFloatingModalOpen(false)}
