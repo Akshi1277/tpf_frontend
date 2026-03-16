@@ -124,8 +124,9 @@ export default function CampaignAmountSelector({
     }
   };
 
+  // Only show flat presets whose label starts with '₹' — filters out bad "0 Kits" entries
   const flatPresets = (config.presets && config.presets.length > 0)
-    ? config.presets.filter(p => !p.qty)
+    ? config.presets.filter(p => (!p.qty || p.qty === 0) && p.label && p.label.startsWith('₹'))
     : [
       { amount: 50, label: '₹50' },
       { amount: 100, label: '₹100' },
@@ -133,8 +134,9 @@ export default function CampaignAmountSelector({
       { amount: 1000, label: '₹1000' }
     ];
 
+  // Only show kit presets with a strictly positive qty
   const kitPresets = (config.presets && config.presets.length > 0)
-    ? config.presets.filter(p => p.qty)
+    ? config.presets.filter(p => p.qty && p.qty >= 1)
     : [];
 
   const isOtherActive = showCustomAmountInput || !!customAmount;
