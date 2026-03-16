@@ -10,8 +10,6 @@ import { useSoftSignupMutation } from "@/utils/slices/authApiSlice";
 import CampaignAmountSelector, { getCampaignConfig } from './DonatePopUpModal/CampaignAmountSelector';
 import DefaultAmountSelector from './DonatePopUpModal/DefaultAmountSelector';
 import ExitConfirmationModal from './DonatePopUpModal/ExitConfirmationModal';
-import ZakatFeeModal from './ZakatFeeModal';
-import { GATEWAY_FEE_PERCENT } from './ZakatFeeModal';
 
 const tipPercentages = [0, 5, 10, 15];
 
@@ -67,10 +65,6 @@ export default function DonatePopUpModal({
 
   const [isDonating, setIsDonating] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-
-  // ── Zakat fee modal state ──────────────────────────────────────────────────
-  const [showZakatFeeModal, setShowZakatFeeModal] = useState(false);
-  const [zakatFeeChoice, setZakatFeeChoice]       = useState(null); // 'pay_more' | 'count_less'
 
   const checkoutStartedRef = useRef(false);
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -141,7 +135,6 @@ export default function DonatePopUpModal({
       setShowCustomTipInput(false);
       setCustomTip('');
       setTipPercentage(0);
-      setZakatFeeChoice(null);
     }
   }, [isOpen, resolvedSlug]);
 
@@ -151,29 +144,7 @@ export default function DonatePopUpModal({
     throw new Error('Unable to identify user');
   };
 
-  // ── Intercept donate click: show Zakat fee modal when needed ──────────────
-  const handleDonateClick = () => {
-    const amount = selectedAmount || parseInt(customAmount);
-    // Run cheap validation first before showing modal
-    if (!amount || amount < 50) {
-      handleDonate();
-      return;
-    }
-    if (donationType === 'ZAKAAT' && zakatVerified) {
-      setShowZakatFeeModal(true);
-      return;
-    }
-    handleDonate();
-  };
-
-  // ── Called when user picks an option in the Zakat fee modal ───────────────
-  const handleZakatFeeConfirm = (choice) => {
-    setZakatFeeChoice(choice);
-    setShowZakatFeeModal(false);
-    handleDonate(choice);
-  };
-
-  const handleDonate = async (zakatChoice = zakatFeeChoice) => {
+  const handleDonate = async () => {
     if (isDonating) return;
     const baseAmt = selectedAmount || parseInt(customAmount);
     if (!baseAmt) return;
@@ -201,13 +172,6 @@ export default function DonatePopUpModal({
       }
     }
 
-    // For Zakat "pay_more": bump the amount so the net received equals the intended Zakat
-    let amount = baseAmt;
-    if (donationType === 'ZAKAAT' && zakatChoice === 'pay_more') {
-      const feeAmount = Math.round(baseAmt * (GATEWAY_FEE_PERCENT / 100) * 100) / 100;
-      amount = Math.round((baseAmt + feeAmount) * 100) / 100;
-    }
-
     setIsDonating(true);
     try {
       let userIdToUse = userId;
@@ -218,7 +182,7 @@ export default function DonatePopUpModal({
       const calculatedTipAmount = customTip
         ? parseInt(customTip)
         : tipPercentage
-          ? Math.round(amount * (tipPercentage / 100))
+          ? Math.round(baseAmt * (tipPercentage / 100))
           : 0;
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/initiate`, {
@@ -226,15 +190,13 @@ export default function DonatePopUpModal({
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          amount,
+          amount: baseAmt,
           tipAmount: calculatedTipAmount,
           campaignId,
           donationType,
           isAnonymous,
           isTaxEligible: false,
           userId: userIdToUse,
-          // Pass Zakat fee choice to backend for record-keeping
-          ...(donationType === 'ZAKAAT' && { zakatFeeChoice: zakatChoice }),
         }),
       });
       const data = await res.json();
@@ -610,7 +572,7 @@ export default function DonatePopUpModal({
                         {/* CTA */}
                         <div className="space-y-1 md:space-y-2.5">
                           <button
-                            onClick={handleDonateClick}
+                            onClick={handleDonate}
                             disabled={isDonating || baseAmount < 50}
                             className={`
                               w-full h-9 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
@@ -654,14 +616,6 @@ export default function DonatePopUpModal({
           </>
         )}
       </AnimatePresence>
-
-      {/* ── Zakat Gateway Fee Modal ────────────────────────────────────────── */}
-      <ZakatFeeModal
-        isOpen={showZakatFeeModal}
-        onConfirm={handleZakatFeeConfirm}
-        darkMode={dk}
-        donationAmount={baseAmount}
-      />
 
       <ExitConfirmationModal
         isOpen={showExitConfirmation}

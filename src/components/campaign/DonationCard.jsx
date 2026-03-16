@@ -10,8 +10,7 @@ import { useSoftSignupMutation } from '@/utils/slices/authApiSlice';
 import CampaignAmountSelector, { getCampaignConfig } from './DonatePopUpModal/CampaignAmountSelector';
 import DefaultAmountSelector from './DonatePopUpModal/DefaultAmountSelector';
 import ExitConfirmationModal from './DonatePopUpModal/ExitConfirmationModal';
-import ZakatFeeModal from './ZakatFeeModal';
-import { GATEWAY_FEE_PERCENT } from './ZakatFeeModal';
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Donation-type definitions
 ───────────────────────────────────────────────────────────────────────────── */
@@ -61,10 +60,6 @@ export default function DonationCard({
   const [isDonating, setIsDonating] = useState(false);
   const [cashfreeData, setCashfreeData] = useState(null);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-
-  /* ── Zakat fee modal state ────────────────────────────────────────────── */
-  const [showZakatFeeModal, setShowZakatFeeModal] = useState(false);
-  const [zakatFeeChoice, setZakatFeeChoice] = useState(null); // 'pay_more' | 'count_less'
 
   const checkoutStartedRef = useRef(false);
 
@@ -144,26 +139,8 @@ export default function DonationCard({
     throw new Error('Unable to identify user');
   };
 
-  /* ── Intercept donate: show Zakat modal when needed ──────────────────── */
-  const handleDonateClick = () => {
-    const amount = selectedAmount || parseInt(customAmount);
-    if (!amount || amount < 50) { handleDonate(); return; }
-    if (donationType === 'ZAKAAT' && zakatVerified) {
-      setShowZakatFeeModal(true);
-      return;
-    }
-    handleDonate();
-  };
-
-  /* ── Called when user picks an option in the Zakat fee modal ─────────── */
-  const handleZakatFeeConfirm = (choice) => {
-    setZakatFeeChoice(choice);
-    setShowZakatFeeModal(false);
-    handleDonate(choice);
-  };
-
   /* ── Donate handler ───────────────────────────────────────────────────── */
-  const handleDonate = async (zakatChoice = zakatFeeChoice) => {
+  const handleDonate = async () => {
     if (isDonating) return;
     const amount = selectedAmount || parseInt(customAmount);
     if (!amount) return;
@@ -191,13 +168,6 @@ export default function DonationCard({
       }
     }
 
-    // For Zakat "pay_more": bump the amount so the net received equals the intended Zakat
-    let finalAmount = amount;
-    if (donationType === 'ZAKAAT' && zakatChoice === 'pay_more') {
-      const feeAmount = Math.round(amount * (GATEWAY_FEE_PERCENT / 100) * 100) / 100;
-      finalAmount = Math.round((amount + feeAmount) * 100) / 100;
-    }
-
     setIsDonating(true);
     try {
       let userIdToUse = userId;
@@ -208,7 +178,7 @@ export default function DonationCard({
       const calculatedTipAmount = customTip
         ? parseInt(customTip)
         : tipPercentage
-          ? Math.round(finalAmount * (tipPercentage / 100))
+          ? Math.round(amount * (tipPercentage / 100))
           : 0;
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/initiate`, {
@@ -216,14 +186,13 @@ export default function DonationCard({
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          amount: finalAmount,
+          amount,
           tipAmount: calculatedTipAmount,
           campaignId,
           donationType,
           isAnonymous,
           isTaxEligible: claim80G,
           userId: userIdToUse,
-          ...(donationType === 'ZAKAAT' && { zakatFeeChoice: zakatChoice }),
         }),
       });
       const data = await res.json();
@@ -514,7 +483,7 @@ export default function DonationCard({
 
         {/* ── Donate Button ─────────────────────────────────────────────── */}
         <button
-          onClick={handleDonateClick}
+          onClick={handleDonate}
           disabled={isDonating || baseAmount < 50}
           className={`
             w-full h-14 rounded-lg font-bold text-base mb-4 transition-all
@@ -561,14 +530,6 @@ export default function DonationCard({
           </p>
         </div>
       </div>
-
-      {/* ── Zakat Fee Modal ──────────────────────────────────────────────── */}
-      <ZakatFeeModal
-        isOpen={showZakatFeeModal}
-        onConfirm={handleZakatFeeConfirm}
-        darkMode={dk}
-        donationAmount={baseAmount}
-      />
 
       {/* ── Exit Confirmation Modal ──────────────────────────────────────── */}
       <ExitConfirmationModal
