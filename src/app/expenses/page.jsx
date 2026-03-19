@@ -15,7 +15,7 @@ import ExpensePillars    from "@/components/expenses/ExpensePillars";
 import ExpenseImpact     from "@/components/expenses/ExpenseImpact";
 import ExpenseDonateCard from "@/components/expenses/ExpenseDonateCard";
 
-const EXPENSE_SLUG = "tpf-expesnses-46e051";
+const EXPENSE_SLUG = "tpf-expesnses-454f4b";
 
 export default function ExpensePage() {
   const [darkMode,         setDarkMode]         = useState(false);
