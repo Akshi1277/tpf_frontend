@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import { getMediaUrl } from '@/utils/media';
+import { isCampaignVisible } from '@/utils/campaignVisibility';
 
 export default function RelatedCampaigns({
   category,
@@ -39,6 +40,11 @@ export default function RelatedCampaigns({
         if (itemSlug === normalizedCurrentSlug) {
           return false;
         }
+
+        if (!isCampaignVisible(item)) {
+      return false;
+    }
+
 
         return itemSlug.length > 0;
       })

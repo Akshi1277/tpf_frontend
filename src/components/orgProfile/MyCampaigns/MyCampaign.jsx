@@ -25,6 +25,7 @@ import { useToggleWishlistMutation, useGetWishlistQuery, useGetMyApplicationsQue
 import { useGetOrganizationCampaignRequestsQuery, useUpdateCampaignRequestMutation } from "@/utils/slices/organizationApiSlice"
 import ShareModal from "../../ui/ShareModal"
 import { getMediaUrl } from "@/utils/media"
+import { isCampaignVisible } from "@/utils/campaignVisibility"
 
 
 export default function MyCampaignsPage({ darkModeFromParent }) {
@@ -391,10 +392,10 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                   onClick={handleCommentSubmit}
                   disabled={isUpdating || !comment.trim()}
                   className={`w-full py-2 px-4 rounded-lg font-bold text-xs transition-all ${isUpdating || !comment.trim()
-                      ? "bg-gray-400 cursor-not-allowed opacity-50"
-                      : darkMode
-                        ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30"
-                        : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                    ? "bg-gray-400 cursor-not-allowed opacity-50"
+                    : darkMode
+                      ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30"
+                      : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
                     }`}
                 >
                   {isUpdating ? "Saving..." : "Save Comment"}
@@ -759,7 +760,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         >
           <div className={`inline-flex w-full sm:w-auto rounded-lg sm:rounded-xl p-1 ${darkMode ? "bg-zinc-800/50" : "bg-white shadow-md"
             }`}>
-              <button
+            <button
               onClick={() => setActiveTab("my-campaigns")}
               className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-3 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm md:text-base transition-all whitespace-nowrap ${activeTab === "my-campaigns"
                 ? darkMode
@@ -785,7 +786,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             >
               Wishlist ({wishlistedCampaigns.length})
             </button>
-            
+
           </div>
 
           {isOrganization && (
@@ -803,21 +804,29 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         {/* Content */}
         {activeTab === "my-campaigns" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-            {myItems.map((item, idx) => (
-              item.type === 'campaign' ? (
-                <CampaignCard key={item.data._id || idx} campaign={item.data} isMyCampaign={true} />
-              ) : item.type === 'request' ? (
-                <RequestCard key={item.data._id || idx} request={item.data} />
-              ) : (
-                <ApplicationCard key={item.data._id || idx} application={item.data} />
-              )
-            ))}
+            {myItems
+              .filter((item) => {
+                // Only filter actual campaigns
+                if (item.type !== 'campaign') return true;
+                return isCampaignVisible(item.data);
+              })
+              .map((item, idx) => (
+                item.type === 'campaign' ? (
+                  <CampaignCard key={item.data._id || idx} campaign={item.data} isMyCampaign={true} />
+                ) : item.type === 'request' ? (
+                  <RequestCard key={item.data._id || idx} request={item.data} />
+                ) : (
+                  <ApplicationCard key={item.data._id || idx} application={item.data} />
+                )
+              ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-            {wishlistedCampaigns.map((campaign) => (
-              <CampaignCard key={campaign._id} campaign={campaign} isMyCampaign={false} />
-            ))}
+            {wishlistedCampaigns
+              .filter(isCampaignVisible)
+              .map((campaign) => (
+                <CampaignCard key={campaign._id} campaign={campaign} isMyCampaign={false} />
+              ))}
           </div>
         )}
 

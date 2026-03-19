@@ -6,6 +6,7 @@ import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import Link from 'next/link';
 import { getMediaUrl } from '@/utils/media';
+import { isCampaignVisible } from '@/utils/campaignVisibility';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -58,10 +59,15 @@ export default function CampaignsSection({ darkMode }) {
   /* --------------------------------
      Category Filter
   --------------------------------- */
-  const filteredCampaigns = useMemo(() => {
-    if (selectedCategory === 'all') return activeCampaigns;
-    return activeCampaigns.filter((c) => c.category === selectedCategory);
-  }, [activeCampaigns, selectedCategory]);
+const filteredCampaigns = useMemo(() => {
+  if (selectedCategory === 'all') {
+    return activeCampaigns.filter(isCampaignVisible);
+  }
+
+  return activeCampaigns.filter(
+    (c) => c.category === selectedCategory && isCampaignVisible(c)
+  );
+}, [activeCampaigns, selectedCategory]);
 
   /* --------------------------------
      NO ACTIVE CAMPAIGNS

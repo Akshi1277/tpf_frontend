@@ -9,6 +9,7 @@ import ScrollToTop from '@/components/ui/ScrollToTop';
 import { getMediaUrl } from '@/utils/media';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { isCampaignVisible } from '@/utils/campaignVisibility';
 
 export default function AllCampaignsPage() {
     const [darkMode, setDarkMode] = useState(() => {
@@ -69,9 +70,11 @@ export default function AllCampaignsPage() {
     };
 
     const filteredCampaigns =
-        selectedCategory === "all"
-            ? validFundraisers
-            : validFundraisers.filter((c) => c.category === selectedCategory);
+    selectedCategory === "all"
+        ? validFundraisers.filter(isCampaignVisible)
+        : validFundraisers.filter(
+            (c) => c.category === selectedCategory && isCampaignVisible(c)
+        );
 
     const COLORS = {
         neutralHeading: darkMode ? "text-white" : "text-zinc-900",

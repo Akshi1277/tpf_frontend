@@ -237,7 +237,7 @@ export default function Footer({ darkMode }) {
         {/* Quranic Quote */}
         <div className={`mb-6 text-center`}>
           <p className={`text-sm font-bold italic ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
-            "Those who give charity—men and women—will have a noble reward." — Quran 57:18
+            "Those who give charity—men and women—will have a noble reward." — (Mafoom) Quran 57:18 
           </p>
         </div>
 

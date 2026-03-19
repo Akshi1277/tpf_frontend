@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { campaigns, categories } from '@/lib/constants';
 import { useRouter } from 'next/navigation';
+import { isCampaignVisible } from '@/utils/campaignVisibility';
 
 export default function RelatedCampaigns({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -12,9 +13,11 @@ export default function RelatedCampaigns({ darkMode }) {
 
   const router = useRouter();
 
-  const filteredCampaigns = selectedCategory === 'all' 
-    ? campaigns 
-    : campaigns.filter(c => c.category === selectedCategory);
+const filteredCampaigns = selectedCategory === 'all'
+  ? campaigns.filter(isCampaignVisible)
+  : campaigns.filter(
+      c => c.category === selectedCategory && isCampaignVisible(c)
+    );
 
   const infiniteCampaigns = [...filteredCampaigns, ...filteredCampaigns];
 

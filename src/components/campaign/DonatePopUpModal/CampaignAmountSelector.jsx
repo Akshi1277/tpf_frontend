@@ -14,7 +14,6 @@ export const CAMPAIGN_CONFIGS = {
       { amount: 50000, label: '1000 Iftaar Kits', sublabel: '₹50,000', qty: 1000 },
     ],
     emoji: '🌙',
-    // active colour per campaign
     activeSolid: 'bg-amber-500 text-white border-amber-500',
     activeSoft: 'bg-amber-100  text-amber-900 border-amber-400 font-extrabold',
     activeSoftDk: 'bg-amber-500/25 text-amber-300 border-amber-400/70 font-extrabold',
@@ -94,13 +93,17 @@ export default function CampaignAmountSelector({
 
   const dk = darkMode;
 
-  // active / inactive classes
+  const isUnitMode = config.configType === 'unit';
+  const isFixedMode = config.configType === 'fixed';
+
   const activeFlat = (dk ? config.activeSoftDk : config.activeSoft) ||
     (dk ? 'bg-emerald-500/25 text-emerald-300 border-emerald-400/70 font-extrabold' : 'bg-emerald-100 text-emerald-900 border-emerald-400 font-extrabold');
   const activeKit = activeFlat;
+
   const inactiveFlat = dk
     ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500 hover:text-zinc-200'
     : 'bg-white border-gray-300 text-gray-700 hover:border-emerald-300';
+
   const inactiveKit = inactiveFlat;
 
   const selectPreset = (preset, key) => {
@@ -124,19 +127,20 @@ export default function CampaignAmountSelector({
     }
   };
 
-  // Only show flat presets whose label starts with '₹' — filters out bad "0 Kits" entries
-  const flatPresets = (config.presets && config.presets.length > 0)
-    ? config.presets.filter(p => (!p.qty || p.qty === 0) && p.label && p.label.startsWith('₹'))
-    : [
-      { amount: 50, label: '₹50' },
-      { amount: 100, label: '₹100' },
-      { amount: 500, label: '₹500' },
-      { amount: 1000, label: '₹1000' }
-    ];
+  // ✅ MODE-AWARE PRESETS
+  const flatPresets = isFixedMode
+    ? (config.presets?.length
+        ? config.presets
+        : [
+            { amount: 50, label: '₹50' },
+            { amount: 100, label: '₹100' },
+            { amount: 500, label: '₹500' },
+            { amount: 1000, label: '₹1000' }
+          ])
+    : (config.presets || []).filter(p => !p.qty || p.qty === 0);
 
-  // Only show kit presets with a strictly positive qty
-  const kitPresets = (config.presets && config.presets.length > 0)
-    ? config.presets.filter(p => p.qty && p.qty >= 1)
+  const kitPresets = isUnitMode
+    ? (config.presets || [])
     : [];
 
   const isOtherActive = showCustomAmountInput || !!customAmount;
@@ -144,7 +148,7 @@ export default function CampaignAmountSelector({
   return (
     <div className="space-y-2">
       {/* Unit cost badge */}
-      {(config.configType !== 'fixed' && config.unitCost > 0) && (
+      {(isUnitMode && config.unitCost > 0) && (
         <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[11px] font-medium ${dk ? 'bg-zinc-900/60 text-zinc-400 border border-zinc-700/50' : 'bg-white text-gray-500 border border-gray-200'
           }`}>
           <span>{config.emoji}</span>
@@ -152,7 +156,7 @@ export default function CampaignAmountSelector({
         </div>
       )}
 
-      {/* Flat amounts + Other — 3 equal columns */}
+      {/* Flat amounts */}
       <div className="grid grid-cols-3 gap-1.5">
         {flatPresets.map((preset, i) => {
           const key = `flat-${i}`;
@@ -176,27 +180,29 @@ export default function CampaignAmountSelector({
         </button>
       </div>
 
-      {/* Kit presets — 2 columns */}
-      <div className="grid grid-cols-2 gap-1.5">
-        {kitPresets.map((preset, i) => {
-          const key = `kit-${i}`;
-          const isActive = selectedPresetKey === key && !customAmount;
-          const label = preset.label || `${preset.qty} ${preset.qty > 1 ? config.unitNamePlural : config.unitName}`;
-          const sublabel = preset.sublabel || `₹${(preset.qty * (config.unitCost || 0)).toLocaleString()}`;
-          return (
-            <button
-              key={key}
-              onClick={() => selectPreset(preset, key)}
-              className={`h-10 rounded-lg transition-colors flex flex-col items-center justify-center gap-0.5 px-2 border ${isActive ? activeKit : inactiveKit}`}
-            >
-              <span className={`text-[10px] font-medium leading-none ${isActive ? 'opacity-70' : dk ? 'text-zinc-500' : 'text-gray-400'}`}>
-                {label}
-              </span>
-              <span className="text-xs font-bold leading-none mt-0.5">{sublabel}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Kit presets */}
+      {isUnitMode && (
+        <div className="grid grid-cols-2 gap-1.5">
+          {kitPresets.map((preset, i) => {
+            const key = `kit-${i}`;
+            const isActive = selectedPresetKey === key && !customAmount;
+            const label = preset.label || `${preset.qty} ${preset.qty > 1 ? config.unitNamePlural : config.unitName}`;
+            const sublabel = preset.sublabel || `₹${(preset.qty * (config.unitCost || 0)).toLocaleString()}`;
+            return (
+              <button
+                key={key}
+                onClick={() => selectPreset(preset, key)}
+                className={`h-10 rounded-lg transition-colors flex flex-col items-center justify-center gap-0.5 px-2 border ${isActive ? activeKit : inactiveKit}`}
+              >
+                <span className={`text-[10px] font-medium leading-none ${isActive ? 'opacity-70' : dk ? 'text-zinc-500' : 'text-gray-400'}`}>
+                  {label}
+                </span>
+                <span className="text-xs font-bold leading-none mt-0.5">{sublabel}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Custom input */}
       {showCustomAmountInput && (

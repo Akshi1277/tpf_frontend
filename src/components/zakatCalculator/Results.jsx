@@ -451,11 +451,11 @@ const Results = ({ results, onReset, formatCurrency, darkMode = false }) => {
             خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِم بِهَا
           </p>
           <p className={`text-xs italic mb-2 ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
-            "Take from their wealth a charity by which you purify them and cause them to increase." — Quran 9:103
+            "Take from their wealth a charity by which you purify them and cause them to increase." — (Mafoom) Quran 9:103
           </p>
           <div className={`h-px my-3 ${darkMode ? 'bg-zinc-800' : 'bg-gray-100'}`} />
           <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-gray-400'}`}>
-            "The example of those who spend their wealth in the way of Allah is like a seed of grain that sprouts seven ears; in every ear there are a hundred grains." — Quran 2:261
+            "The example of those who spend their wealth in the way of Allah is like a seed of grain that sprouts seven ears; in every ear there are a hundred grains." — (Mafoom) Quran 2:261
           </p>
         </div>
       </motion.div>

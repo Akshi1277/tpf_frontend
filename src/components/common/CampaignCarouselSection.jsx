@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import CampaignCard from '@/components/ui/CampaignCard';
 import { useCMS } from '@/app/CMSContext';
 import { getMediaUrl } from '@/utils/media';
+import { isCampaignVisible } from '@/utils/campaignVisibility';
 
 const calcDaysLeft = (deadline) => {
     const end = new Date(deadline);
@@ -25,7 +26,8 @@ export default function CampaignCarouselSection({ darkMode, zakatOnly = false, t
                     item.campaignStatus === 'ACTIVE' &&
                     typeof item.campaignSlug === 'string' &&
                     item.campaignSlug.trim().length > 0 &&
-                    (!zakatOnly || item.zakatVerified)
+                    (!zakatOnly || item.zakatVerified) &&
+                    isCampaignVisible(item) // ✅ ADD THIS
             )
             .map((campaign) => ({
                 ...campaign,

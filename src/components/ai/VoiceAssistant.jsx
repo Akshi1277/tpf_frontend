@@ -11,6 +11,7 @@ import { useFetchMyDonationsQuery } from "@/utils/slices/donationApiSlice";
 import { useFetchCampaignsQuery } from "@/utils/slices/campaignApiSlice";
 import { useAppToast } from "@/app/AppToastContext";
 import { getMediaUrl } from "@/utils/media";
+import { isCampaignVisible } from "@/utils/campaignVisibility";
 
 // Sub-component for Campaign Card (Stable definition outside)
 const CampaignCard = ({ data, isDarkMode, router }) => {
@@ -134,14 +135,17 @@ export default function VoiceAssistant() {
     const { data: campaignList } = useFetchCampaignsQuery();
 
     const activeCampaigns = useMemo(() =>
-        campaignList?.campaigns?.slice(0, 3).map(c => ({
+    campaignList?.campaigns
+        ?.filter(isCampaignVisible) // ✅ FILTER FIRST
+        ?.slice(0, 3)               // ✅ THEN SLICE
+        .map(c => ({
             title: c.title,
             raised: c.raisedAmount,
             goal: c.targetAmount,
             slug: c.slug,
             image: c.imageUrl
         })) || []
-        , [campaignList]);
+, [campaignList]);
 
     const userContext = useMemo(() => ({
         fullName: userInfo?.fullName || "Guest",
