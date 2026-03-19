@@ -44,7 +44,7 @@ export default function ExpenseHero({ campaign, darkMode, onDonate }) {
       <div className="absolute top-[4.5rem] md:top-24 left-4 sm:left-6 lg:left-8 z-20">
         <button
           onClick={() => router.back()}
-          className={`flex items-center justify-center w-9 h-9 rounded-xl border backdrop-blur-sm transition-colors ${
+          className={`flex items-center cursor-pointer justify-center w-9 h-9 rounded-xl border backdrop-blur-sm transition-colors ${
             darkMode
               ? "bg-gray-900/80 border-gray-700 hover:border-emerald-600 text-gray-400 hover:text-white"
               : "bg-white/80 border-gray-200 hover:border-emerald-300 text-gray-500 hover:text-gray-900"
@@ -133,7 +133,7 @@ export default function ExpenseHero({ campaign, darkMode, onDonate }) {
                 onClick={onDonate}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="px-7 py-3 rounded-xl font-semibold text-sm text-white bg-emerald-500 hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+                className="px-7 py-3 rounded-xl cursor-pointer font-semibold text-sm text-white bg-emerald-500 hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
               >
                 Support Platform Operations
               </motion.button>

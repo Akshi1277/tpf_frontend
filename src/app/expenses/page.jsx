@@ -77,6 +77,7 @@ export default function ExpensePage() {
           <div className="lg:col-span-4">
             <ExpenseDonateCard
               campaign={campaign}
+              campaignId={campaign._id}
               darkMode={darkMode}
               onDonate={openDonate}
             />

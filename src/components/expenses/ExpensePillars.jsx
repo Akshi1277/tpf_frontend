@@ -10,51 +10,51 @@ const TOTAL = 1200000;
 const PILLARS = [
   {
     id: "people",
-    label: "People",
+    label: "Our Team",
     color: "emerald",
     amount: 420000,
-    tagline: "The people who plan and execute every mission",
+    tagline: "The people who show up every day to make things happen",
     items: [
-      { Icon: Users,  label: "Administrative staff",   sub: "Management & coordination" },
-      { Icon: Users,  label: "Program managers",        sub: "Planning & oversight" },
-      { Icon: Heart,  label: "Field coordinators",      sub: "On-ground execution" },
-      { Icon: Heart,  label: "Volunteer support",       sub: "Travel, meals & safety" },
+      { Icon: Users,  label: "Office staff",        sub: "People who manage day-to-day work" },
+      { Icon: Users,  label: "Program leads",        sub: "People who plan and run each project" },
+      { Icon: Heart,  label: "Field workers",        sub: "People on the ground helping families" },
+      { Icon: Heart,  label: "Volunteer costs",      sub: "Travel, food & safety for volunteers" },
     ],
   },
   {
     id: "systems",
-    label: "Systems",
+    label: "How We Work",
     color: "blue",
     amount: 350000,
-    tagline: "The infrastructure that keeps everything running",
+    tagline: "The tools and services that keep everything running smoothly",
     items: [
-      { Icon: Globe,     label: "Technology & platform",  sub: "Website, payments, security" },
-      { Icon: Building2, label: "Office infrastructure",  sub: "Workspace & utilities" },
-      { Icon: Scale,     label: "Legal & compliance",     sub: "Filings, audits, registrations" },
-      { Icon: BarChart3, label: "Monitoring & reporting", sub: "Assessments & transparency" },
+      { Icon: Globe,     label: "Website & payments",   sub: "So you can donate safely online" },
+      { Icon: Building2, label: "Office & electricity", sub: "A place to work from" },
+      { Icon: Scale,     label: "Government paperwork", sub: "Staying registered & following the rules" },
+      { Icon: BarChart3, label: "Progress tracking",    sub: "Checking if our work is actually helping" },
     ],
   },
   {
     id: "execution",
-    label: "Execution",
+    label: "Getting Things Done",
     color: "teal",
     amount: 330000,
-    tagline: "Where planning turns into real-world help",
+    tagline: "The real costs of actually delivering help to people in need",
     items: [
-      { Icon: Truck,     label: "Field logistics",      sub: "Transport, fuel, vehicles" },
-      { Icon: Megaphone, label: "Communication",        sub: "Awareness & documentation" },
-      { Icon: Heart,     label: "Volunteer management", sub: "Kits, training & gear" },
+      { Icon: Truck,     label: "Travel & transport",   sub: "Getting people and supplies where they're needed" },
+      { Icon: Megaphone, label: "Spreading the word",   sub: "Letting people know about our campaigns" },
+      { Icon: Heart,     label: "Volunteer gear",       sub: "Kits, training & equipment for our volunteers" },
     ],
   },
   {
     id: "support",
-    label: "Support",
+    label: "Just in Case",
     color: "orange",
     amount: 100000,
-    tagline: "Ensuring readiness for any urgent need",
+    tagline: "A safety net so we're always ready when disaster strikes",
     items: [
-      { Icon: ShieldAlert,    label: "Emergency fund",    sub: "Rapid disaster response" },
-      { Icon: MoreHorizontal, label: "Miscellaneous ops", sub: "Banking, courier, insurance" },
+      { Icon: ShieldAlert,    label: "Emergency reserve",  sub: "Money kept ready for sudden disasters" },
+      { Icon: MoreHorizontal, label: "Small daily costs",  sub: "Bank fees, deliveries, insurance & more" },
     ],
   },
 ];
@@ -67,30 +67,34 @@ const COLOR = {
     iconBg: "bg-emerald-50 dark:bg-emerald-950/50",
     bar:    "bg-emerald-500",
     pct:    "text-emerald-600 dark:text-emerald-400",
+    borderHex: "#10b981",
   },
   blue: {
     active: { bg: "bg-blue-500",    text: "text-white", border: "border-blue-500" },
-    idle:   { border: "border-blue-200 dark:border-blue-800",       label: "text-blue-600 dark:text-blue-400" },
+    idle:   { border: "border-blue-200 dark:border-blue-800", label: "text-blue-600 dark:text-blue-400" },
     icon:   "text-blue-500",
     iconBg: "bg-blue-50 dark:bg-blue-950/50",
     bar:    "bg-blue-500",
     pct:    "text-blue-600 dark:text-blue-400",
+    borderHex: "#3b82f6",
   },
   teal: {
     active: { bg: "bg-teal-500",    text: "text-white", border: "border-teal-500" },
-    idle:   { border: "border-teal-200 dark:border-teal-800",       label: "text-teal-600 dark:text-teal-400" },
+    idle:   { border: "border-teal-200 dark:border-teal-800", label: "text-teal-600 dark:text-teal-400" },
     icon:   "text-teal-500",
     iconBg: "bg-teal-50 dark:bg-teal-950/50",
     bar:    "bg-teal-500",
     pct:    "text-teal-600 dark:text-teal-400",
+    borderHex: "#14b8a6",
   },
   orange: {
     active: { bg: "bg-orange-500",  text: "text-white", border: "border-orange-500" },
-    idle:   { border: "border-orange-200 dark:border-orange-800",   label: "text-orange-600 dark:text-orange-400" },
+    idle:   { border: "border-orange-200 dark:border-orange-800", label: "text-orange-600 dark:text-orange-400" },
     icon:   "text-orange-500",
     iconBg: "bg-orange-50 dark:bg-orange-950/50",
     bar:    "bg-orange-500",
     pct:    "text-orange-600 dark:text-orange-400",
+    borderHex: "#f97316",
   },
 };
 
@@ -116,17 +120,20 @@ export default function ExpensePillars({ darkMode, onDonate }) {
             <p className={`text-xs font-semibold uppercase tracking-widest mb-1.5 ${
               darkMode ? "text-emerald-400" : "text-emerald-600"
             }`}>
-              Annual Breakdown
+              How your money is used
             </p>
             <h2 className={`text-2xl md:text-3xl font-bold ${
               darkMode ? "text-white" : "text-gray-900"
             }`}>
-              Where every rupee goes
+              We spend every rupee carefully
             </h2>
+            <p className={`text-sm mt-1.5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+              Here's exactly what it costs to run this organisation for a full year
+            </p>
           </div>
           <button
             onClick={onDonate}
-            className="shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors"
+            className="shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors cursor-pointer"
           >
             Donate Now
           </button>
@@ -145,7 +152,7 @@ export default function ExpensePillars({ darkMode, onDonate }) {
                 <button
                   key={p.id}
                   onClick={() => setActive(p.id)}
-                  className={`w-full text-left rounded-2xl border-2 transition-all duration-200 overflow-hidden ${
+                  className={`w-full text-left rounded-2xl border-2 transition-all duration-200 overflow-hidden cursor-pointer ${
                     isActive
                       ? `${c.active.bg} ${c.active.border}`
                       : `${darkMode ? "bg-gray-900 border-gray-800 hover:border-gray-600" : "bg-white border-gray-100 hover:border-gray-200"}`
@@ -176,6 +183,11 @@ export default function ExpensePillars({ darkMode, onDonate }) {
                           style={{ width: `${pct}%` }}
                         />
                       </div>
+                      <p className={`text-[11px] mt-1.5 ${
+                        isActive ? "text-white/70" : (darkMode ? "text-gray-500" : "text-gray-400")
+                      }`}>
+                        {pct}% of the total budget
+                      </p>
                     </div>
                     <ChevronDown
                       size={15}
@@ -192,10 +204,17 @@ export default function ExpensePillars({ darkMode, onDonate }) {
             <div className={`rounded-2xl p-4 border mt-1 ${
               darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-100"
             }`}>
-              <div className="flex items-center justify-between mb-2.5 text-xs">
-                <span className={darkMode ? "text-gray-400" : "text-gray-500"}>Total annual budget</span>
-                <span className={`font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>₹12,00,000</span>
+              <div className="flex items-center justify-between mb-1 text-xs">
+                <span className={darkMode ? "text-gray-400" : "text-gray-500"}>
+                  Total needed for the whole year
+                </span>
+                <span className={`font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                  ₹12,00,000
+                </span>
               </div>
+              <p className={`text-[11px] mb-2.5 ${darkMode ? "text-gray-600" : "text-gray-400"}`}>
+                Click any colour below to see where it goes
+              </p>
               <div className="flex h-2.5 rounded-full overflow-hidden gap-0.5">
                 {PILLARS.map((p) => (
                   <div
@@ -211,7 +230,7 @@ export default function ExpensePillars({ darkMode, onDonate }) {
               </div>
               <div className="flex flex-wrap gap-3 mt-2.5">
                 {PILLARS.map((p) => (
-                  <div key={p.id} className="flex items-center gap-1.5">
+                  <div key={p.id} className="flex items-center gap-1.5 cursor-pointer" onClick={() => setActive(p.id)}>
                     <span className={`w-2 h-2 rounded-full ${COLOR[p.color].bar}`} />
                     <span className={`text-[11px] ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
                       {p.label}
@@ -243,7 +262,7 @@ export default function ExpensePillars({ darkMode, onDonate }) {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${c.pct}`}>
-                          {pct}% of annual budget
+                          {pct} paise out of every ₹1 you donate
                         </p>
                         <h3 className={`text-xl font-bold ${
                           darkMode ? "text-white" : "text-gray-900"
@@ -261,7 +280,7 @@ export default function ExpensePillars({ darkMode, onDonate }) {
                           {fmtINR(p.amount)}
                         </p>
                         <p className={`text-xs ${darkMode ? "text-gray-500" : "text-gray-400"}`}>
-                          per year
+                          needed per year
                         </p>
                       </div>
                     </div>
@@ -269,6 +288,11 @@ export default function ExpensePillars({ darkMode, onDonate }) {
 
                   {/* Line items */}
                   <div className="p-6 space-y-4">
+                    <p className={`text-xs font-semibold uppercase tracking-widest mb-3 ${
+                      darkMode ? "text-gray-500" : "text-gray-400"
+                    }`}>
+                      This covers things like…
+                    </p>
                     {p.items.map((item, i) => {
                       const Icon = item.Icon;
                       return (
@@ -294,17 +318,17 @@ export default function ExpensePillars({ darkMode, onDonate }) {
                   </div>
 
                   {/* Panel donate nudge */}
-                  <div className={`px-6 pb-6 pt-0`}>
+                  <div className="px-6 pb-6 pt-0">
                     <button
                       onClick={onDonate}
-                      className={`w-full py-3 rounded-xl text-sm font-semibold border-2 transition-colors ${
+                      className={`w-full py-3 rounded-xl text-sm font-semibold border-2 transition-colors cursor-pointer ${
                         darkMode
-                          ? `border-${p.color}-700 text-${p.color}-400 hover:bg-${p.color}-950/50`
-                          : `border-${p.color}-200 text-${p.color}-600 hover:bg-${p.color}-50`
+                          ? "text-white/80 hover:bg-white/5"
+                          : "text-gray-700 hover:bg-gray-50"
                       }`}
-                      style={{ borderColor: active === "people" ? "#10b981" : active === "systems" ? "#3b82f6" : active === "execution" ? "#14b8a6" : "#f97316" }}
+                      style={{ borderColor: c.borderHex }}
                     >
-                      Support {p.label} costs
+                      Help us cover {p.label.toLowerCase()} costs
                     </button>
                   </div>
                 </div>
