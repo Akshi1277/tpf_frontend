@@ -71,7 +71,7 @@ export default function ExpenseHero({ campaign, darkMode, onDonate }) {
             {(campaign.isUrgent ||
               campaign.taxBenefits ||
               campaign.zakatVerified) && (
-              <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-10 sm:mt-0">
                 {campaign.isUrgent && (
                   <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-semibold">
                     Urgent
