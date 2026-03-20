@@ -65,15 +65,7 @@ export default function ExpenseHero({ campaign, darkMode, onDonate }) {
             className="space-y-6"
           >
             {/* Badge */}
-            <span
-              className={`inline-block text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full border ${
-                darkMode
-                  ? "bg-emerald-950/60 text-emerald-400 border-emerald-800"
-                  : "bg-emerald-50 text-emerald-700 border-emerald-200"
-              }`}
-            >
-              Platform Operations Fund
-            </span>
+          
 
             {/* Badges from campaign */}
             {(campaign.isUrgent ||
