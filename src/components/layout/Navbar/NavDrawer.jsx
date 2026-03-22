@@ -176,19 +176,44 @@ export default function MobileMenu({
                     </div>
                   </div>
                 ) : (
-                  <div className={`p-4 rounded-2xl border
-                    ${darkMode ? 'bg-zinc-900/60 border-zinc-800/60' : 'bg-zinc-50 border-zinc-200'}`}>
-                    <h3 className={`text-base font-bold mb-1.5 text-center ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-                      Be the Change
+                  <div className={`p-4 rounded-2xl border relative overflow-hidden
+    ${darkMode ? 'bg-zinc-900/60 border-zinc-800/60' : 'bg-gradient-to-br from-rose-50 to-orange-50/60 border-rose-100/60'}`}>
+
+                    {/* Decorative glow */}
+                    <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full blur-2xl opacity-20 bg-rose-400 pointer-events-none" />
+                    <div className="absolute -left-4 -top-4 w-16 h-16 rounded-full blur-2xl opacity-10 bg-orange-400 pointer-events-none" />
+
+                    {/* Beating heart */}
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Heart
+                        className="w-3.5 h-3.5 text-rose-500 animate-pulse"
+                        fill="currentColor"
+                      />
+                      <span className={`text-[9px] font-bold tracking-[0.18em] uppercase ${darkMode ? 'text-rose-400/70' : 'text-rose-500/80'
+                        }`}>
+                        Platform at risk
+                      </span>
+                    </div>
+
+                    <h3 className={`text-base font-bold mb-1.5 leading-snug ${darkMode ? 'text-white' : 'text-zinc-900'
+                      }`}>
+                      Help Us Keep the Lights On
                     </h3>
-                    <p className={`text-xs text-center mb-3 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                      Join thousands of donors making a real impact today.
-                    </p>
+
+                    <p className={`text-xs leading-relaxed mb-3 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'
+                      }`}>
+                      Every campaign you see, every family we help — it all runs on people like you.
+                      Without support,{' '}
+                      <span className={`font-bold ${darkMode ? 'text-rose-400' : 'text-rose-600'}`}>
+                        we can't survive.
+                      </span>
+                    </p>                   
                     <button
-                      onClick={() => { handleAuthNavigation('/all-campaigns'); close(); }}
-                      className="w-full py-2 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-colors"
+                      onClick={() => { router.push('/expenses'); close(); }}
+                      className="w-full py-2.5 cursor-pointer bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 active:scale-95 text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-rose-500/20 flex items-center justify-center gap-2"
                     >
-                      Create Impact
+                      <Heart className="w-3.5 h-3.5" fill="currentColor" />
+                      Yes, I want to help
                     </button>
                   </div>
                 )}

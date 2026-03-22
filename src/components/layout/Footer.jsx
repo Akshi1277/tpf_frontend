@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAppToast } from '@/app/AppToastContext';
 
 import { useGetHijriCalendarQuery } from '@/utils/slices/apiSlice';
+import { Heart } from 'lucide-react';
 export default function Footer({ darkMode }) {
   const { showToast } = useAppToast();
   const today = new Date();
@@ -68,6 +69,7 @@ export default function Footer({ darkMode }) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
           {/* Logo and Tagline */}
+          {/* Logo and Tagline */}
           <div className="md:col-span-1">
             <img
               src={darkMode ? "/TPFAid-Logo1.png" : "/TPFAid-Logo.png"}
@@ -76,9 +78,34 @@ export default function Footer({ darkMode }) {
               height={45}
               className="h-9 w-auto cursor-pointer mb-4 object-contain"
             />
-            <p className={`text-sm font-semibold ${darkMode ? 'text-zinc-400' : 'text-gray-600'} leading-relaxed`}>
+            <p className={`text-sm font-semibold ${darkMode ? 'text-zinc-400' : 'text-gray-600'} leading-relaxed mb-3`}>
               Making a difference through community-funded projects and transparent impact.
             </p>
+
+            {/* Expense CTA */}
+            <div className={`rounded-xl p-3 border ${darkMode
+                ? 'bg-zinc-800/60 border-zinc-700'
+                : 'bg-rose-50 border-rose-100'
+              }`}>
+              <p className={`text-xs leading-relaxed mb-2.5 ${darkMode ? 'text-zinc-400' : 'text-gray-600'
+                }`}>
+                Every campaign we run, every family we help —{' '}
+                <span className={`font-bold ${darkMode ? 'text-rose-400' : 'text-rose-600'}`}>
+                  it costs money to keep going.
+                </span>{' '}
+                Help us survive.
+              </p>
+              <Link
+                href="/expenses"
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-[1.02] active:scale-95 ${darkMode
+                    ? 'bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 border border-rose-500/30'
+                    : 'bg-rose-500 text-white hover:bg-rose-600 shadow-sm shadow-rose-500/20'
+                  }`}
+              >
+                <Heart className="w-3 h-3" fill="currentColor" />
+                Keep us running
+              </Link>
+            </div>
           </div>
 
           {/* 1️⃣ Ways To Jannah (moved up) */}
@@ -237,7 +264,7 @@ export default function Footer({ darkMode }) {
         {/* Quranic Quote */}
         <div className={`mb-6 text-center`}>
           <p className={`text-sm font-bold italic ${darkMode ? 'text-zinc-400' : 'text-gray-600'}`}>
-            "Those who give charity—men and women—will have a noble reward." — (Mafoom) Quran 57:18 
+            "Those who give charity—men and women—will have a noble reward." — (Mafoom) Quran 57:18
           </p>
         </div>
 

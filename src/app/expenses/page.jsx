@@ -3,23 +3,23 @@
 import { useState, useEffect } from "react";
 import { useFetchCampaignBySlugQuery } from "@/utils/slices/campaignApiSlice";
 
-import DonatePopUpModal     from "@/components/campaign/DonateModal";
+import DonatePopUpModal from "@/components/campaign/DonateModal";
 import FloatingDonateButton from "@/components/campaign/FloatingDonateButton";
-import Navbar               from "@/components/layout/Navbar";
-import Footer               from "@/components/layout/Footer";
-import GlobalLoader         from "@/components/GlobalLoader";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import GlobalLoader from "@/components/GlobalLoader";
 
-import ExpenseHero       from "@/components/expenses/ExpenseHero";
-import ExpenseProgress   from "@/components/expenses/ExpenseProgress";
-import ExpensePillars    from "@/components/expenses/ExpensePillars";
-import ExpenseImpact     from "@/components/expenses/ExpenseImpact";
+import ExpenseHero from "@/components/expenses/ExpenseHero";
+import ExpenseProgress from "@/components/expenses/ExpenseProgress";
+import ExpensePillars from "@/components/expenses/ExpensePillars";
+import ExpenseImpact from "@/components/expenses/ExpenseImpact";
 import ExpenseDonateCard from "@/components/expenses/ExpenseDonateCard";
-
+import DonorListModal from "@/components/campaign/DonorListModal";
 const EXPENSE_SLUG = "tpf-expesnses-454f4b";
 
 export default function ExpensePage() {
-  const [darkMode,         setDarkMode]         = useState(false);
-  const [isModalOpen,      setIsModalOpen]      = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDonorModalOpen, setIsDonorModalOpen] = useState(false);
 
   const { data, isLoading, error } = useFetchCampaignBySlugQuery(EXPENSE_SLUG, {
@@ -70,11 +70,15 @@ export default function ExpensePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-0">
+
+          {/* On mobile: order-2 (appears second), on desktop: order-none (natural grid flow) */}
+          <div className="lg:col-span-8 space-y-0 order-2 lg:order-none">
             <ExpensePillars darkMode={darkMode} onDonate={openDonate} />
-            <ExpenseImpact  darkMode={darkMode} onDonate={openDonate} />
+            <ExpenseImpact darkMode={darkMode} onDonate={openDonate} />
           </div>
-          <div className="lg:col-span-4">
+
+          {/* On mobile: order-1 (appears first, right after Progress), on desktop: order-none */}
+          <div className="lg:col-span-4 order-1 lg:order-none">
             <ExpenseDonateCard
               campaign={campaign}
               campaignId={campaign._id}
@@ -82,6 +86,7 @@ export default function ExpensePage() {
               onDonate={openDonate}
             />
           </div>
+
         </div>
       </div>
 
@@ -104,6 +109,13 @@ export default function ExpensePage() {
         taxEligible={campaign.taxBenefits}
         unitConfig={campaign.unitConfig}
         allowedDonationTypes={[]}
+      />
+
+      <DonorListModal
+        isOpen={isDonorModalOpen}
+        onClose={() => setIsDonorModalOpen(false)}
+        campaignId={campaign._id}
+        darkMode={darkMode}
       />
     </div>
   );

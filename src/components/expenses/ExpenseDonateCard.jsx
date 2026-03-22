@@ -31,7 +31,7 @@ const PERIODS = [
   },
   {
     key: "yearly",
-    label: "Annual",
+    label: "Annually",
     Icon: Target,
     amount: 120000,
     sub: "funds the entire year of operations",
