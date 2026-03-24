@@ -69,11 +69,9 @@ export default function DesktopNav({
                       <div
                         key={campaign._id}
                         onClick={() => {
-                          checkNavigation(null, () => {
-                            router.push(`/campaign/${campaign.slug}`);
-                            setShowDropdown(false);
-                            setSearchQuery('');
-                          });
+                          router.push(`/campaign/${campaign.slug}`);
+                          setShowDropdown(false);
+                          setSearchQuery('');
                         }}
                         className={`group flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-colors
                           ${darkMode ? 'hover:bg-zinc-800/80' : 'hover:bg-emerald-50/50'}`}

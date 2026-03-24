@@ -14,6 +14,7 @@ export default function PulseSection({ darkMode }) {
 
   const totalRaised = statsData?.stats?.totalRaised || 0;
 
+
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
     neutralBody: darkMode ? "text-zinc-400" : "text-zinc-600",
@@ -52,6 +53,8 @@ export default function PulseSection({ darkMode }) {
 
   const [infIndex, setInfIndex] = useState(0);
   const [infNoTransition, setInfNoTransition] = useState(false);
+
+
 
   useEffect(() => {
     const id = setInterval(() => setInfIndex((i) => i + 1), 1000);
@@ -195,11 +198,20 @@ export default function PulseSection({ darkMode }) {
       </section>
       <section id="pulse" className={`py-14 ${darkMode ? 'bg-zinc-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className={`text-3xl md:text-4xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+          <div className="text-center mb-10 relative">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all duration-300 ${darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-600'}`}>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                </span>
+                Live
+              </span>
+            </div>
+            <h2 className={`text-3xl md:text-5xl font-bold mb-3 ${COLORS.neutralHeading}`}>
               Faith in Motion
             </h2>
-            <p className={`text-sm ${COLORS.neutralBody}`}>
+            <p className={`text-sm md:text-base ${COLORS.neutralBody}`}>
               Live generosity snapshot
             </p>
           </div>
