@@ -2,17 +2,49 @@ import { X, Check, Heart, AlertTriangle } from "lucide-react";
 
 export default function ExpenseImpact({ darkMode, onDonate }) {
   const withoutItems = [
-    { text: "Aid takes days longer to reach families", detail: "No one to coordinate the response" },
-    { text: "Donations go untracked and unverified", detail: "No systems to record what was spent" },
-    { text: "Volunteers show up with no direction", detail: "No coordination or planning support" },
-    { text: "Families wait while we figure things out", detail: "Delays cost lives in emergencies" },
+    {
+      text: "Our team burns out fast",
+      detail: "When basic expenses aren't covered, the team spends more time worrying than working",
+    },
+    {
+      text: "Fewer families get help",
+      detail: "We stay stuck at ₹25–30 lakh in aid when we could be doing so much more",
+    },
+    {
+      text: "We can't grow our team",
+      detail: "No funds means no new people, no new reach, and no new impact",
+    },
+    {
+      text: "No proper place to work",
+      detail: "Without an office, our team loses time, focus, and the ability to coordinate well",
+    },
+    {
+      text: "Many families stay unseen",
+      detail: "Without the right tools, we simply can't find or reach everyone who needs us",
+    },
   ];
 
   const withItems = [
-    { text: "Help reaches families within hours", detail: "A trained team responds immediately" },
-    { text: "Every rupee is tracked and reported", detail: "Full transparency for every donor" },
-    { text: "Volunteers are trained, equipped, ready", detail: "Operations run like a well-oiled machine" },
-    { text: "Families get help when it matters most", detail: "Speed and care, every single time" },
+    {
+      text: "Our team gives their full heart",
+      detail: "When expenses are taken care of, the team can focus on what truly matters — people",
+    },
+    {
+      text: "We can help 3–4x more families",
+      detail: "From ₹25–30 lakh today to ₹1 crore+ in aid — that's what your support can unlock",
+    },
+    {
+      text: "Hundreds become thousands",
+      detail: "A funded team means more people hired, more ground covered, more lives changed",
+    },
+    {
+      text: "A real workspace, real results",
+      detail: "With a proper office, the team works faster, smarter, and serves more people every day",
+    },
+    {
+      text: "Right tools reach more people",
+      detail: "Better equipment means we find families faster and respond before it's too late",
+    },
   ];
 
   return (
@@ -36,15 +68,13 @@ export default function ExpenseImpact({ darkMode, onDonate }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* Without */}
-          <div className={`rounded-2xl p-7 border-2 ${
-            darkMode
-              ? "bg-gray-950 border-red-900/40"
-              : "bg-red-50/60 border-red-100"
-          }`}>
+          <div className={`rounded-2xl p-7 border-2 ${darkMode
+            ? "bg-gray-950 border-red-900/40"
+            : "bg-red-50/60 border-red-100"
+            }`}>
             <div className="flex items-center gap-2.5 mb-5">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                darkMode ? "bg-red-950/60" : "bg-red-100"
-              }`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${darkMode ? "bg-red-950/60" : "bg-red-100"
+                }`}>
                 <AlertTriangle size={14} className="text-red-500" />
               </div>
               <div>
@@ -59,9 +89,8 @@ export default function ExpenseImpact({ darkMode, onDonate }) {
             <ul className="space-y-3.5">
               {withoutItems.map((item) => (
                 <li key={item.text} className="flex items-start gap-3">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                    darkMode ? "bg-red-950/60" : "bg-red-100"
-                  }`}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${darkMode ? "bg-red-950/60" : "bg-red-100"
+                    }`}>
                     <X size={10} className="text-red-500" />
                   </div>
                   <div>
@@ -78,15 +107,13 @@ export default function ExpenseImpact({ darkMode, onDonate }) {
           </div>
 
           {/* With */}
-          <div className={`rounded-2xl p-7 border-2 ${
-            darkMode
-              ? "bg-emerald-950/20 border-emerald-900/50"
-              : "bg-emerald-50/70 border-emerald-100"
-          }`}>
+          <div className={`rounded-2xl p-7 border-2 ${darkMode
+            ? "bg-emerald-950/20 border-emerald-900/50"
+            : "bg-emerald-50/70 border-emerald-100"
+            }`}>
             <div className="flex items-center gap-2.5 mb-5">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                darkMode ? "bg-emerald-950/60" : "bg-emerald-100"
-              }`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${darkMode ? "bg-emerald-950/60" : "bg-emerald-100"
+                }`}>
                 <Heart size={14} className="text-emerald-500" fill="currentColor" />
               </div>
               <div>
@@ -101,9 +128,8 @@ export default function ExpenseImpact({ darkMode, onDonate }) {
             <ul className="space-y-3.5">
               {withItems.map((item) => (
                 <li key={item.text} className="flex items-start gap-3">
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                    darkMode ? "bg-emerald-950/60" : "bg-emerald-100"
-                  }`}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${darkMode ? "bg-emerald-950/60" : "bg-emerald-100"
+                    }`}>
                     <Check size={10} className="text-emerald-500" />
                   </div>
                   <div>

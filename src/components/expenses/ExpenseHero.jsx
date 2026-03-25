@@ -102,11 +102,11 @@ export default function ExpenseHero({ campaign, darkMode, onDonate }) {
                 darkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              Behind Every Donation,
+              Real Help Isn't Free.
               <br />
-              <span className="text-emerald-500">There's a System</span>
+              <span className="text-emerald-500">It Takes a Team, Tools</span>
               <br />
-              That Makes It Reach
+              & Someone Who Cares
             </h1>
 
             <p
@@ -114,9 +114,7 @@ export default function ExpenseHero({ campaign, darkMode, onDonate }) {
                 darkMode ? "text-gray-400" : "text-gray-500"
               }`}
             >
-              TPF Aid runs on people, technology, and coordination. Your
-              support here directly powers every act of help that reaches a
-              family in need.
+              Every donation passes through the hands of a real team. Designers, developers, coordinators, transport staff, etc. All working to make help reach the right people. These roles carry real costs, and your support is what keeps them going.
             </p>
 
             {/* CTAs */}

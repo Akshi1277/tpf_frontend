@@ -10,7 +10,7 @@ const TOTAL = 1200000;
 const PILLARS = [
   {
     id: "people",
-    label: "Our Team",
+    label: "Salaries of Team",
     color: "emerald",
     amount: 420000,
     tagline: "The people who show up every day to make things happen",
@@ -23,7 +23,7 @@ const PILLARS = [
   },
   {
     id: "systems",
-    label: "How We Work",
+    label: "Tools & Service Expenses",
     color: "blue",
     amount: 350000,
     tagline: "The tools and services that keep everything running smoothly",
@@ -32,18 +32,19 @@ const PILLARS = [
       { Icon: Building2, label: "Office & electricity", sub: "A place to work from" },
       { Icon: Scale,     label: "Government paperwork", sub: "Staying registered & following the rules" },
       { Icon: BarChart3, label: "Progress tracking",    sub: "Checking if our work is actually helping" },
+      { Icon: Heart,     label: "Volunteer Kits",       sub: "Kits, training & equipment for our volunteers" },
+
     ],
   },
   {
     id: "execution",
-    label: "Getting Things Done",
+    label: "Transport & Labour",
     color: "teal",
     amount: 330000,
     tagline: "The real costs of actually delivering help to people in need",
     items: [
       { Icon: Truck,     label: "Travel & transport",   sub: "Getting people and supplies where they're needed" },
       { Icon: Megaphone, label: "Spreading the word",   sub: "Letting people know about our campaigns" },
-      { Icon: Heart,     label: "Volunteer gear",       sub: "Kits, training & equipment for our volunteers" },
     ],
   },
   {
