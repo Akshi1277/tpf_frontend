@@ -384,7 +384,7 @@ export default function VolunteerRegister({ darkMode }) {
                                 <div className={`p-4 rounded-[2.3rem] overflow-hidden ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
                                     <div className="relative aspect-[4/5] rounded-2xl overflow-hidden group">
                                         <img
-                                            src="/volunteer_badge.png"
+                                            src="/VolunteerID.webp"
                                             alt="TPF Volunteer Badge Mockup"
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
