@@ -31,6 +31,9 @@ export default function DonationCard({
   zakatVerified,
   taxEligible,
   ribaEligible,
+  sadaqahEligible = true,
+  lillahEligible = true,
+  imdadEligible = true,
   allowedDonationTypes = [],
   unitConfig = null,
 }) {
@@ -88,7 +91,12 @@ export default function DonationCard({
       : allDonationTypes
   ).map((t) => ({
     ...t,
-    disabled: (t.id === 'ZAKAAT' && !zakatVerified) || (t.id === 'RIBA' && !ribaEligible),
+    disabled:
+      (t.id === 'ZAKAAT' && !zakatVerified) ||
+      (t.id === 'RIBA' && !ribaEligible) ||
+      (t.id === 'SADAQAH' && sadaqahEligible === false) ||
+      (t.id === 'LILLAH' && lillahEligible === false) ||
+      (t.id === 'IMDAD' && imdadEligible === false),
   }));
 
   /* ── Sync user info into guest fields ─────────────────────────────────── */

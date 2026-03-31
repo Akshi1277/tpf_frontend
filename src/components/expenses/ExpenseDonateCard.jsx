@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { Shield, BadgeCheck, Lock, Clock, Calendar, CalendarDays, Target, User, Mail, Phone, Sparkles, ShieldCheck, AlertCircle } from "lucide-react";
+import {
+  Shield, BadgeCheck, Lock, Clock, Calendar, CalendarDays,
+  Target, User, Mail, Phone, Sparkles, ShieldCheck, AlertCircle,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { useAppToast } from "@/app/AppToastContext";
 import { useSoftSignupMutation } from "@/utils/slices/authApiSlice";
@@ -45,27 +48,56 @@ function fmtFull(n) {
   return `₹${n.toLocaleString("en-IN")}`;
 }
 
-export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified, taxEligible }) {
-  const [activePeriod, setActivePeriod] = useState("monthly");
+export default function ExpenseDonateCard({
+  darkMode,
+  campaignId,
+  zakatVerified  = false,
+  taxEligible    = false,
+  ribaEligible   = false,
+  sadaqahEligible = true,
+  lillahEligible  = true,
+  imdadEligible   = true,
+}) {
+  const DONATION_TYPES = [
+    { id: "SADAQAH", label: "Sadaqah", enabled: sadaqahEligible },
+    { id: "LILLAH",  label: "Lillah",  enabled: lillahEligible  },
+    { id: "IMDAD",   label: "Imdad",   enabled: imdadEligible   },
+    { id: "ZAKAAT",  label: "Zakat",   enabled: zakatVerified   },
+    { id: "RIBA",    label: "RIBA",    enabled: ribaEligible    },
+  ];
+
+  const defaultType = DONATION_TYPES.find((t) => t.enabled)?.id ?? "SADAQAH";
+
+  const [activePeriod, setActivePeriod]   = useState("monthly");
   const [selectedAmount, setSelectedAmount] = useState(null);
-  const [customAmount, setCustomAmount] = useState("");
-  const [showCustom, setShowCustom] = useState(false);
+  const [customAmount, setCustomAmount]   = useState("");
+  const [showCustom, setShowCustom]       = useState(false);
+  const [donationType, setDonationType]   = useState(defaultType);
 
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [mobileNo, setMobileNo] = useState("");
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId]     = useState(null);
 
-  const [isDonating, setIsDonating] = useState(false);
+  const [isDonating, setIsDonating]   = useState(false);
   const [cashfreeData, setCashfreeData] = useState(null);
   const checkoutStartedRef = useRef(false);
 
-  const userInfo = useSelector((state) => state.auth?.userInfo);
+  const userInfo     = useSelector((state) => state.auth?.userInfo);
   const { showToast } = useAppToast?.() ?? { showToast: () => {} };
-  const [softSignup] = useSoftSignupMutation?.() ?? [async () => {}];
+  const [softSignup]  = useSoftSignupMutation?.() ?? [async () => {}];
 
   const sel = PERIODS.find((p) => p.key === activePeriod);
-  const dk = darkMode;
+  const dk  = darkMode;
+
+  // Re-default donation type if current selection becomes disabled
+  useEffect(() => {
+    const current = DONATION_TYPES.find((t) => t.id === donationType);
+    if (!current?.enabled) {
+      const fallback = DONATION_TYPES.find((t) => t.enabled);
+      if (fallback) setDonationType(fallback.id);
+    }
+  }, [zakatVerified, ribaEligible, sadaqahEligible, lillahEligible, imdadEligible]);
 
   useEffect(() => {
     if (userInfo) {
@@ -141,7 +173,7 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
           amount,
           tipAmount: 0,
           campaignId,
-          donationType: "SADAQAH",
+          donationType,
           isAnonymous: false,
           isTaxEligible: false,
           userId: userIdToUse,
@@ -231,11 +263,7 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
         </div>
 
         {/* Selected period amount display */}
-        <div
-          className={`rounded-xl p-4 text-center transition-all ${
-            dk ? "bg-gray-800" : "bg-emerald-50"
-          }`}
-        >
+        <div className={`rounded-xl p-4 text-center transition-all ${dk ? "bg-gray-800" : "bg-emerald-50"}`}>
           <p className={`text-3xl font-bold tracking-tight ${dk ? "text-white" : "text-gray-900"}`}>
             {fmtFull(sel.amount)}
           </p>
@@ -334,11 +362,9 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
 
         {/* Selected amount summary */}
         {baseAmount > 0 && (
-          <div
-            className={`px-3 py-2.5 rounded-lg flex items-center justify-between ${
-              dk ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-50 border border-gray-100"
-            }`}
-          >
+          <div className={`px-3 py-2.5 rounded-lg flex items-center justify-between ${
+            dk ? "bg-zinc-800/50 border border-zinc-700/50" : "bg-gray-50 border border-gray-100"
+          }`}>
             <span className={`text-xs font-medium ${dk ? "text-zinc-400" : "text-gray-500"}`}>
               Donation amount
             </span>
@@ -357,6 +383,44 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
         {/* Divider */}
         <div className={`border-t border-dashed ${dk ? "border-gray-800" : "border-gray-200"}`} />
 
+        {/* Donation Type selector */}
+        <div>
+          <p className={`text-[11px] font-semibold uppercase tracking-widest mb-2.5 ${dk ? "text-gray-500" : "text-gray-400"}`}>
+            Donation Type
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {DONATION_TYPES.map(({ id, label, enabled }) => {
+              const isActive = donationType === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => enabled && setDonationType(id)}
+                  disabled={!enabled}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full border text-xs font-semibold transition-colors ${
+                    !enabled
+                      ? "opacity-40 cursor-not-allowed " + (dk
+                          ? "border-zinc-700 bg-zinc-800/60 text-zinc-500"
+                          : "border-gray-200 bg-gray-50 text-gray-400")
+                      : isActive
+                        ? dk
+                          ? "border-emerald-500 bg-emerald-950/40 text-emerald-400"
+                          : "border-emerald-600 bg-emerald-50 text-emerald-700"
+                        : dk
+                          ? "border-zinc-700 bg-zinc-800/60 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200"
+                          : "border-gray-200 bg-white text-gray-600 hover:border-emerald-300 hover:text-gray-900"
+                  }`}
+                >
+                  {!enabled && <Lock size={10} className="flex-shrink-0" />}
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className={`border-t border-dashed ${dk ? "border-gray-800" : "border-gray-200"}`} />
+
         {/* Guest Details */}
         {!userInfo && (
           <div className="space-y-2.5">
@@ -365,23 +429,11 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
             </p>
             <div className="relative">
               <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${dk ? "text-zinc-500" : "text-gray-400"}`} />
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className={inputCls}
-              />
+              <input type="text" placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputCls} />
             </div>
             <div className="relative">
               <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${dk ? "text-zinc-500" : "text-gray-400"}`} />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={inputCls}
-              />
+              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
             </div>
             <div className="relative">
               <Phone className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${dk ? "text-zinc-500" : "text-gray-400"}`} />
@@ -398,11 +450,9 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
         )}
 
         {/* Emotional statement */}
-        <div
-          className={`rounded-xl px-4 py-3 text-center ${
-            dk ? "bg-emerald-950/30 border border-emerald-900/40" : "bg-emerald-50 border border-emerald-100"
-          }`}
-        >
+        <div className={`rounded-xl px-4 py-3 text-center ${
+          dk ? "bg-emerald-950/30 border border-emerald-900/40" : "bg-emerald-50 border border-emerald-100"
+        }`}>
           <p className={`text-xs leading-relaxed font-medium ${dk ? "text-emerald-300/80" : "text-emerald-800"}`}>
             💚 Without your support, the lights go out. Every campaign, every cause, every family we help — it all rests on people like you choosing to act.
           </p>
@@ -438,7 +488,7 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
                 ? "Select an Amount"
                 : baseAmount < 50
                 ? "Minimum ₹50 Required"
-                : `Donate ${fmtFull(baseAmount)} Now`}
+                : `Donate ${fmtFull(baseAmount)} as ${DONATION_TYPES.find((t) => t.id === donationType)?.label}`}
             </>
           )}
         </button>
@@ -446,9 +496,9 @@ export default function ExpenseDonateCard({ darkMode, campaignId, zakatVerified,
         {/* Trust row */}
         <div className={`flex items-center justify-between pt-1 border-t ${dk ? "border-gray-800" : "border-gray-100"}`}>
           {[
-            { Icon: Shield, text: "Secure" },
+            { Icon: Shield,    text: "Secure"      },
             { Icon: BadgeCheck, text: "Verified NGO" },
-            { Icon: Lock, text: "Encrypted" },
+            { Icon: Lock,      text: "Encrypted"   },
           ].map(({ Icon: TIcon, text }) => (
             <div key={text} className={`flex items-center gap-1 text-[11px] ${dk ? "text-gray-500" : "text-gray-400"}`}>
               <TIcon size={11} className="text-emerald-500" />

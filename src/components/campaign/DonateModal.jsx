@@ -44,6 +44,9 @@ export default function DonatePopUpModal({
   ribaEligible,
   zakatVerified,
   taxEligible,
+  sadaqahEligible = true,
+  lillahEligible = true,
+  imdadEligible = true,
   allowedDonationTypes = [],
   unitConfig = null,
 }) {
@@ -90,7 +93,12 @@ export default function DonatePopUpModal({
       : allDonationTypes
   ).map((t) => ({
     ...t,
-    disabled: (t.id === 'ZAKAAT' && !zakatVerified) || (t.id === 'RIBA' && !ribaEligible),
+    disabled:
+      (t.id === 'ZAKAAT' && !zakatVerified) ||
+      (t.id === 'RIBA' && !ribaEligible) ||
+      (t.id === 'SADAQAH' && sadaqahEligible === false) ||
+      (t.id === 'LILLAH' && lillahEligible === false) ||
+      (t.id === 'IMDAD' && imdadEligible === false),
   }));
 
   useEffect(() => {

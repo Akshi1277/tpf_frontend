@@ -80,10 +80,14 @@ export default function ExpensePage() {
           {/* On mobile: order-1 (appears first, right after Progress), on desktop: order-none */}
           <div className="lg:col-span-4 order-1 lg:order-none">
             <ExpenseDonateCard
-              campaign={campaign}
               campaignId={campaign._id}
               darkMode={darkMode}
-              onDonate={openDonate}
+              zakatVerified={campaign.zakatVerified}
+              taxEligible={campaign.taxBenefits}
+              ribaEligible={campaign.ribaEligible}
+              sadaqahEligible={campaign.sadaqahEligible ?? true}
+              lillahEligible={campaign.lillahEligible ?? true}
+              imdadEligible={campaign.imdadEligible ?? true}
             />
           </div>
 
@@ -106,6 +110,9 @@ export default function ExpensePage() {
         campaignSlug={campaign.slug}
         zakatVerified={campaign.zakatVerified}
         ribaEligible={campaign.ribaEligible}
+        sadaqahEligible={campaign.sadaqahEligible ?? true}
+        lillahEligible={campaign.lillahEligible ?? true}
+        imdadEligible={campaign.imdadEligible ?? true}
         taxEligible={campaign.taxBenefits}
         unitConfig={campaign.unitConfig}
         allowedDonationTypes={[]}

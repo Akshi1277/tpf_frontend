@@ -80,19 +80,17 @@ export default function CampaignPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className={`group flex items-center gap-2 transition-colors duration-200 ${
-              darkMode
+            className={`group flex items-center gap-2 transition-colors duration-200 ${darkMode
                 ? "text-white hover:text-emerald-400"
                 : "text-gray-900 hover:text-emerald-600"
-            }`}
+              }`}
             aria-label="Go back"
           >
             <div
-              className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border backdrop-blur-md shadow-lg transition-all duration-200 ${
-                darkMode
+              className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl border backdrop-blur-md shadow-lg transition-all duration-200 ${darkMode
                   ? "bg-black/40 border-white/20 hover:border-emerald-500/50 hover:bg-black/60"
                   : "bg-white/70 border-gray-200 hover:border-emerald-500/40 hover:bg-white"
-              }`}
+                }`}
             >
               <ArrowLeft size={18} className="sm:size-[20px]" strokeWidth={2.5} />
             </div>
@@ -183,6 +181,9 @@ export default function CampaignPage() {
         campaignSlug={campaign.slug}
         zakatVerified={campaign.zakatVerified}
         ribaEligible={campaign.ribaEligible}
+        sadaqahEligible={campaign.sadaqahEligible ?? true}
+        lillahEligible={campaign.lillahEligible ?? true}
+        imdadEligible={campaign.imdadEligible ?? true}
         taxEligible={campaign.taxBenefits}
         allowedDonationTypes={campaign.allowedDonationTypes}
         unitConfig={campaign.unitConfig}
