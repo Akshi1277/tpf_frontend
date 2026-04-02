@@ -70,7 +70,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
     chequeDate: "",
     bankAccountName: "",
     remarks: "",
-    donationType: "",  // ← MISSING
+    donationType: "",
     campaignId: "",
   })
 
@@ -97,7 +97,6 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
     setFormData(prev => ({ ...prev, method: method.name }))
   }
 
-  // FIXED — backend only accepts donation details, donor auto detected
   const dispatch = useDispatch();
   const { showToast } = useAppToast();
 
@@ -115,16 +114,15 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
       const payload = {
         method: formData.method,
-        amount, // ✅ FIX
+        amount,
         remarks: formData.remarks || "",
-        donationType: formData.donationType,  // ← MISSING
+        donationType: formData.donationType,
         campaignId: formData.campaignId,
         bankName: formData.bankName,
         bankAccountName: formData.bankAccountName,
         transactionDate: formData.transactionDate,
         referenceNumber: formData.referenceNumber,
         utrNumber: formData.utrNumber,
-
         chequeNumber: formData.chequeNumber,
         chequeDate: formData.chequeDate,
         branchName: formData.branchName,
@@ -133,7 +131,6 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
       const data = await createDonation(payload).unwrap();
 
-      // ⭐ Save new user (with new donation) in Redux state
       dispatch(setCredentials(data.user));
 
       setShowSuccess(true);
@@ -142,7 +139,6 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
         setShowSuccess(false);
         setView("list");
         setSelectedMethod(null);
-
       }, 1500);
     } catch (err) {
       console.error(err);
@@ -172,25 +168,48 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
     }
   }
 
+  // Shared select className — NO appearance-none so native mobile dropdown works
+  const selectClass = (extra = "") =>
+    `w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
+      darkMode
+        ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
+        : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
+    } ${extra}`
+
+  // Shared text input className
+  const inputClass = (hasError = false) =>
+    `w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
+      hasError
+        ? darkMode
+          ? "bg-red-500/5 border-red-500 text-white focus:border-red-500"
+          : "bg-red-50 border-red-500 text-gray-900 focus:border-red-500"
+        : darkMode
+          ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+          : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+    }`
+
+  const iconClass = `absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`
+  const labelClass = `block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`
+
   if (!isClient) {
-    return null; // or a loader
+    return null;
   }
 
   return (
     <div className="relative">
 
-
-      {/* SUCCESS TOAST — unchanged UI */}
+      {/* SUCCESS TOAST */}
       <AnimatePresence>
         {showSuccess && (
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm ${darkMode
-              ? "bg-zinc-900 border border-emerald-500/20"
-              : "bg-white border border-emerald-200"
-              }`}
+            className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm ${
+              darkMode
+                ? "bg-zinc-900 border border-emerald-500/20"
+                : "bg-white border border-emerald-200"
+            }`}
           >
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -209,12 +228,14 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
         )}
       </AnimatePresence>
 
-      {/* BACKGROUND + MAIN UI (UNCHANGED) */}
+      {/* BACKGROUND */}
       <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
-          }`} />
-        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
-          }`} />
+        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
+          darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+        }`} />
+        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
+          darkMode ? "bg-teal-950/20" : "bg-teal-50"
+        }`} />
       </div>
 
       {/* Main Content */}
@@ -246,38 +267,37 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
               exit={{ opacity: 0, y: -20 }}
             >
 
-              {/* CREATE NEW donation button (UI unchanged) */}
+              {/* CREATE NEW donation button */}
               <motion.button
                 onClick={() => setView("create")}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full mb-6 p-6 rounded-2xl border-2 border-dashed transition-all group hover:border-emerald-500"
+                className="w-full mb-6 p-5 sm:p-6 rounded-2xl border-2 border-dashed transition-all group hover:border-emerald-500"
                 style={{
                   borderColor: darkMode ? "#3f3f46" : "#e5e7eb",
                   backgroundColor: darkMode ? "rgba(39,39,42,0.5)" : "#ffffff"
                 }}
               >
                 <div className="flex items-center justify-center gap-3">
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${darkMode
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
+                    darkMode
                       ? "bg-emerald-950/50 group-hover:bg-emerald-900/50"
                       : "bg-emerald-50 group-hover:bg-emerald-100"
-                      }`}
-                  >
-                    <Plus className="w-6 h-6 text-emerald-600" />
+                  }`}>
+                    <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
                   </div>
                   <div className="text-left">
-                    <p className={`font-semibold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    <p className={`font-semibold text-base sm:text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>
                       Create New Offline Donation
                     </p>
-                    <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                    <p className={`text-xs sm:text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                       Submit a new donation request for admin approval
                     </p>
                   </div>
                 </div>
               </motion.button>
 
-              {/* DONATION LIST (FIXED FIELDS, UI UNCHANGED) */}
+              {/* DONATION LIST */}
               {donations.length > 0 ? (
                 <div className="space-y-4">
                   <h2 className={`text-xl font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
@@ -299,84 +319,72 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                     return (
                       <motion.div
                         key={donation._id || `${donation.method}-${donation.submittedOn}-${index}`}
-
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`p-6 rounded-2xl border ${darkMode
-                          ? "bg-zinc-900/50 border-zinc-800"
-                          : "bg-white border-gray-200 shadow-sm"
-                          }`}
+                        className={`p-4 sm:p-6 rounded-2xl border ${
+                          darkMode
+                            ? "bg-zinc-900/50 border-zinc-800"
+                            : "bg-white border-gray-200 shadow-sm"
+                        }`}
                       >
                         {/* Card header */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
                           <div className="flex items-center gap-3">
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${darkMode ? "bg-emerald-950/50" : "bg-emerald-50"
-                              }`}>
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                              darkMode ? "bg-emerald-950/50" : "bg-emerald-50"
+                            }`}>
                               {(() => {
                                 const m = paymentMethods.find(m => m.name === donation.method)
                                 if (!m) return null
                                 const Icon = m.icon
-                                return <Icon className="w-6 h-6 text-emerald-600" />
+                                return <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
                               })()}
                             </div>
-                            <div>
+                            <div className="min-w-0">
                               <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
                                 {donation.method}
                               </p>
-                              <p className={`text-sm ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                              <p className={`text-xs sm:text-sm truncate ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                                 {donation._id}
                               </p>
                             </div>
                           </div>
 
                           {/* STATUS + REMARKS GROUP */}
-                          <div className="flex flex-col items-start sm:items-end gap-1">
-
+                          <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2 sm:gap-1 flex-wrap">
                             {/* Status badge */}
-                            <div
-                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold border ${getStatusColor(donation.status)}`}
-                            >
+                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold border ${getStatusColor(donation.status)}`}>
                               {getStatusIcon(donation.status)}
                               <span className="capitalize">{donation.status}</span>
                             </div>
 
                             {/* Remarks */}
                             {donation.remarks && (
-                              <div className="text-right">
-                                <p
-                                  className={`text-xs uppercase tracking-wide ${darkMode ? "text-zinc-500" : "text-gray-400"
-                                    }`}
-                                >
+                              <div className="sm:text-right">
+                                <p className={`text-xs uppercase tracking-wide ${darkMode ? "text-zinc-500" : "text-gray-400"}`}>
                                   Remarks
                                 </p>
-                                <p
-                                  className={`text-sm leading-snug ${donation.status === "rejected"
-                                    ? darkMode
-                                      ? "text-red-400"
-                                      : "text-red-600"
-                                    : darkMode
-                                      ? "text-zinc-300"
-                                      : "text-gray-700"
-                                    }`}
-                                >
+                                <p className={`text-xs sm:text-sm leading-snug ${
+                                  donation.status === "rejected"
+                                    ? darkMode ? "text-red-400" : "text-red-600"
+                                    : darkMode ? "text-zinc-300" : "text-gray-700"
+                                }`}>
                                   {donation.remarks}
                                 </p>
                               </div>
                             )}
                           </div>
-
                         </div>
 
                         {/* body */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
                           <div>
                             <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                               Amount
                             </p>
-                            <p className={`font-bold text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>
+                            <p className={`font-bold text-base sm:text-lg ${darkMode ? "text-white" : "text-gray-900"}`}>
                               ₹{Number(donation.amount || 0).toLocaleString("en-IN")}
-
                             </p>
                           </div>
 
@@ -384,7 +392,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                             <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                               Date
                             </p>
-                            <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                            <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
                               {new Date(donationDate).toLocaleDateString("en-IN")}
                             </p>
                           </div>
@@ -393,19 +401,18 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                             <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                               Reference Number
                             </p>
-                            <p className={`font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                            <p className={`text-sm font-semibold break-all ${darkMode ? "text-white" : "text-gray-900"}`}>
                               {refNumber}
                             </p>
                           </div>
                         </div>
 
                         {/* footer */}
-                        <div className={`pt-4 border-t ${darkMode ? "border-zinc-800" : "border-gray-200"}`}>
-                          <div className="flex items-center justify-between">
+                        <div className={`pt-3 sm:pt-4 border-t ${darkMode ? "border-zinc-800" : "border-gray-200"}`}>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                             <p className={`text-xs ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                               Submitted on {new Date(donation.submittedOn).toLocaleString("en-IN")}
                             </p>
-
                             {donation.status === "approved" && donation.approvedOn && (
                               <p className={`text-xs ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
                                 Approved on {new Date(donation.approvedOn).toLocaleString("en-IN")}
@@ -413,7 +420,6 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                             )}
                           </div>
                         </div>
-
                       </motion.div>
                     )
                   })}
@@ -422,8 +428,9 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className={`text-center py-16 rounded-2xl border ${darkMode ? "bg-zinc-900/30 border-zinc-800" : "bg-gray-50 border-gray-200"
-                    }`}
+                  className={`text-center py-16 rounded-2xl border ${
+                    darkMode ? "bg-zinc-900/30 border-zinc-800" : "bg-gray-50 border-gray-200"
+                  }`}
                 >
                   <FileText className={`w-16 h-16 mx-auto mb-4 ${darkMode ? "text-zinc-600" : "text-gray-300"}`} />
                   <p className={`text-lg font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
@@ -438,7 +445,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
             </motion.div>
           )}
 
-          {/* CREATE VIEW — UI UNCHANGED */}
+          {/* CREATE VIEW */}
           {view === "create" && (
             <motion.div
               key="create"
@@ -451,19 +458,20 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                   setView("list")
                   setSelectedMethod(null)
                 }}
-                className={`flex items-center gap-2 mb-6 px-4 py-2 rounded-xl font-semibold transition-all ${darkMode
-                  ? "bg-zinc-800 hover:bg-zinc-700 text-white"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                  }`}
+                className={`flex items-center gap-2 mb-6 px-4 py-2 rounded-xl font-semibold transition-all text-sm sm:text-base ${
+                  darkMode
+                    ? "bg-zinc-800 hover:bg-zinc-700 text-white"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                }`}
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 Back to List
               </button>
 
               {/* method selection */}
               {!selectedMethod ? (
                 <div>
-                  <h2 className={`text-2xl font-bold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                  <h2 className={`text-xl sm:text-2xl font-bold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
                     Select Payment Method
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -478,28 +486,28 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                           onClick={() => handleMethodSelect(method)}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`p-6 rounded-2xl border-2 transition-all text-left group ${darkMode
-                            ? "bg-zinc-900/50 border-zinc-800 hover:border-emerald-500"
-                            : "bg-white border-gray-200 hover:border-emerald-500 shadow-sm"
-                            }`}
+                          className={`p-5 sm:p-6 rounded-2xl border-2 transition-all text-left group ${
+                            darkMode
+                              ? "bg-zinc-900/50 border-zinc-800 hover:border-emerald-500"
+                              : "bg-white border-gray-200 hover:border-emerald-500 shadow-sm"
+                          }`}
                         >
-                          <div
-                            className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-colors ${darkMode
+                          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-3 sm:mb-4 transition-colors ${
+                            darkMode
                               ? "bg-emerald-950/50 group-hover:bg-emerald-900/50"
                               : "bg-emerald-50 group-hover:bg-emerald-100"
-                              }`}
-                          >
-                            <Icon className="w-7 h-7 text-emerald-600" />
+                          }`}>
+                            <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
                           </div>
-                          <h3 className={`text-xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                          <h3 className={`text-lg sm:text-xl font-bold mb-1 sm:mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
                             {method.name}
                           </h3>
-                          <p className={`text-sm mb-4 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
+                          <p className={`text-xs sm:text-sm mb-3 sm:mb-4 ${darkMode ? "text-zinc-400" : "text-gray-600"}`}>
                             {method.description}
                           </p>
-                          <div className="flex items-center gap-2 text-emerald-600 font-semibold group-hover:gap-3 transition-all">
+                          <div className="flex items-center gap-2 text-emerald-600 font-semibold text-sm group-hover:gap-3 transition-all">
                             Select
-                            <ChevronRight className="w-5 h-5" />
+                            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                           </div>
                         </motion.button>
                       )
@@ -508,18 +516,20 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                 </div>
               ) : (
                 <>
-                  {/* FORM WRAPPER — UI UNCHANGED */}
-                  <div className={`rounded-3xl overflow-hidden ${darkMode
-                    ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
-                    : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
-                    }`}>
+                  {/* FORM WRAPPER — removed overflow-hidden so select dropdowns render properly on mobile */}
+                  <div className={`rounded-3xl ${
+                    darkMode
+                      ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
+                      : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
+                  }`}>
 
                     {/* colored header */}
-                    <div className={`relative h-24 sm:h-32 bg-gradient-to-r ${selectedMethod.color === "emerald" ? "from-emerald-600 via-teal-600 to-emerald-700" :
+                    <div className={`relative h-24 sm:h-32 rounded-t-3xl bg-gradient-to-r overflow-hidden ${
+                      selectedMethod.color === "emerald" ? "from-emerald-600 via-teal-600 to-emerald-700" :
                       selectedMethod.color === "blue" ? "from-blue-600 via-cyan-600 to-blue-700" :
-                        selectedMethod.color === "purple" ? "from-purple-600 via-violet-600 to-purple-700" :
-                          "from-orange-600 via-amber-600 to-orange-700"
-                      }`}>
+                      selectedMethod.color === "purple" ? "from-purple-600 via-violet-600 to-purple-700" :
+                      "from-orange-600 via-amber-600 to-orange-700"
+                    }`}>
                       <div className="absolute inset-0 opacity-20">
                         <div
                           className="absolute inset-0"
@@ -533,133 +543,124 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                         <div className="text-center px-4">
                           {(() => {
                             const Icon = selectedMethod.icon
-                            return <Icon className="w-12 h-12 text-white mx-auto mb-2" />
+                            return <Icon className="w-8 h-8 sm:w-12 sm:h-12 text-white mx-auto mb-1 sm:mb-2" />
                           })()}
-                          <h2 className="text-2xl font-bold text-white">{selectedMethod.name} Donation</h2>
-                          <p className="text-white/80 text-sm mt-1">{selectedMethod.description}</p>
+                          <h2 className="text-xl sm:text-2xl font-bold text-white">{selectedMethod.name} Donation</h2>
+                          <p className="text-white/80 text-xs sm:text-sm mt-0.5 sm:mt-1">{selectedMethod.description}</p>
                         </div>
                       </div>
                     </div>
 
                     {/* form fields */}
-                    <div className="p-6 sm:p-8 space-y-6">
+                    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
 
-                      {/* donor info — UI kept, but backend ignores these */}
+                      {/* Donor Information */}
                       <div>
-                        <h3 className={`text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        <h3 className={`text-base sm:text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
                           Donor Information
                         </h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                           {/* donor name */}
                           <div>
-                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            <label className={labelClass}>
                               Full Name <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <User className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <User className={iconClass} />
                               <input
                                 type="text"
                                 name="donorName"
                                 value={formData.donorName}
                                 onChange={handleInputChange}
                                 placeholder="Enter your full name"
-                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                  }`}
+                                className={inputClass()}
                               />
                             </div>
                           </div>
 
                           {/* email */}
                           <div>
-                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            <label className={labelClass}>
                               Email Address <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <Mail className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <Mail className={iconClass} />
                               <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 placeholder="your.email@example.com"
-                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                  }`}
+                                className={inputClass()}
                               />
                             </div>
                           </div>
 
                           {/* phone */}
                           <div>
-                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            <label className={labelClass}>
                               Phone Number <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <Phone className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <Phone className={iconClass} />
                               <input
                                 type="tel"
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleInputChange}
                                 placeholder="+91 98765 43210"
-                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                  }`}
+                                className={inputClass()}
                               />
                             </div>
                           </div>
 
                           {/* amount */}
                           <div>
-                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            <label className={labelClass}>
                               Donation Amount <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <DollarSign className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <DollarSign className={iconClass} />
                               <input
                                 type="number"
                                 name="amount"
                                 value={formData.amount}
                                 onChange={handleInputChange}
                                 placeholder="Enter amount in ₹"
-                                className={`w-full h-15 pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                  ? formData.amount && formData.amount < 50 ? "bg-red-500/5 border-red-500 text-white focus:border-red-500" : "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                  : formData.amount && formData.amount < 50 ? "bg-red-50 border-red-500 text-gray-900 focus:border-red-500" : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                  }`}
+                                className={inputClass(formData.amount && formData.amount < 50)}
                               />
                             </div>
-                            {formData.amount && formData.amount < 50 && (
+                            {formData.amount && formData.amount < 50 ? (
                               <p className="mt-2 text-xs font-semibold text-red-500 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" /> Minimum donation is ₹50
                               </p>
-                            )}
-                            {!formData.amount && (
+                            ) : !formData.amount ? (
                               <p className={`mt-2 text-xs font-medium ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
                                 Min. ₹50 contribution required
                               </p>
-                            )}
+                            ) : null}
                           </div>
+
                           {/* Donation Type */}
                           <div>
-                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            <label className={labelClass}>
                               Donation Type <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <FileText className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <FileText className={iconClass} />
+                              {/*
+                                FIX: Removed `appearance-none` so the native select arrow
+                                shows and the dropdown opens properly on mobile devices.
+                                The `appearance-none` was hiding the native dropdown trigger
+                                on iOS/Android causing the dropdown to appear invisible/broken.
+                              */}
                               <select
                                 name="donationType"
                                 value={formData.donationType}
                                 onChange={handleInputChange}
-                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all appearance-none ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
-                                  }`}
+                                className={selectClass()}
                               >
                                 <option value="">Select donation type</option>
                                 <option value="ZAKAAT">ZAKAAT</option>
@@ -670,21 +671,25 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                               </select>
                             </div>
                           </div>
+
                           {/* Campaign */}
                           <div>
-                            <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                            <label className={labelClass}>
                               Campaign <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <Landmark className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <Landmark className={iconClass} />
+                              {/*
+                                FIX: Same fix here — removed `appearance-none`.
+                                On mobile (especially iOS Safari), `appearance-none`
+                                strips the native select styling AND can break the
+                                tap-to-open behaviour, making the dropdown invisible.
+                              */}
                               <select
                                 name="campaignId"
                                 value={formData.campaignId}
                                 onChange={handleInputChange}
-                                className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all appearance-none ${darkMode
-                                  ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
-                                  : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
-                                  }`}
+                                className={selectClass()}
                               >
                                 <option value="">Select a campaign</option>
                                 {campaigns.map((c) => (
@@ -695,22 +700,23 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                               </select>
                             </div>
                           </div>
+
                         </div>
                       </div>
 
-                      {/* TRANSACTION DETAILS — unchanged UI but fixed logic */}
+                      {/* TRANSACTION DETAILS */}
                       <div>
-                        <h3 className={`text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                        <h3 className={`text-base sm:text-lg font-bold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
                           Transaction Details
                         </h3>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                           {selectedMethod.id !== "cheque" ? (
                             <>
                               {/* RTGS/IMPS/NEFT reference/UTR */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   {selectedMethod.id === "rtgs"
                                     ? "UTR Number"
                                     : selectedMethod.id === "imps"
@@ -719,78 +725,67 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                                   <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                  <Hash className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <Hash className={iconClass} />
                                   <input
                                     type="text"
                                     name={selectedMethod.id === "rtgs" ? "utrNumber" : "referenceNumber"}
                                     value={selectedMethod.id === "rtgs" ? formData.utrNumber : formData.referenceNumber}
                                     onChange={handleInputChange}
                                     placeholder="Enter transaction reference"
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
+
                               {/* Transaction Date */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   Transaction Date <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                  <Calendar className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <Calendar className={iconClass} />
                                   <input
                                     type="date"
                                     name="transactionDate"
                                     value={formData.transactionDate}
                                     onChange={handleInputChange}
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
 
                               {/* bank name */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   Bank Name <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                  <Building2 className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <Building2 className={iconClass} />
                                   <input
                                     type="text"
                                     name="bankName"
                                     value={formData.bankName}
                                     onChange={handleInputChange}
                                     placeholder="Enter bank name"
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
 
                               {/* account holder */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   Account Holder Name <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                  <User className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <User className={iconClass} />
                                   <input
                                     type="text"
                                     name="bankAccountName"
                                     value={formData.bankAccountName}
                                     onChange={handleInputChange}
                                     placeholder="Account holder name"
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
@@ -799,87 +794,74 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                             <>
                               {/* CHEQUE NUMBER */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   Cheque Number <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                  <Hash className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <Hash className={iconClass} />
                                   <input
                                     type="text"
                                     name="chequeNumber"
                                     value={formData.chequeNumber}
                                     onChange={handleInputChange}
                                     placeholder="Enter cheque number"
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
 
                               {/* cheque date */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   Cheque Date <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                  <Calendar className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <Calendar className={iconClass} />
                                   <input
                                     type="date"
                                     name="chequeDate"
                                     value={formData.chequeDate}
                                     onChange={handleInputChange}
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
 
                               {/* cheque bank name */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   Bank Name <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
-                                  <Building2 className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <Building2 className={iconClass} />
                                   <input
                                     type="text"
                                     name="bankName"
                                     value={formData.bankName}
                                     onChange={handleInputChange}
                                     placeholder="Bank name on cheque"
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
 
                               {/* optional branch */}
                               <div>
-                                <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                                <label className={labelClass}>
                                   Branch Name
                                 </label>
                                 <div className="relative">
-                                  <Landmark className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                                  <Landmark className={iconClass} />
                                   <input
                                     type="text"
                                     name="branchName"
                                     value={formData.branchName}
                                     onChange={handleInputChange}
                                     placeholder="Branch name (optional)"
-                                    className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
-                                      ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                                      : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                                      }`}
+                                    className={inputClass()}
                                   />
                                 </div>
                               </div>
-
                             </>
                           )}
 
@@ -888,7 +870,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
                       {/* Remarks */}
                       <div>
-                        <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
+                        <label className={labelClass}>
                           Remarks / Additional Information
                         </label>
                         <textarea
@@ -897,28 +879,29 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                           onChange={handleInputChange}
                           rows={4}
                           placeholder="Add any additional information..."
-                          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all resize-none ${darkMode
-                            ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                            }`}
+                          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all resize-none ${
+                            darkMode
+                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+                          }`}
                         />
                       </div>
 
                       {/* Notice */}
-                      <div className={`p-4 rounded-xl border ${darkMode ? "bg-blue-900/20 border-blue-800/50" : "bg-blue-50 border-blue-200"
-                        }`}>
+                      <div className={`p-3 sm:p-4 rounded-xl border ${
+                        darkMode ? "bg-blue-900/20 border-blue-800/50" : "bg-blue-50 border-blue-200"
+                      }`}>
                         <div className="flex items-start gap-3">
-                          <AlertCircle
-                            className={`w-5 h-5 flex-shrink-0 mt-0.5 ${darkMode ? "text-blue-400" : "text-blue-600"
-                              }`}
-                          />
+                          <AlertCircle className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5 ${
+                            darkMode ? "text-blue-400" : "text-blue-600"
+                          }`} />
                           <div>
-                            <p className={`font-semibold mb-1 text-sm ${darkMode ? "text-blue-300" : "text-blue-800"
-                              }`}>
+                            <p className={`font-semibold mb-1 text-xs sm:text-sm ${
+                              darkMode ? "text-blue-300" : "text-blue-800"
+                            }`}>
                               Important Information
                             </p>
-                            <p className={`text-xs ${darkMode ? "text-blue-400" : "text-blue-700"
-                              }`}>
+                            <p className={`text-xs ${darkMode ? "text-blue-400" : "text-blue-700"}`}>
                               Your donation request will be reviewed by our admin team. You'll receive a
                               notification once it's approved.
                             </p>
@@ -929,14 +912,16 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                     </div>
 
                     {/* Submit */}
-                    <div className="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-gray-200 dark:border-zinc-800">
-
+                    <div className={`flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 mt-6 sm:mt-8 px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8 pt-4 sm:pt-6 border-t ${
+                      darkMode ? "border-zinc-800" : "border-gray-200"
+                    }`}>
                       <button
                         onClick={() => setSelectedMethod(null)}
-                        className={`px-6 py-3 rounded-xl font-semibold transition-all ${darkMode
-                          ? "bg-zinc-800 hover:bg-zinc-700 text-white"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                          }`}
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base ${
+                          darkMode
+                            ? "bg-zinc-800 hover:bg-zinc-700 text-white"
+                            : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                        }`}
                       >
                         Change Method
                       </button>
@@ -944,15 +929,15 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                       <button
                         onClick={handleSubmit}
                         disabled={!formData.amount || !formData.donationType || !formData.campaignId || creating}
-                        className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg ${!formData.amount || !formData.donationType || !formData.campaignId || creating
-                          ? "bg-gray-400 cursor-not-allowed text-white"
-                          : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
-                          }`}
+                        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all shadow-lg text-sm sm:text-base ${
+                          !formData.amount || !formData.donationType || !formData.campaignId || creating
+                            ? "bg-gray-400 cursor-not-allowed text-white"
+                            : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                        }`}
                       >
-                        <CheckCircle2 className="w-5 h-5" />
+                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         {creating ? "Submitting..." : "Submit Donation Request"}
                       </button>
-
                     </div>
 
                   </div>

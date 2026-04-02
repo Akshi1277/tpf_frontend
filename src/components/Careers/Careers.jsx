@@ -105,7 +105,7 @@ function EmptyState({ darkMode }) {
 }
 
 // ─── Filter Bar ───────────────────────────────────────────────────────────────
-const TYPES = ["All", "Full-time", "Part-time", "Internship", "Volunteer","Contract"];
+const TYPES = ["All", "Full-time", "Part-time", "Internship", "Volunteer", "Contract"];
 
 function FilterBar({ active, onChange, darkMode }) {
     return (
@@ -151,6 +151,152 @@ function SkeletonGrid({ darkMode }) {
     );
 }
 
+// ─── Why Join Us — Pillars ────────────────────────────────────────────────────
+const pillars = [
+    {
+        number: "01",
+        title: "Real Impact",
+        desc: "Every role here is tied directly to our mission. Your contributions fund livelihoods, support education, and restore dignity to communities in need — at scale.",
+        icon: (
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21C12 21 4 13.5 4 8.5C4 5.46 6.69 3 10 3C11.04 3 12 3.27 12 3.27C12 3.27 12.96 3 14 3C17.31 3 20 5.46 20 8.5C20 13.5 12 21 12 21Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+                <path d="M12 11.5L10.5 10L9 11.5L10.5 13L12 11.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+            </svg>
+        ),
+    },
+    {
+        number: "02",
+        title: "Inclusive Culture",
+        desc: "We are built on pluralism, respect, and shared purpose. Our team spans backgrounds, faiths, and geographies — united by a commitment to service above self.",
+        icon: (
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="7" r="3" stroke="currentColor" strokeWidth="1.8"/>
+                <circle cx="17" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.8"/>
+                <path d="M2 20c0-3.31 3.13-6 7-6s7 2.69 7 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                <path d="M17 15c1.66 0 3 1.34 3 3v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+        ),
+    },
+    {
+        number: "03",
+        title: "Growth & Learning",
+        desc: "We invest in our people with structured mentorship, cross-functional projects, and continuous skill-building — so your growth mirrors the growth of those we serve.",
+        icon: (
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M2 20h20M6 20V10l6-6 6 6v10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="10" y="14" width="4" height="6" rx="0.5" stroke="currentColor" strokeWidth="1.8"/>
+            </svg>
+        ),
+    },
+];
+
+function WhyJoinUs({ darkMode }) {
+    return (
+        <section className={`relative border-t overflow-hidden ${darkMode ? "bg-zinc-900 border-zinc-800" : "bg-slate-50 border-slate-100"}`}>
+
+            {/* Subtle background grid */}
+            <div
+                className="absolute inset-0 pointer-events-none opacity-[0.025]"
+                style={{
+                    backgroundImage: darkMode
+                        ? "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)"
+                        : "linear-gradient(rgba(0,0,0,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.6) 1px, transparent 1px)",
+                    backgroundSize: "48px 48px",
+                }}
+            />
+
+            <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+
+                {/* Section header */}
+                <div className="max-w-xl mb-16">
+                    <span className={`inline-block text-xs font-bold uppercase tracking-[0.2em] mb-4 ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
+                        Why Work With Us
+                    </span>
+                    <h2 className={`font-display text-3xl sm:text-4xl leading-tight mb-4 ${darkMode ? "text-white" : "text-slate-900"}`}>
+                        A place where purpose<br />
+                        <em>meets profession.</em>
+                    </h2>
+                    <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? "text-zinc-400" : "text-slate-500"}`}>
+                        We believe exceptional people deserve more than a job — they deserve meaningful work,
+                        genuine community, and a career that leaves the world better than they found it.
+                    </p>
+                </div>
+
+                {/* Pillars */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 lg:gap-px">
+                    {pillars.map((pillar, i) => (
+                        <div
+                            key={pillar.number}
+                            className={`relative group p-8 sm:p-10 transition-all duration-300 ${
+                                i < pillars.length - 1
+                                    ? darkMode
+                                        ? "border-b lg:border-b-0 lg:border-r border-zinc-800"
+                                        : "border-b lg:border-b-0 lg:border-r border-slate-200"
+                                    : ""
+                            } ${darkMode ? "hover:bg-zinc-800/60" : "hover:bg-white"} rounded-none`}
+                            style={{ transition: "background 0.2s" }}
+                        >
+                            {/* Emerald accent line on hover */}
+                            <div className={`absolute top-0 left-8 sm:left-10 w-8 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`} />
+
+                            {/* Number */}
+                            <span className={`block text-xs font-bold tracking-[0.25em] uppercase mb-6 ${darkMode ? "text-zinc-600" : "text-slate-300"}`}>
+                                {pillar.number}
+                            </span>
+
+                            {/* Icon in a refined container */}
+                            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-6 transition-colors duration-300 ${
+                                darkMode
+                                    ? "bg-zinc-800 text-emerald-400 group-hover:bg-emerald-950/60 group-hover:text-emerald-300"
+                                    : "bg-slate-100 text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600"
+                            }`}>
+                                {pillar.icon}
+                            </div>
+
+                            {/* Title */}
+                            <h3 className={`font-display text-xl sm:text-2xl mb-3 transition-colors duration-300 ${
+                                darkMode
+                                    ? "text-zinc-100 group-hover:text-white"
+                                    : "text-slate-800 group-hover:text-slate-900"
+                            }`}>
+                                {pillar.title}
+                            </h3>
+
+                            {/* Description */}
+                            <p className={`text-sm leading-relaxed ${darkMode ? "text-zinc-500" : "text-slate-400"}`}>
+                                {pillar.desc}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Bottom CTA strip */}
+                <div className={`mt-16 flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t ${
+                    darkMode ? "border-zinc-800" : "border-slate-200"
+                }`}>
+                    <div>
+                        <p className={`text-xs uppercase font-bold tracking-widest mb-1 ${darkMode ? "text-zinc-500" : "text-slate-400"}`}>
+                            Ready to contribute?
+                        </p>
+                        <p className={`text-base sm:text-lg font-display ${darkMode ? "text-zinc-200" : "text-slate-700"}`}>
+                            Browse open roles and take the first step.
+                        </p>
+                    </div>
+                    <a
+                        href="#open-positions"
+                        className="flex-shrink-0 inline-flex items-center gap-2.5 px-7 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold tracking-wide transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
+                    >
+                        See All Openings
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function CareersPage({ darkMode = false }) {
     const { data, isLoading } = useGetAllJobsQuery({ page: 1, limit: 12 });
@@ -182,7 +328,7 @@ export default function CareersPage({ darkMode = false }) {
 
             <div className={`min-h-screen transition-colors duration-300 ${darkMode ? "bg-zinc-900 text-white" : "bg-slate-50 text-slate-900"}`}>
 
-                {/* ── Hero — always emerald, no dark mode needed ── */}
+                {/* ── Hero ── */}
                 <section className="relative overflow-hidden bg-emerald-500">
                     <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-400 opacity-30" />
                     <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-emerald-600 opacity-25" />
@@ -200,27 +346,11 @@ export default function CareersPage({ darkMode = false }) {
                             Be part of a passionate team committed to creating lasting change.
                             Every role here is an opportunity to shape lives and communities.
                         </p>
-                        {/* <div className="mt-8 flex items-center justify-center gap-8 text-white">
-                            <div>
-                                <div className="text-3xl font-display">{jobs.length || "—"}</div>
-                                <div className="text-emerald-200 text-xs uppercase tracking-wider">Open Positions</div>
-                            </div>
-                            <div className="w-px h-10 bg-white/30" />
-                            <div>
-                                <div className="text-3xl font-display">12+</div>
-                                <div className="text-emerald-200 text-xs uppercase tracking-wider">Countries</div>
-                            </div>
-                            <div className="w-px h-10 bg-white/30" />
-                            <div>
-                                <div className="text-3xl font-display">5K+</div>
-                                <div className="text-emerald-200 text-xs uppercase tracking-wider">Lives Impacted</div>
-                            </div>
-                        </div> */}
                     </div>
                 </section>
 
                 {/* ── Jobs Section ── */}
-                <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+                <section id="open-positions" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
                         <div>
                             <h2 className={`font-display text-2xl sm:text-3xl ${darkMode ? "text-white" : "text-slate-800"}`}>
@@ -248,38 +378,12 @@ export default function CareersPage({ darkMode = false }) {
                     )}
                 </section>
 
-                {/* ── Why Join Us ── */}
-                <section className={`border-t ${darkMode ? "bg-zinc-800 border-zinc-700" : "bg-white border-slate-100"}`}>
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-                        <h2 className={`font-display text-2xl sm:text-3xl mb-3 ${darkMode ? "text-white" : "text-slate-800"}`}>
-                            Why Work With Us?
-                        </h2>
-                        <p className={`text-sm max-w-lg mx-auto mb-10 ${darkMode ? "text-zinc-400" : "text-slate-400"}`}>
-                            We believe great people deserve a great place to grow.
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            {[
-                                { icon: "🌍", title: "Real Impact", desc: "Your work directly shapes lives across communities." },
-                                { icon: "🤝", title: "Inclusive Culture", desc: "A diverse, welcoming team where every voice counts." },
-                                { icon: "📈", title: "Growth & Learning", desc: "Ongoing training, mentoring, and skill development." },
-                            ].map((p) => (
-                                <div key={p.title} className={`rounded-2xl p-6 ${darkMode ? "bg-zinc-700" : "bg-slate-50"}`}>
-                                    <div className="text-3xl mb-3">{p.icon}</div>
-                                    <h3 className={`font-bold mb-1 ${darkMode ? "text-white" : "text-slate-800"}`}>
-                                        {p.title}
-                                    </h3>
-                                    <p className={`text-sm ${darkMode ? "text-zinc-300" : "text-slate-500"}`}>
-                                        {p.desc}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
+                {/* ── Why Join Us — redesigned ── */}
+                <WhyJoinUs darkMode={darkMode} />
 
                 {/* ── Footer ── */}
                 <footer className={`text-center py-8 text-xs ${darkMode ? "text-zinc-600" : "text-slate-400"}`}>
-                    © {new Date().getFullYear()} Your NGO Name. All rights reserved.
+                    © {new Date().getFullYear()} TPF Aid. All rights reserved.
                 </footer>
             </div>
 
