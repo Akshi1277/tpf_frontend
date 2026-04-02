@@ -297,147 +297,145 @@ export default function CampaignTabs({ darkMode, campaign }) {
           className={`p-4 sm:p-6 md:p-8 ${(activeTab === 'documents' || activeTab === 'comments') ? 'min-h-[300px] sm:min-h-[400px]' : ''}`}
         >
           {/* ================= ABOUT TAB ================= */}
-          {activeTab === 'about' && (
-            <div className="space-y-8">
-              <div>
-                <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  About This Campaign
-                </h3>
+       {activeTab === 'about' && (
+  <div className="space-y-8">
 
-                {campaign?.beneficiaryName && (
-                  <div className="space-y-4 mb-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Campaigner Box */}
-                      <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-blue-500/50' : 'bg-blue-50/30 border-blue-100 hover:border-blue-300'}`}>
-                        <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                          <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${darkMode ? 'bg-blue-500/10 group-hover:bg-blue-500/20' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
-                            <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-                          </div>
-                          <h4 className={`font-bold text-[10px] sm:text-xs uppercase tracking-widest ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
-                            Campaigner
-                          </h4>
-                        </div>
-                        <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {campaign.campaignerName || campaign.fullName}
-                        </p>
-                        <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          Verified campaign organizer
-                        </p>
-                      </div>
+    {/* ── Social Proof Bar ── */}
+    {hasSocialMedia && (
+      <motion.div
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+        className={`flex flex-wrap items-center gap-2.5 pb-5 border-b ${darkMode ? 'border-zinc-700' : 'border-gray-100'}`}
+      >
+        <div className="flex items-center gap-1.5 mr-1 shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className={`text-[11px] font-semibold uppercase tracking-widest ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+            Live on
+          </span>
+        </div>
 
-                      {/* Beneficiary Box */}
-                      <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50' : 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-300'}`}>
-                        <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                          <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${darkMode ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}>
-                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
-                          </div>
-                          <h4 className={`font-bold text-[10px] sm:text-xs uppercase tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                            Beneficiary
-                          </h4>
-                        </div>
-                        <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {campaign.beneficiaryName}
-                        </p>
-                        <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          The primary recipient of this fund
-                        </p>
-                      </div>
-                    </div>
+        {Object.entries(socialMediaLinks).map(([platform, url]) => {
+          if (!url || url.trim() === '' || platform === 'youtube') return null;
+          const config = getSocialConfig(platform);
+          const Icon = config.icon;
+          return (
+              <a
+              key={platform}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={getPlatformName(platform)}
+              className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-200 hover:shadow-sm hover:-translate-y-0.5 active:translate-y-0
+                ${darkMode
+                  ? `bg-zinc-900/70 border-zinc-700 hover:border-zinc-500 ${config.textDark}`
+                  : `bg-white border-gray-200 hover:border-gray-300 shadow-sm ${config.textLight}`
+                }`}
+            >
+              <Icon className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} />
+              <span>{getPlatformName(platform)}</span>
+            </a>
+          );
+        })}
 
-                    {/* Social Media Box */}
-                    {hasSocialMedia && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-teal-500/50' : 'bg-teal-50/30 border-teal-100 hover:border-teal-300'}`}
-                      >
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className={`p-2 rounded-xl transition-colors ${darkMode ? 'bg-teal-500/10 group-hover:bg-teal-500/20' : 'bg-teal-100 group-hover:bg-teal-200'}`}>
-                            <Share2 className="w-5 h-5 text-teal-500" />
-                          </div>
-                          <h4 className={`font-bold text-xs uppercase tracking-widest ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}>
-                            Follow Campaign Updates
-                          </h4>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {Object.entries(socialMediaLinks).map(([platform, url]) => {
-                            if (!url || url.trim() === '') return null;
-                            const config = getSocialConfig(platform);
-                            const Icon = config.icon;
-                            return (
-                              <a
-                                key={platform}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`group/link flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 hover:shadow-md ${darkMode
-                                  ? `${config.bgDark} border-zinc-700 ${config.darkHoverColor}`
-                                  : `${config.bgLight} border-gray-200 ${config.hoverColor}`
-                                  }`}
-                              >
-                                <div className={`p-1.5 rounded-md transition-colors ${darkMode
-                                  ? `${config.iconBgDark} ${config.iconHoverDark}`
-                                  : `${config.iconBgLight} ${config.iconHoverLight}`
-                                  }`}>
-                                  <Icon className={`w-4 h-4 ${darkMode ? config.textDark : config.textLight}`} />
-                                </div>
-                                <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                  {getPlatformName(platform)}
-                                </span>
-                                <ExternalLink className={`w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                              </a>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
-                )}
+        <span className={`ml-auto text-[11px] hidden sm:flex items-center gap-1 shrink-0 ${darkMode ? 'text-zinc-600' : 'text-gray-400'}`}>
+          <svg className="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          Verified presence
+        </span>
+      </motion.div>
+    )}
 
-                {/* About Text with Read More / Read Less */}
-                <div>
-                  <div className="relative">
-                    <p className={`whitespace-pre-line leading-relaxed text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {displayedAbout}
-                    </p>
-                    {isAboutLong && !aboutExpanded && (
-                      <div className={`absolute bottom-0 left-0 right-0 h-10 pointer-events-none ${darkMode ? 'bg-gradient-to-t from-zinc-800 to-transparent' : 'bg-gradient-to-t from-white to-transparent'}`} />
-                    )}
-                  </div>
+    <div>
+      <h3 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+        About This Campaign
+      </h3>
 
-                  {isAboutLong && (
-                    <button
-                      onClick={() => setAboutExpanded(prev => !prev)}
-                      className={`mt-3 inline-flex items-center gap-1.5 text-sm font-semibold cursor-pointer transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}
-                    >
-                      {aboutExpanded ? 'Read Less' : 'Read More'}
-                      <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${aboutExpanded ? '-rotate-90' : 'rotate-90'}`} />
-                    </button>
-                  )}
+      {campaign?.beneficiaryName && (
+        <div className="space-y-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Campaigner Box */}
+            <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-blue-500/50' : 'bg-blue-50/30 border-blue-100 hover:border-blue-300'}`}>
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${darkMode ? 'bg-blue-500/10 group-hover:bg-blue-500/20' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
+                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
                 </div>
+                <h4 className={`font-bold text-[10px] sm:text-xs uppercase tracking-widest ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                  Campaigner
+                </h4>
               </div>
-
-              {/* Impact Goals */}
-              {impactGoals.length > 0 && (
-                <div className={`p-4 sm:p-6 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100'}`}>
-                  <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    <Award className="w-5 h-5 text-blue-500" />
-                    Campaign Impact Goals
-                  </h4>
-                  <ul className="space-y-2">
-                    {impactGoals.map((goal, i) => (
-                      <li key={i} className={`flex items-start gap-3 text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <ChevronRight className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
-                        <span>{goal}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                {campaign.campaignerName || campaign.fullName}
+              </p>
+              <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                Verified campaign organizer
+              </p>
             </div>
-          )}
 
+            {/* Beneficiary Box */}
+            <div className={`group p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${darkMode ? 'bg-zinc-900/50 border-zinc-700 hover:border-emerald-500/50' : 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-300'}`}>
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <div className={`p-1.5 sm:p-2 rounded-xl transition-colors ${darkMode ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}>
+                  <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
+                </div>
+                <h4 className={`font-bold text-[10px] sm:text-xs uppercase tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  Beneficiary
+                </h4>
+              </div>
+              <p className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                {campaign.beneficiaryName}
+              </p>
+              <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                The primary recipient of this fund
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* About Text with Read More / Read Less */}
+      <div>
+        <div className="relative">
+          <p className={`whitespace-pre-line leading-relaxed text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            {displayedAbout}
+          </p>
+          {isAboutLong && !aboutExpanded && (
+            <div className={`absolute bottom-0 left-0 right-0 h-10 pointer-events-none ${darkMode ? 'bg-gradient-to-t from-zinc-800 to-transparent' : 'bg-gradient-to-t from-white to-transparent'}`} />
+          )}
+        </div>
+
+        {isAboutLong && (
+          <button
+            onClick={() => setAboutExpanded(prev => !prev)}
+            className={`mt-3 inline-flex items-center gap-1.5 text-sm font-semibold cursor-pointer transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}
+          >
+            {aboutExpanded ? 'Read Less' : 'Read More'}
+            <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${aboutExpanded ? '-rotate-90' : 'rotate-90'}`} />
+          </button>
+        )}
+      </div>
+    </div>
+
+    {/* Impact Goals */}
+    {impactGoals.length > 0 && (
+      <div className={`p-4 sm:p-6 rounded-xl ${darkMode ? 'bg-zinc-900 border border-zinc-700' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100'}`}>
+        <h4 className={`font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <Award className="w-5 h-5 text-blue-500" />
+          Campaign Impact Goals
+        </h4>
+        <ul className="space-y-2">
+          {impactGoals.map((goal, i) => (
+            <li key={i} className={`flex items-start gap-3 text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <ChevronRight className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+              <span>{goal}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+)}
           {/* ================= DOCUMENTS TAB ================= */}
           {activeTab === 'documents' && (
             <div className="relative min-h-[350px] flex flex-col">
@@ -747,123 +745,123 @@ export default function CampaignTabs({ darkMode, campaign }) {
         onLoginSuccess={() => setShowLoginModal(false)}
       />
 
-      {/* ================= DOCUMENT PREVIEW MODAL ================= */}
-      <AnimatePresence>
-        {previewDoc && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/90 flex flex-col z-[70]"
-            onClick={() => setPreviewDoc(null)}
-          >
-            {/* Minimal top bar */}
-            <div
-              className="flex items-center justify-between px-5 py-3 shrink-0"
+      {/* ================= DOCUMENT PREVIEW MODAL ================= */ }
+  <AnimatePresence>
+    {previewDoc && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 bg-black/90 flex flex-col z-[70]"
+        onClick={() => setPreviewDoc(null)}
+      >
+        {/* Minimal top bar */}
+        <div
+          className="flex items-center justify-between px-5 py-3 shrink-0"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span className="text-white/60 text-sm truncate max-w-[70%]">
+            {previewDoc.name}
+          </span>
+          <div className="flex items-center gap-4">
+            <a
+              href={getMediaUrl(previewDoc.fileUrl)}
+              download
+              className="text-white/50 hover:text-white text-xs transition-colors"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="text-white/60 text-sm truncate max-w-[70%]">
-                {previewDoc.name}
-              </span>
-              <div className="flex items-center gap-4">
-                <a
-                  href={getMediaUrl(previewDoc.fileUrl)}
-                  download
-                  className="text-white/50 hover:text-white text-xs transition-colors"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Download
-                </a>
-                <button
-                  onClick={() => setPreviewDoc(null)}
-                  className="text-white/50 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
+              Download
+            </a>
+            <button
+              onClick={() => setPreviewDoc(null)}
+              className="text-white/50 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
 
-            {/* Document fills remaining space */}
-            <div
-              className="flex-1 overflow-auto flex items-center justify-center px-4 py-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {previewDoc.fileType?.toLowerCase() === 'pdf' ? (
-                <iframe
-                  src={`${getMediaUrl(previewDoc.fileUrl)}#toolbar=0&navpanes=0`}
-                  className="w-full max-w-3xl h-[calc(100vh-80px)] rounded-sm"
-                  title={previewDoc.name}
-                />
-              ) : (
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.25 }}
-                  src={getMediaUrl(previewDoc.fileUrl)}
-                  alt={previewDoc.name}
-                  className="max-w-3xl w-full object-contain rounded-sm"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/fallback-document.png';
-                  }}
-                />
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Document fills remaining space */}
+        <div
+          className="flex-1 overflow-auto flex items-center justify-center px-4 py-6"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {previewDoc.fileType?.toLowerCase() === 'pdf' ? (
+            <iframe
+              src={`${getMediaUrl(previewDoc.fileUrl)}#toolbar=0&navpanes=0`}
+              className="w-full max-w-3xl h-[calc(100vh-80px)] rounded-sm"
+              title={previewDoc.name}
+            />
+          ) : (
+            <motion.img
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.25 }}
+              src={getMediaUrl(previewDoc.fileUrl)}
+              alt={previewDoc.name}
+              className="max-w-3xl w-full object-contain rounded-sm"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/fallback-document.png';
+              }}
+            />
+          )}
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
 
-      {/* ================= DELETE CONFIRMATION MODAL ================= */}
-      <AnimatePresence>
-        {deleteConfirm.show && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4"
-            onClick={() => setDeleteConfirm({ show: false, id: null })}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className={`rounded-2xl p-6 w-full max-w-sm relative ${darkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white'}`}
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className={`p-4 rounded-full mb-4 ${darkMode ? 'bg-red-500/10' : 'bg-red-50'}`}>
-                  <Trash2 className="w-8 h-8 text-red-500" />
-                </div>
-                <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Delete Comment?
-                </h3>
-                <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  This action cannot be undone. Are you sure you want to remove your comment?
-                </p>
-                <div className="flex w-full gap-3">
-                  <button
-                    onClick={() => setDeleteConfirm({ show: false, id: null })}
-                    className={`flex-1 py-3 rounded-xl font-semibold transition-colors
+  {/* ================= DELETE CONFIRMATION MODAL ================= */ }
+  <AnimatePresence>
+    {deleteConfirm.show && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4"
+        onClick={() => setDeleteConfirm({ show: false, id: null })}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          onClick={(e) => e.stopPropagation()}
+          className={`rounded-2xl p-6 w-full max-w-sm relative ${darkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white'}`}
+        >
+          <div className="flex flex-col items-center text-center">
+            <div className={`p-4 rounded-full mb-4 ${darkMode ? 'bg-red-500/10' : 'bg-red-50'}`}>
+              <Trash2 className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Delete Comment?
+            </h3>
+            <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              This action cannot be undone. Are you sure you want to remove your comment?
+            </p>
+            <div className="flex w-full gap-3">
+              <button
+                onClick={() => setDeleteConfirm({ show: false, id: null })}
+                className={`flex-1 py-3 rounded-xl font-semibold transition-colors
                       ${darkMode
-                        ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleConfirmDelete}
-                    disabled={isDeleting}
-                    className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold flex justify-center items-center transition-opacity disabled:opacity-50"
-                  >
-                    {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Delete"}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+                    ? 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold flex justify-center items-center transition-opacity disabled:opacity-50"
+              >
+                {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : "Delete"}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+    </div >
   );
 }
