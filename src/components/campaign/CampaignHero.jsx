@@ -7,13 +7,14 @@ import DonatePopUpModal from "./DonateModal";
 
 export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
   if (!campaign) return null;
-  const [currentIndex, setCurrentIndex] = useState(0);
 
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const primaryImage = campaign.imageUrl;
 
+  // ✅ FIX: filter invalid/null images
   const galleryImages = (campaign.imageGallery || []).filter(
-    (img) => img !== primaryImage
+    (img) => img && img !== primaryImage
   );
 
   const orderedImages = primaryImage
@@ -32,20 +33,6 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
     return () => clearInterval(interval);
   }, [orderedImages.length]);
 
-  // useEffect(() => {
-  //   const MAX_AUTO_OPENS = 3;
-  //   const storageKey = "donate_popup_count";
-
-  //   const rawCount = sessionStorage.getItem(storageKey);
-  //   const count = rawCount ? parseInt(rawCount, 10) : 0;
-
-  //   if (count < MAX_AUTO_OPENS) {
-  //     setIsModalOpen(true);
-  //     sessionStorage.setItem(storageKey, String(count + 1));
-  //   }
-  // }, []);
-
-
   return (
     <>
       <motion.div
@@ -53,19 +40,33 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
         animate={{ opacity: 1, y: 0 }}
         className="relative h-[350px] sm:h-[450px] md:h-[550px] sm:rounded-3xl overflow-hidden mb-4 sm:mb-6 max-w-5xl mx-auto"
       >
-        {/* IMAGE */}
+        {/* MEDIA */}
         <div className="absolute inset-0">
-          {orderedImages.map((img, index) => (
-            <motion.img
-              key={img}
-              src={getMediaUrl(img)}
-              alt={campaign.title}
-              className="absolute inset-0 w-full h-full object-cover"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: index === currentIndex ? 1 : 0 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
+          {campaign.mediaType === "video" && campaign.videoUrl ? (
+            <video
+              src={getMediaUrl(campaign.videoUrl)}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
             />
-          ))}
+          ) : (
+            orderedImages.length > 0 &&
+            orderedImages.map((img, index) =>
+              img ? (
+                <motion.img
+                  key={img}
+                  src={getMediaUrl(img)}
+                  alt={campaign.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: index === currentIndex ? 1 : 0 }}
+                  transition={{ duration: 1, ease: "easeInOut" }}
+                />
+              ) : null
+            )
+          )}
         </div>
 
         {/* OVERLAY */}
@@ -104,7 +105,7 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
             {campaign.organization}
           </p>
 
-          {/* DONATE NOW BUTTON */}
+          {/* DONATE BUTTON */}
           <motion.button
             onClick={onDonateClick}
             whileHover={{ scale: 1.05 }}
@@ -114,11 +115,8 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
             <Heart className="w-5 h-5" fill="currentColor" />
             Donate Now
           </motion.button>
-
         </div>
       </motion.div>
-     
-
     </>
   );
 }

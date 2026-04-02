@@ -25,6 +25,7 @@ import {
   Landmark,
   AlertCircle,
   Check,
+  IndianRupee,
 } from "lucide-react"
 import { useAppToast } from "@/app/AppToastContext"
 
@@ -617,7 +618,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                               Donation Amount <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                              <DollarSign className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
+                              <IndianRupee className={`absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`} />
                               <input
                                 type="number"
                                 name="amount"

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CreditCard, RefreshCw, DollarSign, FileCheck, AlertCircle } from "lucide-react";
+import { ArrowLeft, CreditCard, RefreshCw, DollarSign, FileCheck, AlertCircle, IndianRupee } from "lucide-react";
 
 export default function Pricing({ onBack }) {
   return (
@@ -39,7 +39,7 @@ export default function Pricing({ onBack }) {
           {/* Pricing Structure */}
           <section>
             <div className="flex items-center gap-3 mb-5">
-              <DollarSign className="w-7 h-7 text-violet-600" />
+              <IndianRupee className="w-7 h-7 text-violet-600" />
               <h2 className="text-3xl font-bold text-gray-900">Pricing Structure</h2>
             </div>
             

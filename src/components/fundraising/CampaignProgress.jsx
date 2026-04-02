@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, Calendar, Users, DollarSign } from 'lucide-react';
+import { TrendingUp, Calendar, Users, DollarSign, IndianRupee } from 'lucide-react';
 
 export default function CampaignProgress({ darkMode }) {
   const raised = 1245000;
@@ -59,7 +59,7 @@ export default function CampaignProgress({ darkMode }) {
             </div>
           </div>
           <div className="flex items-center gap-3" data-testid="stat-avg-donation">
-            <DollarSign className="w-5 h-5 opacity-90" />
+            <IndianRupee className="w-5 h-5 opacity-90" />
             <div>
               <p className="text-sm opacity-90">Avg. donation</p>
               <p className="text-xl font-bold">₹2,945</p>
