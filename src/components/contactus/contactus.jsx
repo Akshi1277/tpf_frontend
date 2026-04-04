@@ -282,37 +282,74 @@ function HelpCentreSection({ darkMode, isInView }) {
             and public trust.
           </p>
 
-          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6`}>
             <div>
-              <p className="font-semibold">Registered Name</p>
+              <p className="font-semibold">Project Name</p>
+              <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                TPF Aid
+              </p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Entity Registered Name</p>
               <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                 True Path Foundation
               </p>
             </div>
 
-            <div>
-              <p className="font-semibold">Official Email</p>
+            <div className="sm:col-span-2">
+              <p className="font-semibold">Entity Registered Office at</p>
               <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                support@tpfaid.org
+                229A, DDA LIG, Pocket - 12, Jasola, New Delhi, Delhi - 110025
               </p>
             </div>
 
             <div>
-              <p className="font-semibold">Contact Number</p>
-              <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                +91-987654321
-              </p>
+              <p className="font-semibold mb-3">Contact Details</p>
+              <div className={`space-y-3 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                <p className="flex items-center gap-3">
+                  <span className={`p-2 rounded-lg ${darkMode ? 'bg-zinc-700/50 text-teal-400' : 'bg-teal-50 text-teal-600'}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                    </svg>
+                  </span>
+                  <a href="tel:+919411565185" className="hover:text-teal-500 transition-colors">(+91) 94 115 65185</a>
+                </p>
+                <p className="flex items-center gap-3">
+                  <span className={`p-2 rounded-lg ${darkMode ? 'bg-zinc-700/50 text-teal-400' : 'bg-teal-50 text-teal-600'}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                  </span>
+                  <a href="mailto:support@tpfaid.org" className="hover:text-teal-500 transition-colors">support@tpfaid.org</a>
+                </p>
+              </div>
             </div>
 
             <div>
-              <p className="font-semibold">Registered Office Address</p>
-              <p className={`${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                Legal Address Over here
-              </p>
+              <p className="font-semibold mb-3">For grievance redressal</p>
+              <div className={`space-y-3 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                <p className="flex items-center gap-3">
+                  <span className={`p-2 rounded-lg ${darkMode ? 'bg-zinc-700/50 text-teal-400' : 'bg-teal-50 text-teal-600'}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                  </span>
+                  <a href="mailto:grievances@tpfaid.org" className="hover:text-teal-500 transition-colors">grievances@tpfaid.org</a>
+                </p>
+                <p className="flex items-center gap-3">
+                  <span className={`p-2 rounded-lg ${darkMode ? 'bg-zinc-700/50 text-teal-400' : 'bg-teal-50 text-teal-600'}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                    </svg>
+                  </span>
+                  <a href="https://www.truepathfoundation.in" target="_blank" rel="noopener noreferrer" className="hover:text-teal-500 transition-colors">www.truepathfoundation.in</a>
+                </p>
+              </div>
             </div>
           </div>
 
-          <p className={`text-xs ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          <p className={`text-xs font-extrabold ${darkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>
             For official correspondence, legal notices, or regulatory matters, please use the details above.
           </p>
         </div>

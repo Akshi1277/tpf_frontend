@@ -227,9 +227,9 @@ export default function DownloadsPage({ darkModeFromParent }) {
     doc.setTextColor(80, 80, 80);
     const addressLines = [
       "True Path Foundation",
-      "123, Charity Lane, Main Street,",
-      "Mumbai - 400001, Maharashtra. https://www.tpfaid.org",
-      "| info@tpfaid.org | (+91) 9876543210"
+      "229A, DDA LIG, Pocket - 12, Jasola,",
+      "New Delhi, Delhi - 110025. www.truepathfoundation.in",
+      "| support@tpfaid.org | (+91) 94 115 65185"
     ];
     doc.text(addressLines, 200, 18, { align: "right" });
 
@@ -636,7 +636,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
         // 2. Company Address (Top Right)
         doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(80, 80, 80);
-        const addressLines = ["True Path Foundation", "123, Charity Lane, Main Street,", "Mumbai - 400001, Maharashtra. https://www.tpfaid.org", "| info@tpfaid.org | (+91) 9876543210"];
+        const addressLines = ["True Path Foundation", "229A, DDA LIG, Pocket - 12, Jasola,", "New Delhi, Delhi - 110025. www.truepathfoundation.in", "| support@tpfaid.org | (+91) 94 115 65185"];
         doc.text(addressLines, 200, 18, { align: "right" });
 
         // 3. Header: "Acknowledgement of Payment" with Orange Underline

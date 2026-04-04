@@ -76,7 +76,7 @@ export default function ContactPage({ darkModeFromParent }) {
     {
       icon: Mail,
       title: "Email Us",
-      value: "info@tpfaid.org",
+      value: "support@tpfaid.org",
       color: "emerald"
     },
     {
