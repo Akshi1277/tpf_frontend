@@ -245,10 +245,13 @@ export default function PulseSection({ darkMode }) {
                       <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
                         {currency(donation.amount)}
                       </div>
-                      <div className={`text-xs ${COLORS.neutralBody}`}>
+                      <div className={`text-xs ${COLORS.neutralBody} font-medium`}>
                         {donation.name}
                       </div>
-                      <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
+                      <div className={`text-[10px] ${COLORS.neutralBody} opacity-70 mt-0.5 line-clamp-1`}>
+                        {donation.campaignName}
+                      </div>
+                      <div className={`text-[10px] ${COLORS.neutralBody} opacity-50 mt-1`}>
                         {timeAgo(donation.time)}
                       </div>
                     </div>
@@ -294,10 +297,13 @@ export default function PulseSection({ darkMode }) {
                           <div className={`text-lg font-bold ${COLORS.neutralHeading} mb-1`}>
                             {currency(donation.amount)}
                           </div>
-                          <div className={`text-xs ${COLORS.neutralBody}`}>
+                          <div className={`text-xs ${COLORS.neutralBody} font-medium`}>
                             {donation.name}
                           </div>
-                          <div className={`text-xs ${COLORS.neutralBody} opacity-60 mt-1`}>
+                          <div className={`text-[10px] ${COLORS.neutralBody} opacity-70 mt-0.5 line-clamp-1 px-1`}>
+                            {donation.campaignName}
+                          </div>
+                          <div className={`text-[10px] ${COLORS.neutralBody} opacity-50 mt-1`}>
                             {timeAgo(donation.time)}
                           </div>
                         </div>

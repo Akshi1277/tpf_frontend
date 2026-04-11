@@ -447,7 +447,7 @@ export default function VolunteerRegister({ darkMode }) {
                             <p className={`text-sm ${darkMode ? 'text-zinc-500' : 'text-gray-600'}`}>
                                 "And cooperate in righteousness and piety."
                                 <br />
-                                <span className="text-[10px] mt-2 block uppercase text-gray-500 tracking-widest opacity-70">— Surah Al-Ma'idah 5:2</span>
+                                <span className="text-[10px] mt-2 block uppercase text-gray-500 tracking-widest opacity-70">— Surah Al-Ma'idah, 5:2 - Mafhoom</span>
                             </p>
                         </motion.div>
                     </div>

@@ -215,7 +215,7 @@ export default function ContactPage({ darkModeFromParent }) {
             <p className={`text-xs sm:text-sm ${
               darkMode ? "text-zinc-400" : "text-gray-600"
             }`}>
-              "Their affairs are decided through consultation" - Surah Ash-Shura (42:38)
+              "Their affairs are decided through consultation" - Surah Ash-Shura, 42:38 - Mafhoom
             </p>
           </div>
         </motion.div>

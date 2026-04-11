@@ -89,11 +89,11 @@ export default function Footer({ darkMode }) {
               }`}>
               <p className={`text-xs leading-relaxed mb-2.5 ${darkMode ? 'text-zinc-400' : 'text-gray-600'
                 }`}>
-                Every campaign we run, every family we help —{' '}
+                Every campaign & every family we support involves real costs —{' '}
                 <span className={`font-bold ${darkMode ? 'text-rose-400' : 'text-rose-600'}`}>
-                  it costs money to keep going.
-                </span>{' '}
-                Help us survive.
+                  salaries, transport, tools, & essential services.
+                </span>{' '} 
+              Help us keep going.
               </p>
               <Link
                 href="/expenses"
@@ -103,7 +103,7 @@ export default function Footer({ darkMode }) {
                   }`}
               >
                 <Heart className="w-3 h-3" fill="currentColor" />
-                Keep us running
+                Donate for our survival
               </Link>
             </div>
           </div>

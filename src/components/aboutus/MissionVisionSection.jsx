@@ -178,7 +178,7 @@ export default function MissionVisionSection({ darkMode }) {
               </p>
               
               <p className={`text-xs sm:text-sm mt-3 sm:mt-4 pl-8 sm:pl-10 ${darkMode ? 'text-zinc-500' : 'text-zinc-600'} font-medium`}>
-                — Surah Al-Insan, 76:8-9
+                — Surah Al-Insan, 76:8-9 - Mafhoom
               </p>
             </div>
 

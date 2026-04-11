@@ -665,7 +665,7 @@ export default function BlogPage() {
                   darkMode ? "text-zinc-600" : "text-gray-400"
                 }`}
               >
-                — Surah Al-Ma'idah 5:2
+                — Surah Al-Ma'idah, 5:2 - Mafhoom
               </div>
             </div>
           </div>

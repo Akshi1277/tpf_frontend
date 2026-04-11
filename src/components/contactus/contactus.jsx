@@ -730,7 +730,7 @@ export default function ContactPage({ darkMode }) {
                 }`}
             >
               <p className={`text-sm sm:text-base italic ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                "And lower your wing in humility to the believers." — Surah Al-Hijr (15:88)
+                "And lower your wing in humility to the believers." — Surah Al-Hijr, 15:88 - Mafhoom
               </p>
             </motion.div>
           </motion.div>

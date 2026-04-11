@@ -158,7 +158,7 @@ export default function LegalAidPage({ darkMode = false }) {
             }`}
           >
             <p className={`text-sm sm:text-base italic ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              "Stand out firmly for justice, as witnesses to Allah, even if it be against yourselves." — Surah An-Nisa (4:135)
+              "Stand out firmly for justice, as witnesses to Allah, even if it be against yourselves." — Surah An-Nisa, 4:135 - Mafhoom
             </p>
           </motion.div>
         </motion.div>

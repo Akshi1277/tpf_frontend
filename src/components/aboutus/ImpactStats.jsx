@@ -7,7 +7,7 @@ import { Users, TrendingUp, Globe, Heart } from 'lucide-react';
 export default function ImpactStats ({ darkMode }){
  const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  const [counts, setCounts] = useState({ donors: 0, raised: 0, countries: 0, campaigns: 0 });
+  const [counts, setCounts] = useState({ donors: 0, raised: 0, cases: 0, impacted: 0 });
 
   useEffect(() => {
     if (isInView) {
@@ -16,10 +16,10 @@ export default function ImpactStats ({ darkMode }){
       const interval = duration / steps;
 
       const finalValues = {
-        donors: 1500000,
-        raised: 500,
-        cities: 120,
-        campaigns: 25000,
+        donors: 10000,
+        raised: 50,
+        cases: 200,
+        impacted: 1000,
       };
 
       let step = 0;
@@ -29,8 +29,8 @@ export default function ImpactStats ({ darkMode }){
         setCounts({
           donors: Math.floor(finalValues.donors * progress),
           raised: Math.floor(finalValues.raised * progress),
-          cities: Math.floor(finalValues.countries * progress),
-          campaigns: Math.floor(finalValues.campaigns * progress),
+          cases: Math.floor(finalValues.cases * progress),
+          impacted: Math.floor(finalValues.impacted * progress),
         });
 
         if (step >= steps) {
@@ -50,7 +50,7 @@ export default function ImpactStats ({ darkMode }){
           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
         </svg>
       ),
-      value: `${(counts.donors / 1000000).toFixed(1)}M+`,
+      value: `${(counts.donors / 1000).toFixed(0)}K+`,
       label: 'Global Donors',
       color: 'from-teal-500 to-emerald-500',
     },
@@ -60,7 +60,7 @@ export default function ImpactStats ({ darkMode }){
           <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
         </svg>
       ),
-      value: `₹${counts.raised}M+`,
+      value: `₹${counts.raised} Lac+`,
       label: 'Total Raised',
       color: 'from-emerald-500 to-teal-500',
     },
@@ -70,8 +70,8 @@ export default function ImpactStats ({ darkMode }){
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
         </svg>
       ),
-      value: `${counts.cities}+`,
-      label: 'Cities Reached',
+      value: `${counts.cases}+`,
+      label: 'Total Cases handled',
       color: 'from-emerald-600 to-emerald-400',
     },
     {
@@ -80,7 +80,7 @@ export default function ImpactStats ({ darkMode }){
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       ),
-      value: `${(counts.campaigns / 1000).toFixed(0)}K+`,
+      value: `${counts.impacted}+`,
       label: 'Lives Impacted',
       color: 'from-emerald-600 to-emerald-400',
     },
