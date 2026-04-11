@@ -55,9 +55,9 @@ export default function MobileMenu({
   const regularMenuItems = [
     { name: 'My Profile', icon: User2Icon, isLucide: true, path: '/profile/userprofile' },
     { name: 'My Donations', icon: Heart, isLucide: true, path: '/profile/mydonation' },
-    { name: 'My Wishlist', icon: Plus, isLucide: true, path: '/profile/my-campaign' },
+    { name: 'My Wishlist', icon: Plus, isLucide: true, path: '/profile/my-campaign?tab=wishlist' },
     { name: 'Daily Givers', icon: Leaf, isLucide: true, path: '/permanent-donor/daily' },
-    { name: 'Zakat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' },
+    { name: 'My-Zakaat', icon: '/TPFAid-Icon-Zakat-1.svg', isLucide: false, path: '/zakat-calculator' },
   ];
 
   const organizationMenuItems = [
