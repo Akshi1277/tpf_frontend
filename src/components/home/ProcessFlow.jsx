@@ -1,91 +1,178 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, ShieldCheck, Users, Heart, CheckCircle, Lock, TrendingUp, HandHeart } from 'lucide-react';
+import { FileText, ShieldCheck, Users, Heart, CheckCircle, Lock, TrendingUp, HandHeart, Search, Smartphone, Share2, ClipboardCheck, Video, Eye, Info } from 'lucide-react';
 
 const TABS = [
   {
-    key: 'beneficiary',
-    heading: 'Beneficiaries',
-    eyebrow: 'Your path to support',
+    key: 'donor',
+    heading: 'For Donors',
+    eyebrow: 'Your path to impact',
+    illustration: '/donors_process.png',
     steps: [
-      { icon: FileText,    num: '01', title: 'Share Your Need',       description: 'Tell your story with honesty and hope. Every case is treated with compassion and full confidentiality.' },
-      { icon: ShieldCheck, num: '02', title: 'Reviewed with Amanah',  description: 'Our team carefully verifies each request to uphold trust, fairness, and complete transparency.' },
-      { icon: Users,       num: '03', title: 'Community Rallies',     description: 'Your campaign reaches a community united by compassion, shared purpose, and responsibility.' },
-      { icon: Heart,       num: '04', title: 'Received with Dignity', description: 'Funds arrive securely and respectfully, ensuring support reaches you with absolute integrity.' },
+      { 
+        icon: HandHeart, 
+        num: '01', 
+        title: 'Contribute with Heart', 
+        description: 'You donate your Sadaqah, Zakat, bank interest, or other contributions to causes that need it most.',
+        image: '/Donor/contributewithheart.png'
+      },
+      { 
+        icon: Search, 
+        num: '02', 
+        title: 'Case Verification', 
+        description: 'Every request goes through a strict, multi-level verification process to ensure 100% authenticity.',
+        image: '/Donor/caseverification.png'
+      },
+      { 
+        icon: ClipboardCheck, 
+        num: '03', 
+        title: 'Verified for You', 
+        description: 'Only genuine, vetted cases are approved and listed on our platform for you to support.',
+        image: '/Donor/verifiedforyou.png'
+      },
+      { 
+        icon: TrendingUp, 
+        num: '04', 
+        title: 'Direct Impact', 
+        description: 'Once a campaign reaches its target, the funds are transferred directly to the beneficiary.',
+        image: '/Donor/image copy 2.png',
+        cover: true
+      },
+      { 
+        icon: Video, 
+        num: '05', 
+        title: 'Confirmation Proof', 
+        description: 'A post or video is shared globally to confirm that help has been successfully delivered.',
+        image: '/Donor/confirmationproof.png'
+      },
+      { 
+        icon: Eye, 
+        num: '06', 
+        title: 'Total Transparency', 
+        description: 'We operate with complete honesty and open accountability at every single step of the journey.',
+        image: '/Donor/transparency.png'
+      },
     ],
   },
   {
-    key: 'donor',
-    heading: 'Donors',
-    eyebrow: 'Your path to impact',
+    key: 'beneficiary',
+    heading: 'For Beneficiaries',
+    eyebrow: 'Your path to support',
     steps: [
-      { icon: CheckCircle, num: '01', title: 'Causes Verified',     description: 'Every campaign is reviewed thoroughly — your amanah is protected before a single dirham moves.' },
-      { icon: Lock,        num: '02', title: 'Secured End-to-End',  description: 'Your donation flows through bank-grade security and ethical care at every single touchpoint.' },
-      { icon: HandHeart,   num: '03', title: 'Reaches Directly',    description: 'Your sadaqah lands without unnecessary intermediaries — maximum impact, minimum friction.' },
-      { icon: TrendingUp,  num: '04', title: 'Tracked Openly',      description: 'Follow every step. See exactly how your generosity transforms lives in real time.' },
+      { 
+        icon: FileText, 
+        num: '01', 
+        title: 'Start Your Journey', 
+        description: 'Register and submit your request to start a fundraiser in a simple and transparent way.',
+        image: '/Beneficiary/startyourjourney.png'
+      },
+      { 
+        icon: ShieldCheck, 
+        num: '02', 
+        title: 'Layered Review', 
+        description: 'Our team conducts a strict and multi-layer verification of your case to ensure full credibility.',
+        image: '/Beneficiary/layeredreview.png'
+      },
+      { 
+        icon: Smartphone, 
+        num: '03', 
+        title: 'Live Campaign', 
+        description: 'If found genuine, your campaign is launched on our platform to reach thousands of potential donors.',
+        image: '/Beneficiary/livecampaign.png'
+      },
+      { 
+        icon: Users, 
+        num: '04', 
+        title: 'Community Rallies', 
+        description: 'The TPF community and donors contribute to your campaign until the required goal is raised.',
+        image: '/Beneficiary/community.png'
+      },
+      { 
+        icon: Lock, 
+        num: '05', 
+        title: 'Funds Transferred', 
+        description: 'Once the target is achieved, the funds are securely transferred to you for the intended cause.',
+        image: '/Beneficiary/funds.png'
+      },
+      { 
+        icon: Share2, 
+        num: '06', 
+        title: 'Delivery Proof', 
+        description: 'After successful help delivery, a confirmation video/post is shared as proof for the community.',
+        image: '/Beneficiary/deliveryproof.png'
+      },
     ],
   },
 ];
 
 export default function ProcessFlowSection({ darkMode }) {
   const [activeIdx, setActiveIdx] = useState(0);
-  const [prevIdx, setPrevIdx]     = useState(0);
+  const [prevIdx, setPrevIdx] = useState(0);
 
   const handleSwitch = (i) => { setPrevIdx(activeIdx); setActiveIdx(i); };
   const dir = activeIdx >= prevIdx ? 1 : -1;
 
-  const { eyebrow, steps } = TABS[activeIdx];
+  const { eyebrow, steps, illustration, heading } = TABS[activeIdx];
 
   // ── theme tokens ──────────────────────────────────────────────────────────
-  const bg      = darkMode ? '#0f1a15' : '#ffffff';
-  const surface = darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(16,185,129,0.03)';
-  const text     = darkMode ? '#f0fdf4' : '#111827';
-  const muted    = darkMode ? 'rgba(240,253,244,0.45)' : '#6b7280';
-  const rule     = darkMode ? 'rgba(255,255,255,0.07)' : '#e5e7eb';
-  const ghostCol = darkMode ? 'rgba(52,211,153,0.09)' : 'rgba(16,185,129,0.08)';
-  const iconCol  = darkMode ? 'rgba(110,231,183,0.7)'  : '#059669';
+  const bg = darkMode ? '#0f1715' : '#ffffff';
+  const surface = darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(16,185,129,0.04)';
+  const text = darkMode ? '#f0fdf4' : '#111827';
+  const muted = darkMode ? 'rgba(240,253,244,0.45)' : '#6b7280';
+  const rule = darkMode ? 'rgba(255,255,255,0.07)' : '#e5e7eb';
+  const ghostCol = darkMode ? 'rgba(52,211,153,0.08)' : 'rgba(16,185,129,0.06)';
+  const iconCol = darkMode ? 'rgba(110,231,183,0.7)' : '#059669';
 
   return (
-    <section style={{ background: bg }} className="relative overflow-hidden py-8 lg:py-12">
+    <section style={{ background: bg }} className="relative overflow-hidden py-16 lg:py-24">
 
-      {/* Top emerald rule */}
-      <div className="absolute top-0 left-0 right-0 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, #10b981 40%, #34d399 60%, transparent)' }} />
+      {/* Background radial glow */}
+      <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[120px] opacity-20 pointer-events-none ${darkMode ? 'bg-emerald-900' : 'bg-emerald-100'}`}></div>
 
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 lg:px-10">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 relative z-10">
 
-        {/* ── HEADER ROW ─────────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-4 mb-7 lg:mb-9">
+        {/* ── HEADER & SWITCHER ───────────────────────────────────────────── */}
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
+              Process Flow
+            </span>
+          </motion.div>
+          
+          <h2 className={`text-3xl sm:text-5xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+            How it works
+          </h2>
+          <p className={`text-base max-w-2xl mb-10 ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            {activeIdx === 0 
+              ? "Your trust matters to us. Here’s how we ensure your donations are used responsibly and reach those in genuine need."
+              : "Start your fundraising journey with us in a simple, transparent way. We guide you through every step of receiving support."
+            }
+          </p>
 
-          {/* Left: label + eyebrow */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
-                How It Works
-              </span>
-            </div>
-            <AnimatePresence mode="wait">
-              <motion.p key={eyebrow}
-                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -3 }}
-                transition={{ duration: 0.22 }}
-                style={{ color: muted }} className="text-sm">
-                {eyebrow}
-              </motion.p>
-            </AnimatePresence>
-          </div>
-
-          {/* Right: tab switcher */}
-          <div className="flex items-baseline gap-6 sm:gap-8">
+          {/* Redesigned Tab Switcher */}
+          <div className={`flex p-1.5 rounded-2xl border ${darkMode ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'} shadow-sm relative w-full max-w-[400px]`}>
             {TABS.map((tab, i) => (
-              <button key={tab.key} onClick={() => handleSwitch(i)}
-                className="relative pb-1.5 outline-none text-2xl sm:text-3xl font-bold tracking-tight transition-colors duration-200"
-                style={{ color: i === activeIdx ? text : muted }}>
-                {tab.heading}
-                {i === activeIdx && (
-                  <motion.span layoutId="tab-underline"
-                    className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full bg-emerald-500"
-                    transition={{ type: 'spring', stiffness: 420, damping: 36 }} />
+              <button
+                key={tab.key}
+                onClick={() => handleSwitch(i)}
+                className={`relative flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300 z-10 ${
+                  activeIdx === i 
+                    ? (darkMode ? 'text-emerald-400' : 'text-emerald-700') 
+                    : (darkMode ? 'text-zinc-500' : 'text-zinc-600')
+                }`}
+              >
+                <span className="relative z-10">{tab.heading}</span>
+                {activeIdx === i && (
+                  <motion.div
+                    layoutId="active-pill"
+                    className={`absolute inset-0 rounded-xl shadow-lg ${darkMode ? 'bg-emerald-500/10' : 'bg-white'}`}
+                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                  />
                 )}
               </button>
             ))}
@@ -93,97 +180,116 @@ export default function ProcessFlowSection({ darkMode }) {
         </div>
 
         {/* ── STEPS GRID ─────────────────────────────────────────────────── */}
-        <AnimatePresence mode="wait" custom={dir}>
-          <motion.div key={activeIdx}
-            className="grid grid-cols-2 lg:grid-cols-4"
-            style={{ border: `1px solid ${rule}`, borderRadius: 16, overflow: 'hidden', background: surface }}>
-            {steps.map((step, i) => {
-              const Icon = step.icon;
-              const isLastRow   = i >= 2;
-              const isLastCol   = i % 4 === 3 || (i === steps.length - 1);
-              return (
-                <motion.div key={i}
-                  custom={dir}
-                  variants={{
-                    hidden:  { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0, transition: { duration: 0.45, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] } },
-                    exit:    { opacity: 0, transition: { duration: 0.12, delay: i * 0.02 } },
-                  }}
-                  initial="hidden" animate="visible" exit="exit"
-                  className="relative flex flex-col p-4 lg:p-5 overflow-hidden group cursor-default"
-                  style={{
-                    borderRight: i % 2 !== 1 ? `1px solid ${rule}` : 'none',      // mobile: 2 cols
-                    borderBottom: i < 2 ? `1px solid ${rule}` : 'none',
-                  }}>
-
-                  {/* Desktop: 4-col borders override */}
-                  <style>{`
-                    @media (min-width: 1024px) {
-                      .step-cell-${i} { 
-                        border-right: ${i < 3 ? `1px solid ${rule}` : 'none'} !important;
-                        border-bottom: none !important;
-                      }
-                    }
-                  `}</style>
-                  <div className={`step-cell-${i} contents`} />
-
-                  {/* Ghost numeral */}
-                  <span aria-hidden className="absolute -bottom-3 -right-1 select-none pointer-events-none leading-none"
-                    style={{ fontSize: 'clamp(80px, 10vw, 120px)', fontWeight: 800, color: ghostCol, lineHeight: 1, letterSpacing: '-0.04em' }}>
-                    {step.num}
-                  </span>
-
-                  {/* Top row: num + rule + icon */}
-                  <div className="relative z-10 flex items-center gap-3 mb-3">
-                    <span className="text-xs font-bold tracking-widest text-emerald-500">{step.num}</span>
-                    <div className="flex-1 h-px" style={{ background: rule }} />
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0
-                      ${darkMode ? 'bg-emerald-500/15' : 'bg-emerald-50'}`}>
-                      <Icon strokeWidth={1.75} className="w-3.5 h-3.5" style={{ color: iconCol }} />
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="relative z-10 text-sm lg:text-[15px] font-semibold mb-2 leading-snug"
-                    style={{ color: text }}>
-                    {step.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="relative z-10 text-xs leading-relaxed font-normal"
-                    style={{ color: muted }}>
-                    {step.description}
-                  </p>
-
-                  {/* Hover: emerald bottom sweep */}
+        <div className="relative">
+          {/* Subtle connecting line background for desktop */}
+          <div className="hidden lg:block absolute top-1/2 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent -translate-y-1/2"></div>
+          
+          <AnimatePresence mode="wait" custom={dir}>
+            <motion.div
+              key={activeIdx}
+              initial={{ opacity: 0, x: dir * 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: dir * -50 }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+            >
+              {steps.map((step, i) => {
+                const Icon = step.icon;
+                return (
                   <motion.div
-                    initial={{ scaleX: 0 }} whileHover={{ scaleX: 1 }}
-                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute bottom-0 left-0 right-0 h-[2px] origin-left"
-                    style={{ background: 'linear-gradient(90deg, #10b981, #34d399)' }} />
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </AnimatePresence>
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className={`relative p-8 lg:p-10 rounded-3xl border transition-all duration-500 hover:shadow-2xl overflow-hidden group ${
+                      darkMode 
+                        ? 'bg-zinc-900/40 border-zinc-800 hover:border-emerald-500/30' 
+                        : 'bg-white border-zinc-100 hover:border-emerald-500/30 shadow-xl shadow-zinc-200/50'
+                    }`}
+                  >
+                    {/* Step Number Decoration */}
+                    <div className="absolute top-6 right-8 text-5xl lg:text-6xl font-black opacity-[0.1] dark:opacity-[0.05] group-hover:opacity-[0.15] dark:group-hover:opacity-[0.1] transition-opacity duration-500 pointer-events-none z-20" style={{ color: iconCol }}>
+                      {step.num}
+                    </div>
 
-        {/* ── BOTTOM ROW ─────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between mt-5 pt-4"
-          style={{ borderTop: `1px solid ${rule}` }}>
-          <div className="flex gap-1.5">
-            {TABS.map((_, i) => (
-              <button key={i} onClick={() => handleSwitch(i)}
-                className="rounded-full transition-all duration-300"
-                style={{
-                  width: i === activeIdx ? 24 : 6,
-                  height: 6,
-                  background: i === activeIdx ? '#10b981' : (darkMode ? 'rgba(255,255,255,0.12)' : '#d1d5db'),
-                }} />
-            ))}
+                    {/* Icon */}
+                    <div className="relative z-10 flex items-center gap-4 mb-6">
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner transition-transform duration-500 group-hover:rotate-6
+                        ${darkMode ? 'bg-emerald-500/10' : 'bg-emerald-50'}`}>
+                        <Icon className="w-7 h-7" style={{ color: iconCol }} />
+                      </div>
+                    </div>
+
+                    {/* Main Graphic - Placed as full-opacity illustration, just like the reference */}
+                    {step.image && (
+                      <div className={`relative z-10 w-full h-40 sm:h-48 mb-6 rounded-2xl flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover:scale-105 ${darkMode ? 'bg-white shadow-inner' : 'bg-transparent'}`}>
+                        <img 
+                          src={step.image} 
+                          alt="" 
+                          className={`w-full h-full ${step.cover ? 'object-cover' : 'object-contain'} transition-all duration-500 ${darkMode ? 'mix-blend-multiply' : 'mix-blend-darken'}`} 
+                        />
+                      </div>
+                    )}
+
+                    {/* Title */}
+                    <h3 className={`relative z-10 text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+                      {step.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className={`relative z-10 text-sm leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                      {step.description}
+                    </p>
+
+                    {/* Hover Glow */}
+                    <div className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'}`}></div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* ── TRUST BANNER ────────────────────────────────────────────────── */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className={`mt-16 lg:mt-24 p-8 lg:p-12 rounded-[40px] relative overflow-hidden flex flex-col md:flex-row items-center gap-8 ${
+            darkMode 
+              ? 'bg-gradient-to-br from-emerald-900/20 to-zinc-900 border border-emerald-500/10' 
+              : 'bg-gradient-to-br from-emerald-50 to-white border border-emerald-100'
+          }`}
+        >
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 ${darkMode ? 'bg-emerald-500/20' : 'bg-white shadow-lg'}`}>
+            <Info className="w-8 h-8 text-emerald-600" />
           </div>
-          <span className="text-[11px] font-medium tracking-widest uppercase" style={{ color: muted }}>
-            {activeIdx + 1} / {TABS.length}
-          </span>
+          <div>
+            <h4 className={`text-xl font-bold mb-2 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+              Transparency & Trust
+            </h4>
+            <p className={`text-base lg:text-lg leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              We are committed to ensuring that every donation reaches the right person. From verification to fund transfer and final proof, every step is handled with honesty, accountability, and full transparency.
+            </p>
+          </div>
+          
+          {/* Decorative illustration backgroup */}
+          <div className="absolute right-0 top-0 w-64 h-full opacity-5 pointer-events-none">
+            <img src={illustration} alt="" className="w-full h-full object-contain grayscale" />
+          </div>
+        </motion.div>
+
+        {/* ── FOOTER PAGE INDICATOR ───────────────────────────────────────── */}
+        <div className="flex items-center justify-center mt-12 gap-1.5">
+          {TABS.map((_, i) => (
+            <button key={i} onClick={() => handleSwitch(i)}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width: i === activeIdx ? 32 : 8,
+                height: 8,
+                background: i === activeIdx ? '#10b981' : (darkMode ? 'rgba(255,255,255,0.1)' : '#d1d5db'),
+              }} />
+          ))}
         </div>
 
       </div>
