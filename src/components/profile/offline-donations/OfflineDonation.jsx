@@ -26,6 +26,7 @@ import {
   AlertCircle,
   Check,
   IndianRupee,
+  Smartphone,
 } from "lucide-react"
 import { useAppToast } from "@/app/AppToastContext"
 
@@ -73,6 +74,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
     remarks: "",
     donationType: "",
     campaignId: "",
+    upiId: "",
+    paymentApp: "",
   })
 
   useEffect(() => {
@@ -85,7 +88,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
     { id: "rtgs", name: "RTGS", icon: Building2, description: "Real Time Gross Settlement", color: "emerald" },
     { id: "imps", name: "IMPS", icon: CreditCard, description: "Immediate Payment Service", color: "blue" },
     { id: "neft", name: "NEFT", icon: Landmark, description: "National Electronic Funds Transfer", color: "purple" },
-    { id: "cheque", name: "CHEQUE", icon: FileText, description: "Bank Cheque Payment", color: "orange" }
+    { id: "cheque", name: "CHEQUE", icon: FileText, description: "Bank Cheque Payment", color: "orange" },
+    { id: "upi", name: "UPI", icon: Smartphone, description: "Unified Payments Interface", color: "teal" },
   ]
 
   const handleInputChange = (e) => {
@@ -127,6 +131,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
         chequeNumber: formData.chequeNumber,
         chequeDate: formData.chequeDate,
         branchName: formData.branchName,
+        upiId: formData.upiId,
+        paymentApp: formData.paymentApp,
       }
       console.log("Submitting donation:", payload);
 
@@ -315,6 +321,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                       donation.referenceNumber ||
                       donation.utrNumber ||
                       donation.chequeNumber ||
+                      donation.upiId ||
                       "--"
 
                     return (
@@ -529,6 +536,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                       selectedMethod.color === "emerald" ? "from-emerald-600 via-teal-600 to-emerald-700" :
                       selectedMethod.color === "blue" ? "from-blue-600 via-cyan-600 to-blue-700" :
                       selectedMethod.color === "purple" ? "from-purple-600 via-violet-600 to-purple-700" :
+                      selectedMethod.color === "teal" ? "from-teal-600 via-cyan-600 to-teal-700" :
                       "from-orange-600 via-amber-600 to-orange-700"
                     }`}>
                       <div className="absolute inset-0 opacity-20">
@@ -713,7 +721,67 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                          {selectedMethod.id !== "cheque" ? (
+                          {selectedMethod.id === "upi" ? (
+                            <>
+                              {/* UPI ID */}
+                              <div>
+                                <label className={labelClass}>
+                                  UPI ID <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                  <Hash className={iconClass} />
+                                  <input
+                                    type="text"
+                                    name="upiId"
+                                    value={formData.upiId}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. name@upi"
+                                    className={inputClass()}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Payment App */}
+                              <div>
+                                <label className={labelClass}>
+                                  Payment App
+                                </label>
+                                <div className="relative">
+                                  <Smartphone className={iconClass} />
+                                  <select
+                                    name="paymentApp"
+                                    value={formData.paymentApp}
+                                    onChange={handleInputChange}
+                                    className={selectClass()}
+                                  >
+                                    <option value="">Select payment app</option>
+                                    <option value="GooglePay">GooglePay</option>
+                                    <option value="PhonePe">PhonePe</option>
+                                    <option value="Paytm">Paytm</option>
+                                    <option value="BHIM">BHIM</option>
+                                    <option value="Other">Other</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              {/* Transaction Date */}
+                              <div>
+                                <label className={labelClass}>
+                                  Transaction Date <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                  <Calendar className={iconClass} />
+                                  <input
+                                    type="date"
+                                    name="transactionDate"
+                                    value={formData.transactionDate}
+                                    onChange={handleInputChange}
+                                    className={inputClass()}
+                                  />
+                                </div>
+                              </div>
+                            </>
+                          ) : selectedMethod.id !== "cheque" ? (
                             <>
                               {/* RTGS/IMPS/NEFT reference/UTR */}
                               <div>
