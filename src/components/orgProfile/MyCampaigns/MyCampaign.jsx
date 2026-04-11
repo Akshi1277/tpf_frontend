@@ -2,6 +2,7 @@
 import { useSelector } from "react-redux"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 import {
   Heart,
@@ -33,7 +34,10 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   const isOrganization = userInfo?.type === "organization"
 
   const [darkMode, setDarkMode] = useState(false)
-  const [activeTab, setActiveTab] = useState("my-campaigns")
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "my-campaigns");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
 
@@ -52,7 +56,11 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
   const applications = applicationsData?.data || [];
   const orgRequests = orgRequestsData?.requests || [];
   const approvedCampaigns = orgRequestsData?.approvedCampaigns || [];
-
+  useEffect(() => {
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [tabFromUrl]);
   const [toggleWishlist] = useToggleWishlistMutation();
   // Sync with parent dark mode
   useEffect(() => {
@@ -510,7 +518,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
               <button className={`p-1.5 sm:p-2 cursor-pointer rounded-full ${darkMode ? "bg-zinc-900/80" : "bg-white/80"
                 } backdrop-blur-sm hover:scale-110 transition-transform`}>
                 <Heart
-                  onClick={() => handleToggleWishlist(campaign._id)}
+                  // onClick={() => handleToggleWishlist(campaign._id)}
                   className="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 fill-rose-500" />
               </button>
             )}
