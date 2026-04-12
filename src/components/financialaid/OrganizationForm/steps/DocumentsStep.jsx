@@ -8,6 +8,7 @@ export default function DocumentsStep({
   formData, 
   handleInputChange, 
   removeFile,
+  removeOtherDocument,
   handleNext, 
   handleBack,
   darkMode 
@@ -296,6 +297,58 @@ export default function DocumentsStep({
           )}
         </div>
       )}
+
+      {/* Other Documents - Independent of type selection, available for both NGO and Non-NGO */}
+      <div className="mt-8 space-y-6">
+        <div className="pt-6 border-t" style={{ borderColor: darkMode ? "#3f3f46" : "#e4e4e7" }}>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+              Other Documents (Optional - Max 3)
+            </label>
+            <div className={`p-4 rounded-lg flex items-start gap-3 mb-4 ${
+              darkMode ? "bg-emerald-500/10 border border-emerald-500/20" : "bg-emerald-50 border border-emerald-200"
+            }`}>
+              <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${darkMode ? "text-emerald-400" : "text-emerald-600"}`} />
+              <p className={`text-sm ${darkMode ? "text-emerald-300" : "text-emerald-800"}`}>
+                More documents will increase your credibility and verification speed.
+              </p>
+            </div>
+            
+            {/* Upload Area */}
+            {formData.otherDocuments.length < 3 && (
+              <div className={`border-2 border-dashed rounded-lg p-6 mb-4 ${
+                darkMode ? "border-zinc-700 bg-zinc-800/50" : "border-zinc-300 bg-zinc-50"
+              }`}>
+                <label className="cursor-pointer flex flex-col items-center gap-2">
+                  <Upload className={`w-8 h-8 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+                  <span className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+                    Click to upload more documents
+                  </span>
+                  <input
+                    type="file"
+                    name="otherDocuments"
+                    multiple
+                    onChange={handleInputChange}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            )}
+            
+            {/* File Previews */}
+            <div className="grid grid-cols-1 gap-3">
+              {formData.otherDocuments.map((file, index) => (
+                <FilePreview 
+                  key={index}
+                  file={file} 
+                  darkMode={darkMode}
+                  onRemove={() => removeOtherDocument(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Navigation */}
       <div className="flex justify-between pt-6 mt-6">

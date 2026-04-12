@@ -286,15 +286,14 @@ export default function VoiceAssistant() {
     };
 
     const confirmClose = () => {
-        const byeMessage = "Assalamu Alaikum! It was a pleasure assisting you. Have a blessed day! Good bye.";
-        setHistory(prev => [...prev, { role: "assistant", text: byeMessage }]);
-        speak(byeMessage);
+        // Stop any ongoing speech immediately
+        if (synthesisRef.current) synthesisRef.current.cancel();
+        setIsSpeaking(false);
 
-        setTimeout(() => {
-            clearHistory();
-            setIsExpanded(false);
-            setShowCloseConfirm(false);
-        }, 3000);
+        // Close instantly — no goodbye audio, no delay
+        clearHistory();
+        setIsExpanded(false);
+        setShowCloseConfirm(false);
     };
 
     const startRecording = async () => {

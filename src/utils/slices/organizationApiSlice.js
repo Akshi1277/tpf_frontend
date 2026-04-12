@@ -145,6 +145,18 @@ export const organizationApiSlice = apiSlice.injectEndpoints({
       ],
     }),
 
+    submitOrganizationClarification: builder.mutation({
+      query: ({ id, formData }) => ({
+        url: `/organizations/${id}/clarify`,
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Organization", id },
+        "Organization",
+      ],
+    }),
+
     requestEdit: builder.mutation({
       query: ({ id, formData }) => ({
         url: `/organizations/${id}/request-edit`,
@@ -234,6 +246,7 @@ export const {
   useFetchOrganizationStatsQuery,
   useFetchOrganizationByIdQuery,
   useUpdateOrganizationMutation,
+  useSubmitOrganizationClarificationMutation,
   useRequestEditMutation,
   useUpdateVerificationStatusMutation,
   useDeleteOrganizationMutation,

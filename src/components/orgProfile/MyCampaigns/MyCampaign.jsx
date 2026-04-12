@@ -138,6 +138,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
 
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [clarificationComment, setClarificationComment] = useState("");
     const [uploadClarificationDocuments, { isLoading: isUploading }] = useUploadClarificationDocumentsMutation();
 
     const handleFileSelect = (e) => {
@@ -167,12 +168,15 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
     };
 
     const handleUpload = async () => {
-      if (selectedFiles.length === 0) return;
+      if (selectedFiles.length === 0 && !clarificationComment.trim()) return;
 
       const formData = new FormData();
       selectedFiles.forEach((file) => {
         formData.append('supportingDocuments', file);
       });
+      if (clarificationComment.trim()) {
+        formData.append('clarificationComment', clarificationComment);
+      }
 
       try {
         await uploadClarificationDocuments({
@@ -181,10 +185,11 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
         }).unwrap();
 
         setSelectedFiles([]);
-        alert('Documents uploaded successfully!');
+        setClarificationComment("");
+        alert('Clarification submitted successfully!');
       } catch (error) {
-        console.error('Upload failed:', error);
-        alert('Failed to upload documents. Please try again.');
+        console.error('Submission failed:', error);
+        alert('Failed to submit clarification. Please try again.');
       }
     };
 
@@ -223,12 +228,28 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             </div>
           )}
 
-          {/* Upload Section for Clarification */}
+          {/* Clarification Section */}
           {isClarification && (
-            <div className="mb-4">
-              <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
-                Upload Clarification Documents
-              </label>
+            <div className="mb-4 space-y-4">
+              <div className="space-y-2">
+                <label className={`block text-xs font-bold uppercase tracking-wider ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                  Your Response (Optional)
+                </label>
+                <textarea
+                  value={clarificationComment}
+                  onChange={(e) => setClarificationComment(e.target.value)}
+                  placeholder="Explain your case or clarify the issue..."
+                  className={`w-full p-3 rounded-lg text-sm resize-none focus:ring-2 focus:ring-emerald-500 outline-none transition-all ${
+                    darkMode ? "bg-zinc-900 text-white border-zinc-700" : "bg-gray-50 text-gray-900 border-gray-200"
+                  }`}
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                  Upload Documents (Optional)
+                </label>
 
               {/* Drag and Drop Area */}
               <div
@@ -287,17 +308,31 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
 
                   <button
                     onClick={handleUpload}
-                    disabled={isUploading}
-                    className={`w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all ${isUploading
+                    disabled={isUploading || (selectedFiles.length === 0 && !clarificationComment.trim())}
+                    className={`w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all ${isUploading || (selectedFiles.length === 0 && !clarificationComment.trim())
                       ? darkMode ? "bg-zinc-600 text-zinc-400 cursor-not-allowed" : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       : darkMode
                         ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
                         : "bg-emerald-500 text-white hover:bg-emerald-600"
                       }`}
                   >
-                    {isUploading ? "Uploading..." : "Upload Documents"}
+                    {isUploading ? "Submitting..." : "Submit Clarification"}
                   </button>
                 </div>
+              )}
+              {selectedFiles.length === 0 && (
+                 <button
+                    onClick={handleUpload}
+                    disabled={isUploading || !clarificationComment.trim()}
+                    className={`w-full mt-3 py-2 px-4 rounded-lg font-semibold text-sm transition-all ${isUploading || !clarificationComment.trim()
+                      ? darkMode ? "bg-zinc-600 text-zinc-400 cursor-not-allowed hidden" : "bg-gray-300 text-gray-500 cursor-not-allowed hidden"
+                      : darkMode
+                        ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                        : "bg-emerald-500 text-white hover:bg-emerald-600"
+                      }`}
+                  >
+                    {isUploading ? "Submitting..." : "Submit Clarification"}
+                  </button>
               )}
             </div>
           )}

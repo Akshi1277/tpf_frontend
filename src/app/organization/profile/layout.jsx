@@ -8,6 +8,7 @@ import OrgSidebar from "@/components/layout/OrgSidebar";
 import GlobalLoader from "@/components/GlobalLoader";
 import { useAppToast } from "@/app/AppToastContext";
 import { useState, useEffect, useRef } from "react";
+import ClarificationWrapper from "@/components/organization/ClarificationWrapper";
 
 export default function OrgLayout({ children }) {
   const { userInfo, authChecked } = useSelector((state) => state.auth);
@@ -67,7 +68,7 @@ export default function OrgLayout({ children }) {
         <main className="flex-1 w-full lg:w-auto overflow-x-hidden">
           {/* pass darkMode down through page → dashboard component */}
           <div className="w-full">
-            {children}
+            <ClarificationWrapper userInfo={userInfo} darkMode={darkMode} targetChildren={children} />
           </div>
         </main>
       </div>

@@ -194,7 +194,7 @@ export default function OrganizationProfileStep({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
-                Annual Revenue Range <span className="text-red-500">*</span>
+                Annual Turnover Range <span className="text-red-500">*</span>
               </label>
               <select
                 name="annualRevenue"
@@ -317,11 +317,12 @@ export default function OrganizationProfileStep({
         </h3>
         
         <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
               Organization Logo (Optional)
             </label>
-            <div className={`border-2 border-dashed rounded-lg p-6 ${
+            <div className={`border-2 border-dashed rounded-lg p-6 h-[160px] flex items-center justify-center ${
               darkMode ? "border-zinc-700 bg-zinc-800/50" : "border-zinc-300 bg-zinc-50"
             }`}>
               {formData.organizationLogo ? (
@@ -333,8 +334,8 @@ export default function OrganizationProfileStep({
               ) : (
                 <label className="cursor-pointer flex flex-col items-center gap-2">
                   <Upload className={`w-8 h-8 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
-                  <span className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
-                    Click to upload logo (PNG, JPG - Max 2MB)
+                  <span className={`text-sm text-center ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+                    Click to upload logo<br/><span className="text-[10px]">(PNG, JPG - Max 2MB)</span>
                   </span>
                   <input
                     type="file"
@@ -347,6 +348,38 @@ export default function OrganizationProfileStep({
               )}
             </div>
           </div>
+
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+              Organization Cover Photo (Optional)
+            </label>
+            <div className={`border-2 border-dashed rounded-lg p-6 h-[160px] flex items-center justify-center ${
+              darkMode ? "border-zinc-700 bg-zinc-800/50" : "border-zinc-300 bg-zinc-50"
+            }`}>
+              {formData.organizationCover ? (
+                <FilePreview 
+                  file={formData.organizationCover} 
+                  darkMode={darkMode}
+                  onRemove={() => removeFile("organizationCover")}
+                />
+              ) : (
+                <label className="cursor-pointer flex flex-col items-center gap-2 text-center">
+                  <Upload className={`w-8 h-8 ${darkMode ? "text-zinc-500" : "text-zinc-400"}`} />
+                  <span className={`text-sm ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+                    Click to upload cover photo<br/><span className="text-[10px]">(PNG, JPG - Max 5MB)</span>
+                  </span>
+                  <input
+                    type="file"
+                    name="organizationCover"
+                    onChange={handleInputChange}
+                    accept=".png,.jpg,.jpeg"
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+        </div>
 
           <div>
   <label

@@ -16,7 +16,7 @@ import ReviewSubmitStep from "./steps/ReviewSubmitStep"
 import ProgressBar from "./components/ProgressBar"
 import SuccessMessage from "./components/SuccessMessage"
 
-export default function OrganizationRegistrationPage({ darkModeFromParent }) {
+export default function OrganizationRegistrationPage({ darkModeFromParent, isClarification = false, initialData = null, onClarifySubmit = null }) {
   const router = useRouter()
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [registerOrganization, { isLoading }] = useRegisterOrganizationMutation()
@@ -28,6 +28,12 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
       setDarkMode(darkModeFromParent)
     }
   }, [darkModeFromParent])
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({ ...prev, ...initialData }))
+    }
+  }, [initialData])
 
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
@@ -90,7 +96,10 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     
     // Common optional fields
     organizationLogo: null,
+    organizationCover: null,
     organizationDescription: "",
+
+    otherDocuments: [], // Array of files
 
     termsAccepted: false,
   })
@@ -99,16 +108,32 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
     const { name, value, type } = e.target
 
     if (type === "file") {
-      setFormData(prev => ({
-        ...prev,
-        [name]: e.target.files[0]
-      }))
+      if (name === "otherDocuments") {
+        const files = Array.from(e.target.files)
+        setFormData(prev => ({
+          ...prev,
+          otherDocuments: [...(prev.otherDocuments || []), ...files].slice(0, 3)
+        }))
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: e.target.files[0]
+        }))
+      }
     } else {
       setFormData(prev => ({
         ...prev,
         [name]: value
       }))
     }
+  }
+
+
+  const removeOtherDocument = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      otherDocuments: prev.otherDocuments.filter((_, i) => i !== index)
+    }))
   }
 
   const handleCheckboxChange = (name, value) => {
@@ -223,6 +248,18 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
         }
       })
 
+      if (isClarification && onClarifySubmit) {
+        await onClarifySubmit(formDataToSend)
+        setShowSuccessMessage(true)
+        showToast({
+          type: "success",
+          title: "Clarification Submitted",
+          message: "Your application is back under review.",
+          duration: 3000,
+        })
+        return
+      }
+
       const response = await registerOrganization(formDataToSend).unwrap()
 
       setShowSuccessMessage(true)
@@ -312,6 +349,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent }) {
                 formData={formData}
                 handleInputChange={handleInputChange}
                 removeFile={removeFile}
+                removeOtherDocument={removeOtherDocument}
                 handleNext={handleNext}
                 handleBack={handleBack}
                 darkMode={darkMode}
