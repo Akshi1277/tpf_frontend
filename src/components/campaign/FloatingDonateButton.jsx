@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 
-export default function FloatingDonateButton({ darkMode, onClick, isModalOpen }) {
+export default function FloatingDonateButton({ darkMode, onClick, isModalOpen, isCompleted }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
 
@@ -35,6 +35,8 @@ export default function FloatingDonateButton({ darkMode, onClick, isModalOpen })
       observer.disconnect();
     };
   }, []);
+
+  if (isCompleted) return null;
 
   return (
     <AnimatePresence>

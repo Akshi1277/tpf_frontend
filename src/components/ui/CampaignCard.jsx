@@ -12,7 +12,7 @@ import { useToggleWishlistMutation } from '@/utils/slices/authApiSlice';
 import { useSelector } from 'react-redux';
 import { getMediaUrl } from '@/utils/media';
 
-export default function CampaignCard({ campaign, darkMode }) {
+export default function CampaignCard({ campaign, darkMode, isCompleted = false }) {
 
   const progress = campaign.requiredAmount
     ? Math.min(
@@ -141,11 +141,21 @@ export default function CampaignCard({ campaign, darkMode }) {
           </span>
         </div>
 
-        <Link href={`/campaign/${campaign.slug}`} prefetch className="w-full block">
-          <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
-            Donate Now
+        {isCompleted ? (
+          <button
+            disabled
+            className="w-full bg-zinc-200 text-zinc-500 py-2 rounded-lg font-medium text-base sm:text-lg mb-3 sm:mb-4 cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <CheckCircle className="w-4 h-4 text-emerald-500" />
+            Goal Achieved
           </button>
-        </Link>
+        ) : (
+          <Link href={`/campaign/${campaign.slug}`} prefetch className="w-full block">
+            <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-base sm:text-lg transition-colors mb-3 sm:mb-4 cursor-pointer">
+              Donate Now
+            </button>
+          </Link>
+        )}
 
         <div className={`flex items-center justify-between pt-3 sm:pt-4 border-t ${border}`}>
           <div className="flex items-center gap-3 sm:gap-4">
@@ -213,7 +223,11 @@ export default function CampaignCard({ campaign, darkMode }) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/80" />
 
         {/* Badges */}
-        {campaign.urgent && (
+        {isCompleted ? (
+          <div className="absolute top-3 left-3 z-20 bg-emerald-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit flex items-center gap-1">
+            <CheckCircle className="w-3 h-3" /> Completed
+          </div>
+        ) : campaign.urgent && (
           <div className="absolute top-3 left-3 z-20 bg-red-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit">
             Urgent
           </div>
@@ -251,7 +265,11 @@ export default function CampaignCard({ campaign, darkMode }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
-        {campaign.urgent && (
+        {isCompleted ? (
+          <div className="absolute top-3 left-3 bg-emerald-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit flex items-center gap-1">
+            <CheckCircle className="w-3 h-3" /> Completed
+          </div>
+        ) : campaign.urgent && (
           <div className="absolute top-3 left-3 bg-red-600 text-white px-2.5 py-1 rounded-full text-[10px] font-semibold w-fit">
             Urgent
           </div>

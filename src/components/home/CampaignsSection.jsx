@@ -28,32 +28,36 @@ export default function CampaignsSection({ darkMode }) {
   const activeCampaigns = useMemo(() => {
     if (!Array.isArray(cms)) return [];
 
-    return cms
-      .filter(
-        (item) =>
-          item.type === 'fundraiser' &&
-          item.campaignStatus === 'ACTIVE' &&
-          typeof item.campaignSlug === 'string' &&
-          item.campaignSlug.trim().length > 0
-      )
-      .sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      )
-      .map((campaign) => ({
-        ...campaign,
-        image: campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : null,
-        video: campaign.videoUrl ? getMediaUrl(campaign.videoUrl) : null,
-        raised: Number(campaign.raisedAmount || 0),
-        goal: Number(campaign.requiredAmount || campaign.goal || 0),
-        org: campaign.organization || '',
-        urgent: Boolean(campaign.isUrgent),
-        taxBenefit: Boolean(campaign.taxBenefits),
-        validityDate: campaign.deadline ? calcDaysLeft(campaign.deadline) : null,
-        zakatVerified: Boolean(campaign.zakatVerified),
-        slug: campaign.campaignSlug,
-        source: campaign.source,
-        fundsDisbursed: Number(campaign.fundsDisbursed || 0),
-      }));
+    const mapCampaign = (campaign) => ({
+      ...campaign,
+      image: campaign.imageUrl ? getMediaUrl(campaign.imageUrl) : null,
+      video: campaign.videoUrl ? getMediaUrl(campaign.videoUrl) : null,
+      raised: Number(campaign.raisedAmount || 0),
+      goal: Number(campaign.requiredAmount || campaign.goal || 0),
+      org: campaign.organization || '',
+      urgent: Boolean(campaign.isUrgent),
+      taxBenefit: Boolean(campaign.taxBenefits),
+      validityDate: campaign.deadline ? calcDaysLeft(campaign.deadline) : null,
+      zakatVerified: Boolean(campaign.zakatVerified),
+      slug: campaign.campaignSlug,
+      source: campaign.source,
+      fundsDisbursed: Number(campaign.fundsDisbursed || 0),
+    });
+
+    const isValidSlug = (item) =>
+      typeof item.campaignSlug === 'string' && item.campaignSlug.trim().length > 0;
+
+    const active = cms
+      .filter((item) => item.type === 'fundraiser' && item.campaignStatus === 'ACTIVE' && isValidSlug(item))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map((c) => ({ ...mapCampaign(c), isCompleted: false }));
+
+    const completed = cms
+      .filter((item) => item.type === 'fundraiser' && item.campaignStatus === 'COMPLETED' && isValidSlug(item))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map((c) => ({ ...mapCampaign(c), isCompleted: true }));
+
+    return [...active, ...completed];
   }, [cms]);
 
   /* --------------------------------
@@ -145,7 +149,11 @@ const filteredCampaigns = useMemo(() => {
                   key={campaign._id}
                   className="flex-shrink-0 w-[280px] sm:w-[285px] flex"
                 >
-                  <CampaignCard campaign={campaign} darkMode={darkMode} />
+                  <CampaignCard
+                    campaign={campaign}
+                    darkMode={darkMode}
+                    isCompleted={campaign.isCompleted}
+                  />
                 </div>
               ))}
             </div>

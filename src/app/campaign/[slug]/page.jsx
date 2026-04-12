@@ -33,7 +33,7 @@ export default function CampaignPage() {
   });
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !data?.campaign || data.campaign.campaignStatus === "COMPLETED") return;
 
     const MAX_AUTO_OPENS = 4;
     const storageKey = "donate_popup_count";
@@ -60,8 +60,10 @@ export default function CampaignPage() {
   }
 
   const campaign = data.campaign;
+  const isCompleted = campaign.campaignStatus === "COMPLETED";
 
   const handleDonateClick = () => {
+    if (isCompleted) return;
     setIsFloatingModalOpen(true);
   };
 
@@ -101,6 +103,7 @@ export default function CampaignPage() {
           campaign={campaign}
           darkMode={darkMode}
           onDonateClick={handleDonateClick}
+          isCompleted={isCompleted}
         />
       </div>
 
@@ -114,6 +117,7 @@ export default function CampaignPage() {
             onDonateClick={handleDonateClick}
             isDonorModalOpen={isDonorModalOpen}
             setIsDonorModalOpen={setIsDonorModalOpen}
+            isCompleted={isCompleted}
           />
         </div>
 
@@ -135,6 +139,7 @@ export default function CampaignPage() {
               allowedDonationTypes={campaign.allowedDonationTypes}
               unitConfig={campaign.unitConfig}
               darkMode={darkMode}
+              isCompleted={isCompleted}
             />
           </div>
         </div>
@@ -171,10 +176,11 @@ export default function CampaignPage() {
         darkMode={darkMode}
         onClick={() => setIsFloatingModalOpen(true)}
         isModalOpen={isFloatingModalOpen || isDonorModalOpen}
+        isCompleted={isCompleted}
       />
 
       <DonatePopUpModal
-        isOpen={isFloatingModalOpen}
+        isOpen={isFloatingModalOpen && !isCompleted}
         onClose={() => setIsFloatingModalOpen(false)}
         darkMode={darkMode}
         campaignId={campaign._id}

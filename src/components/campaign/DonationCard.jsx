@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { Heart, Lock, Info, Check, AlertCircle, Sparkles, ShieldCheck, User, Mail, Phone, Moon, Coins, Gift, Star, HandHeart } from 'lucide-react';
+import { Heart, Lock, Info, Check, AlertCircle, Sparkles, ShieldCheck, User, Mail, Phone, Moon, Coins, Gift, Star, HandHeart, CheckCircle } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useAppToast } from '@/app/AppToastContext';
 import { useSoftSignupMutation } from '@/utils/slices/authApiSlice';
@@ -36,6 +36,7 @@ export default function DonationCard({
   imdadEligible = true,
   allowedDonationTypes = [],
   unitConfig = null,
+  isCompleted = false,
 }) {
   /* ── Amount state ─────────────────────────────────────────────────────── */
   const [selectedAmount, setSelectedAmount] = useState(100);
@@ -278,7 +279,7 @@ export default function DonationCard({
   /* ── Render ───────────────────────────────────────────────────────────── */
   return (
     <>
-      <div className={`${dk ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'} border-2 rounded-xl p-5 sm:p-8`}>
+      <div className={`${dk ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-100'} border-2 rounded-xl p-5 sm:p-8 ${isCompleted ? 'opacity-75' : ''}`}>
 
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-dashed" style={{ borderColor: dk ? '#27272a' : '#f3f4f6' }}>
@@ -490,40 +491,51 @@ export default function DonationCard({
         </div>
 
         {/* ── Donate Button ─────────────────────────────────────────────── */}
-        <button
-          onClick={handleDonate}
-          disabled={isDonating || baseAmount < 50}
-          className={`
-            w-full h-14 rounded-lg font-bold text-base mb-4 transition-all
+        {isCompleted ? (
+          <div className={`
+            w-full h-14 rounded-lg font-bold text-base mb-4
             flex items-center justify-center gap-2
-            ${isDonating
-              ? 'bg-emerald-600 text-white cursor-wait'
-              : baseAmount >= 50
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.99] text-white shadow-lg shadow-emerald-600/20'
-                : dk
-                  ? 'bg-zinc-800 text-gray-600 cursor-not-allowed border border-zinc-700'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
-          `}
-        >
-          {isDonating ? (
-            <>
-              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z" />
-              </svg>
-              Processing Donation…
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-5 h-5" />
-              {baseAmount === 0
-                ? 'Enter Amount to Continue'
-                : baseAmount < 50
-                  ? 'Minimum ₹50 to Donate'
-                  : `Donate ₹${totalAmount.toLocaleString()}`}
-            </>
-          )}
-        </button>
+            bg-zinc-100 text-zinc-500 border border-zinc-200
+          `}>
+            <CheckCircle className="w-5 h-5 text-emerald-500" />
+            Goal Achieved
+          </div>
+        ) : (
+          <button
+            onClick={handleDonate}
+            disabled={isDonating || baseAmount < 50}
+            className={`
+              w-full h-14 rounded-lg font-bold text-base mb-4 transition-all
+              flex items-center justify-center gap-2
+              ${isDonating
+                ? 'bg-emerald-600 text-white cursor-wait'
+                : baseAmount >= 50
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.99] text-white shadow-lg shadow-emerald-600/20'
+                  : dk
+                    ? 'bg-zinc-800 text-gray-600 cursor-not-allowed border border-zinc-700'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
+            `}
+          >
+            {isDonating ? (
+              <>
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z" />
+                </svg>
+                Processing Donation…
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5" />
+                {baseAmount === 0
+                  ? 'Enter Amount to Continue'
+                  : baseAmount < 50
+                    ? 'Minimum ₹50 to Donate'
+                    : `Donate ₹${totalAmount.toLocaleString()}`}
+              </>
+            )}
+          </button>
+        )}
 
         {/* Secure badge */}
         <div className={`flex items-center justify-center gap-1.5 mb-6 ${dk ? 'text-zinc-600' : 'text-gray-400'}`}>

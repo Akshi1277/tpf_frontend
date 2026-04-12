@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { getMediaUrl } from "@/utils/media";
 import { useState, useEffect } from "react";
-import { Heart } from "lucide-react";
+import { Heart, CheckCircle } from "lucide-react";
 import DonateModal from "./DonateModal";
 import DonatePopUpModal from "./DonateModal";
 
-export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
+export default function CampaignHero({ campaign, darkMode, onDonateClick, isCompleted }) {
   if (!campaign) return null;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -76,7 +76,11 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-10">
           {/* BADGES */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            {campaign.isUrgent && (
+            {isCompleted ? (
+              <span className="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-semibold flex items-center gap-1">
+                <CheckCircle className="w-3.5 h-3.5" /> Completed
+              </span>
+            ) : campaign.isUrgent && (
               <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-semibold">
                 Urgent
               </span>
@@ -106,15 +110,22 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick }) {
           </p>
 
           {/* DONATE BUTTON */}
-          <motion.button
-            onClick={onDonateClick}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/50 transition-all"
-          >
-            <Heart className="w-5 h-5" fill="currentColor" />
-            Donate Now
-          </motion.button>
+          {isCompleted ? (
+            <div className="inline-flex items-center gap-2 px-8 py-3 bg-zinc-200/20 backdrop-blur-md border border-white/30 text-white font-bold rounded-xl shadow-lg">
+              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              Goal Achieved
+            </div>
+          ) : (
+            <motion.button
+              onClick={onDonateClick}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/50 transition-all"
+            >
+              <Heart className="w-5 h-5" fill="currentColor" />
+              Donate Now
+            </motion.button>
+          )}
         </div>
       </motion.div>
     </>

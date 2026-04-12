@@ -38,15 +38,20 @@ export default function AllCampaignsPage() {
     const validFundraisers = useMemo(() => {
         if (!Array.isArray(cms)) return [];
 
-        return cms
-            .filter(
-                (item) =>
-                    item.type === "fundraiser" &&
-                    item.campaignStatus === "ACTIVE" &&
-                    typeof item.campaignSlug === "string" &&
-                    item.campaignSlug.trim().length > 0
-            )
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const isValidSlug = (item) =>
+            typeof item.campaignSlug === 'string' && item.campaignSlug.trim().length > 0;
+
+        const active = cms
+            .filter((item) => item.type === 'fundraiser' && item.campaignStatus === 'ACTIVE' && isValidSlug(item))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map((c) => ({ ...c, isCompleted: false }));
+
+        const completed = cms
+            .filter((item) => item.type === 'fundraiser' && item.campaignStatus === 'COMPLETED' && isValidSlug(item))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map((c) => ({ ...c, isCompleted: true }));
+
+        return [...active, ...completed];
     }, [cms]);
 
     // Dynamic categories extracted from valid fundraisers
@@ -158,6 +163,7 @@ export default function AllCampaignsPage() {
                                         slug: campaign.campaignSlug,
                                     }}
                                     darkMode={darkMode}
+                                    isCompleted={campaign.isCompleted}
                                 />
                             </div>
                         </div>

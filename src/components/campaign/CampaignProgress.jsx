@@ -8,7 +8,8 @@ import {
   Heart,
   ArrowRight,
   TrendingUp as TrendingUpIcon,
-  X
+  X,
+  CheckCircle
 } from "lucide-react";
 import { useState } from "react";
 import Image from 'next/image';
@@ -22,7 +23,7 @@ import { FiShare2 } from "react-icons/fi";
 import DonorListModal from "./DonorListModal";
 import { useFetchCampaignDonorsQuery } from "@/utils/slices/donationApiSlice";
 
-export default function CampaignProgress({ darkMode, campaign, onDonateClick, isDonorModalOpen, setIsDonorModalOpen }) {
+export default function CampaignProgress({ darkMode, campaign, onDonateClick, isDonorModalOpen, setIsDonorModalOpen, isCompleted }) {
   const [openShare, setOpenShare] = useState(false);
 
   const router = useRouter();
@@ -202,7 +203,22 @@ export default function CampaignProgress({ darkMode, campaign, onDonateClick, is
               </div>
 
               {/* Motivational message */}
-              {percentage < 100 && (
+              {isCompleted ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className={`mt-4 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-l-4 border-emerald-500 ${darkMode
+                    ? "bg-gradient-to-r from-emerald-500/20 to-transparent text-gray-100"
+                    : "bg-gradient-to-r from-emerald-50 to-transparent text-gray-800"
+                    }`}
+                >
+                  <p className="text-xs sm:text-sm font-bold flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                    Target achieved! Thank you for your support.
+                  </p>
+                </motion.div>
+              ) : percentage < 100 && (
                 <motion.div
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -228,43 +244,56 @@ export default function CampaignProgress({ darkMode, campaign, onDonateClick, is
             />
 
             {/* DONATE NOW BUTTON - Updated Design */}
-            <motion.button
-              onClick={onDonateClick}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`
+            {isCompleted ? (
+              <div className={`
                 w-full sm:w-auto mb-6
-                group relative overflow-hidden
                 px-5 sm:px-8 py-3 sm:py-3.5
-                bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500
-                text-white font-bold text-sm sm:text-base
-                rounded-xl
-                shadow-lg shadow-emerald-500/30
-                hover:shadow-xl hover:shadow-emerald-500/40
-                transition-all duration-300
-                flex items-center justify-center gap-2
-              `}
-            >
-              {/* Shine effect */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{ x: ["-200%", "200%"] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              />
-
-              {/* Button content */}
-              <div className="relative flex items-center gap-2.5">
-                <Heart className="w-5 h-5 sm:w-5 sm:h-5" fill="currentColor" />
-                <span>Donate Now</span>
-                <motion.div
-                  className="flex items-center"
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </motion.div>
+                bg-zinc-100 border border-zinc-200
+                text-zinc-500 font-bold text-sm sm:text-base
+                rounded-xl flex items-center justify-center gap-2
+              `}>
+                <CheckCircle className="w-5 h-5 text-emerald-500" />
+                <span>Goal Achieved</span>
               </div>
-            </motion.button>
+            ) : (
+              <motion.button
+                onClick={onDonateClick}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`
+                  w-full sm:w-auto mb-6
+                  group relative overflow-hidden
+                  px-5 sm:px-8 py-3 sm:py-3.5
+                  bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500
+                  text-white font-bold text-sm sm:text-base
+                  rounded-xl
+                  shadow-lg shadow-emerald-500/30
+                  hover:shadow-xl hover:shadow-emerald-500/40
+                  transition-all duration-300
+                  flex items-center justify-center gap-2
+                `}
+              >
+                {/* Shine effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ["-200%", "200%"] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                />
+
+                {/* Button content */}
+                <div className="relative flex items-center gap-2.5">
+                  <Heart className="w-5 h-5 sm:w-5 sm:h-5" fill="currentColor" />
+                  <span>Donate Now</span>
+                  <motion.div
+                    className="flex items-center"
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </motion.div>
+                </div>
+              </motion.button>
+            )}
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-1 sm:gap-3">
