@@ -334,6 +334,7 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
                     {isUploading ? "Submitting..." : "Submit Clarification"}
                   </button>
               )}
+              </div>
             </div>
           )}
         </div>
