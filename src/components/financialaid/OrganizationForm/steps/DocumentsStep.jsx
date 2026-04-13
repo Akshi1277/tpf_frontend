@@ -348,7 +348,6 @@ export default function DocumentsStep({
             </div>
           </div>
         </div>
-      </div>
 
       {/* Navigation */}
       <div className="flex justify-between pt-6 mt-6">
