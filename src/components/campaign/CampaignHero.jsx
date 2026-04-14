@@ -112,8 +112,11 @@ export default function CampaignHero({ campaign, darkMode, onDonateClick, isComp
           {/* DONATE BUTTON */}
           {isCompleted ? (
             <div className="inline-flex items-center gap-2 px-8 py-3 bg-zinc-200/20 backdrop-blur-md border border-white/30 text-white font-bold rounded-xl shadow-lg">
-              <CheckCircle className="w-5 h-5 text-emerald-400" />
-              Goal Achieved
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0">
+                <rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M7 10h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              Not accepting payments
             </div>
           ) : (
             <motion.button

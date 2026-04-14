@@ -31,6 +31,7 @@ import {
 import { useAppToast } from "@/app/AppToastContext"
 
 export default function OfflineDonationsPage({ darkModeFromParent }) {
+  const userInfo = useSelector((state) => state.auth?.userInfo || null);
   const [darkMode, setDarkMode] = useState(false)
   const [view, setView] = useState("list")
   const [selectedMethod, setSelectedMethod] = useState(null)
@@ -93,9 +94,29 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
   ]
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+
+    if (name === "phone") {
+      const numericValue = value.replace(/\D/g, "");
+      setFormData(prev => ({ ...prev, phone: numericValue }));
+    } else if (name === "donorName") {
+      const cleanedValue = value.replace(/[^a-zA-Z\s]/g, ""); // only letters + space
+      setFormData(prev => ({ ...prev, donorName: cleanedValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      setFormData(prev => ({
+        ...prev,
+        donorName: userInfo.fullName || "",
+        email: userInfo.email || "",
+        phone: userInfo.mobileNo || "",
+      }));
+    }
+  }, [userInfo]);
 
   const handleMethodSelect = (method) => {
     setSelectedMethod(method)
@@ -177,22 +198,20 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
   // Shared select className — NO appearance-none so native mobile dropdown works
   const selectClass = (extra = "") =>
-    `w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
-      darkMode
-        ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
-        : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
+    `w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${darkMode
+      ? "bg-zinc-800/50 border-zinc-700 text-white focus:border-emerald-500"
+      : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500"
     } ${extra}`
 
   // Shared text input className
   const inputClass = (hasError = false) =>
-    `w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${
-      hasError
-        ? darkMode
-          ? "bg-red-500/5 border-red-500 text-white focus:border-red-500"
-          : "bg-red-50 border-red-500 text-gray-900 focus:border-red-500"
-        : darkMode
-          ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-          : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+    `w-full pl-12 pr-4 py-3 rounded-xl border-2 outline-none transition-all ${hasError
+      ? darkMode
+        ? "bg-red-500/5 border-red-500 text-white focus:border-red-500"
+        : "bg-red-50 border-red-500 text-gray-900 focus:border-red-500"
+      : darkMode
+        ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+        : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
     }`
 
   const iconClass = `absolute left-4 top-3.5 w-5 h-5 ${darkMode ? "text-zinc-500" : "text-gray-400"}`
@@ -212,11 +231,10 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm ${
-              darkMode
-                ? "bg-zinc-900 border border-emerald-500/20"
-                : "bg-white border border-emerald-200"
-            }`}
+            className={`fixed top-4 right-4 sm:top-6 sm:right-6 z-50 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl max-w-[calc(100vw-2rem)] sm:max-w-sm ${darkMode
+              ? "bg-zinc-900 border border-emerald-500/20"
+              : "bg-white border border-emerald-200"
+              }`}
           >
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -237,12 +255,10 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
 
       {/* BACKGROUND */}
       <div className="absolute inset-y-0 left-0 right-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${
-          darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
-        }`} />
-        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${
-          darkMode ? "bg-teal-950/20" : "bg-teal-50"
-        }`} />
+        <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] ${darkMode ? "bg-emerald-950/20" : "bg-emerald-50"
+          }`} />
+        <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] ${darkMode ? "bg-teal-950/20" : "bg-teal-50"
+          }`} />
       </div>
 
       {/* Main Content */}
@@ -286,11 +302,10 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                 }}
               >
                 <div className="flex items-center justify-center gap-3">
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
-                    darkMode
-                      ? "bg-emerald-950/50 group-hover:bg-emerald-900/50"
-                      : "bg-emerald-50 group-hover:bg-emerald-100"
-                  }`}>
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${darkMode
+                    ? "bg-emerald-950/50 group-hover:bg-emerald-900/50"
+                    : "bg-emerald-50 group-hover:bg-emerald-100"
+                    }`}>
                     <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
                   </div>
                   <div className="text-left">
@@ -330,18 +345,16 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`p-4 sm:p-6 rounded-2xl border ${
-                          darkMode
-                            ? "bg-zinc-900/50 border-zinc-800"
-                            : "bg-white border-gray-200 shadow-sm"
-                        }`}
+                        className={`p-4 sm:p-6 rounded-2xl border ${darkMode
+                          ? "bg-zinc-900/50 border-zinc-800"
+                          : "bg-white border-gray-200 shadow-sm"
+                          }`}
                       >
                         {/* Card header */}
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                              darkMode ? "bg-emerald-950/50" : "bg-emerald-50"
-                            }`}>
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${darkMode ? "bg-emerald-950/50" : "bg-emerald-50"
+                              }`}>
                               {(() => {
                                 const m = paymentMethods.find(m => m.name === donation.method)
                                 if (!m) return null
@@ -373,11 +386,10 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                                 <p className={`text-xs uppercase tracking-wide ${darkMode ? "text-zinc-500" : "text-gray-400"}`}>
                                   Remarks
                                 </p>
-                                <p className={`text-xs sm:text-sm leading-snug ${
-                                  donation.status === "rejected"
-                                    ? darkMode ? "text-red-400" : "text-red-600"
-                                    : darkMode ? "text-zinc-300" : "text-gray-700"
-                                }`}>
+                                <p className={`text-xs sm:text-sm leading-snug ${donation.status === "rejected"
+                                  ? darkMode ? "text-red-400" : "text-red-600"
+                                  : darkMode ? "text-zinc-300" : "text-gray-700"
+                                  }`}>
                                   {donation.remarks}
                                 </p>
                               </div>
@@ -436,9 +448,8 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className={`text-center py-16 rounded-2xl border ${
-                    darkMode ? "bg-zinc-900/30 border-zinc-800" : "bg-gray-50 border-gray-200"
-                  }`}
+                  className={`text-center py-16 rounded-2xl border ${darkMode ? "bg-zinc-900/30 border-zinc-800" : "bg-gray-50 border-gray-200"
+                    }`}
                 >
                   <FileText className={`w-16 h-16 mx-auto mb-4 ${darkMode ? "text-zinc-600" : "text-gray-300"}`} />
                   <p className={`text-lg font-semibold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
@@ -466,11 +477,10 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                   setView("list")
                   setSelectedMethod(null)
                 }}
-                className={`flex items-center gap-2 mb-6 px-4 py-2 rounded-xl font-semibold transition-all text-sm sm:text-base ${
-                  darkMode
-                    ? "bg-zinc-800 hover:bg-zinc-700 text-white"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }`}
+                className={`flex items-center gap-2 mb-6 px-4 py-2 rounded-xl font-semibold transition-all text-sm sm:text-base ${darkMode
+                  ? "bg-zinc-800 hover:bg-zinc-700 text-white"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  }`}
               >
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 Back to List
@@ -494,17 +504,15 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                           onClick={() => handleMethodSelect(method)}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`p-5 sm:p-6 rounded-2xl border-2 transition-all text-left group ${
-                            darkMode
-                              ? "bg-zinc-900/50 border-zinc-800 hover:border-emerald-500"
-                              : "bg-white border-gray-200 hover:border-emerald-500 shadow-sm"
-                          }`}
+                          className={`p-5 sm:p-6 rounded-2xl border-2 transition-all text-left group ${darkMode
+                            ? "bg-zinc-900/50 border-zinc-800 hover:border-emerald-500"
+                            : "bg-white border-gray-200 hover:border-emerald-500 shadow-sm"
+                            }`}
                         >
-                          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-3 sm:mb-4 transition-colors ${
-                            darkMode
-                              ? "bg-emerald-950/50 group-hover:bg-emerald-900/50"
-                              : "bg-emerald-50 group-hover:bg-emerald-100"
-                          }`}>
+                          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center mb-3 sm:mb-4 transition-colors ${darkMode
+                            ? "bg-emerald-950/50 group-hover:bg-emerald-900/50"
+                            : "bg-emerald-50 group-hover:bg-emerald-100"
+                            }`}>
                             <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" />
                           </div>
                           <h3 className={`text-lg sm:text-xl font-bold mb-1 sm:mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
@@ -525,20 +533,18 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
               ) : (
                 <>
                   {/* FORM WRAPPER — removed overflow-hidden so select dropdowns render properly on mobile */}
-                  <div className={`rounded-3xl ${
-                    darkMode
-                      ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
-                      : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
-                  }`}>
+                  <div className={`rounded-3xl ${darkMode
+                    ? "bg-zinc-900/50 backdrop-blur-xl border border-zinc-800"
+                    : "bg-white backdrop-blur-xl border border-gray-200 shadow-xl"
+                    }`}>
 
                     {/* colored header */}
-                    <div className={`relative h-24 sm:h-32 rounded-t-3xl bg-gradient-to-r overflow-hidden ${
-                      selectedMethod.color === "emerald" ? "from-emerald-600 via-teal-600 to-emerald-700" :
+                    <div className={`relative h-24 sm:h-32 rounded-t-3xl bg-gradient-to-r overflow-hidden ${selectedMethod.color === "emerald" ? "from-emerald-600 via-teal-600 to-emerald-700" :
                       selectedMethod.color === "blue" ? "from-blue-600 via-cyan-600 to-blue-700" :
-                      selectedMethod.color === "purple" ? "from-purple-600 via-violet-600 to-purple-700" :
-                      selectedMethod.color === "teal" ? "from-teal-600 via-cyan-600 to-teal-700" :
-                      "from-orange-600 via-amber-600 to-orange-700"
-                    }`}>
+                        selectedMethod.color === "purple" ? "from-purple-600 via-violet-600 to-purple-700" :
+                          selectedMethod.color === "teal" ? "from-teal-600 via-cyan-600 to-teal-700" :
+                            "from-orange-600 via-amber-600 to-orange-700"
+                      }`}>
                       <div className="absolute inset-0 opacity-20">
                         <div
                           className="absolute inset-0"
@@ -948,26 +954,22 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                           onChange={handleInputChange}
                           rows={4}
                           placeholder="Add any additional information..."
-                          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all resize-none ${
-                            darkMode
-                              ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
-                              : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
-                          }`}
+                          className={`w-full px-4 py-3 rounded-xl border-2 outline-none transition-all resize-none ${darkMode
+                            ? "bg-zinc-800/50 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500"
+                            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-500"
+                            }`}
                         />
                       </div>
 
                       {/* Notice */}
-                      <div className={`p-3 sm:p-4 rounded-xl border ${
-                        darkMode ? "bg-blue-900/20 border-blue-800/50" : "bg-blue-50 border-blue-200"
-                      }`}>
+                      <div className={`p-3 sm:p-4 rounded-xl border ${darkMode ? "bg-blue-900/20 border-blue-800/50" : "bg-blue-50 border-blue-200"
+                        }`}>
                         <div className="flex items-start gap-3">
-                          <AlertCircle className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5 ${
-                            darkMode ? "text-blue-400" : "text-blue-600"
-                          }`} />
+                          <AlertCircle className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5 ${darkMode ? "text-blue-400" : "text-blue-600"
+                            }`} />
                           <div>
-                            <p className={`font-semibold mb-1 text-xs sm:text-sm ${
-                              darkMode ? "text-blue-300" : "text-blue-800"
-                            }`}>
+                            <p className={`font-semibold mb-1 text-xs sm:text-sm ${darkMode ? "text-blue-300" : "text-blue-800"
+                              }`}>
                               Important Information
                             </p>
                             <p className={`text-xs ${darkMode ? "text-blue-400" : "text-blue-700"}`}>
@@ -981,16 +983,14 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                     </div>
 
                     {/* Submit */}
-                    <div className={`flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 mt-6 sm:mt-8 px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8 pt-4 sm:pt-6 border-t ${
-                      darkMode ? "border-zinc-800" : "border-gray-200"
-                    }`}>
+                    <div className={`flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 mt-6 sm:mt-8 px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8 pt-4 sm:pt-6 border-t ${darkMode ? "border-zinc-800" : "border-gray-200"
+                      }`}>
                       <button
                         onClick={() => setSelectedMethod(null)}
-                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base ${
-                          darkMode
-                            ? "bg-zinc-800 hover:bg-zinc-700 text-white"
-                            : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                        }`}
+                        className={`w-full sm:w-auto px-6 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base ${darkMode
+                          ? "bg-zinc-800 hover:bg-zinc-700 text-white"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                          }`}
                       >
                         Change Method
                       </button>
@@ -998,11 +998,10 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                       <button
                         onClick={handleSubmit}
                         disabled={!formData.amount || !formData.donationType || !formData.campaignId || creating}
-                        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all shadow-lg text-sm sm:text-base ${
-                          !formData.amount || !formData.donationType || !formData.campaignId || creating
-                            ? "bg-gray-400 cursor-not-allowed text-white"
-                            : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
-                        }`}
+                        className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all shadow-lg text-sm sm:text-base ${!formData.amount || !formData.donationType || !formData.campaignId || creating
+                          ? "bg-gray-400 cursor-not-allowed text-white"
+                          : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
+                          }`}
                       >
                         <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         {creating ? "Submitting..." : "Submit Donation Request"}

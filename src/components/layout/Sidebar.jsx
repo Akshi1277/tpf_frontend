@@ -28,7 +28,7 @@ const menuItems = [
     icon: User,
     gradient: "from-blue-500 to-indigo-600",
     activeColor: "blue",
-    description: "Manage your account"
+    description: "Manage your personal details"
   },
   {
     name: "My Donations",

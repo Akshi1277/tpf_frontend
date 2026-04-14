@@ -144,10 +144,13 @@ export default function CampaignCard({ campaign, darkMode, isCompleted = false }
         {isCompleted ? (
           <button
             disabled
-            className="w-full bg-zinc-200 text-zinc-500 py-2 rounded-lg font-medium text-base sm:text-lg mb-3 sm:mb-4 cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-zinc-100 text-zinc-400 py-2 rounded-lg font-medium text-sm mb-3 sm:mb-4 cursor-not-allowed flex items-center justify-center gap-2"
           >
-            <CheckCircle className="w-4 h-4 text-emerald-500" />
-            Goal Achieved
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 shrink-0">
+              <rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M7 10h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            Not accepting payments
           </button>
         ) : (
           <Link href={`/campaign/${campaign.slug}`} prefetch className="w-full block">

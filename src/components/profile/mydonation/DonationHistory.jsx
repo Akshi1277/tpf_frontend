@@ -241,7 +241,7 @@ export default function RecentTransactions({
               })}
 
               {/* More Button */}
-              {transactions.length > 6 && (
+              {transactions.length > 5 && (
                 <div className="p-4 sm:p-6">
                   <a
                     href="/profile/downloads"
