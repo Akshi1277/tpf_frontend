@@ -1,13 +1,98 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ExternalLink, Calendar } from "lucide-react";
+import {
+    ArrowLeft, ExternalLink, Calendar, Heart, Share2,
+    BookOpen, Globe, CheckCircle2, Sparkles,
+} from "lucide-react";
 import axios from "axios";
 import GlobalLoader from "@/components/GlobalLoader";
+import Navbar from "@/components/layout/Navbar";
 import { getMediaUrl } from "@/utils/media";
+import Footer from "@/components/layout/Footer";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+/* ── viewport reveal hook ── */
+function useReveal(threshold = 0.08) {
+    const ref = useRef(null);
+    const [visible, setVisible] = useState(false);
+    useEffect(() => {
+        if (!ref.current) return;
+        const io = new IntersectionObserver(
+            ([e]) => { if (e.isIntersecting) { setVisible(true); io.disconnect(); } },
+            { threshold }
+        );
+        io.observe(ref.current);
+        return () => io.disconnect();
+    }, []);
+    return [ref, visible];
+}
+
+/* ── reading progress bar ── */
+function ReadingProgress() {
+    const [pct, setPct] = useState(0);
+    useEffect(() => {
+        const fn = () => {
+            const d = document.documentElement;
+            setPct(d.scrollHeight - d.clientHeight > 0
+                ? (d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100 : 0);
+        };
+        window.addEventListener("scroll", fn, { passive: true });
+        return () => window.removeEventListener("scroll", fn);
+    }, []);
+    return (
+        <div className="fixed top-0 left-0 right-0 h-[3px] z-[9999] pointer-events-none">
+            <div
+                className="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500"
+                style={{ width: `${pct}%`, transition: "width 80ms linear" }}
+            />
+        </div>
+    );
+}
+
+/* ── reveal wrapper ── */
+function Reveal({ children, delay = 0, dir = "up" }) {
+    const [ref, visible] = useReveal();
+    const from =
+        dir === "left" ? "translateX(-20px)" :
+            dir === "right" ? "translateX(20px)" : "translateY(16px)";
+    return (
+        <div
+            ref={ref}
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translate(0)" : from,
+                transition: `opacity 0.55s ease ${delay}ms, transform 0.55s ease ${delay}ms`,
+                willChange: "opacity, transform",
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+/* ── pull quote ── */
+function PullQuote({ text, T }) {
+    const [ref, visible] = useReveal();
+    return (
+        <div
+            ref={ref}
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translateX(0)" : "translateX(-14px)",
+                transition: "opacity 0.6s ease, transform 0.6s ease",
+                willChange: "opacity, transform",
+            }}
+            className="my-8 pl-5 border-l-[3px] border-emerald-500"
+        >
+            <p className={`text-base sm:text-lg font-medium leading-relaxed italic ${T.body}`}>
+                {text}
+            </p>
+        </div>
+    );
+}
 
 export default function ImpactStoryDetailPage() {
     const { id } = useParams();
@@ -16,286 +101,488 @@ export default function ImpactStoryDetailPage() {
     const [story, setStory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const [darkMode, setDarkMode] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('darkMode') === 'true'
-        }
-        return false
-    })
+        if (typeof window !== "undefined") return localStorage.getItem("darkMode") === "true";
+        return false;
+    });
 
     useEffect(() => {
-        const handleStorageChange = () => {
-            const savedMode = localStorage.getItem('darkMode')
-            setDarkMode(savedMode === 'true')
-        }
-
-        window.addEventListener('storage', handleStorageChange)
-        window.addEventListener('darkModeChanged', handleStorageChange)
-
+        const sync = () => setDarkMode(localStorage.getItem("darkMode") === "true");
+        window.addEventListener("storage", sync);
+        window.addEventListener("darkModeChanged", sync);
         return () => {
-            window.removeEventListener('storage', handleStorageChange)
-            window.removeEventListener('darkModeChanged', handleStorageChange)
-        }
-    }, [])
+            window.removeEventListener("storage", sync);
+            window.removeEventListener("darkModeChanged", sync);
+        };
+    }, []);
 
     useEffect(() => {
         if (!id) return;
-
-        const fetchStory = async () => {
+        (async () => {
             try {
-                setLoading(true);
-                setError("");
-
+                setLoading(true); setError("");
                 const res = await axios.get(`${API_BASE}/cms/impact-stories/${id}`);
-
-                if (!res.data.success) {
-                    throw new Error(res.data.message || "Failed to load story");
-                }
-
+                if (!res.data.success) throw new Error(res.data.message || "Failed to load");
                 setStory(res.data.data);
             } catch (err) {
-                console.error("Error loading impact story:", err);
                 setError(err.message || "Failed to load story");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchStory();
+            } finally { setLoading(false); }
+        })();
     }, [id]);
 
-    const COLORS = {
-        bg: darkMode ? "bg-zinc-950" : "bg-white",
-        sectionBg: darkMode ? "bg-zinc-900" : "bg-zinc-50",
-        cardBg: darkMode ? "bg-zinc-900" : "bg-white",
-        border: darkMode ? "border-zinc-800" : "border-zinc-200",
-        muted: darkMode ? "text-zinc-400" : "text-zinc-600",
-        heading: darkMode ? "text-white" : "text-zinc-900",
-        accent: darkMode ? "text-emerald-400" : "text-emerald-600",
+    const fmt = (iso) =>
+        iso ? new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "";
+
+    const getParagraphs = (text) =>
+        text ? text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean) : [];
+
+    const handleShare = async () => {
+        if (navigator.share) {
+            await navigator.share({ title: story?.title, url: window.location.href }).catch(() => { });
+        } else {
+            await navigator.clipboard.writeText(window.location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2200);
+        }
     };
 
-    const formattedDate = (isoString) => {
-        if (!isoString) return "";
-        return new Date(isoString).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
+    const dk = darkMode;
+    const T = {
+        page: dk ? "bg-zinc-950" : "bg-[#f4f4f0]",
+        card: dk ? "bg-zinc-900" : "bg-white",
+        cardAlt: dk ? "bg-zinc-800/50" : "bg-zinc-50",
+        border: dk ? "border-zinc-800" : "border-zinc-200",
+        divider: dk ? "divide-zinc-800" : "divide-zinc-100",
+        head: dk ? "text-white" : "text-zinc-900",
+        body: dk ? "text-zinc-300" : "text-zinc-600",
+        muted: dk ? "text-zinc-500" : "text-zinc-400",
     };
 
-    const getParagraphs = (text) => {
-        if (!text) return [];
-        return text
-            .split(/\n{2,}/)
-            .map((p) => p.trim())
-            .filter(Boolean);
-    };
-
-    if (loading) {
-        return <GlobalLoader />;
-    }
+    if (loading) return <GlobalLoader />;
 
     if (error || !story) {
         return (
-            <main className={`${COLORS.bg} min-h-screen px-4 py-8 flex items-center justify-center`}>
-                <div className="max-w-md w-full text-center space-y-4">
-                    <p className={`${COLORS.heading} text-lg font-semibold`}>
-                        {error || "Story not found"}
-                    </p>
-                    <p className={`${COLORS.muted} text-sm`}>
-                        The story you&apos;re looking for may have been removed or is temporarily unavailable.
-                    </p>
-                    <button
-                        onClick={() => router.push("/#stories")}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors cursor-pointer"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Impact Stories
-                    </button>
-                </div>
-            </main>
+            <>
+                <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled />
+                <main className={`${T.page} min-h-screen flex items-center justify-center px-4`}>
+                    <div className="max-w-sm text-center space-y-4">
+                        <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+                            <BookOpen className="w-7 h-7 text-emerald-500" />
+                        </div>
+                        <p className={`${T.head} text-lg font-semibold`}>{error || "Story not found"}</p>
+                        <p className={`${T.muted} text-sm`}>This story may have been removed or is temporarily unavailable.</p>
+                        <button
+                            onClick={() => router.push("/#stories")}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-colors"
+                        >
+                            <ArrowLeft className="w-4 h-4" /> Back to Stories
+                        </button>
+                    </div>
+                </main>
+            </>
         );
     }
 
-    const storyParagraphs = getParagraphs(story.story);
-    const hasStoryContent = storyParagraphs.length > 0;
+    const paras = getParagraphs(story.story);
+    const splitAt = Math.max(1, Math.floor(paras.length / 2));
+    const firstHalf = paras.slice(0, splitAt);
+    const pullCandidate = firstHalf.length > 1 ? firstHalf[firstHalf.length - 1] : null;
+    const mainParas = pullCandidate ? firstHalf.slice(0, -1) : firstHalf;
+    const secondHalf = paras.slice(splitAt);
 
+    const checkpoints = [
+        "Story verified by our field team",
+        "Funds distributed transparently",
+        "Impact tracked and reported",
+        "Community feedback collected",
+    ];
+
+    /* impact items — custom SVG, visual first */
+    const impacts = [
+        {
+            number: "01",
+            label: "Rapid Relief",
+            sub: "Critical aid delivered in the first 72 hours — when delay costs lives.",
+        },
+        {
+            number: "02",
+            label: "Restored Dignity",
+            sub: "Families regain stability, privacy, and control over daily life.",
+        },
+        {
+            number: "03",
+            label: "Sustained Support",
+            sub: "Not one-time help — structured programs that continue beyond crisis.",
+        },
+        {
+            number: "04",
+            label: "Stronger Communities",
+            sub: "Local networks rebuild together, reducing future vulnerability.",
+        },
+    ];
     return (
-        <main className={`${COLORS.bg} min-h-screen`}>
-            {/* Hero Section */}
-            <div className="relative isolate overflow-hidden">
-                {/* Background gradient */}
-                <div
-                    className="absolute inset-0 opacity-20 sm:opacity-30 pointer-events-none"
-                    style={{
-                        backgroundImage:
-                            "radial-gradient(circle at 0 0, #22c55e 0, transparent 45%), radial-gradient(circle at 100% 0, #0ea5e9 0, transparent 55%)",
-                    }}
-                />
+        <>
+            <ReadingProgress />
+            <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled />
 
-                {/* Back button */}
-                <div className="relative z-10 max-w-6xl mx-auto px-3 sm:px-4 pt-4 sm:pt-6 md:pt-10">
-                    <button
-                        onClick={() => router.push("/#stories")}
-                        className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-zinc-900/80 text-zinc-100 text-xs sm:text-sm border border-zinc-700/70 shadow-sm hover:bg-zinc-800 transition-colors cursor-pointer"
-                    >
-                        <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                        <span>Impact Stories</span>
-                    </button>
-                </div>
+            <main className={`${T.page} min-h-screen`}>
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
 
-                {/* Hero content grid */}
-                <div className="relative z-10 max-w-6xl mx-auto px-3 sm:px-4 pb-6 sm:pb-10 md:pb-14 pt-4 sm:pt-6">
-                    <div className="flex flex-col md:grid md:grid-cols-5 gap-5 sm:gap-8 md:gap-10 items-center">
+                    {/* ── back nav ── */}
+                    <div className="mb-7" style={{ animation: "fadeUp 0.5s ease both" }}>
+                        <button
+                            onClick={() => router.push("/#stories")}
+                            className={`inline-flex items-center gap-2 text-sm font-medium ${T.muted} hover:text-emerald-500 transition-colors group`}
+                        >
+                            <span
+                                className={`w-7 h-7 rounded-full border ${T.border} flex items-center justify-center group-hover:border-emerald-500/50 transition-colors`}
+                            >
+                                <ArrowLeft className="w-3.5 h-3.5" />
+                            </span>
+                            Impact Stories
+                        </button>
+                    </div>
 
-                        {/* Text — full width on mobile, 2/5 on desktop */}
-                        <div className="w-full md:col-span-2 space-y-3 sm:space-y-4 md:space-y-5">
-                            {/* Badge */}
-                            <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-                                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                                <span className="text-[10px] sm:text-xs font-medium text-emerald-500 tracking-wide whitespace-nowrap">
-                                    Impact Story
-                                </span>
+                    {/* ════════════════════════════════
+              MAIN TWO-COLUMN GRID
+          ════════════════════════════════ */}
+                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_320px] gap-6 lg:gap-7 items-start">
+
+                        {/* ══════════════
+                LEFT COLUMN
+            ══════════════ */}
+                        <div className="space-y-5">
+
+                            {/* ── HERO CARD ── */}
+                            <div
+                                className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}
+                                style={{ animation: "fadeUp 0.55s ease 60ms both" }}
+                            >
+                                {/* accent strip */}
+                                <div className="h-[3px] bg-gradient-to-r from-emerald-500 via-teal-400 to-transparent" />
+
+                                <div className="p-5 sm:p-6 md:p-7">
+
+                                    {/* title + meta */}
+                                    <div className="mb-5">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span
+                                                className="relative flex h-2 w-2 flex-shrink-0"
+                                                aria-hidden="true"
+                                            >
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                                            </span>
+                                            <span className={`text-xs font-semibold uppercase tracking-widest text-emerald-500`}>
+                                                Impact Story
+                                            </span>
+                                        </div>
+
+                                        <h1 className={`text-2xl sm:text-3xl md:text-[2rem] font-bold leading-tight tracking-tight ${T.head} mb-3`}>
+                                            {story.title}
+                                        </h1>
+
+                                        <p className={`text-sm sm:text-base leading-relaxed ${T.body}`}>
+                                            {story.description}
+                                        </p>
+
+                                        <div className={`flex items-center gap-4 mt-4 text-xs ${T.muted}`}>
+                                            <span className="flex items-center gap-1.5">
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                {fmt(story.updatedAt || story.createdAt)}
+                                            </span>
+                                            <span className="flex items-center gap-1.5">
+                                                <Globe className="w-3.5 h-3.5" />
+                                                Verified · TPF Aid
+                                            </span>
+                                            <button
+                                                onClick={handleShare}
+                                                className="flex items-center gap-1.5 hover:text-emerald-500 transition-colors"
+                                            >
+                                                <Share2 className="w-3.5 h-3.5" />
+                                                {copied ? "Copied!" : "Share"}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* IMAGE — full width inside card, good height */}
+                                    <div className={`relative rounded-2xl overflow-hidden border ${T.border} bg-zinc-800`}>
+                                        <img
+                                            src={getMediaUrl(story.image)}
+                                            alt={story.title}
+                                            onLoad={() => setImgLoaded(true)}
+                                            className="w-full object-cover block"
+                                            style={{
+                                                height: "clamp(220px, 35vw, 420px)",
+                                                opacity: imgLoaded ? 1 : 0,
+                                                transform: imgLoaded ? "scale(1)" : "scale(1.03)",
+                                                transition: "opacity 0.6s ease, transform 0.6s ease",
+                                            }}
+                                        />
+                                        {/* gradient overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                                        <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+                                            <span className="text-[10px] text-white/50 uppercase tracking-[0.15em]">TPF Aid · Īmān Fund</span>
+                                            <span className="text-[10px] text-white/40">Impact Collection</span>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
 
-                            {/* Title */}
-                            <h1 className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight leading-tight ${COLORS.heading}`}>
-                                {story.title}
-                            </h1>
+                            {/* ── STORY ARTICLE ── */}
+                            <div
+                                className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}
+                                style={{ animation: "fadeUp 0.55s ease 120ms both" }}
+                            >
+                                <div className="px-5 sm:px-7 md:px-8 py-6 sm:py-7">
 
-                            {/* Description */}
-                            <p className={`${COLORS.muted} text-sm sm:text-base leading-relaxed`}>
-                                {story.description}
-                            </p>
+                                    <Reveal>
+                                        <div className="flex items-center gap-3 mb-7">
+                                            <BookOpen className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                                            <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${T.muted}`}>The Story</span>
+                                            <div className={`flex-1 h-px ${dk ? "bg-zinc-800" : "bg-zinc-100"}`} />
+                                        </div>
+                                    </Reveal>
 
-                            {/* Meta pills */}
-                            <div className="flex flex-col xs:flex-row flex-wrap gap-2">
-                                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-black/60 text-zinc-100 border border-zinc-700/70 text-xs sm:text-sm">
-                                    <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                                    <span className="truncate">
-                                        Updated {formattedDate(story.updatedAt || story.createdAt)}
-                                    </span>
+                                    {paras.length > 0 ? (
+                                        <div>
+                                            {mainParas.map((p, i) => (
+                                                <Reveal key={i} delay={i * 50}>
+                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{p}</p>
+                                                </Reveal>
+                                            ))}
+                                            {pullCandidate && <PullQuote text={pullCandidate} T={T} />}
+                                            {secondHalf.map((p, i) => (
+                                                <Reveal key={`s${i}`} delay={i * 50}>
+                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{p}</p>
+                                                </Reveal>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <Reveal>
+                                            <p className={`${T.muted} text-sm leading-relaxed`}>
+                                                The full story is being prepared and will be published soon. Thank you for your patience and continued support.
+                                            </p>
+                                        </Reveal>
+                                    )}
                                 </div>
-                                <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-zinc-900/80 text-zinc-100 border border-zinc-700/70 text-xs sm:text-sm">
-                                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 flex-shrink-0" />
-                                    <span className="whitespace-nowrap">Powered by your donations</span>
-                                </div>
+
+                                <Reveal>
+                                    <div className={`border-t ${T.border} px-5 sm:px-7 md:px-8 py-3.5 flex items-center justify-between gap-3`}>
+                                        <span className={`text-xs ${T.muted}`}>TPF Aid · Verified Impact Story</span>
+                                        <button
+                                            onClick={() => router.push("/#stories")}
+                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-500 hover:underline"
+                                        >
+                                            <ArrowLeft className="w-3 h-3" /> More stories
+                                        </button>
+                                    </div>
+                                </Reveal>
                             </div>
+
+                            {/* ── VERIFICATION ── */}
+                            <Reveal>
+                                <div className={`rounded-3xl border ${T.border} ${T.card} p-5 sm:p-6`}>
+                                    <div className="flex items-center gap-2 mb-5">
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                                        <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${T.muted}`}>Story Verification</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
+                                        {checkpoints.map((cp, i) => (
+                                            <div key={i} className="flex items-start gap-3">
+                                                <span className="mt-1 w-3.5 h-3.5 rounded-full bg-emerald-500/15 flex-shrink-0 flex items-center justify-center">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                </span>
+                                                <span className={`text-sm ${T.body} leading-snug`}>{cp}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </Reveal>
+
                         </div>
+                        {/* end left col */}
 
-                        {/* Image — full width on mobile, 3/5 on desktop */}
-                        <div className="w-full md:col-span-3">
-                            <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-emerald-500/40 bg-zinc-900 shadow-xl sm:shadow-2xl shadow-emerald-500/20">
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none z-10" />
-                                <img
-                                    src={getMediaUrl(story.image)}
-                                    alt={story.title}
-                                    className="w-full h-[200px] xs:h-[240px] sm:h-[280px] md:h-[320px] object-cover"
-                                    loading="lazy"
-                                />
-                                <div className="absolute bottom-0 left-0 right-0 z-20 p-3 sm:p-4 md:p-5 flex items-end justify-between gap-2">
-                                    <div className="space-y-0.5 flex-1 min-w-0">
-                                        <p className="text-[11px] xs:text-xs sm:text-sm text-zinc-200 font-medium leading-tight">
-                                            &quot;Your generosity continues to create ripples of change.&quot;
+                        {/* ══════════════
+                RIGHT SIDEBAR
+            ══════════════ */}
+                        <aside className="space-y-5 lg:sticky lg:top-[72px]">
+
+                            {/* ── Why This Matters ── */}
+                            <Reveal dir="right">
+                                <div className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}>
+                                    <div className="h-[3px] bg-gradient-to-r from-emerald-500/70 to-transparent" />
+                                    <div className="p-5">
+                                        <p className={`text-[10px] font-bold uppercase tracking-[0.22em] ${T.muted} mb-2.5`}>Why This Matters</p>
+                                        <p className={`text-sm font-semibold leading-snug ${T.head} mb-3`}>
+                                            Every donation is a direct lifeline — not an abstraction.
+                                        </p>
+                                        <p className={`text-xs leading-relaxed ${T.body}`}>
+                                            Stories like this prove that transparent giving creates tangible, lasting change.
+                                            Your contribution doesn&apos;t just help once — it ripples outward into entire communities.
                                         </p>
                                     </div>
-                                    <div className="text-right flex-shrink-0">
-                                        <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-zinc-400">
-                                            Īmān Fund
-                                        </p>
-                                        <p className="text-[10px] sm:text-xs font-semibold text-zinc-100">
-                                            Impact Collection
-                                        </p>
+                                </div>
+                            </Reveal>
+
+                            {/* ── YOUR DONATION CREATES — editorial rows ── */}
+                            <Reveal dir="right" delay={70}>
+                                <div className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}>
+                                    <div className="px-5 pt-5 pb-3 flex items-center justify-between">
+                                        <p className={`text-[10px] font-bold uppercase tracking-[0.22em] ${T.muted}`}>Your Donation Creates</p>
+                                    </div>
+
+                                    <div className="px-4 pb-4 space-y-4">
+                                        {impacts.map((item, i) => (
+                                            <div
+                                                key={item.number}
+                                                className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 group"
+                                            >
+                                                {/* glowing background */}
+                                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500">
+                                                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 blur-2xl rounded-full" />
+                                                </div>
+
+                                                {/* subtle grid texture */}
+                                                <div
+                                                    className="absolute inset-0 opacity-[0.04]"
+                                                    style={{
+                                                        backgroundImage:
+                                                            "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
+                                                        backgroundSize: "12px 12px",
+                                                    }}
+                                                />
+
+                                                <div className="relative z-10">
+                                                    {/* top row */}
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="text-[10px] tracking-[0.2em] uppercase text-emerald-500 font-bold">
+                                                            {item.number}
+                                                        </span>
+
+                                                        {/* flowing connector */}
+                                                        {i !== impacts.length - 1 && (
+                                                            <span className="text-[10px] text-zinc-400">↓</span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* main label */}
+                                                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-emerald-500 transition">
+                                                        {item.label}
+                                                    </h3>
+
+                                                    {/* description */}
+                                                    <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                                                        {item.sub}
+                                                    </p>
+
+                                                    {/* impact line */}
+                                                    <div className="mt-3 h-[2px] w-12 bg-gradient-to-r from-emerald-500 to-transparent group-hover:w-20 transition-all duration-300" />
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </Reveal>
 
+                            {/* ── Story meta table ── */}
+                            <Reveal dir="right" delay={130}>
+                                <div className={`rounded-3xl border ${T.border} ${T.card} divide-y ${T.divider} overflow-hidden`}>
+                                    <div className="px-5 py-3.5 flex items-center justify-between">
+                                        <span className={`text-xs ${T.muted}`}>Published</span>
+                                        <span className={`text-xs font-medium ${T.head}`}>{fmt(story.createdAt)}</span>
+                                    </div>
+                                    {story.updatedAt && story.updatedAt !== story.createdAt && (
+                                        <div className="px-5 py-3.5 flex items-center justify-between">
+                                            <span className={`text-xs ${T.muted}`}>Updated</span>
+                                            <span className={`text-xs font-medium ${T.head}`}>{fmt(story.updatedAt)}</span>
+                                        </div>
+                                    )}
+                                    <div className="px-5 py-3.5 flex items-center justify-between">
+                                        <span className={`text-xs ${T.muted}`}>Category</span>
+                                        <span className="text-xs font-semibold text-emerald-500">Impact Story</span>
+                                    </div>
+                                    <div className="px-5 py-3.5 flex items-center justify-between">
+                                        <span className={`text-xs ${T.muted}`}>Source</span>
+                                        <span className={`text-xs font-medium ${T.head}`}>TPF Aid · Īmān Fund</span>
+                                    </div>
+                                </div>
+                            </Reveal>
+
+                            {/* ── CTA ── */}
+                            <Reveal dir="right" delay={180}>
+                                <div className="rounded-3xl overflow-hidden relative">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-700" />
+                                    <div
+                                        className="absolute inset-0 opacity-15"
+                                        style={{ backgroundImage: "radial-gradient(circle at 75% 20%, white 0%, transparent 60%)" }}
+                                    />
+                                    <div className="relative p-5 space-y-3">
+                                        <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
+                                            <Sparkles className="w-4 h-4 text-white" />
+                                        </div>
+                                        <p className="text-sm font-bold text-white leading-snug">
+                                            Help us create more stories like this.
+                                        </p>
+                                        <p className="text-xs text-white/65 leading-relaxed">
+                                            Your ongoing support keeps our initiatives alive and transforms more lives every month.
+                                        </p>
+                                        <button
+                                            onClick={() => router.push("/all-campaigns")}
+                                            className="w-full px-4 py-2.5 rounded-xl bg-white text-emerald-700 text-xs font-bold cursor-pointer hover:bg-white/90 transition-colors"
+                                        >
+                                            Support Similar Causes →
+                                        </button>
+                                    </div>
+                                </div>
+                            </Reveal>
+
+                            {/* ── Media links ── */}
+                            {story.mediaLinks?.length > 0 && (
+                                <Reveal dir="right" delay={230}>
+                                    <div className={`rounded-3xl border ${T.border} ${T.card} p-5`}>
+                                        <p className={`text-[10px] font-bold uppercase tracking-[0.22em] ${T.muted} mb-1.5`}>Related Resources</p>
+                                        <p className={`text-xs ${T.body} mb-3.5 leading-relaxed`}>
+                                            External links related to this impact story.
+                                        </p>
+                                        <div className="space-y-2">
+                                            {story.mediaLinks.map((link, idx) => (
+                                                <a
+                                                    key={`${link}-${idx}`}
+                                                    href={link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border ${T.border} hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-colors group`}
+                                                >
+                                                    <span className={`text-xs ${T.muted} truncate min-w-0 group-hover:text-emerald-500 transition-colors`}>
+                                                        {link}
+                                                    </span>
+                                                    <ExternalLink
+                                                        className="w-3.5 h-3.5 flex-shrink-0 text-emerald-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+                                                    />
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </Reveal>
+                            )}
+
+                        </aside>
                     </div>
                 </div>
-            </div>
-            {/* end hero */}
+                <Footer />
+            </main>
 
-            {/* Story content + sidebar */}
-            <div className="relative z-10 max-w-6xl mx-auto px-3 sm:px-4 pb-10 sm:pb-16 md:pb-20">
-                <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-5 sm:gap-8 md:gap-10">
-
-                    {/* Sidebar — rendered first on mobile via order */}
-                    <aside className="order-1 lg:order-2 space-y-4 sm:space-y-6">
-                        {/* Highlight card */}
-                        <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 ${COLORS.cardBg} border ${COLORS.border} relative overflow-hidden`}>
-                            <div className="absolute -top-10 -right-10 w-24 h-24 sm:w-28 sm:h-28 bg-emerald-500/10 rounded-full blur-3xl" />
-                            <div className="relative space-y-2 sm:space-y-3">
-                                <p className={`text-[10px] sm:text-xs font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase ${COLORS.muted}`}>
-                                    Why this matters
-                                </p>
-                                <p className={`text-sm sm:text-base font-medium leading-snug ${COLORS.heading}`}>
-                                    Each story is a living proof that your contribution is more than a
-                                    transaction—it&apos;s a mercy, a lifeline, a renewed hope.
-                                </p>
-                                <p className={`${COLORS.muted} text-xs sm:text-sm leading-relaxed`}>
-                                    Continue supporting initiatives like this to keep transforming lives and
-                                    hearts across the Ummah.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Media links */}
-                        {story.mediaLinks && story.mediaLinks.length > 0 && (
-                            <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 ${COLORS.cardBg} border ${COLORS.border}`}>
-                                <h3 className={`text-sm sm:text-base font-semibold mb-2 sm:mb-3 ${COLORS.heading}`}>
-                                    Explore more about this story
-                                </h3>
-                                <p className={`${COLORS.muted} text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed`}>
-                                    These external resources may include campaign pages, videos, or social
-                                    posts related to this impact.
-                                </p>
-                                <div className="space-y-2">
-                                    {story.mediaLinks.map((link, idx) => (
-                                        <a
-                                            key={`${link}-${idx}`}
-                                            href={link}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/5 text-xs sm:text-sm text-emerald-600 hover:bg-emerald-500/10 hover:border-emerald-500/70 transition-colors"
-                                        >
-                                            <span className="truncate min-w-0 break-all">{link}</span>
-                                            <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
-                                        </a>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </aside>
-
-                    {/* Story article */}
-                    <article className={`order-2 lg:order-1 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 ${COLORS.cardBg} border ${COLORS.border} shadow-sm`}>
-                        <h2 className={`text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4 md:mb-6 ${COLORS.heading}`}>
-                            The Story
-                        </h2>
-
-                        {hasStoryContent ? (
-                            <div className="space-y-4 sm:space-y-5 md:space-y-6">
-                                {storyParagraphs.map((para, idx) => (
-                                    <p
-                                        key={idx}
-                                        className={`${COLORS.muted} text-sm sm:text-base leading-relaxed`}
-                                    >
-                                        {para}
-                                    </p>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className={`${COLORS.muted} text-sm sm:text-base leading-relaxed`}>
-                                The full story is being prepared and will be published soon. Thank you for
-                                your patience and continued support.
-                            </p>
-                        )}
-                    </article>
-
-                </div>
-            </div>
-        </main>
+            <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+        </>
     );
 }
