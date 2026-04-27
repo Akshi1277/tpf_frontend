@@ -10,6 +10,7 @@ import { isCampaignVisible } from '@/utils/campaignVisibility';
 
 export default function CampaignsSection({ darkMode }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [visibleCount, setVisibleCount] = useState(6);
   const containerRef = useRef(null);
   const cms = useCMS();
 
@@ -63,15 +64,15 @@ export default function CampaignsSection({ darkMode }) {
   /* --------------------------------
      Category Filter
   --------------------------------- */
-const filteredCampaigns = useMemo(() => {
-  if (selectedCategory === 'all') {
-    return activeCampaigns.filter(isCampaignVisible);
-  }
+  const filteredCampaigns = useMemo(() => {
+    if (selectedCategory === 'all') {
+      return activeCampaigns.filter(isCampaignVisible);
+    }
 
-  return activeCampaigns.filter(
-    (c) => c.category === selectedCategory && isCampaignVisible(c)
-  );
-}, [activeCampaigns, selectedCategory]);
+    return activeCampaigns.filter(
+      (c) => c.category === selectedCategory && isCampaignVisible(c)
+    );
+  }, [activeCampaigns, selectedCategory]);
 
   /* --------------------------------
      NO ACTIVE CAMPAIGNS
@@ -93,6 +94,18 @@ const filteredCampaigns = useMemo(() => {
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     });
+  };
+
+  const handleScroll = () => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const scrollRight = container.scrollLeft + container.clientWidth;
+    const threshold = container.scrollWidth - 100;
+
+    if (scrollRight >= threshold) {
+      setVisibleCount((prev) => prev + 4);
+    }
   };
 
   const showArrows = filteredCampaigns.length > 3;
@@ -141,10 +154,11 @@ const filteredCampaigns = useMemo(() => {
           {/* Cards Container */}
           <div
             ref={containerRef}
+            onScroll={handleScroll}
             className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide"
           >
             <div className="flex gap-4 sm:gap-5 items-stretch">
-              {filteredCampaigns.map((campaign) => (
+              {filteredCampaigns.slice(0, visibleCount).map((campaign) => (
                 <div
                   key={campaign._id}
                   className="flex-shrink-0 w-[280px] sm:w-[285px] flex"

@@ -1,108 +1,162 @@
-// app/page.jsx
 'use client';
+
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/home/HeroSection';
-import ImpactStatsBar from '@/components/home/ImpactStatsBar';
-import CampaignsSection from '@/components/home/CampaignsSection';
-import CuratedSection from '@/components/home/CuratedSection';
-import ImpactBanner from '@/components/home/ImpactBanner';
-import CommunitiesSection from '@/components/home/CommunitiesSection';
-import OrganizationSection from '@/components/home/OrganizationSection';
-import PartnersSection from '@/components/home/PartnersSection';
-import PulseSection from '@/components/home/PulseSection';
-import StoriesSection from '@/components/home/StoriesSection';
-
+import ProcessFlowSection from '@/components/home/ProcessFlow';
 import ScrollToTop from '@/components/ui/ScrollToTop';
-import StartFundraiserBanner from '@/components/home/FundraiserBanner';
-import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+
 import { useCMS } from './CMSContext';
 import { useFetchImpactStatsQuery } from '@/utils/slices/campaignApiSlice';
-import ProcessFlowSection from '@/components/home/ProcessFlow';
+
+// 🔥 Lazy load ALL heavy sections
+const StoriesSection = dynamic(() => import('@/components/home/StoriesSection'), { ssr: false });
+const CampaignsSection = dynamic(() => import('@/components/home/CampaignsSection'), { ssr: false });
+const CuratedSection = dynamic(() => import('@/components/home/CuratedSection'), { ssr: false });
+const ImpactBanner = dynamic(() => import('@/components/home/ImpactBanner'), { ssr: false });
+const CommunitiesSection = dynamic(() => import('@/components/home/CommunitiesSection'), { ssr: false });
+const PartnersSection = dynamic(() => import('@/components/home/PartnersSection'), { ssr: false });
+const PulseSection = dynamic(() => import('@/components/home/PulseSection'), { ssr: false });
+const StartFundraiserBanner = dynamic(() => import('@/components/home/FundraiserBanner'), { ssr: false });
+
+// 🔥 Lazy Section Wrapper (Intersection Observer)
+function LazySection({ children }) {
+  const [visible, setVisible] = useState(false);
+  const [ref, setRef] = useState(null);
+
+  useEffect(() => {
+    if (!ref) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' } // preload slightly before visible
+    );
+
+    observer.observe(ref);
+
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return <div ref={setRef}>{visible ? children : null}</div>;
+}
 
 export default function Page() {
-  const cms = useCMS()
+  const cms = useCMS();
 
+  // 🌙 Dark Mode (safe initialization)
+  const [darkMode, setDarkMode] = useState(false);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('darkMode');
+      if (saved) setDarkMode(JSON.parse(saved));
+    } catch {}
+  }, []);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    } catch {}
+  }, [darkMode]);
 
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('darkMode');
-        return saved ? JSON.parse(saved) : false;
-      } catch (error) {
-        return false;
-      }
-    }
-    return false;
-  });
-
-  const { data: statsData } = useFetchImpactStatsQuery();
+  // 🔥 Optimized scroll listener (no spam re-renders)
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 0);
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 0);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode]);
+  // 🔥 Delay API call until user interacts
+  const { data: statsData } = useFetchImpactStatsQuery(undefined, {
+    skip: !scrolled,
+  });
 
   return (
     <div className={`min-h-screen font-sans ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} scrolled={scrolled} />
 
+      {/* ✅ ABOVE THE FOLD ONLY */}
       <section id="hero">
         <HeroSection darkMode={darkMode} />
       </section>
 
-      <section id="impact-stats">
+      <section id="process-flow">
         <ProcessFlowSection darkMode={darkMode} />
       </section>
-      {/* <section id="impact-stats">
-        <ImpactStatsBar darkMode={darkMode} />
-      </section> */}
 
-      <section id="stories">
-        <StoriesSection darkMode={darkMode} />
-      </section>
+      {/* 🔥 BELOW THE FOLD (Lazy Loaded) */}
 
-      <section id="campaigns">
-        <CampaignsSection darkMode={darkMode} />
-      </section>
+      <LazySection>
+        <section id="stories">
+          <StoriesSection darkMode={darkMode} />
+        </section>
+      </LazySection>
 
-      <section id="curated">
-        <CuratedSection darkMode={darkMode} cms={cms} />
-      </section>
+      <LazySection>
+        <section id="campaigns">
+          <CampaignsSection darkMode={darkMode} />
+        </section>
+      </LazySection>
 
-      <section id="impact-banner">
-        <ImpactBanner darkMode={darkMode} />
-      </section>
+      <LazySection>
+        <section id="curated">
+          <CuratedSection darkMode={darkMode} cms={cms} />
+        </section>
+      </LazySection>
 
-      <section id="communities">
-        <CommunitiesSection darkMode={darkMode} />
-      </section>
+      <LazySection>
+        <section id="impact-banner">
+          <ImpactBanner darkMode={darkMode} />
+        </section>
+      </LazySection>
 
-     
-      <section id="partners">
-        <PartnersSection darkMode={darkMode} />
-      </section>
+      <LazySection>
+        <section id="communities">
+          <CommunitiesSection darkMode={darkMode} />
+        </section>
+      </LazySection>
 
+      <LazySection>
+        <section id="partners">
+          <PartnersSection darkMode={darkMode} />
+        </section>
+      </LazySection>
 
-      <section id="pulse">
-        <PulseSection darkMode={darkMode} />
-      </section>
+      <LazySection>
+        <section id="pulse">
+          <PulseSection darkMode={darkMode} />
+        </section>
+      </LazySection>
 
-      <section id="fundraiser-banner">
-        <StartFundraiserBanner darkMode={darkMode} />
-      </section>
+      <LazySection>
+        <section id="fundraiser-banner">
+          <StartFundraiserBanner darkMode={darkMode} />
+        </section>
+      </LazySection>
 
       <Footer darkMode={darkMode} />
+      <ScrollToTop scrolled={scrolled} />
     </div>
   );
 }
