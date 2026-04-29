@@ -25,6 +25,46 @@ import {
   ChevronDown
 } from "lucide-react"
 
+// Static fallback for Indian States in case API fails
+const FALLBACK_STATES = [
+  { name: "Andaman and Nicobar Islands", iso2: "AN" },
+  { name: "Andhra Pradesh", iso2: "AP" },
+  { name: "Arunachal Pradesh", iso2: "AR" },
+  { name: "Assam", iso2: "AS" },
+  { name: "Bihar", iso2: "BR" },
+  { name: "Chandigarh", iso2: "CH" },
+  { name: "Chhattisgarh", iso2: "CT" },
+  { name: "Dadra and Nagar Haveli and Daman and Diu", iso2: "DN" },
+  { name: "Delhi", iso2: "DL" },
+  { name: "Goa", iso2: "GA" },
+  { name: "Gujarat", iso2: "GJ" },
+  { name: "Haryana", iso2: "HR" },
+  { name: "Himachal Pradesh", iso2: "HP" },
+  { name: "Jammu and Kashmir", iso2: "JK" },
+  { name: "Jharkhand", iso2: "JH" },
+  { name: "Karnataka", iso2: "KA" },
+  { name: "Kerala", iso2: "KL" },
+  { name: "Ladakh", iso2: "LA" },
+  { name: "Lakshadweep", iso2: "LD" },
+  { name: "Madhya Pradesh", iso2: "MP" },
+  { name: "Maharashtra", iso2: "MH" },
+  { name: "Manipur", iso2: "MN" },
+  { name: "Meghalaya", iso2: "ML" },
+  { name: "Mizoram", iso2: "MZ" },
+  { name: "Nagaland", iso2: "NL" },
+  { name: "Odisha", iso2: "OR" },
+  { name: "Puducherry", iso2: "PY" },
+  { name: "Punjab", iso2: "PB" },
+  { name: "Rajasthan", iso2: "RJ" },
+  { name: "Sikkim", iso2: "SK" },
+  { name: "Tamil Nadu", iso2: "TN" },
+  { name: "Telangana", iso2: "TG" },
+  { name: "Tripura", iso2: "TR" },
+  { name: "Uttar Pradesh", iso2: "UP" },
+  { name: "Uttarakhand", iso2: "UT" },
+  { name: "West Bengal", iso2: "WB" }
+];
+
 export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const dispatch = useDispatch()
   const userInfo = useSelector((state) => state.auth?.userInfo || null);
@@ -149,15 +189,22 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const fetchStates = async () => {
     setLoadingStates(true)
     try {
-      const response = await fetch('https://api.countrystatecity.in/v1/countries/IN/states', {
-        headers: {
-          'X-CSCAPI-KEY': 'NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA=='
-        }
+      const response = await fetch('https://countriesnow.space/api/v0.1/countries/states', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country: "India" })
       })
-      const data = await response.json()
+      const result = await response.json()
+      if (result.error) throw new Error(result.msg)
+      
+      const data = result.data.states.map(s => ({
+        name: s.name,
+        iso2: s.state_code || s.name
+      }))
       setStates(data)
     } catch (error) {
       console.error('Error fetching states:', error)
+      setStates(FALLBACK_STATES)
     } finally {
       setLoadingStates(false)
     }
@@ -166,15 +213,25 @@ export default function KYCPage({ darkModeFromParent, onComplete, onSkip }) {
   const fetchCities = async (stateCode) => {
     setLoadingCities(true)
     try {
-      const response = await fetch(`https://api.countrystatecity.in/v1/countries/IN/states/${stateCode}/cities`, {
-        headers: {
-          'X-CSCAPI-KEY': 'NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA=='
-        }
+      const state = states.find(s => s.iso2 === stateCode || s.name === stateCode)
+      const stateName = state ? state.name : stateCode
+
+      const response = await fetch('https://countriesnow.space/api/v0.1/countries/state/cities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          country: "India",
+          state: stateName
+        })
       })
-      const data = await response.json()
+      const result = await response.json()
+      if (result.error) throw new Error(result.msg)
+
+      const data = result.data.map(cityName => ({ name: cityName }))
       setCities(data)
     } catch (error) {
       console.error('Error fetching cities:', error)
+      setCities([])
     } finally {
       setLoadingCities(false)
     }
