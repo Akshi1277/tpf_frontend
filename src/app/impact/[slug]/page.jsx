@@ -11,6 +11,7 @@ import GlobalLoader from "@/components/GlobalLoader";
 import Navbar from "@/components/layout/Navbar";
 import { getMediaUrl } from "@/utils/media";
 import Footer from "@/components/layout/Footer";
+import { slugToId } from "@/utils/slug";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -95,7 +96,8 @@ function PullQuote({ text, T }) {
 }
 
 export default function ImpactStoryDetailPage() {
-    const { id } = useParams();
+    const { slug } = useParams();
+    const id = slugToId(slug);
     const router = useRouter();
 
     const [story, setStory] = useState(null);
@@ -290,10 +292,7 @@ export default function ImpactStoryDetailPage() {
                                         </p>
 
                                         <div className={`flex items-center gap-4 mt-4 text-xs ${T.muted}`}>
-                                            <span className="flex items-center gap-1.5">
-                                                <Calendar className="w-3.5 h-3.5" />
-                                                {fmt(story.updatedAt || story.createdAt)}
-                                            </span>
+                                           
                                             <span className="flex items-center gap-1.5">
                                                 <Globe className="w-3.5 h-3.5" />
                                                 Verified · TPF Aid

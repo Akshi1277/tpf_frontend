@@ -1,17 +1,16 @@
 import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getMediaUrl } from '@/utils/media';
+import { toSlug } from '@/utils/slug';
 
 export default function StoryCard({ story, darkMode }) {
   const router = useRouter();
 
-  const handleCardClick = () => {
-    if (story.story && story.story.trim().length > 0) {
-      router.push(`/impact/${story._id}`);
-    } else {
-      alert("Full story is not available.");
-    }
-  };
+const handleCardClick = () => {
+  if (story._id) {
+    router.push(`/impact/${toSlug(story.title, story._id)}`);
+  }
+};
 
   return (
     <div
