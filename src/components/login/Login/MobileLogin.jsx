@@ -18,7 +18,9 @@ export default function MobileLogin({
   handleOtpSubmit,
   setStep,
   sendingOtp,
-  verifyingOtp
+  verifyingOtp,
+  handleResend,
+  resendCooldown
 }) {
   return (
     <div className="lg:hidden min-h-screen flex flex-col">
@@ -26,12 +28,10 @@ export default function MobileLogin({
       <div className="relative px-4 pt-24 pb-8">
         {/* Decorative Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className={`absolute top-0 left-0 w-72 h-72 rounded-full blur-3xl opacity-20 ${
-            darkMode ? "bg-emerald-500/30" : "bg-emerald-400/40"
-          }`} />
-          <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20 ${
-            darkMode ? "bg-teal-500/30" : "bg-teal-400/40"
-          }`} />
+          <div className={`absolute top-0 left-0 w-72 h-72 rounded-full blur-3xl opacity-20 ${darkMode ? "bg-emerald-500/30" : "bg-emerald-400/40"
+            }`} />
+          <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20 ${darkMode ? "bg-teal-500/30" : "bg-teal-400/40"
+            }`} />
         </div>
 
         {/* Content */}
@@ -63,19 +63,18 @@ export default function MobileLogin({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 + i * 0.1 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
-                  color === "emerald"
-                    ? darkMode
-                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                      : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                    : color === "blue"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${color === "emerald"
+                  ? darkMode
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                    : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                  : color === "blue"
                     ? darkMode
                       ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
                       : "bg-blue-50 text-blue-700 border border-blue-200"
                     : darkMode
                       ? "bg-pink-500/20 text-pink-300 border border-pink-500/30"
                       : "bg-pink-50 text-pink-700 border border-pink-200"
-                }`}
+                  }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 {text}
@@ -91,20 +90,17 @@ export default function MobileLogin({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className={`rounded-3xl p-6 sm:p-8 relative overflow-hidden ${
-            darkMode
-              ? "bg-zinc-900/80 backdrop-blur-xl border-2 border-zinc-800"
-              : "bg-white/90 backdrop-blur-xl border-2 border-gray-100 shadow-xl"
-          }`}
+          className={`rounded-3xl p-6 sm:p-8 relative overflow-hidden ${darkMode
+            ? "bg-zinc-900/80 backdrop-blur-xl border-2 border-zinc-800"
+            : "bg-white/90 backdrop-blur-xl border-2 border-gray-100 shadow-xl"
+            }`}
         >
           {/* Subtle gradient */}
           <div className="absolute inset-0 opacity-40">
-            <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl ${
-              darkMode ? "bg-emerald-500/20" : "bg-emerald-100"
-            }`} />
-            <div className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-3xl ${
-              darkMode ? "bg-teal-500/20" : "bg-teal-100"
-            }`} />
+            <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl ${darkMode ? "bg-emerald-500/20" : "bg-emerald-100"
+              }`} />
+            <div className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-3xl ${darkMode ? "bg-teal-500/20" : "bg-teal-100"
+              }`} />
           </div>
 
           <div className="relative z-10 space-y-6">
@@ -127,37 +123,33 @@ export default function MobileLogin({
                 </div>
 
                 {/* Login Method Toggle */}
-                <div className={`p-1.5 rounded-2xl relative ${
-                  darkMode ? "bg-zinc-800/50" : "bg-gray-100"
-                }`}>
+                <div className={`p-1.5 rounded-2xl relative ${darkMode ? "bg-zinc-800/50" : "bg-gray-100"
+                  }`}>
                   <div className="grid grid-cols-2 relative">
                     <motion.div
                       layoutId="mobileActiveTab"
-                      className={`absolute inset-y-0 w-1/2 rounded-xl ${
-                        darkMode ? "bg-zinc-900 shadow-lg" : "bg-white shadow-md"
-                      }`}
+                      className={`absolute inset-y-0 w-1/2 rounded-xl ${darkMode ? "bg-zinc-900 shadow-lg" : "bg-white shadow-md"
+                        }`}
                       initial={false}
                       animate={{ x: loginMethod === "email" ? "0%" : "100%" }}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                     <button
                       onClick={() => setLoginMethod("email")}
-                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-                        loginMethod === "email"
-                          ? darkMode ? "text-emerald-400" : "text-emerald-600"
-                          : darkMode ? "text-zinc-500" : "text-gray-500"
-                      }`}
+                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${loginMethod === "email"
+                        ? darkMode ? "text-emerald-400" : "text-emerald-600"
+                        : darkMode ? "text-zinc-500" : "text-gray-500"
+                        }`}
                     >
                       <Mail className="w-4 h-4" />
                       Email
                     </button>
                     <button
                       onClick={() => setLoginMethod("mobile")}
-                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-                        loginMethod === "mobile"
-                          ? darkMode ? "text-emerald-400" : "text-emerald-600"
-                          : darkMode ? "text-zinc-500" : "text-gray-500"
-                      }`}
+                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${loginMethod === "mobile"
+                        ? darkMode ? "text-emerald-400" : "text-emerald-600"
+                        : darkMode ? "text-zinc-500" : "text-gray-500"
+                        }`}
                     >
                       <Phone className="w-4 h-4" />
                       Mobile
@@ -182,11 +174,10 @@ export default function MobileLogin({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className={`w-full px-4 py-3.5 rounded-xl border-2 outline-none text-base transition-all ${
-                          darkMode
-                            ? "bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:bg-zinc-800/80"
-                            : "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-500/10"
-                        }`}
+                        className={`w-full px-4 py-3.5 rounded-xl border-2 outline-none text-base transition-all ${darkMode
+                          ? "bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:bg-zinc-800/80"
+                          : "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-500/10"
+                          }`}
                       />
                       <motion.div
                         className="absolute inset-0 rounded-xl pointer-events-none"
@@ -215,11 +206,10 @@ export default function MobileLogin({
                     <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
                       Mobile Number
                     </label>
-                    <div className={`relative flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all group ${
-                      darkMode
-                        ? "bg-zinc-800 border-zinc-700 focus-within:border-emerald-500 focus-within:bg-zinc-800/80"
-                        : "bg-white border-gray-200 focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-500/10"
-                    }`}>
+                    <div className={`relative flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all group ${darkMode
+                      ? "bg-zinc-800 border-zinc-700 focus-within:border-emerald-500 focus-within:bg-zinc-800/80"
+                      : "bg-white border-gray-200 focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-500/10"
+                      }`}>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <svg className="w-6 h-4" viewBox="0 0 30 20">
                           <rect width="30" height="6.67" fill="#FF9933" />
@@ -235,9 +225,8 @@ export default function MobileLogin({
                         value={mobile}
                         onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
                         placeholder="10-digit number"
-                        className={`flex-1 bg-transparent outline-none text-base ${
-                          darkMode ? "text-white placeholder:text-zinc-500" : "text-gray-900 placeholder:text-gray-400"
-                        }`}
+                        className={`flex-1 bg-transparent outline-none text-base ${darkMode ? "text-white placeholder:text-zinc-500" : "text-gray-900 placeholder:text-gray-400"
+                          }`}
                       />
                       <motion.div
                         className="absolute inset-0 rounded-xl pointer-events-none"
@@ -349,11 +338,10 @@ export default function MobileLogin({
                           }
                         }}
                         whileFocus={{ scale: 1.05 }}
-                        className={`w-full aspect-square text-center text-2xl sm:text-3xl font-bold rounded-xl border-2 outline-none transition-all ${
-                          darkMode
-                            ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
-                            : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
-                        }`}
+                        className={`w-full aspect-square text-center text-2xl sm:text-3xl font-bold rounded-xl border-2 outline-none transition-all ${darkMode
+                          ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
+                          : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
+                          }`}
                       />
                     ))}
                   </div>
@@ -396,9 +384,8 @@ export default function MobileLogin({
                     onClick={() => setStep(1)}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className={`py-3 px-6 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${
-                      darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    }`}
+                    className={`py-3 px-6 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      }`}
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     Change {loginMethod === "email" ? "Email" : "Number"}
@@ -407,8 +394,16 @@ export default function MobileLogin({
 
                 <p className={`text-center text-xs sm:text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                   Didn't receive?{" "}
-                  <button className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
-                    Resend code
+                  <button
+                    onClick={handleResend}
+                    disabled={resendCooldown > 0 || sendingOtp}
+                    className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {sendingOtp
+                      ? "Sending..."
+                      : resendCooldown > 0
+                        ? `Resend in ${resendCooldown}s`
+                        : "Resend code"}
                   </button>
                 </p>
               </motion.div>

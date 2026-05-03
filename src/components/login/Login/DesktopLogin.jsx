@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { ArrowRight, ArrowLeft, Mail, Phone } from "lucide-react"
+import { useState } from "react";
 
 export default function DesktopLogin({
   darkMode,
@@ -18,7 +19,9 @@ export default function DesktopLogin({
   handleOtpSubmit,
   setStep,
   sendingOtp,
-  verifyingOtp
+  verifyingOtp,
+  handleResend,
+  resendCooldown
 }) {
   return (
     <div className="hidden lg:grid lg:grid-cols-5 gap-8 lg:gap-12 xl:gap-16 items-center">
@@ -96,19 +99,16 @@ export default function DesktopLogin({
         transition={{ duration: 0.6 }}
         className="lg:col-span-3"
       >
-        <div className={`rounded-3xl p-12 border-2 relative overflow-hidden ${
-          darkMode
+        <div className={`rounded-3xl p-12 border-2 relative overflow-hidden ${darkMode
             ? "bg-zinc-900/50 backdrop-blur-xl border-zinc-800"
             : "bg-white/80 backdrop-blur-xl border-gray-100 shadow-2xl shadow-gray-200/50"
-        }`}>
+          }`}>
           {/* Subtle background gradient */}
           <div className="absolute inset-0 opacity-30">
-            <div className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl ${
-              darkMode ? "bg-emerald-500/10" : "bg-emerald-50"
-            }`} />
-            <div className={`absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl ${
-              darkMode ? "bg-teal-500/10" : "bg-teal-50"
-            }`} />
+            <div className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl ${darkMode ? "bg-emerald-500/10" : "bg-emerald-50"
+              }`} />
+            <div className={`absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl ${darkMode ? "bg-teal-500/10" : "bg-teal-50"
+              }`} />
           </div>
 
           <div className="relative z-10 max-w-md mx-auto space-y-8">
@@ -131,37 +131,33 @@ export default function DesktopLogin({
                 </div>
 
                 {/* Login Method Toggle */}
-                <div className={`p-1.5 rounded-2xl relative ${
-                  darkMode ? "bg-zinc-800/50" : "bg-gray-100"
-                }`}>
+                <div className={`p-1.5 rounded-2xl relative ${darkMode ? "bg-zinc-800/50" : "bg-gray-100"
+                  }`}>
                   <div className="grid grid-cols-2 relative">
                     <motion.div
                       layoutId="activeTab"
-                      className={`absolute inset-y-0 w-1/2 rounded-xl ${
-                        darkMode ? "bg-zinc-900 shadow-lg" : "bg-white shadow-md"
-                      }`}
+                      className={`absolute inset-y-0 w-1/2 rounded-xl ${darkMode ? "bg-zinc-900 shadow-lg" : "bg-white shadow-md"
+                        }`}
                       initial={false}
                       animate={{ x: loginMethod === "email" ? "0%" : "100%" }}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                     <button
                       onClick={() => setLoginMethod("email")}
-                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-                        loginMethod === "email"
+                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${loginMethod === "email"
                           ? darkMode ? "text-emerald-400" : "text-emerald-600"
                           : darkMode ? "text-zinc-500" : "text-gray-500"
-                      }`}
+                        }`}
                     >
                       <Mail className="w-4 h-4" />
                       Email
                     </button>
                     <button
                       onClick={() => setLoginMethod("mobile")}
-                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-                        loginMethod === "mobile"
+                      className={`relative z-10 py-3 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${loginMethod === "mobile"
                           ? darkMode ? "text-emerald-400" : "text-emerald-600"
                           : darkMode ? "text-zinc-500" : "text-gray-500"
-                      }`}
+                        }`}
                     >
                       <Phone className="w-4 h-4" />
                       Mobile
@@ -186,11 +182,10 @@ export default function DesktopLogin({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className={`w-full px-5 py-4 rounded-2xl border-2 outline-none text-lg transition-all ${
-                          darkMode
+                        className={`w-full px-5 py-4 rounded-2xl border-2 outline-none text-lg transition-all ${darkMode
                             ? "bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-emerald-500 focus:bg-zinc-800/80"
                             : "bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-500/10"
-                        }`}
+                          }`}
                       />
                       <motion.div
                         className="absolute inset-0 rounded-2xl pointer-events-none"
@@ -219,11 +214,10 @@ export default function DesktopLogin({
                     <label className={`block text-sm font-medium ${darkMode ? "text-zinc-300" : "text-gray-700"}`}>
                       Mobile Number
                     </label>
-                    <div className={`relative flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all group ${
-                      darkMode
+                    <div className={`relative flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all group ${darkMode
                         ? "bg-zinc-800 border-zinc-700 focus-within:border-emerald-500 focus-within:bg-zinc-800/80"
                         : "bg-white border-gray-200 focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-500/10"
-                    }`}>
+                      }`}>
                       <div className="flex items-center gap-2.5 flex-shrink-0">
                         <svg className="w-7 h-5" viewBox="0 0 30 20">
                           <rect width="30" height="6.67" fill="#FF9933" />
@@ -239,9 +233,8 @@ export default function DesktopLogin({
                         value={mobile}
                         onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
                         placeholder="10-digit number"
-                        className={`flex-1 bg-transparent outline-none text-lg ${
-                          darkMode ? "text-white placeholder:text-zinc-500" : "text-gray-900 placeholder:text-gray-400"
-                        }`}
+                        className={`flex-1 bg-transparent outline-none text-lg ${darkMode ? "text-white placeholder:text-zinc-500" : "text-gray-900 placeholder:text-gray-400"
+                          }`}
                       />
                       <motion.div
                         className="absolute inset-0 rounded-2xl pointer-events-none"
@@ -353,11 +346,10 @@ export default function DesktopLogin({
                           }
                         }}
                         whileFocus={{ scale: 1.05 }}
-                        className={`w-full aspect-square text-center text-3xl font-bold rounded-2xl border-2 outline-none transition-all ${
-                          darkMode
+                        className={`w-full aspect-square text-center text-3xl font-bold rounded-2xl border-2 outline-none transition-all ${darkMode
                             ? "bg-zinc-800 border-zinc-700 text-white focus:border-emerald-500"
                             : "bg-white border-gray-200 text-gray-900 focus:border-emerald-500 focus:shadow-lg"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -400,9 +392,8 @@ export default function DesktopLogin({
                     onClick={() => setStep(1)}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className={`py-3 px-6 rounded-2xl font-medium text-base transition-all flex items-center justify-center gap-2 ${
-                      darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    }`}
+                    className={`py-3 px-6 rounded-2xl font-medium text-base transition-all flex items-center justify-center gap-2 ${darkMode ? "bg-zinc-800 hover:bg-zinc-700 text-zinc-300" : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      }`}
                   >
                     <ArrowLeft className="w-4 h-4" />
                     Change {loginMethod === "email" ? "Email" : "Number"}
@@ -411,27 +402,35 @@ export default function DesktopLogin({
 
                 <p className={`text-center text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
                   Didn't receive?{" "}
-                  <button className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
-                    Resend code
+                  <button
+                    onClick={handleResend}
+                    disabled={resendCooldown > 0 || sendingOtp}
+                    className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {sendingOtp
+                      ? "Sending..."
+                      : resendCooldown > 0
+                        ? `Resend in ${resendCooldown}s`
+                        : "Resend code"}
                   </button>
                 </p>
               </motion.div>
             )}
 
-           <div className="text-center space-y-2">
-  <p className={`text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-    Don't have an account?{" "}
-    <a href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
-      Sign up
-    </a>
-  </p>
-  <p className={`text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
-    Are you an Organization?{" "}
-    <a href="/organization/login" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
-      Login Here
-    </a>
-  </p>
-</div>
+            <div className="text-center space-y-2">
+              <p className={`text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                Don't have an account?{" "}
+                <a href="/signup" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                  Sign up
+                </a>
+              </p>
+              <p className={`text-sm ${darkMode ? "text-zinc-500" : "text-gray-500"}`}>
+                Are you an Organization?{" "}
+                <a href="/organization/login" className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+                  Login Here
+                </a>
+              </p>
+            </div>
 
           </div>
         </div>
