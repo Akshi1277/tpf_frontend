@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   User,
   Heart,
@@ -102,6 +103,9 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion, role }) => 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
+  const router = useRouter();
+  const firstIncomplete = filteredMenuItems.find((i) => i.incomplete);
+
   useEffect(() => setMounted(true), []);
 
   return (
@@ -173,6 +177,15 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion, role }) => 
                 >
                   Complete to unlock all features
                 </p>
+
+                {firstIncomplete && (
+                  <button
+                    onClick={() => { router.push(firstIncomplete.path); onClose?.(); }}
+                    className={`mt-2 w-full text-[10px] sm:text-xs font-semibold cursor-pointer py-1.5 rounded-lg transition-all active:scale-95 bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm hover:shadow-md hover:from-blue-600 hover:to-indigo-600`}
+                  >
+                    Complete Profile →
+                  </button>
+                )}
               </div>
             )}
 
@@ -217,10 +230,7 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion, role }) => 
                       : "hover:bg-gray-50 border-transparent"
                     }`}
                 >
-                  {/* Alert Icon */}
-                  {mounted && item.incomplete && (
-                    <AlertTriangle className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
-                  )}
+              
 
                   {isActive && (
                     <motion.div
@@ -255,12 +265,22 @@ const SidebarContent = memo(({ onClose, darkMode, profileCompletion, role }) => 
                       </p>
                     </div>
 
-                    <ChevronRight className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-all ${isActive
-                      ? darkMode ? "text-white translate-x-0.5" : "text-gray-900 translate-x-0.5"
-                      : darkMode
-                        ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
-                        : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
-                      }`} />
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {mounted && item.incomplete && (
+                        <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                      )}
+
+                      <ChevronRight
+                        className={`w-3 h-3 sm:w-4 sm:h-4 transition-all ${isActive
+                            ? darkMode
+                              ? "text-white translate-x-0.5"
+                              : "text-gray-900 translate-x-0.5"
+                            : darkMode
+                              ? "text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                              : "text-gray-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                          }`}
+                      />
+                    </div>
                   </div>
                 </motion.div>
               </Link>

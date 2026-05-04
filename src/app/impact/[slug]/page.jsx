@@ -375,7 +375,7 @@ export default function ImpactStoryDetailPage() {
                                         <span className={`text-xs ${T.muted}`}>TPF Aid · Verified Impact Story</span>
                                         <button
                                             onClick={() => router.push("/#stories")}
-                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-500 hover:underline"
+                                            className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-500 hover:underline cursor-pointer"
                                         >
                                             <ArrowLeft className="w-3 h-3" /> More stories
                                         </button>

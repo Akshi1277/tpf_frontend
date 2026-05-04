@@ -13,8 +13,10 @@ import MobileLogin from "@/components/login/Login/MobileLogin"
 
 export default function LoginPage({ darkMode }) {
   const router = useRouter()
+ 
   const dispatch = useDispatch()
   const [loginMethod, setLoginMethod] = useState("email")
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [email, setEmail] = useState("")
   const [mobile, setMobile] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
@@ -67,6 +69,25 @@ export default function LoginPage({ darkMode }) {
     }
   }
 
+
+const handleResend = async () => {
+  if (resendCooldown > 0) return;
+
+  await handleLogin(); // send OTP again
+
+  setResendCooldown(30); // 30 sec cooldown
+
+  const timer = setInterval(() => {
+    setResendCooldown((prev) => {
+      if (prev <= 1) {
+        clearInterval(timer);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+};
+
   const handleOtpSubmit = async () => {
     if (otp.length !== 4) return
 
@@ -87,7 +108,7 @@ export default function LoginPage({ darkMode }) {
         duration: 2000,
       })
 
-      setTimeout(() => router.push("/profile/userprofile"), 2500)
+      setTimeout(() => router.push("/profile/mydonation"), 2500)
     } catch {
       showToast({
         type: "error",
@@ -180,6 +201,8 @@ export default function LoginPage({ darkMode }) {
             setStep={setStep}
             sendingOtp={sendingOtp}
             verifyingOtp={verifyingOtp}
+            handleResend={handleResend}
+            resendCooldown={resendCooldown}
           />
 
           {/* Mobile Login */}
@@ -199,6 +222,8 @@ export default function LoginPage({ darkMode }) {
             setStep={setStep}
             sendingOtp={sendingOtp}
             verifyingOtp={verifyingOtp}
+            handleResend={handleResend}
+            resendCooldown={resendCooldown}
           />
         </div>
       </div>
