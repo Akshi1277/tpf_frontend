@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Clock, Target, TrendingUp, Heart, Flame, ArrowUpRight } from "lucide-react";
+import { Users, Clock, Target, TrendingUp, Heart, Flame, ArrowRight } from "lucide-react";
 
 function fmtINR(n) {
   return `₹${Number(n).toLocaleString("en-IN")}`;
 }
 
 export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDonorModalOpen }) {
-  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const raised = campaign?.raisedAmount ?? 0;
   const target = campaign?.targetAmount ?? 1200000;
@@ -52,7 +51,7 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
             </span>
           </div>
           <span className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-            {fmtINR(raised)} of {fmtINR(target)} goal
+            {fmtINR(raised)} raised of goal {fmtINR(target)}
           </span>
         </div>
 
@@ -74,7 +73,7 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
           <span className={`text-[11px] font-semibold ${darkMode ? "text-emerald-400" : "text-emerald-600"}`}>
             {raisedPct}% funded
           </span>
@@ -88,8 +87,45 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
           )}
         </div>
 
-        {/* ── Stats row ── */}
+        {/* ── Donors link ── */}
+        <div className="flex items-center gap-2 mb-6">
+          <Users size={13} className={darkMode ? "text-gray-400" : "text-gray-500"} />
+          <span className={`text-xs sm:text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+            {donors.toLocaleString("en-IN")} donors —
+          </span>
+          <button
+            type="button"
+            onClick={() => setIsDonorModalOpen(true)}
+            className="text-emerald-500 hover:text-emerald-400 font-bold hover:underline cursor-pointer inline-flex items-center gap-0.5 transition-all text-xs sm:text-sm"
+          >
+            Click here to view our supporters <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        {/* ── Stats row: Goal / Raised / Still Needed / Days Remaining ── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+
+          {/* Goal */}
+          <div className={`p-3.5 rounded-2xl border-2 ${
+            darkMode
+              ? "bg-blue-950/50 border-blue-800"
+              : "bg-blue-100 border-blue-200"
+          }`}>
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <Target size={12} className="text-blue-600" />
+              <span className={`text-[10px] font-bold uppercase tracking-widest ${
+                darkMode ? "text-blue-400" : "text-blue-700"
+              }`}>Goal</span>
+            </div>
+            <p className={`text-lg font-bold leading-none ${
+              darkMode ? "text-blue-300" : "text-blue-800"
+            }`}>
+              {fmtINR(target)}
+            </p>
+            <p className={`text-[11px] mt-1 font-medium ${
+              darkMode ? "text-blue-500" : "text-blue-600"
+            }`}>Annual target</p>
+          </div>
 
           {/* Raised */}
           <div className={`p-3.5 rounded-2xl border-2 ${
@@ -103,7 +139,7 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
                 darkMode ? "text-emerald-400" : "text-emerald-700"
               }`}>Raised</span>
             </div>
-            <p className={`text-lg font-extrabold leading-none ${
+            <p className={`text-lg font-bold leading-none ${
               darkMode ? "text-emerald-300" : "text-emerald-800"
             }`}>
               {fmtINR(raised)}
@@ -125,7 +161,7 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
                 darkMode ? "text-orange-400" : "text-orange-700"
               }`}>Still Needed</span>
             </div>
-            <p className={`text-lg font-extrabold leading-none ${
+            <p className={`text-lg font-bold leading-none ${
               darkMode ? "text-orange-300" : "text-orange-700"
             }`}>
               {fmtINR(remaining)}
@@ -135,72 +171,7 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
             }`}>To reach goal</p>
           </div>
 
-          {/* Donors — with tooltip */}
-          <div className="relative">
-            <button
-              onClick={() => setIsDonorModalOpen?.(true)}
-              onMouseEnter={() => setTooltipVisible(true)}
-              onMouseLeave={() => setTooltipVisible(false)}
-              onFocus={() => setTooltipVisible(true)}
-              onBlur={() => setTooltipVisible(false)}
-              className={`w-full h-full p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer ${
-                darkMode
-                  ? "bg-violet-950/50 border-violet-800 hover:border-violet-600 hover:bg-violet-950/70"
-                  : "bg-violet-100 border-violet-200 hover:border-violet-400 hover:bg-violet-150"
-              }`}
-            >
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Users size={12} className="text-violet-600" />
-                <span className={`text-[10px] font-bold uppercase tracking-widest ${
-                  darkMode ? "text-violet-400" : "text-violet-700"
-                }`}>Donors</span>
-              </div>
-              <p className={`text-lg font-extrabold leading-none ${
-                darkMode ? "text-violet-300" : "text-violet-800"
-              }`}>
-                {donors.toLocaleString("en-IN")}
-              </p>
-              <p className={`text-[11px] mt-1 font-medium ${
-                darkMode ? "text-violet-500" : "text-violet-600"
-              }`}>People like you</p>
-
-              {/* Tap indicator — always visible on mobile, hidden on desktop */}
-              <div className={`flex items-center gap-1 mt-2 sm:hidden`}>
-                <ArrowUpRight size={10} className="text-violet-500" />
-                <span className={`text-[9px] font-bold ${
-                  darkMode ? "text-violet-400" : "text-violet-600"
-                }`}>Tap to view</span>
-              </div>
-            </button>
-
-            {/* Tooltip — desktop hover only */}
-            <div className={`
-              hidden sm:block
-              absolute top-full left-1/2 -translate-x-1/2 mt-3 z-30
-              w-44 rounded-xl shadow-xl pointer-events-none
-              transition-all duration-200
-              ${tooltipVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"}
-              ${darkMode ? "bg-zinc-800 border border-zinc-700" : "bg-gray-900"}
-            `}>
-              {/* Arrow pointing UP */}
-              <div className={`absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 rounded-sm ${
-                darkMode ? "bg-zinc-800 border-l border-t border-zinc-700" : "bg-gray-900"
-              }`} />
-              <div className="px-3 py-2.5">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Users size={11} className="text-violet-400 shrink-0" />
-                  <p className="text-white text-[11px] font-bold leading-tight">
-                    View our supporters
-                  </p>
-                </div>
-                <p className="text-gray-400 text-[10px] leading-tight">
-                  Click to see who donated to this campaign
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Days Left */}
+          {/* Days Remaining */}
           {daysLeft !== null ? (
             <div className={`p-3.5 rounded-2xl border-2 ${
               daysLeft < 30
@@ -213,7 +184,7 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
                   darkMode ? "text-gray-400" : "text-gray-600"
                 }`}>Days Left</span>
               </div>
-              <p className={`text-lg font-extrabold leading-none ${
+              <p className={`text-lg font-bold leading-none ${
                 daysLeft < 30
                   ? "text-red-500"
                   : darkMode ? "text-white" : "text-gray-900"
@@ -226,22 +197,20 @@ export default function ExpenseProgress({ campaign, darkMode, onDonate, setIsDon
             </div>
           ) : (
             <div className={`p-3.5 rounded-2xl border-2 ${
-              darkMode ? "bg-blue-950/50 border-blue-800" : "bg-blue-100 border-blue-200"
+              darkMode ? "bg-gray-800/80 border-gray-700" : "bg-gray-100 border-gray-200"
             }`}>
               <div className="flex items-center gap-1.5 mb-1.5">
-                <Target size={12} className="text-blue-600" />
+                <Clock size={12} className={darkMode ? "text-gray-400" : "text-gray-500"} />
                 <span className={`text-[10px] font-bold uppercase tracking-widest ${
-                  darkMode ? "text-blue-400" : "text-blue-700"
-                }`}>Goal</span>
+                  darkMode ? "text-gray-400" : "text-gray-600"
+                }`}>Days Left</span>
               </div>
-              <p className={`text-lg font-extrabold leading-none ${
-                darkMode ? "text-blue-300" : "text-blue-800"
-              }`}>
-                {fmtINR(target)}
+              <p className={`text-lg font-bold leading-none ${darkMode ? "text-white" : "text-gray-900"}`}>
+                —
               </p>
-              <p className={`text-[11px] mt-1 font-medium ${
-                darkMode ? "text-blue-500" : "text-blue-600"
-              }`}>Annual target</p>
+              <p className={`text-[11px] mt-1 font-medium ${darkMode ? "text-gray-500" : "text-gray-600"}`}>
+                No deadline set
+              </p>
             </div>
           )}
         </div>

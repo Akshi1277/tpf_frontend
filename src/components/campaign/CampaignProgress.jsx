@@ -9,7 +9,8 @@ import {
   ArrowRight,
   TrendingUp as TrendingUpIcon,
   X,
-  CheckCircle
+  CheckCircle,
+  Target
 } from "lucide-react";
 import { useState } from "react";
 import Image from 'next/image';
@@ -70,6 +71,8 @@ export default function CampaignProgress({ darkMode, campaign, onDonateClick, is
       )
     )
     : 0;
+// Add this calculation near the other derived values (after avgDonation)
+const remaining = Math.max(0, targetAmount - raisedAmount);
 
   const avgDonation =
     totalDonors > 0 ? Math.round(raisedAmount / totalDonors) : 0;
@@ -170,7 +173,7 @@ export default function CampaignProgress({ darkMode, campaign, onDonateClick, is
                     {percentage}%
                   </div>
                   <div className={`text-xs sm:text-base md:text-lg pb-0.5 sm:pb-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-                    of ₹{formatNumber(targetAmount)}
+                    raised of goal ₹{formatNumber(targetAmount)}
                   </div>
                 </div>
               )}
@@ -299,29 +302,37 @@ export default function CampaignProgress({ darkMode, campaign, onDonateClick, is
             )}
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-1 sm:gap-3">
-              <StatCard
-                darkMode={darkMode}
-                icon={<Users className="w-4 h-4 sm:w-5 sm:h-5" />}
-                value={formatNumber(totalDonors)}
-                label="Donors"
-                color="emerald"
-              />
-              <StatCard
-                darkMode={darkMode}
-                icon={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />}
-                value={isFoundation ? "Permanent" : formatNumber(daysLeft)}
-                label={isFoundation ? "Fund Status" : "Days Left"}
-                color="blue"
-              />
-              <StatCard
-                darkMode={darkMode}
-                icon={<IndianRupee className="w-4 h-4 sm:w-5 sm:h-5" />}
-                value={`₹${formatNumber(avgDonation)}`}
-                label="Avg. Donation"
-                color="purple"
-              />
-            </div>
+           {/* Stats */}
+<div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-3">
+  <StatCard
+    darkMode={darkMode}
+    icon={<Target className="w-4 h-4 sm:w-5 sm:h-5" />}
+    value={`₹${formatNumber(targetAmount)}`}
+    label="Goal"
+    color="blue"
+  />
+  <StatCard
+    darkMode={darkMode}
+    icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
+    value={`₹${formatNumber(raisedAmount)}`}
+    label="Raised"
+    color="emerald"
+  />
+  <StatCard
+    darkMode={darkMode}
+    icon={<IndianRupee className="w-4 h-4 sm:w-5 sm:h-5" />}
+    value={`₹${formatNumber(remaining)}`}
+    label="Still Needed"
+    color="purple"
+  />
+  <StatCard
+    darkMode={darkMode}
+    icon={<Calendar className="w-4 h-4 sm:w-5 sm:h-5" />}
+    value={isFoundation ? "Permanent" : formatNumber(daysLeft)}
+    label={isFoundation ? "Fund Status" : "Days Left"}
+    color="orange"
+  />
+</div>
           </div>
 
           {/* RIGHT: TRUST & SAFETY - Only visible on desktop (lg and above) */}
