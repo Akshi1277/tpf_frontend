@@ -174,6 +174,18 @@ export default function AllCampaignsPage() {
                     ))}
                 </div>
 
+                {/* Load More Button */}
+                {visibleCount < filteredCampaigns.length && (
+                    <div className="mt-12 text-center">
+                        <button
+                            onClick={loadMore}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-full transition-all shadow-lg hover:shadow-emerald-500/20 active:scale-95"
+                        >
+                            Load More Campaigns
+                        </button>
+                    </div>
+                )}
+
                 {filteredCampaigns.length === 0 && (
                     <div className={`text-center py-20 ${COLORS.neutralBody}`}>
                         <p className="text-xl">No campaigns found in this category.</p>
