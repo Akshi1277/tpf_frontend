@@ -117,7 +117,7 @@ export default function DesktopNav({
         {isAuthReady && !isOrganization && (
           <button
             className="hidden md:flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm transition-colors cursor-pointer whitespace-nowrap"
-            onClick={() => checkNavigation('/financial-aid')}
+            onClick={() => router.push('/financial-aid')}
           >
             Start fundraising
           </button>

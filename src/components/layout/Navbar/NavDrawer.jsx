@@ -264,15 +264,26 @@ export default function MobileMenu({
 
               {/* ── DISCOVER ───────────────────────────────── */}
               <FadeIn delay={110}>
-                <Link
-                  href="/#campaigns"
-                  className={`flex items-center gap-2.5 text-sm font-medium transition-colors
-                    ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-emerald-600'}`}
-                  onClick={close}
-                >
-                  <Globe className="w-4.5 h-4.5 flex-shrink-0" style={{ width: 18, height: 18 }} />
-                  Discover inspiring campaigns →
-                </Link>
+                <div className="space-y-3">
+                  <Link
+                    href="/#campaigns"
+                    className={`flex items-center gap-2.5 text-sm font-medium transition-colors
+                      ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-emerald-600'}`}
+                    onClick={close}
+                  >
+                    <Globe className="w-4.5 h-4.5 flex-shrink-0" style={{ width: 18, height: 18 }} />
+                    Discover inspiring campaigns →
+                  </Link>
+                  <Link
+                    href="/all-impact-stories"
+                    className={`flex items-center gap-2.5 text-sm font-medium transition-colors
+                      ${darkMode ? 'text-zinc-300 hover:text-white' : 'text-zinc-700 hover:text-emerald-600'}`}
+                    onClick={close}
+                  >
+                    <Heart className="w-4.5 h-4.5 flex-shrink-0" style={{ width: 18, height: 18 }} />
+                    Discover impact stories →
+                  </Link>
+                </div>
               </FadeIn>
 
               {/* ── VOLUNTEER — only shown once auth resolved ──────────────── */}

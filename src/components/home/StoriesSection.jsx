@@ -2,6 +2,7 @@
 import { useRef } from 'react';
 import StoryCard from '@/components/ui/StoryCard';
 import { useCMS } from '@/app/CMSContext';
+import Link from 'next/link';
 
 export default function StoriesSection({ darkMode }) {
   const containerRef = useRef(null);
@@ -40,27 +41,35 @@ export default function StoriesSection({ darkMode }) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${darkMode ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'}`}>
-              <span className={`text-2xl md:text-3xl font-semibold ${darkMode ? 'text-emerald-400' : 'text-black'}`}>
-                Impact Stories
-              </span>
+        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-4 mb-10">
+          <div className="flex-1 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2 mb-4">
+              <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${darkMode ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'}`}>
+                <span className={`text-2xl md:text-3xl font-semibold ${darkMode ? 'text-emerald-400' : 'text-black'}`}>
+                  Impact Stories
+                </span>
+              </div>
+              <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'} sm:hidden`}></div>
             </div>
-            <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
+
+            <h2 className={`text-xl md:text-2xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+              Building Īmān,
+              <span className={`block mt-1 ${darkMode ? 'text-emerald-400' : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'}`}>
+                Inspiring Hearts
+              </span>
+            </h2>
+
+            <p className={`text-sm md:text-base ${COLORS.neutralBody} max-w-2xl mx-auto sm:mx-0 leading-relaxed`}>
+              Every act of kindness strengthens our unity and faith. These are the journeys of hope, resilience, and spiritual renewal that flourish through your support.
+            </p>
           </div>
 
-          <h2 className={`text-xl md:text-2xl font-bold mb-3 ${COLORS.neutralHeading}`}>
-            Building Īmān,
-            <span className={`block mt-1 ${darkMode ? 'text-emerald-400' : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'}`}>
-              Inspiring Hearts
-            </span>
-          </h2>
-
-          <p className={`text-sm md:text-base ${COLORS.neutralBody} max-w-2xl mx-auto leading-relaxed`}>
-            Every act of kindness strengthens our unity and faith. These are the journeys of hope, resilience, and spiritual renewal that flourish through your support.
-          </p>
+          <Link href="/all-impact-stories">
+            <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-6 py-2.5 rounded-full text-white hover:bg-emerald-700 transition-all shadow-md hover:shadow-emerald-500/20 active:scale-95 whitespace-nowrap">
+              Discover more
+            </button>
+          </Link>
         </div>
 
         {/* Carousel */}
