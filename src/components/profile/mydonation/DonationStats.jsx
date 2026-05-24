@@ -23,7 +23,8 @@ export default function DonationStats({
   leaderboardError = false,
   getRankIcon,
   peopleHelped = 0,
-  rankByTab = {}
+  rankByTab = {},
+  combinedTotalAmount
 }) {
 
   const [activeTab, setActiveTab] = useState("weekly")
@@ -93,7 +94,7 @@ export default function DonationStats({
               {hasAnyDonations && donationStats.totalAmount > 0 ? (
                 <p className={`text-2xl md:text-3xl font-bold ${darkMode ? "text-white" : "text-gray-900"
                   }`}>
-                  ₹{donationStats.totalAmount.toLocaleString('en-IN')}
+                  ₹{(combinedTotalAmount || donationStats.totalAmount).toLocaleString('en-IN')}
                 </p>
               ) : (
                 <p className={`text-sm md:text-base font-semibold ${darkMode ? "text-zinc-300" : "text-gray-700"

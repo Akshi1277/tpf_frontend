@@ -18,6 +18,7 @@ import DonationHistory from "./DonationHistory"
 import RealWorldImpact from "./RealWorldImpact"
 import { useGetLeaderboardStatsQuery } from "@/utils/slices/leaderboardApiSlice"
 import { useGetRecentTransactionsQuery, useGetPeopleHelpedStatsQuery } from "@/utils/slices/authApiSlice"
+import { useFetchMyDonationsQuery } from "@/utils/slices/donationApiSlice"
 
 export default function DonationsPage({ darkModeFromParent }) {
   const userInfo = useSelector((state) => state.auth.userInfo || [])
@@ -48,6 +49,11 @@ export default function DonationsPage({ darkModeFromParent }) {
     isError: leaderboardError,
   } = useGetLeaderboardStatsQuery()
 
+  const { data: myDonationsData } = useFetchMyDonationsQuery({
+  page: 1,
+  limit: 1,  // just need the stats, not the list
+  dateFilter: "all"
+});
 
 // AFTER (fixed)
 const currentUserStats = leaderboardStats?.currentUser || {};
@@ -180,6 +186,7 @@ const currentUser = {
           leaderboardLoading={leaderboardLoading}
           leaderboardError={leaderboardError}
           getRankIcon={getRankIcon}
+          combinedTotalAmount={myDonationsData?.stats?.totalFilteredAmount || donationStats.totalAmount}
           peopleHelped={peopleHelped}
         />
 
