@@ -54,8 +54,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
     donationType: "all",
     dateFilter: "all",
     customStartDate: "",
-    customEndDate: "",
-    show80GOnly: false
+    customEndDate: ""
   })
 
   // Fetch real transactions
@@ -204,7 +203,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
     });
 
     // 0. KYC Check for 80G
-    if (txn.taxEligible && kycDetails?.status !== 'verified') {
+    if (kycDetails?.status !== 'verified') {
       alert("KYC verification is required to download a valid 80G tax receipt. Please complete your KYC in the Profile section and wait for admin approval (usually within 24 working hours).");
       return;
     }
@@ -245,7 +244,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
     doc.line(15, 52, 100, 52);
 
     // Add "Tax Benefit" Badge if eligible
-    if (txn.taxEligible) {
+    if (kycDetails?.status === 'verified') {
       doc.setFillColor(236, 253, 245); // Light emerald bg
       doc.roundedRect(150, 44, 45, 8, 1, 1, 'F');
       doc.setTextColor(5, 150, 105); // Emerald 600 text
@@ -273,7 +272,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
 
     startY += 20;
 
-    if (txn.taxEligible && kycDetails?.status === 'verified') {
+    if (kycDetails?.status === 'verified') {
       addField("Donor PAN:", kycDetails.panNumber || "N/A", startY);
       addField("City:", kycDetails.city || "N/A", startY + lineHeight);
       addField("State:", kycDetails.state || "N/A", startY + lineHeight * 2);
@@ -760,8 +759,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
       donationType: "all",
       dateFilter: "all",
       customStartDate: "",
-      customEndDate: "",
-      show80GOnly: false
+      customEndDate: ""
     })
     setCurrentPage(1)
     setShowCustomDateRange(false)
@@ -1020,7 +1018,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
               </div>
 
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+              <div className="grid grid-cols-1 mb-6">
                 <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${darkMode ? "bg-zinc-900/50 border-zinc-700" : "bg-gray-50 border-gray-200"
                   }`}>
                   <p className={`text-xs font-medium mb-1 ${darkMode ? "text-zinc-400" : "text-gray-600"
@@ -1034,22 +1032,6 @@ export default function DownloadsPage({ darkModeFromParent }) {
                   <p className={`text-xs mt-1 ${darkMode ? "text-zinc-500" : "text-gray-500"
                     }`}>
                     {pagination.totalDonations} {pagination.totalDonations === 1 ? 'invoice' : 'invoices'}
-                  </p>
-                </div>
-
-                <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border ${darkMode ? "bg-emerald-900/20 border-emerald-700/50" : "bg-emerald-50 border-emerald-200"
-                  }`}>
-                  <p className={`text-xs font-medium mb-1 ${darkMode ? "text-emerald-400" : "text-emerald-700"
-                    }`}>
-                    80G Eligible Amount
-                  </p>
-                  <p className={`text-xl sm:text-2xl font-bold ${darkMode ? "text-emerald-400" : "text-emerald-600"
-                    }`}>
-                    ₹{stats.total80GAmount.toLocaleString('en-IN')}
-                  </p>
-                  <p className={`text-xs mt-1 ${darkMode ? "text-emerald-500" : "text-emerald-600"
-                    }`}>
-                    {stats.eligibleDonationsCount} eligible donations
                   </p>
                 </div>
               </div>
@@ -1096,25 +1078,8 @@ export default function DownloadsPage({ darkModeFromParent }) {
                     </select>
                   </div>
                 </div>
-
-                {/* 80G Toggle and Date Filters */}
+                {/* Date Filters */}
                 <div className="flex flex-wrap gap-2 sm:gap-3">
-                  {/* 80G Toggle Button */}
-                  <button
-                    onClick={() => setInvoiceFilters({ ...invoiceFilters, show80GOnly: !invoiceFilters.show80GOnly })}
-                    className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2 ${invoiceFilters.show80GOnly
-                      ? darkMode
-                        ? "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/50"
-                        : "bg-emerald-500 text-white border-2 border-emerald-600"
-                      : darkMode
-                        ? "bg-zinc-700 text-zinc-400 border-2 border-zinc-600 hover:border-emerald-500/50"
-                        : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-emerald-500/50"
-                      }`}
-                  >
-                    <Shield className="w-4 h-4" />
-                    80G Only
-                  </button>
-
                   {quickDateFilters.map((filter) => (
                     <button
                       key={filter.value}
@@ -1136,7 +1101,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
                     </button>
                   ))}
 
-                  {(invoiceFilters.search || invoiceFilters.donationType !== "all" || invoiceFilters.dateFilter !== "all" || invoiceFilters.show80GOnly) && (
+                  {(invoiceFilters.search || invoiceFilters.donationType !== "all" || invoiceFilters.dateFilter !== "all") && (
                     <button
                       onClick={resetFilters}
                       className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base border-2 border-red-500/30 text-red-500 hover:bg-red-500/10 transition-all`}
@@ -1244,7 +1209,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
                             }`}>
                             {txn.recipient}
                           </h3>
-                          {txn.taxEligible && (
+                          {(txn.taxEligible || kycDetails?.status === 'verified') && (
                             <div className={`px-2 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1 flex-shrink-0 ${darkMode ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-100 text-emerald-700"
                               }`}>
                               <Shield className="w-3 h-3" />
