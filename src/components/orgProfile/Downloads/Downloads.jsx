@@ -269,17 +269,20 @@ export default function DownloadsPage({ darkModeFromParent }) {
       addField("Donor PAN:", kycDetails.panNumber || "N/A", startY);
       addField("City:", kycDetails.city || "N/A", startY + lineHeight);
       addField("State:", kycDetails.state || "N/A", startY + lineHeight * 2);
-      startY += lineHeight;
+      addField("Donation Date:", date, startY + lineHeight * 3);
+      startY += lineHeight * 3;
     } else {
       addField("Donor Name:", name, startY);
       if (kycDetails) {
         addField("City:", kycDetails.city || "N/A", startY + lineHeight);
         addField("State:", kycDetails.state || "N/A", startY + lineHeight * 2);
+        addField("Donation Date:", date, startY + lineHeight * 3);
+        startY += lineHeight * 3;
+      } else {
+        addField("Donation Date:", date, startY + lineHeight);
         startY += lineHeight;
       }
     }
-
-    addField("Donation Date:", date, startY + lineHeight);
 
     doc.setFont("helvetica", "bold");
     doc.text("Donation To:", 15, startY + lineHeight * 2);
@@ -480,7 +483,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
       if (data.success && data.donations.length > 0) {
         const donorName = userInfo?.fullName || "Valued Donor";
         const doc = new jsPDF();
-        
+
         const logoData = await getLogoDataUrl('/TPFAid-Logo.png');
         const fallbackBannerData = await getLogoDataUrl('/funding.jpg');
 
@@ -507,8 +510,8 @@ export default function DownloadsPage({ darkModeFromParent }) {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(15);
         doc.setTextColor(40, 40, 40);
-        const titleStr = is80G 
-          ? "80G Tax Benefit Acknowledgement (Consolidated)" 
+        const titleStr = is80G
+          ? "80G Tax Benefit Acknowledgement (Consolidated)"
           : "Donation Payment Receipt & Invoice (Consolidated)";
         doc.text(titleStr, 15, 48);
 
@@ -558,7 +561,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
         addField("Date Range:", dateRange, startY + lineHeight);
         addField("Total Contributions:", `${data.donations.length} Donations`, startY + lineHeight * 2);
         addField("Total Amount Paid:", `INR ${totalAmount.toLocaleString('en-IN')}`, startY + lineHeight * 3);
-        
+
         startY += lineHeight * 4 + 4;
 
         const tableRows = data.donations.map((d) => [
@@ -675,7 +678,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
         doc.setFont("helvetica", "italic");
         doc.text("This is a computer-generated consolidated document. No signature is required.", 105, 288, { align: "center" });
 
-        const filename = is80G 
+        const filename = is80G
           ? `Consolidated_80G_Acknowledgement_${donorName.replace(/\s+/g, '_')}.pdf`
           : `Consolidated_Invoice_${donorName.replace(/\s+/g, '_')}.pdf`;
         doc.save(filename);
@@ -1344,23 +1347,22 @@ export default function DownloadsPage({ darkModeFromParent }) {
                           >
                             <Download className="w-4 h-4 sm:w-5 sm:h-5" />
                           </button>
-                          
+
                           {openDropdownId === txn.id && (
                             <>
-                              <div 
-                                className="fixed inset-0 z-30" 
-                                onClick={() => setOpenDropdownId(null)} 
+                              <div
+                                className="fixed inset-0 z-30"
+                                onClick={() => setOpenDropdownId(null)}
                               />
                               <motion.div
                                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                                 transition={{ duration: 0.15 }}
-                                className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-40 border ${
-                                  darkMode
+                                className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-40 border ${darkMode
                                     ? "bg-zinc-800 border-zinc-700 text-white"
                                     : "bg-white border-gray-100 text-gray-800"
-                                }`}
+                                  }`}
                               >
                                 <div className="py-1 px-1">
                                   <button
@@ -1368,26 +1370,24 @@ export default function DownloadsPage({ darkModeFromParent }) {
                                       handleDownloadIndividual(txn, false);
                                       setOpenDropdownId(null);
                                     }}
-                                    className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-2 transition-all ${
-                                      darkMode 
-                                        ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white" 
+                                    className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-2 transition-all ${darkMode
+                                        ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white"
                                         : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
-                                    }`}
+                                      }`}
                                   >
                                     <FileText className="w-4 h-4 text-blue-500" />
                                     Download Invoice
                                   </button>
-                                  
+
                                   <button
                                     onClick={() => {
                                       handleDownloadIndividual(txn, true);
                                       setOpenDropdownId(null);
                                     }}
-                                    className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-2 transition-all ${
-                                      darkMode 
-                                        ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white" 
+                                    className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-2 transition-all ${darkMode
+                                        ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white"
                                         : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
-                                    }`}
+                                      }`}
                                   >
                                     <Shield className="w-4 h-4 text-emerald-500" />
                                     Download 80G Ack
