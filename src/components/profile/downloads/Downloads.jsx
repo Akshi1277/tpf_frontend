@@ -500,6 +500,7 @@ export default function DownloadsPage({ darkModeFromParent }) {
         doc.setTextColor(80, 80, 80);
         const addressLines = [
           "True Path Foundation",
+          "PAN: AAJCT1092M | 80G: AAJCT1092MF2023101",
           "229A, DDA LIG, Pocket - 12, Jasola,",
           "New Delhi, Delhi - 110025. www.truepathfoundation.in",
           "| support@tpfaid.org | (+91) 94 115 65185"
@@ -1359,8 +1360,8 @@ export default function DownloadsPage({ darkModeFromParent }) {
                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                                 transition={{ duration: 0.15 }}
                                 className={`absolute right-0 mt-2 w-56 rounded-xl shadow-xl z-40 border ${darkMode
-                                    ? "bg-zinc-800 border-zinc-700 text-white"
-                                    : "bg-white border-gray-100 text-gray-800"
+                                  ? "bg-zinc-800 border-zinc-700 text-white"
+                                  : "bg-white border-gray-100 text-gray-800"
                                   }`}
                               >
                                 <div className="py-1 px-1">
@@ -1370,8 +1371,8 @@ export default function DownloadsPage({ darkModeFromParent }) {
                                       setOpenDropdownId(null);
                                     }}
                                     className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-2 transition-all ${darkMode
-                                        ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white"
-                                        : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
+                                      ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white"
+                                      : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
                                       }`}
                                   >
                                     <FileText className="w-4 h-4 text-blue-500" />
@@ -1384,8 +1385,8 @@ export default function DownloadsPage({ darkModeFromParent }) {
                                       setOpenDropdownId(null);
                                     }}
                                     className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-lg flex items-center gap-2 transition-all ${darkMode
-                                        ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white"
-                                        : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
+                                      ? "hover:bg-zinc-700/50 text-zinc-300 hover:text-white"
+                                      : "hover:bg-gray-50 text-gray-700 hover:text-gray-900"
                                       }`}
                                   >
                                     <Shield className="w-4 h-4 text-emerald-500" />
