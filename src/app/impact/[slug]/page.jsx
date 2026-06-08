@@ -15,6 +15,16 @@ import { slugToId } from "@/utils/slug";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
+const renderFormattedText = (text) => {
+    if (!text) return "";
+    const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    const bolded = escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    return <span dangerouslySetInnerHTML={{ __html: bolded }} />;
+};
+
 /* ── viewport reveal hook ── */
 function useReveal(threshold = 0.08) {
     const ref = useRef(null);
@@ -284,11 +294,11 @@ export default function ImpactStoryDetailPage() {
                                         </div>
 
                                         <h1 className={`text-2xl sm:text-3xl md:text-[2rem] font-bold leading-tight tracking-tight ${T.head} mb-3`}>
-                                            {story.title}
+                                            {renderFormattedText(story.title)}
                                         </h1>
 
                                         <p className={`text-sm sm:text-base leading-relaxed ${T.body}`}>
-                                            {story.description}
+                                            {renderFormattedText(story.description)}
                                         </p>
 
                                         <div className={`flex items-center gap-4 mt-4 text-xs ${T.muted}`}>
@@ -351,13 +361,13 @@ export default function ImpactStoryDetailPage() {
                                         <div>
                                             {mainParas.map((p, i) => (
                                                 <Reveal key={i} delay={i * 50}>
-                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{p}</p>
+                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{renderFormattedText(p)}</p>
                                                 </Reveal>
                                             ))}
                                             {pullCandidate && <PullQuote text={pullCandidate} T={T} />}
                                             {secondHalf.map((p, i) => (
                                                 <Reveal key={`s${i}`} delay={i * 50}>
-                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{p}</p>
+                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{renderFormattedText(p)}</p>
                                                 </Reveal>
                                             ))}
                                         </div>
