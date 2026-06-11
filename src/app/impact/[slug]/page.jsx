@@ -15,6 +15,20 @@ import { slugToId } from "@/utils/slug";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
+const renderFormattedText = (text, darkMode = false) => {
+    if (!text) return "";
+    const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    const color = darkMode ? "#f1f5f9" : "#0f172a"; // slate-100 on dark, slate-900 on light
+    const bolded = escaped.replace(
+        /\*\*(.*?)\*\*/g,
+        `<strong style="font-weight:700;color:${color}">\$1</strong>`
+    );
+    return <span dangerouslySetInnerHTML={{ __html: bolded }} />;
+};
+
 /* ── viewport reveal hook ── */
 function useReveal(threshold = 0.08) {
     const ref = useRef(null);
@@ -177,10 +191,10 @@ export default function ImpactStoryDetailPage() {
                         <p className={`${T.head} text-lg font-semibold`}>{error || "Story not found"}</p>
                         <p className={`${T.muted} text-sm`}>This story may have been removed or is temporarily unavailable.</p>
                         <button
-                            onClick={() => router.push("/#stories")}
+                            onClick={() => router.push("/")}
                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-colors"
                         >
-                            <ArrowLeft className="w-4 h-4" /> Back to Stories
+                            <ArrowLeft className="w-4 h-4" /> Back to Home
                         </button>
                     </div>
                 </main>
@@ -202,7 +216,6 @@ export default function ImpactStoryDetailPage() {
         "Community feedback collected",
     ];
 
-    /* impact items — custom SVG, visual first */
     const impacts = [
         {
             number: "01",
@@ -225,6 +238,7 @@ export default function ImpactStoryDetailPage() {
             sub: "Local networks rebuild together, reducing future vulnerability.",
         },
     ];
+
     return (
         <>
             <ReadingProgress />
@@ -233,10 +247,10 @@ export default function ImpactStoryDetailPage() {
             <main className={`${T.page} min-h-screen`}>
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-16">
 
-                    {/* ── back nav ── */}
+                    {/* ── back nav — routes to / (home) ── */}
                     <div className="mb-7" style={{ animation: "fadeUp 0.5s ease both" }}>
                         <button
-                            onClick={() => router.push("/#stories")}
+                            onClick={() => router.push("/")}
                             className={`inline-flex items-center gap-2 text-sm font-medium ${T.muted} hover:text-emerald-500 transition-colors group`}
                         >
                             <span
@@ -245,6 +259,18 @@ export default function ImpactStoryDetailPage() {
                                 <ArrowLeft className="w-3.5 h-3.5" />
                             </span>
                             Impact Stories
+                        </button>
+                    </div>
+
+                    <div className="mb-5">
+                        <button
+                            onClick={() => router.push("/")}
+                            className={`inline-flex items-center gap-1.5 text-xs font-medium ${T.muted} hover:text-emerald-500 transition-colors group`}
+                        >
+                            <span className={`w-6 h-6 rounded-full border ${T.border} flex items-center justify-center group-hover:border-emerald-500/50 transition-colors`}>
+                                <ArrowLeft className="w-3 h-3" />
+                            </span>
+                            Back to Home
                         </button>
                     </div>
 
@@ -268,8 +294,11 @@ export default function ImpactStoryDetailPage() {
 
                                 <div className="p-5 sm:p-6 md:p-7">
 
-                                    {/* title + meta */}
+
+
+                                {/* title + meta */}
                                     <div className="mb-5">
+ 
                                         <div className="flex items-center gap-2 mb-3">
                                             <span
                                                 className="relative flex h-2 w-2 flex-shrink-0"
@@ -282,17 +311,16 @@ export default function ImpactStoryDetailPage() {
                                                 Impact Story
                                             </span>
                                         </div>
-
+ 
                                         <h1 className={`text-2xl sm:text-3xl md:text-[2rem] font-bold leading-tight tracking-tight ${T.head} mb-3`}>
-                                            {story.title}
+                                            {renderFormattedText(story.title, dk)}
                                         </h1>
-
+ 
                                         <p className={`text-sm sm:text-base leading-relaxed ${T.body}`}>
-                                            {story.description}
+                                            {renderFormattedText(story.description, dk)}
                                         </p>
-
+ 
                                         <div className={`flex items-center gap-4 mt-4 text-xs ${T.muted}`}>
-                                           
                                             <span className="flex items-center gap-1.5">
                                                 <Globe className="w-3.5 h-3.5" />
                                                 Verified · TPF Aid
@@ -306,8 +334,8 @@ export default function ImpactStoryDetailPage() {
                                             </button>
                                         </div>
                                     </div>
-
-                                    {/* IMAGE — full width inside card, good height */}
+ 
+                                    {/* IMAGE */}
                                     <div className={`relative rounded-2xl overflow-hidden border ${T.border} bg-zinc-800`}>
                                         <img
                                             src={getMediaUrl(story.image)}
@@ -321,24 +349,20 @@ export default function ImpactStoryDetailPage() {
                                                 transition: "opacity 0.6s ease, transform 0.6s ease",
                                             }}
                                         />
-                                        {/* gradient overlay */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                                         <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
                                             <span className="text-[10px] text-white/50 uppercase tracking-[0.15em]">TPF Aid · Īmān Fund</span>
                                             <span className="text-[10px] text-white/40">Impact Collection</span>
                                         </div>
                                     </div>
-
+ 
                                 </div>
                             </div>
-
+ 
                             {/* ── STORY ARTICLE ── */}
-                            <div
-                                className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}
-                                style={{ animation: "fadeUp 0.55s ease 120ms both" }}
-                            >
+                            <div className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}>
                                 <div className="px-5 sm:px-7 md:px-8 py-6 sm:py-7">
-
+ 
                                     <Reveal>
                                         <div className="flex items-center gap-3 mb-7">
                                             <BookOpen className="w-4 h-4 text-emerald-500 flex-shrink-0" />
@@ -346,18 +370,18 @@ export default function ImpactStoryDetailPage() {
                                             <div className={`flex-1 h-px ${dk ? "bg-zinc-800" : "bg-zinc-100"}`} />
                                         </div>
                                     </Reveal>
-
+ 
                                     {paras.length > 0 ? (
                                         <div>
                                             {mainParas.map((p, i) => (
                                                 <Reveal key={i} delay={i * 50}>
-                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{p}</p>
+                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{renderFormattedText(p, dk)}</p>
                                                 </Reveal>
                                             ))}
                                             {pullCandidate && <PullQuote text={pullCandidate} T={T} />}
                                             {secondHalf.map((p, i) => (
                                                 <Reveal key={`s${i}`} delay={i * 50}>
-                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{p}</p>
+                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{renderFormattedText(p, dk)}</p>
                                                 </Reveal>
                                             ))}
                                         </div>
@@ -369,12 +393,12 @@ export default function ImpactStoryDetailPage() {
                                         </Reveal>
                                     )}
                                 </div>
-
+ 
                                 <Reveal>
                                     <div className={`border-t ${T.border} px-5 sm:px-7 md:px-8 py-3.5 flex items-center justify-between gap-3`}>
                                         <span className={`text-xs ${T.muted}`}>TPF Aid · Verified Impact Story</span>
                                         <button
-                                            onClick={() => router.push("/#stories")}
+                                            onClick={() => router.push("/")}
                                             className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-500 hover:underline cursor-pointer"
                                         >
                                             <ArrowLeft className="w-3 h-3" /> More stories
@@ -382,7 +406,7 @@ export default function ImpactStoryDetailPage() {
                                     </div>
                                 </Reveal>
                             </div>
-
+ 
                             {/* ── VERIFICATION ── */}
                             <Reveal>
                                 <div className={`rounded-3xl border ${T.border} ${T.card} p-5 sm:p-6`}>
@@ -402,15 +426,15 @@ export default function ImpactStoryDetailPage() {
                                     </div>
                                 </div>
                             </Reveal>
-
+ 
                         </div>
                         {/* end left col */}
-
+ 
                         {/* ══════════════
                 RIGHT SIDEBAR
             ══════════════ */}
                         <aside className="space-y-5 lg:sticky lg:top-[72px]">
-
+ 
                             {/* ── Why This Matters ── */}
                             <Reveal dir="right">
                                 <div className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}>
@@ -427,26 +451,23 @@ export default function ImpactStoryDetailPage() {
                                     </div>
                                 </div>
                             </Reveal>
-
-                            {/* ── YOUR DONATION CREATES — editorial rows ── */}
+ 
+                            {/* ── YOUR DONATION CREATES ── */}
                             <Reveal dir="right" delay={70}>
                                 <div className={`rounded-3xl border ${T.border} ${T.card} overflow-hidden`}>
                                     <div className="px-5 pt-5 pb-3 flex items-center justify-between">
                                         <p className={`text-[10px] font-bold uppercase tracking-[0.22em] ${T.muted}`}>Your Donation Creates</p>
                                     </div>
-
+ 
                                     <div className="px-4 pb-4 space-y-4">
                                         {impacts.map((item, i) => (
                                             <div
                                                 key={item.number}
                                                 className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 group"
                                             >
-                                                {/* glowing background */}
                                                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500">
                                                     <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/20 blur-2xl rounded-full" />
                                                 </div>
-
-                                                {/* subtle grid texture */}
                                                 <div
                                                     className="absolute inset-0 opacity-[0.04]"
                                                     style={{
@@ -455,31 +476,21 @@ export default function ImpactStoryDetailPage() {
                                                         backgroundSize: "12px 12px",
                                                     }}
                                                 />
-
                                                 <div className="relative z-10">
-                                                    {/* top row */}
                                                     <div className="flex items-center justify-between mb-2">
                                                         <span className="text-[10px] tracking-[0.2em] uppercase text-emerald-500 font-bold">
                                                             {item.number}
                                                         </span>
-
-                                                        {/* flowing connector */}
                                                         {i !== impacts.length - 1 && (
                                                             <span className="text-[10px] text-zinc-400">↓</span>
                                                         )}
                                                     </div>
-
-                                                    {/* main label */}
                                                     <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-emerald-500 transition">
                                                         {item.label}
                                                     </h3>
-
-                                                    {/* description */}
                                                     <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
                                                         {item.sub}
                                                     </p>
-
-                                                    {/* impact line */}
                                                     <div className="mt-3 h-[2px] w-12 bg-gradient-to-r from-emerald-500 to-transparent group-hover:w-20 transition-all duration-300" />
                                                 </div>
                                             </div>
@@ -487,7 +498,7 @@ export default function ImpactStoryDetailPage() {
                                     </div>
                                 </div>
                             </Reveal>
-
+ 
                             {/* ── Story meta table ── */}
                             <Reveal dir="right" delay={130}>
                                 <div className={`rounded-3xl border ${T.border} ${T.card} divide-y ${T.divider} overflow-hidden`}>
@@ -511,7 +522,7 @@ export default function ImpactStoryDetailPage() {
                                     </div>
                                 </div>
                             </Reveal>
-
+ 
                             {/* ── CTA ── */}
                             <Reveal dir="right" delay={180}>
                                 <div className="rounded-3xl overflow-hidden relative">
@@ -539,7 +550,7 @@ export default function ImpactStoryDetailPage() {
                                     </div>
                                 </div>
                             </Reveal>
-
+ 
                             {/* ── Media links ── */}
                             {story.mediaLinks?.length > 0 && (
                                 <Reveal dir="right" delay={230}>
@@ -569,19 +580,13 @@ export default function ImpactStoryDetailPage() {
                                     </div>
                                 </Reveal>
                             )}
-
+ 
                         </aside>
                     </div>
                 </div>
                 <Footer />
             </main>
-
-            <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(14px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+ 
         </>
     );
 }

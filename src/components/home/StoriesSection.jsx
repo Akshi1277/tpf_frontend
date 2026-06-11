@@ -8,10 +8,17 @@ export default function StoriesSection({ darkMode }) {
   const containerRef = useRef(null);
   const cms = useCMS();
 
-  const cmsImpactStories = cms.filter(item => item.type === "impact-stories");
+  // Sort newest to oldest, then slice to max 8
+  const allStories = cms.filter(item => item.type === "impact-stories");
+  const cmsImpactStories = [...allStories]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 8);
+
   if (!cmsImpactStories || cmsImpactStories.length === 0) {
     return null;
   }
+
+  const hasMore = allStories.length > 8;
 
   const COLORS = {
     neutralHeading: darkMode ? "text-white" : "text-zinc-900",
@@ -40,31 +47,33 @@ export default function StoriesSection({ darkMode }) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-4 mb-10">
-          <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-2 mb-4">
-              <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${darkMode ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'}`}>
-                <span className={`text-2xl md:text-3xl font-semibold ${darkMode ? 'text-emerald-400' : 'text-black'}`}>
-                  Impact Stories
-                </span>
-              </div>
-              <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'} sm:hidden`}></div>
-            </div>
-
-            <h2 className={`text-xl md:text-2xl font-bold mb-3 ${COLORS.neutralHeading}`}>
-              Building Īmān,
-              <span className={`block mt-1 ${darkMode ? 'text-emerald-400' : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'}`}>
-                Inspiring Hearts
+        {/* Header — fully centered, Discover More below on all sizes */}
+        <div className="flex flex-col items-center text-center mb-10 w-full">
+          {/* Badge */}
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${darkMode ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-200'}`}>
+              <span className={`text-2xl md:text-3xl font-semibold ${darkMode ? 'text-emerald-400' : 'text-black'}`}>
+                Impact Stories
               </span>
-            </h2>
-
-            <p className={`text-sm md:text-base ${COLORS.neutralBody} max-w-2xl mx-auto sm:mx-0 leading-relaxed`}>
-              Every act of kindness strengthens our unity and faith. These are the journeys of hope, resilience, and spiritual renewal that flourish through your support.
-            </p>
+            </div>
+            <div className={`h-px w-8 ${darkMode ? 'bg-emerald-500/30' : 'bg-emerald-600/30'}`}></div>
           </div>
 
+          {/* Heading */}
+          <h2 className={`text-xl md:text-2xl font-bold mb-3 ${COLORS.neutralHeading}`}>
+            Building Īmān,
+            <span className={`block mt-1 ${darkMode ? 'text-emerald-400' : 'bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'}`}>
+              Inspiring Hearts
+            </span>
+          </h2>
+
+          {/* Description */}
+          <p className={`text-sm md:text-base ${COLORS.neutralBody} max-w-2xl mx-auto leading-relaxed mb-6`}>
+            Every act of kindness strengthens our unity and faith. These are the journeys of hope, resilience, and spiritual renewal that flourish through your support.
+          </p>
+
+          {/* Discover More button — centered, never displaces heading */}
           <Link href="/all-impact-stories">
             <button className="text-xs sm:text-sm font-medium bg-emerald-600 px-6 py-2.5 rounded-full text-white hover:bg-emerald-700 transition-all shadow-md hover:shadow-emerald-500/20 active:scale-95 whitespace-nowrap">
               Discover more
@@ -133,6 +142,21 @@ export default function StoriesSection({ darkMode }) {
             ← Swipe to see more →
           </p>
         </div>
+
+        {/* "See more" button — shown when there are more than 8 stories */}
+        {hasMore && (
+          <div className="flex justify-center mt-8">
+            <Link href="/all-impact-stories">
+              <button className={`text-sm font-medium px-8 py-3 rounded-full border-2 transition-all duration-200 active:scale-95 ${
+                darkMode
+                  ? 'border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400'
+                  : 'border-emerald-500/60 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-600'
+              }`}>
+                See all stories →
+              </button>
+            </Link>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
