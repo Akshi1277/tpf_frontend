@@ -3,6 +3,16 @@ import { useRouter } from 'next/navigation';
 import { getMediaUrl } from '@/utils/media';
 import { toSlug } from '@/utils/slug';
 
+const renderFormattedText = (text) => {
+  if (!text) return "";
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const bolded = escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  return <span dangerouslySetInnerHTML={{ __html: bolded }} />;
+};
+
 export default function StoryCard({ story, darkMode }) {
   const router = useRouter();
 
@@ -36,11 +46,11 @@ const handleCardClick = () => {
       {/* Content */}
       <div className="p-5 flex flex-col flex-grow">
         <h3 className={`font-bold text-lg mb-2 line-clamp-2 leading-tight ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
-          {story.title}
+          {story.title ? renderFormattedText(story.title) : ""}
         </h3>
 
         <p className={`text-sm mb-4 line-clamp-2 leading-relaxed ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-          {story.description || story.excerpt}
+          {story.description || story.excerpt ? renderFormattedText(story.description || story.excerpt) : ""}
         </p>
 
         <div className={`pt-3 border-t mt-auto ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}>

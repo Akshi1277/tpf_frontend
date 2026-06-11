@@ -216,15 +216,65 @@ export default function MyCampaignsPage({ darkModeFromParent }) {
             <p><span className="font-semibold">Applied on:</span> {new Date(application.createdAt).toLocaleDateString()}</p>
           </div>
 
+          {/* Rejection / Clarification History */}
           {(isRejected || isClarification) && (
-            <div className={`p-4 rounded-lg text-sm mb-4 ${darkMode ? "bg-red-500/10 border border-red-500/20" : "bg-red-50 border border-red-100"
-              }`}>
-              <p className={`font-semibold mb-1 ${darkMode ? "text-red-400" : "text-red-700"}`}>
-                {isClarification ? "Clarification Required:" : "Reason for Rejection:"}
-              </p>
-              <p className={darkMode ? "text-zinc-300" : "text-gray-600"}>
-                {reason}
-              </p>
+            <div className="space-y-3 mb-4">
+              {/* Show legacy singular reason if no clarifications history exists yet */}
+              {(!application.clarifications || application.clarifications.length === 0) && (
+                <div className={`p-4 rounded-lg text-sm ${darkMode ? "bg-red-500/10 border border-red-500/20" : "bg-red-50 border border-red-100"}`}>
+                  <p className={`font-semibold mb-1 ${darkMode ? "text-red-400" : "text-red-700"}`}>
+                    {isClarification ? "Clarification Required:" : "Reason for Rejection:"}
+                  </p>
+                  <p className={darkMode ? "text-zinc-300" : "text-gray-600"}>
+                    {reason}
+                  </p>
+                </div>
+              )}
+
+              {/* Show full history if clarification history exists */}
+              {application.clarifications && application.clarifications.length > 0 && (
+                <div className={`p-4 rounded-lg text-sm border ${darkMode ? "bg-zinc-900/50 border-zinc-700" : "bg-gray-50 border-gray-200"} space-y-4`}>
+                  <p className={`font-bold border-b pb-2 ${darkMode ? "text-emerald-400 border-zinc-700" : "text-emerald-700 border-gray-200"}`}>
+                    Clarification History & Status
+                  </p>
+                  {application.clarifications.map((clar, idx) => (
+                    <div key={idx} className="space-y-1.5 pb-3 border-b last:border-0 last:pb-0 dark:border-zinc-700 border-gray-200">
+                      <div className="flex justify-between items-center text-xs text-gray-400 dark:text-zinc-500">
+                        <span className="font-semibold">Iteration #{idx + 1}</span>
+                        <span>{new Date(clar.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      {clar.adminRemarks && (
+                        <p className={darkMode ? "text-zinc-300" : "text-gray-700"}>
+                          <span className="font-semibold text-xs text-red-500 dark:text-red-400 uppercase tracking-wide mr-1">Admin Remark:</span>
+                          {clar.adminRemarks}
+                        </p>
+                      )}
+                      {clar.beneficiaryComment && (
+                        <p className={darkMode ? "text-zinc-300" : "text-gray-700"}>
+                          <span className="font-semibold text-xs text-emerald-500 dark:text-emerald-400 uppercase tracking-wide mr-1">Your Response:</span>
+                          {clar.beneficiaryComment}
+                        </p>
+                      )}
+                      {clar.documents && clar.documents.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
+                          <span className="font-semibold text-gray-500 dark:text-zinc-400">Attached Docs:</span>
+                          {clar.documents.map((doc, docIdx) => (
+                            <a
+                              key={docIdx}
+                              href={getMediaUrl(doc)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-emerald-600 hover:text-emerald-500 underline break-all mr-2"
+                            >
+                              File {docIdx + 1}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
