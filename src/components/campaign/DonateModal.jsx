@@ -153,7 +153,7 @@ export default function DonatePopUpModal({
       setShowCustomAmountInput(false);
       setShowCustomTipInput(false);
       setCustomTip('');
-      setTipPercentage(0);
+      setTipPercentage(5);
       setShowLargeDonation(false);
     }
   }, [isOpen, resolvedSlug]);
