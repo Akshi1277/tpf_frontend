@@ -19,11 +19,11 @@ import LargeDonationModal from './LargeDonationModal';
 const tipPercentages = [0, 5, 10, 15];
 
 const allDonationTypes = [
-  { id: 'ZAKAAT',  label: 'Zakat',   Icon: Moon      },
-  { id: 'RIBA',    label: 'RIBA',    Icon: Coins     },
-  { id: 'SADAQAH', label: 'Sadaqah', Icon: Gift      },
-  { id: 'LILLAH',  label: 'Lillah',  Icon: Star      },
-  { id: 'IMDAD',   label: 'Imdad',   Icon: HandHeart },
+  { id: 'ZAKAAT', label: 'Zakat', Icon: Moon },
+  { id: 'RIBA', label: 'RIBA', Icon: Coins },
+  { id: 'SADAQAH', label: 'Sadaqah', Icon: Gift },
+  { id: 'LILLAH', label: 'Lillah', Icon: Star },
+  { id: 'IMDAD', label: 'Imdad', Icon: HandHeart },
 ];
 
 /* ─── Tiny shared primitives ────────────────────────────────── */
@@ -53,39 +53,40 @@ export default function DonatePopUpModal({
   zakatVerified,
   taxEligible,
   sadaqahEligible = true,
-  lillahEligible   = true,
-  imdadEligible    = true,
+  lillahEligible = true,
+  imdadEligible = true,
   allowedDonationTypes = [],
   unitConfig = null,
 }) {
   /* ── state ───────────────────────────────────────────────── */
-  const [selectedAmount,        setSelectedAmount]        = useState(100);
-  const [customAmount,          setCustomAmount]          = useState('');
+  const [selectedAmount, setSelectedAmount] = useState(100);
+  const [customAmount, setCustomAmount] = useState('');
   const [showCustomAmountInput, setShowCustomAmountInput] = useState(false);
-  const [selectedPresetKey,     setSelectedPresetKey]     = useState(null);
-  const [tipPercentage,         setTipPercentage]         = useState(5);
-  const [customTip,             setCustomTip]             = useState('');
-  const [showCustomTipInput,    setShowCustomTipInput]    = useState(false);
-  const [cashfreeData,          setCashfreeData]          = useState(null);
-  const [donationType,          setDonationType]          = useState('SADAQAH');
-  const [isAnonymous,           setIsAnonymous]           = useState(false);
-  const [fullName,              setFullName]              = useState('');
-  const [email,                 setEmail]                 = useState('');
-  const [mobileNo,              setMobileNo]              = useState('');
-  const [userId,                setUserId]                = useState(null);
-  const [isDonating,            setIsDonating]            = useState(false);
-  const [showExitConfirmation,  setShowExitConfirmation]  = useState(false);
+  const [selectedPresetKey, setSelectedPresetKey] = useState(null);
+  const [tipPercentage, setTipPercentage] = useState(5);
+  const [customTip, setCustomTip] = useState('');
+  const [showCustomTipInput, setShowCustomTipInput] = useState(false);
+  const [cashfreeData, setCashfreeData] = useState(null);
+  const [donationType, setDonationType] = useState('SADAQAH');
+  const [showTipInfoModal, setShowTipInfoModal] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobileNo, setMobileNo] = useState('');
+  const [userId, setUserId] = useState(null);
+  const [isDonating, setIsDonating] = useState(false);
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
 
   /* large-donation modal */
   const [showLargeDonation, setShowLargeDonation] = useState(false);
 
   const checkoutStartedRef = useRef(false);
-  const userInfo  = useSelector((state) => state.auth.userInfo);
+  const userInfo = useSelector((state) => state.auth.userInfo);
   const { showToast } = useAppToast();
   const [softSignup] = useSoftSignupMutation();
 
-  const pathname     = usePathname();
-  const slugFromUrl  = pathname?.split('/campaign/')?.[1]?.split('/')?.[0] || null;
+  const pathname = usePathname();
+  const slugFromUrl = pathname?.split('/campaign/')?.[1]?.split('/')?.[0] || null;
   const resolvedSlug = campaignSlug || slugFromUrl;
   const campaignConfig = getCampaignConfig(resolvedSlug);
   const dk = darkMode;
@@ -94,21 +95,21 @@ export default function DonatePopUpModal({
   const filteredDonationTypes = (
     allowedDonationTypes?.length > 0
       ? allDonationTypes.filter((t) =>
-          allowedDonationTypes.some(
-            (at) =>
-              at.toUpperCase() === t.id.toUpperCase() ||
-              (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
-          )
+        allowedDonationTypes.some(
+          (at) =>
+            at.toUpperCase() === t.id.toUpperCase() ||
+            (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
         )
+      )
       : allDonationTypes
   ).map((t) => ({
     ...t,
     disabled:
-      (t.id === 'ZAKAAT'  && !zakatVerified)            ||
-      (t.id === 'RIBA'    && !ribaEligible)              ||
-      (t.id === 'SADAQAH' && sadaqahEligible === false)  ||
-      (t.id === 'LILLAH'  && lillahEligible  === false)  ||
-      (t.id === 'IMDAD'   && imdadEligible   === false),
+      (t.id === 'ZAKAAT' && !zakatVerified) ||
+      (t.id === 'RIBA' && !ribaEligible) ||
+      (t.id === 'SADAQAH' && sadaqahEligible === false) ||
+      (t.id === 'LILLAH' && lillahEligible === false) ||
+      (t.id === 'IMDAD' && imdadEligible === false),
   }));
 
   /* ── sync donation type when allowedDonationTypes changes ── */
@@ -177,8 +178,8 @@ export default function DonatePopUpModal({
   }, [cashfreeData]);
 
   /* ── computed amounts ────────────────────────────────────── */
-  const baseAmount  = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
-  const tipAmount   = customTip ? parseInt(customTip) : tipPercentage ? Math.round(baseAmount * (tipPercentage / 100)) : 0;
+  const baseAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
+  const tipAmount = customTip ? parseInt(customTip) : tipPercentage ? Math.round(baseAmount * (tipPercentage / 100)) : 0;
   const totalAmount = baseAmount + (tipAmount || 0);
 
   /* ── online donate handler ───────────────────────────────── */
@@ -271,32 +272,29 @@ export default function DonatePopUpModal({
   };
 
   /* ── style tokens ────────────────────────────────────────── */
-  const inputCls = `w-full h-8 md:h-10 pl-8 md:pl-9 pr-3 text-xs md:text-sm rounded-lg font-medium focus:outline-none transition-colors border ${
-    dk
-      ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
-      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
-  }`;
+  const inputCls = `w-full h-8 md:h-10 pl-8 md:pl-9 pr-3 text-xs md:text-sm rounded-lg font-medium focus:outline-none transition-colors border ${dk
+    ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
+    : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
+    }`;
 
   const typeBtn = (active, disabled) =>
-    `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${disabled ? 'opacity-40 cursor-not-allowed ' : ''}${
-      active
-        ? dk
-          ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
-          : 'bg-emerald-100 border-emerald-400 text-emerald-900'
-        : dk
-          ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500 hover:text-zinc-200'
-          : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300 hover:text-gray-800'
+    `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${disabled ? 'opacity-40 cursor-not-allowed ' : ''}${active
+      ? dk
+        ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
+        : 'bg-emerald-100 border-emerald-400 text-emerald-900'
+      : dk
+        ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500 hover:text-zinc-200'
+        : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300 hover:text-gray-800'
     }`;
 
   const tipBtn = (active) =>
-    `flex-1 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${
-      active
-        ? dk
-          ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
-          : 'bg-emerald-100 border-emerald-400 text-emerald-900'
-        : dk
-          ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500'
-          : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300'
+    `flex-1 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${active
+      ? dk
+        ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
+        : 'bg-emerald-100 border-emerald-400 text-emerald-900'
+      : dk
+        ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500'
+        : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300'
     }`;
 
   const CustomCheckbox = ({ checked, onChange, label }) => (
@@ -304,11 +302,10 @@ export default function DonatePopUpModal({
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${
-          checked
-            ? 'bg-emerald-500 border-emerald-500'
-            : dk ? 'border-zinc-600 bg-zinc-800 group-hover:border-zinc-500' : 'border-gray-300 bg-white group-hover:border-emerald-300'
-        }`}
+        className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${checked
+          ? 'bg-emerald-500 border-emerald-500'
+          : dk ? 'border-zinc-600 bg-zinc-800 group-hover:border-zinc-500' : 'border-gray-300 bg-white group-hover:border-emerald-300'
+          }`}
       >
         {checked && (
           <svg className="w-2 h-2 md:w-2.5 md:h-2.5 text-white" viewBox="0 0 10 10" fill="none">
@@ -351,16 +348,14 @@ export default function DonatePopUpModal({
                 style={{ maxHeight: '100dvh' }}
               >
                 <div
-                  className={`flex flex-col rounded-2xl shadow-2xl ${
-                    dk ? 'bg-zinc-900 border border-zinc-800' : 'bg-white border border-gray-100'
-                  }`}
+                  className={`flex flex-col rounded-2xl shadow-2xl ${dk ? 'bg-zinc-900 border border-zinc-800' : 'bg-white border border-gray-100'
+                    }`}
                   style={{ maxHeight: '92dvh' }}
                 >
                   {/* ─── Header ──────────────────────────── */}
                   <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-5 pt-2 md:pt-4 pb-2 md:pb-3 border-b flex-shrink-0 ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
-                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${
-                      dk ? 'bg-emerald-500/20 shadow-emerald-900/40' : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/25'
-                    }`}>
+                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${dk ? 'bg-emerald-500/20 shadow-emerald-900/40' : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/25'
+                      }`}>
                       <Heart className={`w-4 h-4 md:w-5 md:h-5 ${dk ? 'text-emerald-400' : 'text-white'}`} fill="currentColor" />
                     </div>
 
@@ -371,9 +366,8 @@ export default function DonatePopUpModal({
 
                     {/* Total pill — desktop only */}
                     {baseAmount >= 50 && (
-                      <div className={`hidden md:flex items-baseline gap-2 px-4 py-2 rounded-xl mr-1 ${
-                        dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
-                      }`}>
+                      <div className={`hidden md:flex items-baseline gap-2 px-4 py-2 rounded-xl mr-1 ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
+                        }`}>
                         <span className={`text-xs font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</span>
                         <span className={`text-xl font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
                           ₹{totalAmount.toLocaleString()}
@@ -386,11 +380,10 @@ export default function DonatePopUpModal({
 
                     <button
                       onClick={handleCloseAttempt}
-                      className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
-                        dk
-                          ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700'
-                      }`}
+                      className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${dk
+                        ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700'
+                        }`}
                     >
                       <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     </button>
@@ -467,8 +460,8 @@ export default function DonatePopUpModal({
                             <SectionLabel dark={dk}>Your Details</SectionLabel>
                             <div className="space-y-1 md:space-y-2.5">
                               {[
-                                { Icon: User,  type: 'text',  placeholder: 'Full Name', value: fullName, onChange: setFullName },
-                                { Icon: Mail,  type: 'email', placeholder: 'Email',     value: email,    onChange: setEmail    },
+                                { Icon: User, type: 'text', placeholder: 'Full Name', value: fullName, onChange: setFullName },
+                                { Icon: Mail, type: 'email', placeholder: 'Email', value: email, onChange: setEmail },
                               ].map(({ Icon, type, placeholder, value, onChange }) => (
                                 <div key={placeholder} className="relative">
                                   <Icon className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
@@ -488,13 +481,16 @@ export default function DonatePopUpModal({
                         <Card dark={dk}>
                           <div className="flex items-center justify-between mb-1 md:mb-3">
                             <SectionLabel dark={dk} className="mb-0">Platform Tip</SectionLabel>
-                            <div className="group relative">
-                              <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center cursor-help text-[8px] md:text-[9px] font-extrabold border ${dk ? 'border-zinc-400 text-zinc-300 bg-zinc-700' : 'border-gray-400 text-gray-600 bg-gray-100'}`}>i</div>
-                              <div className={`absolute bottom-full right-0 mb-2 w-48 p-2.5 rounded-xl text-[11px] leading-relaxed z-20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl ${dk ? 'bg-zinc-800 text-zinc-200 border border-zinc-700' : 'bg-gray-900 text-white'}`}>
-                                Helps keep the platform running. 100% goes to operations.
-                                <div className={`absolute top-full right-3 -mt-0.5 w-2 h-2 rotate-45 ${dk ? 'bg-zinc-800' : 'bg-gray-900'}`} />
-                              </div>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setShowTipInfoModal(true)}
+                              className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center text-[8px] md:text-[9px] font-extrabold border ${dk
+                                ? 'border-zinc-400 text-zinc-300 bg-zinc-700'
+                                : 'border-gray-400 text-gray-600 bg-gray-100'
+                                }`}
+                            >
+                              i
+                            </button>
                           </div>
                           <div className="flex gap-1 md:gap-2">
                             {tipPercentages.map((pct) => (
@@ -518,10 +514,9 @@ export default function DonatePopUpModal({
                               <span className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none ${dk ? 'text-zinc-400' : 'text-gray-400'}`}>₹</span>
                               <input type="number" placeholder="Custom tip amount" value={customTip} autoFocus min={0}
                                 onChange={(e) => { setCustomTip(e.target.value); setTipPercentage(null); }}
-                                className={`w-full h-8 md:h-10 pl-6 md:pl-7 pr-3 text-xs md:text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
-                                  dk ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
-                                     : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
-                                }`}
+                                className={`w-full h-8 md:h-10 pl-6 md:pl-7 pr-3 text-xs md:text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${dk ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
+                                  : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
+                                  }`}
                               />
                             </div>
                           )}
@@ -542,14 +537,13 @@ export default function DonatePopUpModal({
                         {/* CTA */}
                         <div className="space-y-1 md:space-y-2.5">
                           <button onClick={handleDonate} disabled={isDonating || baseAmount < 50}
-                            className={`w-full h-9 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                              isDonating
-                                ? 'bg-emerald-600 text-white cursor-wait'
-                                : baseAmount >= 50
-                                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.98] text-white shadow-lg shadow-emerald-600/20'
-                                  : dk ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700'
-                                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            }`}>
+                            className={`w-full h-9 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${isDonating
+                              ? 'bg-emerald-600 text-white cursor-wait'
+                              : baseAmount >= 50
+                                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.98] text-white shadow-lg shadow-emerald-600/20'
+                                : dk ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700'
+                                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              }`}>
                             {isDonating ? (
                               <><svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z" /></svg>Processing...</>
                             ) : (
@@ -579,6 +573,62 @@ export default function DonatePopUpModal({
         totalAmount={totalAmount}
       />
 
+      <AnimatePresence>
+        {showTipInfoModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowTipInfoModal(false)}
+              className="fixed inset-0 bg-black/50 z-[60]"
+            />
+
+            <motion.div
+              initial={{ y: 100 }}
+              animate={{ y: 0 }}
+              exit={{ y: 100 }}
+              transition={{ duration: 0.2 }}
+              className={`fixed bottom-0 left-0 right-0 z-[61] rounded-t-3xl p-5 ${dk
+                  ? 'bg-zinc-900 border-t border-zinc-800'
+                  : 'bg-white border-t border-gray-200'
+                }`}
+            >
+              <div className="flex justify-center mb-4">
+                <div
+                  className={`w-10 h-1 rounded-full ${dk ? 'bg-zinc-700' : 'bg-gray-300'
+                    }`}
+                />
+              </div>
+
+              <h3
+                className={`text-base font-bold mb-2 ${dk ? 'text-white' : 'text-gray-900'
+                  }`}
+              >
+                Platform Tip
+              </h3>
+
+              <p
+                className={`text-sm leading-relaxed ${dk ? 'text-zinc-300' : 'text-gray-600'
+                  }`}
+              >
+                Your optional tip helps keep the platform running and supports
+                operational costs. Donations always go to the selected campaign,
+                while the tip helps us maintain and improve the donation experience.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => setShowTipInfoModal(false)}
+                className="w-full mt-5 h-11 rounded-xl bg-emerald-600 text-white font-semibold"
+              >
+                Got it
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Large donation modal — rendered outside the donate modal so it's independent */}
       <LargeDonationModal
         isOpen={showLargeDonation}
@@ -587,9 +637,9 @@ export default function DonatePopUpModal({
         darkMode={darkMode}
         baseAmount={baseAmount}
         campaignId={campaignId}
-        donorName={userInfo?.fullName  || fullName  || ''}
-        donorPhone={userInfo?.mobileNo || mobileNo  || ''}
-        donorEmail={userInfo?.email    || email     || ''}
+        donorName={userInfo?.fullName || fullName || ''}
+        donorPhone={userInfo?.mobileNo || mobileNo || ''}
+        donorEmail={userInfo?.email || email || ''}
       />
     </>
   );
