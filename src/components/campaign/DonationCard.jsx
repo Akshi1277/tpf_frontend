@@ -45,7 +45,7 @@ export default function DonationCard({
   const [selectedPresetKey, setSelectedPresetKey] = useState(null);
 
   /* ── Tip state ────────────────────────────────────────────────────────── */
-  const [tipPercentage, setTipPercentage] = useState(0);
+  const [tipPercentage, setTipPercentage] = useState(5);
   const [customTip, setCustomTip] = useState('');
   const [showCustomTipInput, setShowCustomTipInput] = useState(false);
 
