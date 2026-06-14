@@ -2,26 +2,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Lock, X, Sparkles, Moon, Coins, Gift, Star, HandHeart, User, Mail, Phone, ShieldCheck } from 'lucide-react';
+import {
+  Heart, Lock, X, Sparkles, Moon, Coins, Gift, Star, HandHeart,
+  User, Mail, Phone, ShieldCheck,
+} from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useAppToast } from '@/app/AppToastContext';
-import { useSoftSignupMutation } from "@/utils/slices/authApiSlice";
-
+import { useSoftSignupMutation } from '@/utils/slices/authApiSlice';
+import { setCredentials } from '@/utils/slices/authSlice';
 import CampaignAmountSelector, { getCampaignConfig } from './DonatePopUpModal/CampaignAmountSelector';
 import DefaultAmountSelector from './DonatePopUpModal/DefaultAmountSelector';
 import ExitConfirmationModal from './DonatePopUpModal/ExitConfirmationModal';
+import LargeDonationModal from './LargeDonationModal';
 
+/* ─── Constants ─────────────────────────────────────────────── */
 const tipPercentages = [0, 5, 10, 15];
 
 const allDonationTypes = [
-  { id: 'ZAKAAT', label: 'Zakat', Icon: Moon },
-  { id: 'RIBA', label: 'RIBA', Icon: Coins },
-  { id: 'SADAQAH', label: 'Sadaqah', Icon: Gift },
-  { id: 'LILLAH', label: 'Lillah', Icon: Star },
-  { id: 'IMDAD', label: 'Imdad', Icon: HandHeart },
+  { id: 'ZAKAAT',  label: 'Zakat',   Icon: Moon      },
+  { id: 'RIBA',    label: 'RIBA',    Icon: Coins     },
+  { id: 'SADAQAH', label: 'Sadaqah', Icon: Gift      },
+  { id: 'LILLAH',  label: 'Lillah',  Icon: Star      },
+  { id: 'IMDAD',   label: 'Imdad',   Icon: HandHeart },
 ];
 
-/* ── tiny reusable primitives ─────────────────────────────────────────────── */
+/* ─── Tiny shared primitives ────────────────────────────────── */
 const SectionLabel = ({ children, dark, className = '' }) => (
   <p className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest mb-1 md:mb-2 ${dark ? 'text-emerald-400/70' : 'text-emerald-600/70'} ${className}`}>
     {children}
@@ -34,73 +39,79 @@ const Card = ({ dark, children, className = '' }) => (
   </div>
 );
 
-
+/* ══════════════════════════════════════════════════════════════
+   MAIN EXPORT
+══════════════════════════════════════════════════════════════ */
 export default function DonatePopUpModal({
   isOpen,
   onClose,
   darkMode,
   campaignId,
   campaignSlug,
+  campaignName,
   ribaEligible,
   zakatVerified,
   taxEligible,
   sadaqahEligible = true,
-  lillahEligible = true,
-  imdadEligible = true,
+  lillahEligible   = true,
+  imdadEligible    = true,
   allowedDonationTypes = [],
   unitConfig = null,
 }) {
-  const [selectedAmount, setSelectedAmount] = useState(100);
-  const [customAmount, setCustomAmount] = useState('');
+  /* ── state ───────────────────────────────────────────────── */
+  const [selectedAmount,        setSelectedAmount]        = useState(100);
+  const [customAmount,          setCustomAmount]          = useState('');
   const [showCustomAmountInput, setShowCustomAmountInput] = useState(false);
-  const [selectedPresetKey, setSelectedPresetKey] = useState(null);
-  const [tipPercentage, setTipPercentage] = useState(0);
-  const [customTip, setCustomTip] = useState('');
-  const [showCustomTipInput, setShowCustomTipInput] = useState(false);
-  const [cashfreeData, setCashfreeData] = useState(null);
-  const [donationType, setDonationType] = useState('SADAQAH');
-  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [selectedPresetKey,     setSelectedPresetKey]     = useState(null);
+  const [tipPercentage,         setTipPercentage]         = useState(5);
+  const [customTip,             setCustomTip]             = useState('');
+  const [showCustomTipInput,    setShowCustomTipInput]    = useState(false);
+  const [cashfreeData,          setCashfreeData]          = useState(null);
+  const [donationType,          setDonationType]          = useState('SADAQAH');
+  const [isAnonymous,           setIsAnonymous]           = useState(false);
+  const [fullName,              setFullName]              = useState('');
+  const [email,                 setEmail]                 = useState('');
+  const [mobileNo,              setMobileNo]              = useState('');
+  const [userId,                setUserId]                = useState(null);
+  const [isDonating,            setIsDonating]            = useState(false);
+  const [showExitConfirmation,  setShowExitConfirmation]  = useState(false);
 
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [mobileNo, setMobileNo] = useState('');
-  const [userId, setUserId] = useState(null);
-
-  const [isDonating, setIsDonating] = useState(false);
-  const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  /* large-donation modal */
+  const [showLargeDonation, setShowLargeDonation] = useState(false);
 
   const checkoutStartedRef = useRef(false);
-  const userInfo = useSelector((state) => state.auth.userInfo);
+  const userInfo  = useSelector((state) => state.auth.userInfo);
   const { showToast } = useAppToast();
   const [softSignup] = useSoftSignupMutation();
 
-  const pathname = usePathname();
-  const slugFromUrl = pathname?.split('/campaign/')?.[1]?.split('/')?.[0] || null;
+  const pathname     = usePathname();
+  const slugFromUrl  = pathname?.split('/campaign/')?.[1]?.split('/')?.[0] || null;
   const resolvedSlug = campaignSlug || slugFromUrl;
   const campaignConfig = getCampaignConfig(resolvedSlug);
-
   const dk = darkMode;
 
+  /* ── filtered donation types ─────────────────────────────── */
   const filteredDonationTypes = (
     allowedDonationTypes?.length > 0
       ? allDonationTypes.filter((t) =>
-        allowedDonationTypes.some(
-          (at) =>
-            at.toUpperCase() === t.id.toUpperCase() ||
-            (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
+          allowedDonationTypes.some(
+            (at) =>
+              at.toUpperCase() === t.id.toUpperCase() ||
+              (at.toUpperCase() === 'ZAKAT' && t.id === 'ZAKAAT')
+          )
         )
-      )
       : allDonationTypes
   ).map((t) => ({
     ...t,
     disabled:
-      (t.id === 'ZAKAAT' && !zakatVerified) ||
-      (t.id === 'RIBA' && !ribaEligible) ||
-      (t.id === 'SADAQAH' && sadaqahEligible === false) ||
-      (t.id === 'LILLAH' && lillahEligible === false) ||
-      (t.id === 'IMDAD' && imdadEligible === false),
+      (t.id === 'ZAKAAT'  && !zakatVerified)            ||
+      (t.id === 'RIBA'    && !ribaEligible)              ||
+      (t.id === 'SADAQAH' && sadaqahEligible === false)  ||
+      (t.id === 'LILLAH'  && lillahEligible  === false)  ||
+      (t.id === 'IMDAD'   && imdadEligible   === false),
   }));
 
+  /* ── sync donation type when allowedDonationTypes changes ── */
   useEffect(() => {
     if (
       allowedDonationTypes?.length > 0 &&
@@ -114,6 +125,7 @@ export default function DonatePopUpModal({
     }
   }, [allowedDonationTypes]);
 
+  /* ── prefill from logged-in user ────────────────────────── */
   useEffect(() => {
     if (userInfo) {
       setFullName(userInfo.fullName || '');
@@ -123,15 +135,14 @@ export default function DonatePopUpModal({
     }
   }, [userInfo]);
 
+  /* ── scroll lock ─────────────────────────────────────────── */
   useEffect(() => {
-    if (isOpen || showExitConfirmation) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    const locked = isOpen || showExitConfirmation || showLargeDonation;
+    document.body.style.overflow = locked ? 'hidden' : 'unset';
     return () => { document.body.style.overflow = 'unset'; };
-  }, [isOpen, showExitConfirmation]);
+  }, [isOpen, showExitConfirmation, showLargeDonation]);
 
+  /* ── reset on open ───────────────────────────────────────── */
   useEffect(() => {
     if (isOpen) {
       checkoutStartedRef.current = false;
@@ -143,9 +154,34 @@ export default function DonatePopUpModal({
       setShowCustomTipInput(false);
       setCustomTip('');
       setTipPercentage(0);
+      setShowLargeDonation(false);
     }
   }, [isOpen, resolvedSlug]);
 
+  /* ── cashfree checkout trigger ───────────────────────────── */
+  useEffect(() => {
+    if (!cashfreeData?.paymentSessionId) return;
+    if (checkoutStartedRef.current) return;
+    checkoutStartedRef.current = true;
+    const startCheckout = () => {
+      const cashfree = new window.Cashfree({ mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || 'sandbox' });
+      cashfree.checkout({ paymentSessionId: cashfreeData.paymentSessionId, redirectTarget: '_self' });
+    };
+    if (window.Cashfree) { startCheckout(); return; }
+    const script = document.createElement('script');
+    script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+    script.async = true;
+    script.onload = startCheckout;
+    document.body.appendChild(script);
+    return () => { if (document.body.contains(script)) document.body.removeChild(script); };
+  }, [cashfreeData]);
+
+  /* ── computed amounts ────────────────────────────────────── */
+  const baseAmount  = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
+  const tipAmount   = customTip ? parseInt(customTip) : tipPercentage ? Math.round(baseAmount * (tipPercentage / 100)) : 0;
+  const totalAmount = baseAmount + (tipAmount || 0);
+
+  /* ── online donate handler ───────────────────────────────── */
   const handleIdentifyUser = async () => {
     const result = await softSignup({ fullName, email, mobileNo }).unwrap();
     if (result?.data?.userId) return result.data.userId;
@@ -161,6 +197,13 @@ export default function DonatePopUpModal({
       showToast({ title: 'Minimum Amount', message: 'The minimum donation amount is ₹50.', type: 'error' });
       return;
     }
+
+    /* ── large donation: hand off to LargeDonationModal ── */
+    if (baseAmt >= 3000) {
+      setShowLargeDonation(true);
+      return;
+    }
+
     if (donationType === 'ZAKAAT' && !zakatVerified) {
       showToast({ title: 'Not Verified', message: 'This campaign is not verified for Zakaat.', type: 'error' });
       return;
@@ -220,58 +263,40 @@ export default function DonatePopUpModal({
     }
   };
 
-  useEffect(() => {
-    if (!cashfreeData?.paymentSessionId) return;
-    if (checkoutStartedRef.current) return;
-    checkoutStartedRef.current = true;
-    const startCheckout = () => {
-      const cashfree = new window.Cashfree({ mode: process.env.NEXT_PUBLIC_CASHFREE_MODE || 'sandbox' });
-      cashfree.checkout({ paymentSessionId: cashfreeData.paymentSessionId, redirectTarget: '_self' });
-    };
-    if (window.Cashfree) { startCheckout(); return; }
-    const script = document.createElement('script');
-    script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
-    script.async = true;
-    script.onload = startCheckout;
-    document.body.appendChild(script);
-    return () => { if (document.body.contains(script)) document.body.removeChild(script); };
-  }, [cashfreeData]);
-
+  /* ── close attempt ───────────────────────────────────────── */
   const handleCloseAttempt = () => {
     const amount = selectedAmount || parseInt(customAmount);
     if (amount >= 50 && !isDonating) setShowExitConfirmation(true);
     else onClose();
   };
 
-  const baseAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
-  const tipAmount = customTip ? parseInt(customTip) : tipPercentage ? Math.round(baseAmount * (tipPercentage / 100)) : 0;
-  const totalAmount = baseAmount + (tipAmount || 0);
-
   /* ── style tokens ────────────────────────────────────────── */
-  const inputCls = `w-full h-8 md:h-10 pl-8 md:pl-9 pr-3 text-xs md:text-sm rounded-lg font-medium focus:outline-none transition-colors border ${dk
-    ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
-    : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
-    }`;
+  const inputCls = `w-full h-8 md:h-10 pl-8 md:pl-9 pr-3 text-xs md:text-sm rounded-lg font-medium focus:outline-none transition-colors border ${
+    dk
+      ? 'bg-zinc-800/80 border-zinc-700 text-white placeholder-zinc-500 focus:border-emerald-500'
+      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/10'
+  }`;
 
   const typeBtn = (active, disabled) =>
-    `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${disabled ? 'opacity-40 cursor-not-allowed ' : ''
-    }${active
-      ? dk
-        ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
-        : 'bg-emerald-100 border-emerald-400 text-emerald-900'
-      : dk
-        ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500 hover:text-zinc-200'
-        : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300 hover:text-gray-800'
+    `flex-1 flex items-center justify-center gap-1 md:gap-1.5 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-bold transition-colors border ${disabled ? 'opacity-40 cursor-not-allowed ' : ''}${
+      active
+        ? dk
+          ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
+          : 'bg-emerald-100 border-emerald-400 text-emerald-900'
+        : dk
+          ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500 hover:text-zinc-200'
+          : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300 hover:text-gray-800'
     }`;
 
   const tipBtn = (active) =>
-    `flex-1 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${active
-      ? dk
-        ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
-        : 'bg-emerald-100 border-emerald-400 text-emerald-900'
-      : dk
-        ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500'
-        : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300'
+    `flex-1 h-6 md:h-9 rounded-lg text-[10px] md:text-xs font-extrabold transition-colors border ${
+      active
+        ? dk
+          ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
+          : 'bg-emerald-100 border-emerald-400 text-emerald-900'
+        : dk
+          ? 'bg-zinc-900/60 border-zinc-600 text-zinc-300 hover:border-zinc-500'
+          : 'bg-white border-gray-300 text-gray-600 hover:border-emerald-300'
     }`;
 
   const CustomCheckbox = ({ checked, onChange, label }) => (
@@ -279,10 +304,11 @@ export default function DonatePopUpModal({
       <button
         type="button"
         onClick={() => onChange(!checked)}
-        className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${checked
-          ? 'bg-emerald-500 border-emerald-500'
-          : dk ? 'border-zinc-600 bg-zinc-800 group-hover:border-zinc-500' : 'border-gray-300 bg-white group-hover:border-emerald-300'
-          }`}
+        className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded flex items-center justify-center border-2 transition-colors flex-shrink-0 ${
+          checked
+            ? 'bg-emerald-500 border-emerald-500'
+            : dk ? 'border-zinc-600 bg-zinc-800 group-hover:border-zinc-500' : 'border-gray-300 bg-white group-hover:border-emerald-300'
+        }`}
       >
         {checked && (
           <svg className="w-2 h-2 md:w-2.5 md:h-2.5 text-white" viewBox="0 0 10 10" fill="none">
@@ -296,6 +322,7 @@ export default function DonatePopUpModal({
     </label>
   );
 
+  /* ══ RENDER ═══════════════════════════════════════════════ */
   return (
     <>
       <AnimatePresence>
@@ -304,9 +331,7 @@ export default function DonatePopUpModal({
             {/* Backdrop */}
             <motion.div
               key="donate-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
               onClick={handleCloseAttempt}
               className="fixed inset-0 bg-black/60 z-50"
@@ -326,34 +351,29 @@ export default function DonatePopUpModal({
                 style={{ maxHeight: '100dvh' }}
               >
                 <div
-                  className={`flex flex-col overflow-hidden rounded-2xl shadow-2xl ${dk
-                    ? 'bg-zinc-900 border border-zinc-800'
-                    : 'bg-white border border-gray-100'
-                    }`}
-                  style={{ maxHeight: '100dvh' }}
+                  className={`flex flex-col rounded-2xl shadow-2xl ${
+                    dk ? 'bg-zinc-900 border border-zinc-800' : 'bg-white border border-gray-100'
+                  }`}
+                  style={{ maxHeight: '92dvh' }}
                 >
-                  {/* Mobile drag pill */}
-                  <div className="flex justify-center pt-1.5 md:pt-2.5 md:hidden flex-shrink-0">
-                    <div className={`w-8 h-1 rounded-full ${dk ? 'bg-zinc-700' : 'bg-gray-200'}`} />
-                  </div>
-
-                  {/* ─── Header ─────────────── */}
-                  <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-5 pt-1.5 md:pt-4 pb-1.5 md:pb-4 border-b flex-shrink-0 ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
-                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${dk
-                      ? 'bg-emerald-500/20 shadow-emerald-900/40'
-                      : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/25'
-                      }`}>
+                  {/* ─── Header ──────────────────────────── */}
+                  <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-5 pt-2 md:pt-4 pb-2 md:pb-3 border-b flex-shrink-0 ${dk ? 'border-zinc-800' : 'border-gray-100'}`}>
+                    <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md ${
+                      dk ? 'bg-emerald-500/20 shadow-emerald-900/40' : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/25'
+                    }`}>
                       <Heart className={`w-4 h-4 md:w-5 md:h-5 ${dk ? 'text-emerald-400' : 'text-white'}`} fill="currentColor" />
                     </div>
+
                     <div className="flex-1 min-w-0">
                       <h2 className={`text-sm md:text-base font-bold ${dk ? 'text-white' : 'text-gray-900'}`}>Make a Difference</h2>
                       <p className={`text-[10px] md:text-xs ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>Your generosity transforms lives</p>
                     </div>
 
-                    {/* Total pill — desktop only (unchanged) */}
+                    {/* Total pill — desktop only */}
                     {baseAmount >= 50 && (
-                      <div className={`hidden md:flex items-baseline gap-2 px-4 py-2 rounded-xl mr-1 ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
-                        }`}>
+                      <div className={`hidden md:flex items-baseline gap-2 px-4 py-2 rounded-xl mr-1 ${
+                        dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
+                      }`}>
                         <span className={`text-xs font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</span>
                         <span className={`text-xl font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
                           ₹{totalAmount.toLocaleString()}
@@ -366,26 +386,22 @@ export default function DonatePopUpModal({
 
                     <button
                       onClick={handleCloseAttempt}
-                      className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${dk
-                        ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700'
-                        }`}
+                      className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
+                        dk
+                          ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200'
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700'
+                      }`}
                     >
                       <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     </button>
                   </div>
 
-                  {/* ─── Body ────────────── */}
-                  <div className="overflow-y-auto overscroll-contain flex-1 [&::-webkit-scrollbar]:hidden" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="p-2 md:p-0 md:h-full grid md:grid-cols-2 gap-2 md:gap-0 md:divide-x md:divide-zinc-800/0">
-                      {/* invisible divider handled by padding asymmetry (pr-3 / pl-3) */}
+                  {/* ─── Body ────────────────────────────── */}
+                  <div className="overflow-y-auto flex-1 min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
+                    <div className="p-2 md:p-0 md:h-full grid md:grid-cols-2 gap-2 md:gap-0">
 
-                      {/* ═══════════════════════════════
-                          LEFT — Donation Type + Amount
-                      ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-2 md:gap-2 md:overflow-y-auto md:p-6 md:pr-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-
-                        {/* Donation Type */}
+                      {/* LEFT — Type + Amount */}
+                      <div className="flex flex-col gap-2 md:overflow-y-auto md:p-6 md:pr-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
                         <Card dark={dk}>
                           <SectionLabel dark={dk}>Donation Type</SectionLabel>
                           <div className="flex flex-col gap-1 md:gap-2">
@@ -393,12 +409,8 @@ export default function DonatePopUpModal({
                               {filteredDonationTypes.slice(0, 3).map((type) => {
                                 const Icon = type.Icon;
                                 return (
-                                  <button
-                                    key={type.id}
-                                    onClick={() => !type.disabled && setDonationType(type.id)}
-                                    disabled={type.disabled}
-                                    className={typeBtn(donationType === type.id, type.disabled)}
-                                  >
+                                  <button key={type.id} onClick={() => !type.disabled && setDonationType(type.id)}
+                                    disabled={type.disabled} className={typeBtn(donationType === type.id, type.disabled)}>
                                     <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" />
                                     <span>{type.label}</span>
                                     {type.disabled && <Lock className="w-2 h-2 md:w-2.5 md:h-2.5 opacity-70" />}
@@ -411,12 +423,8 @@ export default function DonatePopUpModal({
                                 {filteredDonationTypes.slice(3).map((type) => {
                                   const Icon = type.Icon;
                                   return (
-                                    <button
-                                      key={type.id}
-                                      onClick={() => !type.disabled && setDonationType(type.id)}
-                                      disabled={type.disabled}
-                                      className={`${typeBtn(donationType === type.id, type.disabled)} max-w-[50%]`}
-                                    >
+                                    <button key={type.id} onClick={() => !type.disabled && setDonationType(type.id)}
+                                      disabled={type.disabled} className={`${typeBtn(donationType === type.id, type.disabled)} max-w-[50%]`}>
                                       <Icon className="w-3 h-3 md:w-3.5 md:h-3.5" />
                                       <span>{type.label}</span>
                                       {type.disabled && <Lock className="w-2 h-2 md:w-2.5 md:h-2.5 opacity-70" />}
@@ -428,58 +436,39 @@ export default function DonatePopUpModal({
                           </div>
                         </Card>
 
-                        {/* Amount */}
                         <Card dark={dk}>
                           <SectionLabel dark={dk}>Amount</SectionLabel>
                           {(campaignConfig || unitConfig) ? (
                             <CampaignAmountSelector
-                              slug={resolvedSlug}
-                              unitConfig={unitConfig}
-                              darkMode={dk}
-                              selectedAmount={selectedAmount}
-                              setSelectedAmount={setSelectedAmount}
-                              customAmount={customAmount}
-                              setCustomAmount={setCustomAmount}
-                              showCustomAmountInput={showCustomAmountInput}
-                              setShowCustomAmountInput={setShowCustomAmountInput}
-                              selectedPresetKey={selectedPresetKey}
-                              setSelectedPresetKey={setSelectedPresetKey}
+                              slug={resolvedSlug} unitConfig={unitConfig} darkMode={dk}
+                              selectedAmount={selectedAmount} setSelectedAmount={setSelectedAmount}
+                              customAmount={customAmount} setCustomAmount={setCustomAmount}
+                              showCustomAmountInput={showCustomAmountInput} setShowCustomAmountInput={setShowCustomAmountInput}
+                              selectedPresetKey={selectedPresetKey} setSelectedPresetKey={setSelectedPresetKey}
                             />
                           ) : (
                             <DefaultAmountSelector
                               darkMode={dk}
-                              selectedAmount={selectedAmount}
-                              setSelectedAmount={setSelectedAmount}
-                              customAmount={customAmount}
-                              setCustomAmount={setCustomAmount}
-                              showCustomAmountInput={showCustomAmountInput}
-                              setShowCustomAmountInput={setShowCustomAmountInput}
+                              selectedAmount={selectedAmount} setSelectedAmount={setSelectedAmount}
+                              customAmount={customAmount} setCustomAmount={setCustomAmount}
+                              showCustomAmountInput={showCustomAmountInput} setShowCustomAmountInput={setShowCustomAmountInput}
                             />
                           )}
-                          {/* Anonymous — desktop only, inside card so it never gets pushed out of viewport */}
                           <div className={`hidden md:block mt-2 pt-2 border-t ${dk ? 'border-zinc-700/50' : 'border-gray-100'}`}>
-                            <CustomCheckbox
-                              checked={isAnonymous}
-                              onChange={setIsAnonymous}
-                              label="Donate Anonymously"
-                            />
+                            <CustomCheckbox checked={isAnonymous} onChange={setIsAnonymous} label="Donate Anonymously" />
                           </div>
                         </Card>
                       </div>
 
-                      {/* ═══════════════════════════════
-                          RIGHT — Details + Tip + CTA
-                      ═══════════════════════════════ */}
-                      <div className="flex flex-col gap-2 md:gap-3 md:overflow-y-auto md:p-6 md:pl-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-
-                        {/* Guest details */}
+                      {/* RIGHT — Details + Tip + CTA */}
+                      <div className="flex flex-col gap-2 md:gap-3 md:overflow-y-auto md:p-6 md:pl-3 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
                         {!userInfo && (
                           <Card dark={dk}>
                             <SectionLabel dark={dk}>Your Details</SectionLabel>
                             <div className="space-y-1 md:space-y-2.5">
                               {[
-                                { Icon: User, type: 'text', placeholder: 'Full Name', value: fullName, onChange: setFullName },
-                                { Icon: Mail, type: 'email', placeholder: 'Email', value: email, onChange: setEmail },
+                                { Icon: User,  type: 'text',  placeholder: 'Full Name', value: fullName, onChange: setFullName },
+                                { Icon: Mail,  type: 'email', placeholder: 'Email',     value: email,    onChange: setEmail    },
                               ].map(({ Icon, type, placeholder, value, onChange }) => (
                                 <div key={placeholder} className="relative">
                                   <Icon className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
@@ -488,28 +477,20 @@ export default function DonatePopUpModal({
                               ))}
                               <div className="relative">
                                 <Phone className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 ${dk ? 'text-zinc-500' : 'text-gray-400'}`} />
-                                <input
-                                  type="tel"
-                                  placeholder="Mobile (10 digits)"
-                                  value={mobileNo}
+                                <input type="tel" placeholder="Mobile (10 digits)" value={mobileNo}
                                   onChange={(e) => setMobileNo(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                  maxLength={10}
-                                  className={inputCls}
-                                />
+                                  maxLength={10} className={inputCls} />
                               </div>
                             </div>
                           </Card>
                         )}
 
-                        {/* Platform Tip */}
                         <Card dark={dk}>
                           <div className="flex items-center justify-between mb-1 md:mb-3">
                             <SectionLabel dark={dk} className="mb-0">Platform Tip</SectionLabel>
                             <div className="group relative">
-                              <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center cursor-help text-[8px] md:text-[9px] font-extrabold border ${dk ? 'border-zinc-400 text-zinc-300 bg-zinc-700' : 'border-gray-400 text-gray-600 bg-gray-100'
-                                }`}>i</div>
-                              <div className={`absolute bottom-full right-0 mb-2 w-48 p-2.5 rounded-xl text-[11px] leading-relaxed z-20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl ${dk ? 'bg-zinc-800 text-zinc-200 border border-zinc-700' : 'bg-gray-900 text-white'
-                                }`}>
+                              <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center cursor-help text-[8px] md:text-[9px] font-extrabold border ${dk ? 'border-zinc-400 text-zinc-300 bg-zinc-700' : 'border-gray-400 text-gray-600 bg-gray-100'}`}>i</div>
+                              <div className={`absolute bottom-full right-0 mb-2 w-48 p-2.5 rounded-xl text-[11px] leading-relaxed z-20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl ${dk ? 'bg-zinc-800 text-zinc-200 border border-zinc-700' : 'bg-gray-900 text-white'}`}>
                                 Helps keep the platform running. 100% goes to operations.
                                 <div className={`absolute top-full right-3 -mt-0.5 w-2 h-2 rotate-45 ${dk ? 'bg-zinc-800' : 'bg-gray-900'}`} />
                               </div>
@@ -517,104 +498,69 @@ export default function DonatePopUpModal({
                           </div>
                           <div className="flex gap-1 md:gap-2">
                             {tipPercentages.map((pct) => (
-                              <button
-                                key={pct}
+                              <button key={pct}
                                 onClick={() => { setTipPercentage(pct); setCustomTip(''); setShowCustomTipInput(false); }}
-                                className={tipBtn(tipPercentage === pct && !customTip)}
-                              >
+                                className={tipBtn(tipPercentage === pct && !customTip)}>
                                 {pct === 0 ? 'None' : `${pct}%`}
                               </button>
                             ))}
-                            <button
-                              onClick={() => {
-                                const next = !showCustomTipInput;
-                                setShowCustomTipInput(next);
-                                if (!next) { setCustomTip(''); setTipPercentage(0); }
-                                else { setTipPercentage(null); setCustomTip(''); }
-                              }}
-                              className={tipBtn(showCustomTipInput || !!customTip)}
-                            >
+                            <button onClick={() => {
+                              const next = !showCustomTipInput;
+                              setShowCustomTipInput(next);
+                              if (!next) { setCustomTip(''); setTipPercentage(0); }
+                              else { setTipPercentage(null); setCustomTip(''); }
+                            }} className={tipBtn(showCustomTipInput || !!customTip)}>
                               {customTip && !showCustomTipInput ? `₹${customTip}` : 'Other'}
                             </button>
                           </div>
                           {showCustomTipInput && (
                             <div className="mt-1 md:mt-2.5 relative">
                               <span className={`absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none ${dk ? 'text-zinc-400' : 'text-gray-400'}`}>₹</span>
-                              <input
-                                type="number"
-                                placeholder="Custom tip amount"
-                                value={customTip}
-                                autoFocus
-                                min={0}
+                              <input type="number" placeholder="Custom tip amount" value={customTip} autoFocus min={0}
                                 onChange={(e) => { setCustomTip(e.target.value); setTipPercentage(null); }}
-                                className={`w-full h-8 md:h-10 pl-6 md:pl-7 pr-3 text-xs md:text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${dk
-                                  ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
-                                  : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
-                                  }`}
+                                className={`w-full h-8 md:h-10 pl-6 md:pl-7 pr-3 text-xs md:text-sm rounded-lg font-semibold focus:outline-none border transition-colors ${
+                                  dk ? 'bg-zinc-800 border-zinc-600 focus:border-emerald-500 text-white placeholder-zinc-500'
+                                     : 'bg-white border-gray-200 focus:border-emerald-400 text-gray-900 placeholder-gray-400'
+                                }`}
                               />
                             </div>
                           )}
                         </Card>
 
-                        {/* ── Mobile only: Anonymous + Total in one compact row ── */}
+                        {/* Mobile anon + total row */}
                         <div className="md:hidden flex items-center justify-between px-0.5">
-                          <CustomCheckbox
-                            checked={isAnonymous}
-                            onChange={setIsAnonymous}
-                            label="Donate Anonymously"
-                          />
+                          <CustomCheckbox checked={isAnonymous} onChange={setIsAnonymous} label="Donate Anonymously" />
                           {baseAmount >= 50 && (
-                            <div className={`flex items-baseline gap-1 px-2.5 py-1 rounded-lg ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'
-                              }`}>
+                            <div className={`flex items-baseline gap-1 px-2.5 py-1 rounded-lg ${dk ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-emerald-50 border border-emerald-100'}`}>
                               <span className={`text-[10px] font-medium ${dk ? 'text-zinc-400' : 'text-gray-500'}`}>Total</span>
-                              <span className={`text-sm font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                                ₹{totalAmount.toLocaleString()}
-                              </span>
-                              {tipAmount > 0 && (
-                                <span className={`text-[9px] ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>+₹{tipAmount}</span>
-                              )}
+                              <span className={`text-sm font-extrabold tracking-tight ${dk ? 'text-emerald-400' : 'text-emerald-600'}`}>₹{totalAmount.toLocaleString()}</span>
+                              {tipAmount > 0 && <span className={`text-[9px] ${dk ? 'text-zinc-500' : 'text-gray-400'}`}>+₹{tipAmount}</span>}
                             </div>
                           )}
                         </div>
 
                         {/* CTA */}
                         <div className="space-y-1 md:space-y-2.5">
-                          <button
-                            onClick={handleDonate}
-                            disabled={isDonating || baseAmount < 50}
-                            className={`
-                              w-full h-9 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
-                              ${isDonating
+                          <button onClick={handleDonate} disabled={isDonating || baseAmount < 50}
+                            className={`w-full h-9 md:h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                              isDonating
                                 ? 'bg-emerald-600 text-white cursor-wait'
                                 : baseAmount >= 50
                                   ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.98] text-white shadow-lg shadow-emerald-600/20'
-                                  : dk
-                                    ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700'
-                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
-                            `}
-                          >
+                                  : dk ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700'
+                                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            }`}>
                             {isDonating ? (
-                              <>
-                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z" />
-                                </svg>
-                                Processing...
-                              </>
+                              <><svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v0C5.373 4 0 8.373 0 12h4z" /></svg>Processing...</>
                             ) : (
-                              <>
-                                <Sparkles className="w-4 h-4" />
-                                {baseAmount < 50 ? 'Minimum ₹50 to donate' : `Donate ₹${totalAmount.toLocaleString()}`}
-                              </>
+                              <><Sparkles className="w-4 h-4" />{baseAmount < 50 ? 'Minimum ₹50 to donate' : `Donate ₹${totalAmount.toLocaleString()}`}</>
                             )}
                           </button>
-
                           <div className={`flex items-center justify-center gap-1.5 ${dk ? 'text-zinc-600' : 'text-gray-400'}`}>
                             <ShieldCheck className="w-3 h-3" />
                             <span className="text-[10px] font-medium">Secure payment · Receipt via email</span>
                           </div>
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -631,6 +577,19 @@ export default function DonatePopUpModal({
         onCancel={() => setShowExitConfirmation(false)}
         darkMode={dk}
         totalAmount={totalAmount}
+      />
+
+      {/* Large donation modal — rendered outside the donate modal so it's independent */}
+      <LargeDonationModal
+        isOpen={showLargeDonation}
+        onClose={() => { setShowLargeDonation(false); onClose(); }}
+        onPayOnline={() => setShowLargeDonation(false)}
+        darkMode={darkMode}
+        baseAmount={baseAmount}
+        campaignId={campaignId}
+        donorName={userInfo?.fullName  || fullName  || ''}
+        donorPhone={userInfo?.mobileNo || mobileNo  || ''}
+        donorEmail={userInfo?.email    || email     || ''}
       />
     </>
   );

@@ -681,7 +681,7 @@ export default function OfflineDonationsPage({ darkModeFromParent }) {
                                 <option value="ZAKAAT">ZAKAAT</option>
                                 <option value="LILLAH">LILLAH</option>
                                 <option value="IMDAD">IMDAD</option>
-                                <option value="SADQAH">SADQAH</option>
+                                <option value="SADAQAH">SADAQAH</option>
                                 <option value="RIBA">RIBA</option>
                               </select>
                             </div>
