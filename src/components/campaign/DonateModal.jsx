@@ -182,47 +182,41 @@ export default function DonatePopUpModal({
   const tipAmount = customTip ? parseInt(customTip) : tipPercentage ? Math.round(baseAmount * (tipPercentage / 100)) : 0;
   const totalAmount = baseAmount + (tipAmount || 0);
 
-  /* ── online donate handler ───────────────────────────────── */
+  /* ── identify guest user ─────────────────────────────────── */
   const handleIdentifyUser = async () => {
     const result = await softSignup({ fullName, email, mobileNo }).unwrap();
     if (result?.data?.userId) return result.data.userId;
     throw new Error('Unable to identify user');
   };
 
-  const handleDonate = async () => {
-    if (isDonating) return;
-    const baseAmt = selectedAmount || parseInt(customAmount);
-    if (!baseAmt) return;
-
-    if (baseAmt < 50) {
-      showToast({ title: 'Minimum Amount', message: 'The minimum donation amount is ₹50.', type: 'error' });
-      return;
+  /* ── validate guest fields ───────────────────────────────── */
+  const validateGuestFields = () => {
+    if (!fullName.trim()) {
+      showToast({ title: 'Name Required', message: 'Please enter your full name.', type: 'error' });
+      return false;
     }
-
-    /* ── large donation: hand off to LargeDonationModal ── */
-    if (baseAmt >= 3000) {
-      setShowLargeDonation(true);
-      return;
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast({ title: 'Valid Email Required', message: 'Please enter a valid email address.', type: 'error' });
+      return false;
     }
+    if (!mobileNo.trim() || !/^\d{10}$/.test(mobileNo)) {
+      showToast({ title: 'Valid Mobile Required', message: 'Please enter a valid 10-digit mobile number.', type: 'error' });
+      return false;
+    }
+    return true;
+  };
+
+  /* ── core payment initiation (reusable) ──────────────────── */
+  const initiateOnlinePayment = async (overrideAmount) => {
+    const baseAmt = overrideAmount ?? (selectedAmount || parseInt(customAmount));
+    if (!baseAmt || baseAmt < 50) return;
 
     if (donationType === 'ZAKAAT' && !zakatVerified) {
       showToast({ title: 'Not Verified', message: 'This campaign is not verified for Zakaat.', type: 'error' });
       return;
     }
-    if (!userInfo) {
-      if (!fullName.trim()) {
-        showToast({ title: 'Name Required', message: 'Please enter your full name.', type: 'error' });
-        return;
-      }
-      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showToast({ title: 'Valid Email Required', message: 'Please enter a valid email address.', type: 'error' });
-        return;
-      }
-      if (!mobileNo.trim() || !/^\d{10}$/.test(mobileNo)) {
-        showToast({ title: 'Valid Mobile Required', message: 'Please enter a valid 10-digit mobile number.', type: 'error' });
-        return;
-      }
-    }
+
+    if (!userInfo && !validateGuestFields()) return;
 
     setIsDonating(true);
     try {
@@ -255,6 +249,8 @@ export default function DonatePopUpModal({
       if (!res.ok || !data?.cashfree?.paymentSessionId) {
         throw new Error(data?.message || 'Unable to initiate payment');
       }
+      // Reset the checkout gate so the new session triggers properly
+      checkoutStartedRef.current = false;
       setCashfreeData(data.cashfree);
     } catch (err) {
       console.error('Donation initiate failed', err);
@@ -262,6 +258,35 @@ export default function DonatePopUpModal({
     } finally {
       setIsDonating(false);
     }
+  };
+
+  /* ── main donate handler ─────────────────────────────────── */
+  const handleDonate = async () => {
+    if (isDonating) return;
+    const baseAmt = selectedAmount || parseInt(customAmount);
+    if (!baseAmt) return;
+
+    if (baseAmt < 50) {
+      showToast({ title: 'Minimum Amount', message: 'The minimum donation amount is ₹50.', type: 'error' });
+      return;
+    }
+
+    /* ── large donation: show offline-first modal ── */
+    if (baseAmt >= 3000) {
+      setShowLargeDonation(true);
+      return;
+    }
+
+    await initiateOnlinePayment(baseAmt);
+  };
+
+  /* ── "pay online" from the large donation modal ──────────── */
+  // Called when user picks "Continue paying online" inside LargeDonationModal.
+  // Closes the large-donation modal, then triggers Cashfree checkout normally.
+  const handlePayOnlineFromLargeModal = async () => {
+    setShowLargeDonation(false);
+    const baseAmt = selectedAmount || parseInt(customAmount);
+    await initiateOnlinePayment(baseAmt);
   };
 
   /* ── close attempt ───────────────────────────────────────── */
@@ -595,28 +620,16 @@ export default function DonatePopUpModal({
                 }`}
             >
               <div className="flex justify-center mb-4">
-                <div
-                  className={`w-10 h-1 rounded-full ${dk ? 'bg-zinc-700' : 'bg-gray-300'
-                    }`}
-                />
+                <div className={`w-10 h-1 rounded-full ${dk ? 'bg-zinc-700' : 'bg-gray-300'}`} />
               </div>
-
-              <h3
-                className={`text-base font-bold mb-2 ${dk ? 'text-white' : 'text-gray-900'
-                  }`}
-              >
+              <h3 className={`text-base font-bold mb-2 ${dk ? 'text-white' : 'text-gray-900'}`}>
                 Platform Tip
               </h3>
-
-              <p
-                className={`text-sm leading-relaxed ${dk ? 'text-zinc-300' : 'text-gray-600'
-                  }`}
-              >
+              <p className={`text-sm leading-relaxed ${dk ? 'text-zinc-300' : 'text-gray-600'}`}>
                 Your optional tip helps keep the platform running and supports
                 operational costs. Donations always go to the selected campaign,
                 while the tip helps us maintain and improve the donation experience.
               </p>
-
               <button
                 type="button"
                 onClick={() => setShowTipInfoModal(false)}
@@ -629,11 +642,14 @@ export default function DonatePopUpModal({
         )}
       </AnimatePresence>
 
-      {/* Large donation modal — rendered outside the donate modal so it's independent */}
+      {/*
+        Large donation modal — rendered outside the donate modal so it's independent.
+        onPayOnline now triggers real Cashfree checkout instead of just closing the modal.
+      */}
       <LargeDonationModal
         isOpen={showLargeDonation}
         onClose={() => { setShowLargeDonation(false); onClose(); }}
-        onPayOnline={() => setShowLargeDonation(false)}
+        onPayOnline={handlePayOnlineFromLargeModal}
         darkMode={darkMode}
         baseAmount={baseAmount}
         campaignId={campaignId}
