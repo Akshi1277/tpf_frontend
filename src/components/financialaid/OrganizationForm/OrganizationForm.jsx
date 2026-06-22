@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useRegisterOrganizationMutation } from "@/utils/slices/organizationApiSlice"
 import { ChevronLeft } from "lucide-react"
 import { useAppToast } from "@/app/AppToastContext"
+import { useDraft } from "@/utils/hooks/useDraft"
 
 // Import step components
 import OrganizationDetailsStep from "./steps/OrganizationDetailsStep"
@@ -22,6 +23,17 @@ export default function OrganizationRegistrationPage({ darkModeFromParent, isCla
   const [registerOrganization, { isLoading }] = useRegisterOrganizationMutation()
   const [darkMode, setDarkMode] = useState(false)
   const { showToast } = useAppToast()
+
+  const { hasExistingDraft, existingDraftData, saveDraft, clearDraft } = useDraft("draft_financial_aid_organization")
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false)
+  const [draftSavedStatus, setDraftSavedStatus] = useState("")
+
+  // Check for draft on load (only if not clarification page)
+  useEffect(() => {
+    if (hasExistingDraft && !isClarification) {
+      setShowDraftPrompt(true)
+    }
+  }, [hasExistingDraft, isClarification])
 
   useEffect(() => {
     if (darkModeFromParent !== undefined) {
@@ -103,6 +115,35 @@ export default function OrganizationRegistrationPage({ darkModeFromParent, isCla
 
     termsAccepted: false,
   })
+
+  // Debounced auto-save
+  useEffect(() => {
+    if (showDraftPrompt || isClarification) return
+
+    const hasData = Object.entries(formData).some(([key, val]) => {
+      if (['certification80G', 'panCardImage', 'businessDocument', 'businessPanCard', 'organizationLogo', 'organizationCover', 'otherDocuments', 'termsAccepted', 'causesSupported'].includes(key)) return false;
+      return val !== '' && val !== null && val !== undefined;
+    });
+    if (!hasData) return
+
+    setDraftSavedStatus("Saving...")
+    const delayDebounce = setTimeout(() => {
+      const cleanData = { ...formData }
+      delete cleanData.certification80G
+      delete cleanData.panCardImage
+      delete cleanData.businessDocument
+      delete cleanData.businessPanCard
+      delete cleanData.organizationLogo
+      delete cleanData.organizationCover
+      delete cleanData.otherDocuments
+
+      saveDraft({ formData: cleanData, currentStep })
+      setDraftSavedStatus("Draft Saved")
+      setTimeout(() => setDraftSavedStatus(""), 2000)
+    }, 2000)
+
+    return () => clearTimeout(delayDebounce)
+  }, [formData, currentStep, saveDraft, showDraftPrompt, isClarification])
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target
@@ -262,6 +303,7 @@ export default function OrganizationRegistrationPage({ darkModeFromParent, isCla
 
       const response = await registerOrganization(formDataToSend).unwrap()
 
+      clearDraft()
       setShowSuccessMessage(true)
       showToast({
         type: "success",
@@ -297,7 +339,56 @@ export default function OrganizationRegistrationPage({ darkModeFromParent, isCla
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900" : "bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50"} py-8 px-4`}>
+    <>
+      {showDraftPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`w-full max-w-md p-6 rounded-2xl shadow-2xl border transition-all ${
+              darkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-zinc-200 text-zinc-900"
+            }`}
+          >
+            <h3 className="text-xl font-bold mb-2">Resume Previous Session?</h3>
+            <p className={`text-sm mb-6 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+              We found an unsaved draft from your previous session. Would you like to restore your progress and continue?
+            </p>
+            <div className="flex gap-4 justify-end">
+              <button
+                onClick={() => {
+                  clearDraft()
+                  setShowDraftPrompt(false)
+                }}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg border transition-all ${
+                  darkMode
+                    ? "border-zinc-600 hover:bg-zinc-700 text-zinc-300"
+                    : "border-zinc-300 hover:bg-zinc-100 text-zinc-700"
+                }`}
+              >
+                Start Over
+              </button>
+              <button
+                onClick={() => {
+                  if (existingDraftData) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      ...existingDraftData.formData,
+                    }))
+                    if (existingDraftData.currentStep) {
+                      setCurrentStep(existingDraftData.currentStep)
+                    }
+                  }
+                  setShowDraftPrompt(false)
+                }}
+                className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md"
+              >
+                Resume Progress
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+      <div className={`min-h-screen ${darkMode ? "bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900" : "bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50"} py-8 px-4`}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -318,7 +409,14 @@ export default function OrganizationRegistrationPage({ darkModeFromParent, isCla
         />
 
         {/* Form Steps */}
-        <div className={`rounded-2xl shadow-2xl p-6 md:p-8 mt-8 ${darkMode ? "bg-zinc-800/50 backdrop-blur" : "bg-white"}`}>
+        <div className={`rounded-2xl shadow-2xl p-6 md:p-8 mt-8 relative ${darkMode ? "bg-zinc-800/50 backdrop-blur" : "bg-white"}`}>
+          {draftSavedStatus && (
+            <span className={`absolute top-4 right-4 text-xs font-semibold px-2.5 py-1 rounded-full animate-pulse transition-all ${
+              darkMode ? "bg-zinc-700 text-zinc-300" : "bg-zinc-100 text-zinc-600"
+            }`}>
+              {draftSavedStatus}
+            </span>
+          )}
           <AnimatePresence mode="wait">
             {currentStep === 1 && (
               <OrganizationDetailsStep

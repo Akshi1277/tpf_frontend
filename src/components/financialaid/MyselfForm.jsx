@@ -7,6 +7,7 @@ import { useSubmitFinancialAidMutation } from "@/utils/slices/financialAidApiSli
 import { User, Calendar, MapPin, Phone, Mail, CreditCard, Check, ChevronLeft } from "lucide-react"
 import LoginModal from "../login/LoginModal/MainModal"
 import { useSelector } from "react-redux"
+import { useDraft } from "@/utils/hooks/useDraft"
 
 import Link from "next/link"
 
@@ -27,6 +28,17 @@ export default function MyselfForm({ darkModeFromParent }) {
       setDarkMode(darkModeFromParent)
     }
   }, [darkModeFromParent])
+  const { hasExistingDraft, existingDraftData, saveDraft, clearDraft, setHasExistingDraft } = useDraft("draft_financial_aid_myself")
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false)
+  const [draftSavedStatus, setDraftSavedStatus] = useState("")
+
+  // Check for draft on load
+  useEffect(() => {
+    if (hasExistingDraft) {
+      setShowDraftPrompt(true)
+    }
+  }, [hasExistingDraft])
+
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     // Personal Information
@@ -62,6 +74,32 @@ export default function MyselfForm({ darkModeFromParent }) {
     supportingPictures: []
 
   })
+
+  // Debounced auto-save
+  useEffect(() => {
+    if (showDraftPrompt) return
+
+    const hasData = Object.entries(formData).some(([key, val]) => {
+      if (['govIdDocument', 'bankStatement', 'supportingDocuments', 'supportingPictures', 'declarationAccepted', 'termsAccepted', 'sameAddress', 'noIncome'].includes(key)) return false;
+      return val !== '' && val !== null && val !== undefined;
+    });
+    if (!hasData) return
+
+    setDraftSavedStatus("Saving...")
+    const delayDebounce = setTimeout(() => {
+      const cleanData = { ...formData }
+      delete cleanData.govIdDocument
+      delete cleanData.bankStatement
+      delete cleanData.supportingDocuments
+      delete cleanData.supportingPictures
+
+      saveDraft({ formData: cleanData, currentStep })
+      setDraftSavedStatus("Draft Saved")
+      setTimeout(() => setDraftSavedStatus(""), 2000)
+    }, 2000)
+
+    return () => clearTimeout(delayDebounce)
+  }, [formData, currentStep, saveDraft, showDraftPrompt])
 
   const handleInputChange = (e) => {
     const { name, type, value, checked } = e.target;
@@ -228,6 +266,7 @@ export default function MyselfForm({ darkModeFromParent }) {
       const result = await submitFinancialAid(formDataToSend).unwrap()
 
       if (result.success) {
+        clearDraft()
         setShowSuccessMessage(true)
         setTimeout(() => router.push("/"), 3000)
       }
@@ -252,6 +291,55 @@ export default function MyselfForm({ darkModeFromParent }) {
 
   return (
     <>
+      {showDraftPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`w-full max-w-md p-6 rounded-2xl shadow-2xl border transition-all ${
+              darkMode ? "bg-zinc-800 border-zinc-700 text-white" : "bg-white border-zinc-200 text-zinc-900"
+            }`}
+          >
+            <h3 className="text-xl font-bold mb-2">Resume Previous Session?</h3>
+            <p className={`text-sm mb-6 ${darkMode ? "text-zinc-400" : "text-zinc-600"}`}>
+              We found an unsaved draft from your previous session. Would you like to restore your progress and continue?
+            </p>
+            <div className="flex gap-4 justify-end">
+              <button
+                onClick={() => {
+                  clearDraft()
+                  setShowDraftPrompt(false)
+                }}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg border transition-all ${
+                  darkMode
+                    ? "border-zinc-600 hover:bg-zinc-700 text-zinc-300"
+                    : "border-zinc-300 hover:bg-zinc-100 text-zinc-700"
+                }`}
+              >
+                Start Over
+              </button>
+              <button
+                onClick={() => {
+                  if (existingDraftData) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      ...existingDraftData.formData,
+                    }))
+                    if (existingDraftData.currentStep) {
+                      setCurrentStep(existingDraftData.currentStep)
+                    }
+                  }
+                  setShowDraftPrompt(false)
+                }}
+                className="px-5 py-2 text-sm font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md"
+              >
+                Resume Progress
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {showSuccessMessage && (
         <motion.div
           initial={{ opacity: 0, y: -50 }}
@@ -372,8 +460,15 @@ export default function MyselfForm({ darkModeFromParent }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className={`rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg ${darkMode ? "bg-zinc-800" : "bg-white"}`}
+            className={`rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg relative ${darkMode ? "bg-zinc-800" : "bg-white"}`}
           >
+            {draftSavedStatus && (
+              <span className={`absolute top-4 right-4 text-xs font-semibold px-2.5 py-1 rounded-full animate-pulse transition-all ${
+                darkMode ? "bg-zinc-700 text-zinc-300" : "bg-zinc-100 text-zinc-600"
+              }`}>
+                {draftSavedStatus}
+              </span>
+            )}
             {/* Step 1: Personal Information */}
             {currentStep === 1 && (
               <div className="space-y-4 sm:space-y-6">
