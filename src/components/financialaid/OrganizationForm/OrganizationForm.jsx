@@ -482,5 +482,6 @@ export default function OrganizationRegistrationPage({ darkModeFromParent, isCla
         </div>
       </div>
     </div>
+    </>
   )
 }
