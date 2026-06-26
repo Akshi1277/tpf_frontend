@@ -35,6 +35,7 @@ import {
   useDeleteCommentMutation,
 } from '@/utils/slices/commentApiSlice';
 import { getMediaUrl } from '@/utils/media';
+import DOMPurify from 'dompurify';
 
 export default function CampaignTabs({ darkMode, campaign }) {
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -399,9 +400,12 @@ export default function CampaignTabs({ darkMode, campaign }) {
                 {/* About Text with Read More / Read Less */}
                 <div>
                   <div className="relative">
-                    <p className={`whitespace-pre-line leading-relaxed text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      {displayedAbout}
-                    </p>
+                    <div
+                      className={`whitespace-pre-line leading-relaxed text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
+                      dangerouslySetInnerHTML={{
+                        __html: typeof window !== 'undefined' ? DOMPurify.sanitize(displayedAbout) : displayedAbout
+                      }}
+                    />
                     {isAboutLong && !aboutExpanded && (
                       <div className={`absolute bottom-0 left-0 right-0 h-10 pointer-events-none ${darkMode ? 'bg-gradient-to-t from-zinc-800 to-transparent' : 'bg-gradient-to-t from-white to-transparent'}`} />
                     )}
