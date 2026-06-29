@@ -236,7 +236,10 @@ export default function PulseSection({ darkMode }) {
                 recentDonations.map((donation, index) => (
                   <div
                     key={index}
-                    className={`shrink-0 w-60 p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
+                    onClick={() => donation.campaignSlug && router.push(`/campaign/${donation.campaignSlug}`)}
+                    className={`shrink-0 w-60 p-5 rounded-xl text-center overflow-hidden transition-all duration-300 ${
+                      donation.campaignSlug ? 'cursor-pointer' : ''
+                    } ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
                       } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
         shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
                   >
@@ -248,7 +251,7 @@ export default function PulseSection({ darkMode }) {
                       <div className={`text-xs ${COLORS.neutralBody} font-medium`}>
                         {donation.name}
                       </div>
-                      <div className={`text-[10px] ${COLORS.neutralBody} opacity-70 mt-0.5 line-clamp-1`}>
+                      <div className={`text-[10px] ${COLORS.neutralBody} opacity-70 mt-0.5 line-clamp-1 underline`}>
                         {donation.campaignName}
                       </div>
                       <div className={`text-[10px] ${COLORS.neutralBody} opacity-50 mt-1`}>
@@ -288,7 +291,10 @@ export default function PulseSection({ darkMode }) {
                   recentDonations.map((donation, index) => (
                     <div key={index} className="shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-[16.66%] px-2">
                       <div
-                        className={`relative group p-5 w-full h-28 rounded-xl text-center overflow-hidden transition-all duration-300 ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
+                        onClick={() => donation.campaignSlug && router.push(`/campaign/${donation.campaignSlug}`)}
+                        className={`relative group p-5 w-full h-28 rounded-xl text-center overflow-hidden transition-all duration-300 ${
+                          donation.campaignSlug ? 'cursor-pointer' : ''
+                        } ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-50 hover:bg-white'
                           } border ${darkMode ? 'border-zinc-700' : 'border-zinc-200'} hover:border-zinc-400
             shadow-[0_4px_10px_rgba(156,163,175,0.4)] hover:shadow-[0_6px_14px_rgba(107,114,128,0.6)]`}
                       >
@@ -300,7 +306,7 @@ export default function PulseSection({ darkMode }) {
                           <div className={`text-xs ${COLORS.neutralBody} font-medium`}>
                             {donation.name}
                           </div>
-                          <div className={`text-[10px] ${COLORS.neutralBody} opacity-70 mt-0.5 line-clamp-1 px-1`}>
+                          <div className={`text-[10px] ${COLORS.neutralBody} opacity-70 mt-0.5 line-clamp-1 px-1 underline`}>
                             {donation.campaignName}
                           </div>
                           <div className={`text-[10px] ${COLORS.neutralBody} opacity-50 mt-1`}>

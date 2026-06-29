@@ -17,16 +17,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const renderFormattedText = (text, darkMode = false) => {
     if (!text) return "";
-    const escaped = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+    let html = text;
     const color = darkMode ? "#f1f5f9" : "#0f172a"; // slate-100 on dark, slate-900 on light
-    const bolded = escaped.replace(
+    html = html.replace(
         /\*\*(.*?)\*\*/g,
-        `<strong style="font-weight:700;color:${color}">\$1</strong>`
+        `<strong style="font-weight:700;color:${color}">$1</strong>`
     );
-    return <span dangerouslySetInnerHTML={{ __html: bolded }} />;
+    return <span dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
 /* ── viewport reveal hook ── */
@@ -371,20 +368,12 @@ export default function ImpactStoryDetailPage() {
                                         </div>
                                     </Reveal>
  
-                                    {paras.length > 0 ? (
-                                        <div>
-                                            {mainParas.map((p, i) => (
-                                                <Reveal key={i} delay={i * 50}>
-                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{renderFormattedText(p, dk)}</p>
-                                                </Reveal>
-                                            ))}
-                                            {pullCandidate && <PullQuote text={pullCandidate} T={T} />}
-                                            {secondHalf.map((p, i) => (
-                                                <Reveal key={`s${i}`} delay={i * 50}>
-                                                    <p className={`${T.body} text-sm sm:text-base leading-[1.95] mb-5`}>{renderFormattedText(p, dk)}</p>
-                                                </Reveal>
-                                            ))}
-                                        </div>
+                                    {story.story ? (
+                                        <Reveal>
+                                            <div className={`${T.body} text-sm sm:text-base leading-[1.95] whitespace-pre-line`}>
+                                                {renderFormattedText(story.story, dk)}
+                                            </div>
+                                        </Reveal>
                                     ) : (
                                         <Reveal>
                                             <p className={`${T.muted} text-sm leading-relaxed`}>

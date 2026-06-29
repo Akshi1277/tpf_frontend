@@ -5,12 +5,9 @@ import { toSlug } from '@/utils/slug';
 
 const renderFormattedText = (text) => {
   if (!text) return "";
-  const escaped = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  const bolded = escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  return <span dangerouslySetInnerHTML={{ __html: bolded }} />;
+  let html = text;
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  return <span dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
 export default function StoryCard({ story, darkMode }) {
